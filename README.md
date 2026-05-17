@@ -5,7 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
 [![Version](https://img.shields.io/badge/version-2.0.0-green)](./CHANGELOG.md)
-[![Marketplace](https://img.shields.io/badge/Marketplace-coming%20soon-orange)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
+[![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
+[![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
 [![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red)](./LICENSE)
 [![Website](https://img.shields.io/badge/Website-specsolid.com-blueviolet)](https://www.specsolid.com)
 
@@ -266,15 +267,21 @@ User places nodes on SVG canvas
 
 ### Step 1 — Install
 
-Download the `.vsix` file from [GitHub Releases](https://github.com/sergioide007/alpaquitay-ai/releases), then run:
+**Option A — VS Code Marketplace (recommended):**
+
+Search **"Alpaquitay AI"** in the Extensions panel, or run:
 
 ```bash
-code --install-extension alpaquitay-ai-2.0.0.vsix
+code --install-extension alpaquitay-ai.alpaquitay-ai
 ```
 
-> **Marketplace:** Publishing to the VS Code Marketplace is coming soon. Once live, installation will be:
-> `code --install-extension alpaquitay-ai.alpaquitay-ai`
-> or by searching **"Alpaquitay AI"** in the Extensions panel.
+**Option B — Open VSX (VS Codium / other editors):**
+
+Install from [open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai), or run:
+
+```bash
+ovsx install alpaquitay-ai.alpaquitay-ai
+```
 
 ### Step 2 — Configure a provider
 
