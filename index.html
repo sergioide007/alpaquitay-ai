@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alpaquitay AI — Spec-Driven Development for VS Code</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2128;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --accent2: #7ee787;
+      --accent3: #bc8cff;
+      --accent4: #ffa657;
+      --accent5: #f0883e;
+      --text: #c9d1d9;
+      --muted: #8b949e;
+      --heading: #f0f6fc;
+      --tag-bg: #1f3044;
+      --tag-border: #388bfd55;
+      --radius: 8px;
+      --max: 960px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,17,23,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .nav-logo { font-weight: 700; font-size: 1.05rem; color: var(--heading); text-decoration: none; letter-spacing: -0.3px; }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.88rem; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text); }
+    .badge-oss { background: #2d4a1e; color: var(--accent2); border: 1px solid #388529; border-radius: 20px; font-size: 0.75rem; font-weight: 600; padding: 2px 10px; letter-spacing: 0.3px; }
+
+    /* ── Hero ── */
+    .hero { max-width: var(--max); margin: 0 auto; padding: 96px 24px 72px; text-align: center; position: relative; }
+    .hero::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 320px;
+      background: radial-gradient(ellipse at center, rgba(88,166,255,0.09) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 6px; background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--accent); border-radius: 20px; font-size: 0.8rem; font-weight: 600; padding: 4px 14px; margin-bottom: 24px; letter-spacing: 0.4px; }
+    h1 { font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800; color: var(--heading); line-height: 1.15; letter-spacing: -1.5px; margin-bottom: 20px; }
+    h1 .hi { color: var(--accent); }
+    .hero-sub { font-size: 1.1rem; color: var(--muted); max-width: 600px; margin: 0 auto 36px; line-height: 1.7; }
+    .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: var(--radius); font-size: 0.95rem; font-weight: 600; text-decoration: none; transition: opacity 0.15s, transform 0.1s; cursor: pointer; border: none; }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn-primary { background: var(--accent); color: #0d1117; }
+    .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+
+    /* ── Stats bar ── */
+    .stats-bar { max-width: var(--max); margin: 0 auto 64px; padding: 0 24px; display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 1.8rem; font-weight: 700; color: var(--heading); letter-spacing: -0.5px; }
+    .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Workflow ── */
+    .workflow { max-width: var(--max); margin: 0 auto; padding: 0 24px 72px; }
+    .flow-steps { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 16px; }
+    .flow-step { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 14px; text-align: center; min-width: 80px; }
+    .flow-step .icon { font-size: 1.4rem; line-height: 1; }
+    .flow-step .label { font-size: 0.76rem; color: var(--muted); font-weight: 500; }
+    .flow-arrow { color: var(--border); font-size: 1.2rem; padding: 0 4px; user-select: none; }
+
+    /* ── Sections ── */
+    section { max-width: var(--max); margin: 0 auto; padding: 0 24px 72px; }
+    h2 { font-size: 1.7rem; font-weight: 700; color: var(--heading); letter-spacing: -0.5px; margin-bottom: 8px; }
+    h3 { font-size: 1.1rem; font-weight: 600; color: var(--heading); margin-bottom: 10px; }
+    .section-sub { color: var(--muted); margin-bottom: 32px; font-size: 1rem; }
+
+    /* ── Feature grid ── */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: border-color 0.15s; }
+    .card:hover { border-color: var(--accent); }
+    .card-icon { font-size: 1.4rem; margin-bottom: 10px; }
+    .card h3 { font-size: 1rem; font-weight: 600; color: var(--heading); margin-bottom: 6px; }
+    .card p { font-size: 0.875rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── SDD ── */
+    .sdd-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px; }
+    .sdd-box h3 { margin-bottom: 16px; }
+    .spec-preview { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 0.82rem; color: var(--text); line-height: 1.7; overflow-x: auto; }
+    .spec-preview .epic { color: var(--accent); font-weight: 700; }
+    .spec-preview .done { color: var(--accent2); }
+    .spec-preview .pending { color: var(--muted); }
+    .spec-preview .id { color: #f0883e; font-size: 0.75rem; margin-left: 6px; }
+    .sdd-steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 24px; }
+    .sdd-step { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; }
+    .sdd-step .num { font-size: 0.7rem; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .sdd-step p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── Architecture section ── */
+    .arch-subsection { margin-bottom: 48px; }
+    .arch-subsection > p { font-size: 0.9rem; color: var(--muted); margin-bottom: 18px; }
+
+    /* Extension host diagram */
+    .ext-diagram { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .ext-layer-label { font-size: 0.7rem; color: var(--muted); text-align: center; letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 6px; }
+    .ext-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 6px; }
+    .ext-box { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 0.8rem; color: var(--text); text-align: center; }
+    .ext-box small { display: block; font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+    .ext-box.webview { border-color: #58a6ff66; color: var(--accent); }
+    .ext-box.core    { border-color: #ffffff22; }
+    .ext-box.ai      { border-color: #bc8cff66; color: var(--accent3); }
+    .ext-box.mcp     { border-color: #7ee78766; color: var(--accent2); }
+    .ext-box.cfg     { border-color: #ffa65766; color: var(--accent4); }
+    .ext-sep { border: none; border-top: 1px dashed var(--border); margin: 10px 0; }
+    .ext-arrow { text-align: center; color: var(--muted); font-size: 0.8rem; margin: 6px 0; }
+
+    /* Clean Architecture layer diagram */
+    .ca-layers { display: flex; flex-direction: column; gap: 0; }
+    .ca-layer { border: 2px solid; border-radius: 8px; padding: 14px 18px; }
+    .ca-layer.infra  { background: rgba(255,166,87,0.05);  border-color: rgba(255,166,87,0.35); }
+    .ca-layer.app    { background: rgba(88,166,255,0.05);  border-color: rgba(88,166,255,0.35); }
+    .ca-layer.domain { background: rgba(188,140,255,0.05); border-color: rgba(188,140,255,0.35); }
+    .ca-layer.shared { background: rgba(139,148,158,0.05); border-color: rgba(139,148,158,0.25); }
+    .ca-layer-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .ca-badge { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
+    .ca-layer.infra  .ca-badge { background: rgba(255,166,87,0.15);  color: var(--accent4); }
+    .ca-layer.app    .ca-badge { background: rgba(88,166,255,0.15);  color: var(--accent); }
+    .ca-layer.domain .ca-badge { background: rgba(188,140,255,0.15); color: var(--accent3); }
+    .ca-layer.shared .ca-badge { background: rgba(139,148,158,0.1);  color: var(--muted); }
+    .ca-layer-name { font-weight: 600; font-size: 0.95rem; color: var(--heading); }
+    .ca-layer-desc { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; }
+    .ca-pkgs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ca-pkg { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 3px 10px; font-size: 0.77rem; font-family: "SFMono-Regular", Consolas, monospace; color: var(--text); }
+    .ca-arrow { text-align: center; padding: 8px 0; color: var(--muted); font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .ca-arrow::before, .ca-arrow::after { content: ''; flex: 1; height: 1px; background: var(--border); max-width: 180px; }
+
+    /* Directory trees */
+    .ca-split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+    .ca-split-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+    .ca-split-panel h4 { font-size: 0.88rem; font-weight: 600; color: var(--heading); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    pre.tree { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 0.78rem; line-height: 1.75; overflow-x: auto; white-space: pre; }
+    .t-root   { color: var(--heading); font-weight: 600; }
+    .t-infra  { color: var(--accent4); }
+    .t-app    { color: var(--accent); }
+    .t-domain { color: var(--accent3); }
+    .t-pres   { color: var(--accent2); }
+    .t-shared { color: var(--muted); }
+    .t-file   { color: var(--text); }
+    .t-dim    { color: #444c56; }
+
+    /* SDD Pipeline */
+    .pipeline { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; }
+    .pl-step { display: flex; align-items: flex-start; gap: 16px; padding: 14px 0; border-bottom: 1px solid #21262d; }
+    .pl-step:last-child { border-bottom: none; }
+    .pl-num { flex-shrink: 0; width: 28px; height: 28px; background: var(--tag-bg); border: 1px solid var(--tag-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: var(--accent); }
+    .pl-body strong { font-size: 0.9rem; color: var(--heading); display: block; margin-bottom: 3px; }
+    .pl-body p { font-size: 0.82rem; color: var(--muted); }
+
+    /* Providers */
+    .providers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+    .provider-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+    .provider-card .pname { font-weight: 600; color: var(--heading); margin-bottom: 6px; font-size: 0.95rem; }
+    .provider-card .ptype { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+    .local { background: #1a3525; color: var(--accent2); }
+    .cloud { background: #1a2a3f; color: var(--accent); }
+    .provider-card > p { font-size: 0.82rem; color: var(--muted); }
+    .model-list { display: flex; flex-direction: column; gap: 5px; }
+    .model-item { font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; }
+    .model-name { color: var(--text); font-family: "SFMono-Regular", Consolas, monospace; }
+    .model-ctx  { color: var(--accent2); font-size: 0.72rem; }
+
+    /* Memory table */
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    thead th { text-align: left; color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    tbody td { padding: 10px 12px; border-bottom: 1px solid #21262d; color: var(--text); vertical-align: top; }
+    tbody tr:hover td { background: var(--surface); }
+
+    code { background: #1f2428; border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 0.82em; font-family: "SFMono-Regular", Consolas, monospace; color: #f0883e; }
+    .kbd { background: var(--surface2); border: 1px solid var(--border); border-bottom: 2px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: 0.8em; font-family: "SFMono-Regular", Consolas, monospace; color: var(--text); }
+
+    /* Get started */
+    .get-started { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px; text-align: center; }
+    .get-started h2 { margin-bottom: 12px; }
+    .get-started > p { color: var(--muted); margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .install-cmd { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px 20px; font-family: monospace; font-size: 0.9rem; color: var(--accent2); display: inline-block; margin-bottom: 24px; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; color: var(--muted); font-size: 0.82rem; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      .flow-arrow { display: none; }
+      .flow-steps { flex-direction: column; align-items: flex-start; }
+      .ca-split { grid-template-columns: 1fr; }
+      .stats-bar { gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a class="nav-logo" href="#">Alpaquitay AI</a>
+  <div class="nav-links">
+    <a href="#sdd">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#domains">Domain Agents</a>
+    <a href="#providers">Models</a>
+    <a href="#memory">Memory</a>
+    <a href="https://github.com/sergioide007/alpaquitay-ai">GitHub</a>
+  </div>
+  <span class="badge-oss">Open Source &middot; MIT</span>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <span class="hero-eyebrow">VS Code Extension &middot; v2.0</span>
+  <h1>Spec-Driven Development<br><span class="hi">with AI autonomy</span></h1>
+  <p class="hero-sub">
+    One panel. Five tabs. Write a spec, drag a task to In&nbsp;Progress,
+    and watch the AI implement it &mdash; locally or in the cloud,
+    following <strong style="color:var(--heading)">Clean Architecture</strong> from the first file.
+  </p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="https://github.com/sergioide007/alpaquitay-ai/releases">
+      Download VSIX
+    </a>
+    <a class="btn btn-secondary" href="https://github.com/sergioide007/alpaquitay-ai">
+      View on GitHub
+    </a>
+  </div>
+  <p style="margin-top:14px;font-size:0.8rem;color:var(--muted);">VS Code Marketplace release coming soon &mdash; install manually from GitHub Releases in the meantime.</p>
+</div>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num">16+</div>
+    <div class="stat-label">Supported stacks</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">4</div>
+    <div class="stat-label">AI providers</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">14</div>
+    <div class="stat-label">Domain Agent Shells</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">0</div>
+    <div class="stat-label">Intermediary servers</div>
+  </div>
+</div>
+
+<!-- Workflow -->
+<div class="workflow">
+  <div class="flow-steps">
+    <div class="flow-step">
+      <div class="icon">&#9998;</div>
+      <div class="label">Write<br>spec.md</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">
+      <div class="icon">&#9724;</div>
+      <div class="label">Kanban<br>Board</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">
+      <div class="icon">&#9881;</div>
+      <div class="label">AI<br>implements</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">
+      <div class="icon">&#10003;</div>
+      <div class="label">spec.md<br>updated</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">
+      <div class="icon">&#9741;</div>
+      <div class="label">git commit<br>#SPEC-XXX</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-step">
+      <div class="icon">&#127968;</div>
+      <div class="label">Clean Arch<br>structure</div>
+    </div>
+  </div>
+</div>
+
+<!-- SDD explainer -->
+<section id="sdd">
+  <h2>What is Spec-Driven Development?</h2>
+  <p class="section-sub">SDD is the core idea behind Alpaquitay. Your <code>spec.md</code> is the single source of truth for requirements, progress, and AI context.</p>
+
+  <div class="sdd-box">
+    <h3>spec.md &mdash; the source of truth</h3>
+    <div class="spec-preview">
+<span class="epic">## Epic: Authentication</span>
+
+- [x] Design auth flow   <span class="done id">SPEC-001 &#10003;</span>
+- [ ] Implement JWT provider   <span class="pending id">SPEC-002</span>
+- [ ] Add refresh token rotation   <span class="pending id">SPEC-003</span>
+
+<span class="epic">## Epic: Dashboard</span>
+
+- [ ] Build metrics chart component   <span class="pending id">SPEC-004</span>
+- [ ] Add export to CSV   <span class="pending id">SPEC-005</span>
+    </div>
+
+    <div class="sdd-steps">
+      <div class="sdd-step">
+        <div class="num">Step 1</div>
+        <p>Write epics and tasks in plain Markdown. AI can generate the initial spec from your goal description.</p>
+      </div>
+      <div class="sdd-step">
+        <div class="num">Step 2</div>
+        <p>The Kanban board derives its state from the checkboxes &mdash; no separate database, no sync problems.</p>
+      </div>
+      <div class="sdd-step">
+        <div class="num">Step 3</div>
+        <p>Drag a task to In Progress. The AI plans files, generates code, and writes them to your workspace.</p>
+      </div>
+      <div class="sdd-step">
+        <div class="num">Step 4</div>
+        <p>The task is auto-marked done in spec.md. Your git commit references <code>#SPEC-002</code> for full traceability.</p>
+      </div>
+      <div class="sdd-step">
+        <div class="num">Correction</div>
+        <p>Drag a completed task back. Type what needs fixing. The AI re-implements with your feedback applied.</p>
+      </div>
+      <div class="sdd-step">
+        <div class="num">For everyone</div>
+        <p>Non-technical stakeholders read spec.md and understand the full project state. No Jira login needed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+  <h2>Features</h2>
+  <p class="section-sub">Everything in one panel &mdash; no context switching.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-icon">&#9998;</div>
+      <h3>Spec Editor</h3>
+      <p>View and edit spec.md in the panel. Regenerate from AI. Convert existing YAML, OpenAPI, or Gherkin files into spec format.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#9724;</div>
+      <h3>Kanban Board</h3>
+      <p>Four columns: Backlog, Todo, In Progress, Done. State derived from spec.md &mdash; drag to implement, drag back to correct.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#128172;</div>
+      <h3>Chat</h3>
+      <p>Conversational AI with streaming responses. Stack-aware system prompt. Task work streams progress here in real time.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#9741;</div>
+      <h3>Git Integration</h3>
+      <p>Last 40 commits. Commits referencing <code>#SPEC-XXX</code> are linked to tasks. Full traceability from code to requirement.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#9881;</div>
+      <h3>Skills</h3>
+      <p>Built-in: Refactor, Generate Tests, Create File, Generate from Spec, Project Builder, Daily Standup. Custom skills via UI or TypeScript.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#128220;</div>
+      <h3>Hierarchical Memory</h3>
+      <p>Auto-extracts class names, exported functions, and completed features into <code>.alpaquitay/memory.json</code>. Keeps AI context coherent across sessions.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#128203;</div>
+      <h3>Stack Detection</h3>
+      <p>Scans package.json, requirements.txt, pom.xml, go.mod, .csproj. Generates architecture-specific prompts for 16+ stacks.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#127968;</div>
+      <h3>Clean Architecture</h3>
+      <p>Generates Java, React, and Spring+React projects with strict Clean Architecture layers: domain &#8594; application &#8594; infrastructure. ISO&nbsp;12207 compliant.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#128274;</div>
+      <h3>Privacy First</h3>
+      <p>No Alpaquitay servers. Code and prompts go directly to your provider. API keys in OS keychain, never on disk.</p>
+    </div>
+    <div class="card" style="border-color: var(--accent2);">
+      <div class="card-icon">&#9889;</div>
+      <h3>Instant Kanban &mdash; Deferred Quality Pipeline</h3>
+      <p>Kanban card moves to <strong>Done in &lt; 3 s</strong> after file generation. Format, validate, build, and test run asynchronously &mdash; results stream to chat. <strong>&gt;95% faster</strong> than the blocking pipeline.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#128202;</div>
+      <h3>Auto Architecture Diagram</h3>
+      <p>When you open the Architecture tab on a new or code-less project, Alpaquitay infers components from spec.md epics and workspace folders and generates the diagram automatically &mdash; no manual node placement.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section id="architecture">
+  <h2>Architecture</h2>
+  <p class="section-sub">How the extension is built &mdash; and how it builds your projects.</p>
+
+  <!-- 1. Extension Host Overview -->
+  <div class="arch-subsection">
+    <h3>1. Extension Host Overview</h3>
+    <p>All processing happens inside the VS Code Extension Host (Node.js). The WebView SPA communicates via the VS Code <code>postMessage</code> API &mdash; no HTTP servers, no ports, no data leaving your machine unless you invoke a cloud AI provider.</p>
+    <div class="ext-diagram">
+      <div class="ext-layer-label">WebView &mdash; isolated browser context (5 tabs)</div>
+      <div class="ext-row">
+        <div class="ext-box webview">Spec Tab</div>
+        <div class="ext-box webview">Kanban Tab</div>
+        <div class="ext-box webview">Chat Tab</div>
+        <div class="ext-box webview">Git Tab</div>
+        <div class="ext-box webview">Settings Tab</div>
+      </div>
+      <div class="ext-arrow">&#8597;&nbsp; acquireVsCodeApi().postMessage &nbsp;/&nbsp; onDidReceiveMessage</div>
+      <hr class="ext-sep"/>
+      <div class="ext-layer-label">Extension Host &mdash; Node.js process</div>
+      <div class="ext-row">
+        <div class="ext-box core">MainPanel</div>
+        <div class="ext-box core">MessageRouter</div>
+        <div class="ext-box core">SkillRegistry</div>
+        <div class="ext-box core">DeepAgentSkill</div>
+      </div>
+      <div class="ext-arrow">&#8595;</div>
+      <div class="ext-row">
+        <div class="ext-box ai">AIClient</div>
+        <div class="ext-box ai">ProjectContextBuilder</div>
+        <div class="ext-box ai">ModelCatalog</div>
+        <div class="ext-box mcp">MCPExecutor</div>
+        <div class="ext-box cfg">AlpaquitayConfig</div>
+        <div class="ext-box ai">HierarchicalMemory</div>
+      </div>
+      <div class="ext-arrow">&#8595;</div>
+      <div class="ext-row">
+        <div class="ext-box ai">Anthropic API<small>SSE / Messages API</small></div>
+        <div class="ext-box ai">OpenAI API<small>SSE / Chat Completions</small></div>
+        <div class="ext-box ai">Ollama<small>local / localhost:11434</small></div>
+        <div class="ext-box ai">LM Studio<small>local / localhost:1234</small></div>
+        <div class="ext-box mcp">filesystem MCP<small>read, write, list</small></div>
+        <div class="ext-box mcp">git MCP<small>log, commit, diff</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Clean Architecture Layers -->
+  <div class="arch-subsection">
+    <h3>2. Clean Architecture Layers (Robert C. Martin)</h3>
+    <p>Dependencies always flow <strong style="color:var(--heading)">inward</strong>. Infrastructure depends on Application; Application depends on Domain. The Domain layer has <em>zero</em> framework imports &mdash; it is pure business logic.</p>
+    <div class="ca-layers">
+      <div class="ca-layer infra">
+        <div class="ca-layer-header">
+          <span class="ca-badge">Infrastructure</span>
+          <span class="ca-layer-name">Web &middot; Persistence &middot; Configuration</span>
+        </div>
+        <div class="ca-layer-desc">Spring <code>@RestController</code> &middot; JPA <code>@Entity</code> &middot; <code>@Configuration</code> beans &middot; Adapter classes that implement domain ports</div>
+        <div class="ca-pkgs">
+          <span class="ca-pkg">infrastructure/web/rest</span>
+          <span class="ca-pkg">infrastructure/persistence</span>
+          <span class="ca-pkg">infrastructure/config</span>
+        </div>
+      </div>
+      <div class="ca-arrow">depends on &darr;&nbsp; &mdash;&nbsp; this direction only, never reversed</div>
+      <div class="ca-layer app">
+        <div class="ca-layer-header">
+          <span class="ca-badge">Application</span>
+          <span class="ca-layer-name">Use Cases &middot; Orchestration &middot; DTOs</span>
+        </div>
+        <div class="ca-layer-desc">Service classes that coordinate domain objects &middot; Input/Output DTOs that cross layer boundaries &middot; No framework annotations</div>
+        <div class="ca-pkgs">
+          <span class="ca-pkg">application/service</span>
+          <span class="ca-pkg">application/dto</span>
+        </div>
+      </div>
+      <div class="ca-arrow">depends on &darr;&nbsp; &mdash;&nbsp; this direction only, never reversed</div>
+      <div class="ca-layer domain">
+        <div class="ca-layer-header">
+          <span class="ca-badge">Domain</span>
+          <span class="ca-layer-name">Business Rules &middot; Entities &middot; Port Interfaces</span>
+        </div>
+        <div class="ca-layer-desc">Pure Java POJOs (or TypeScript classes) &middot; Repository interfaces (ports) that infrastructure implements &middot; <strong>Zero framework imports allowed</strong></div>
+        <div class="ca-pkgs">
+          <span class="ca-pkg">domain/model</span>
+          <span class="ca-pkg">domain/port</span>
+        </div>
+      </div>
+      <div class="ca-arrow">&mdash; cross-cutting &mdash;</div>
+      <div class="ca-layer shared">
+        <div class="ca-layer-header">
+          <span class="ca-badge">Shared</span>
+          <span class="ca-layer-name">Cross-cutting Concerns</span>
+        </div>
+        <div class="ca-layer-desc">Global exception handlers &middot; Utility classes &middot; Constants accessible by all layers without creating circular dependencies</div>
+        <div class="ca-pkgs">
+          <span class="ca-pkg">shared/exception</span>
+          <span class="ca-pkg">shared/util</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Directory Trees -->
+  <div class="arch-subsection">
+    <h3>3. Generated Project Structures</h3>
+    <p>Alpaquitay scaffolds every new project with the correct package hierarchy from the first file. The AI is instructed to respect these boundaries in every subsequent code-generation step.</p>
+    <div class="ca-split">
+      <div class="ca-split-panel">
+        <h4>Java &middot; Spring Boot &middot; Maven</h4>
+<pre class="tree"><span class="t-root">src/main/java/com/example/myapp/</span>
+<span class="t-dim">│</span>
+<span class="t-domain">├── domain/</span>
+<span class="t-dim">│   ├── </span><span class="t-domain">model/</span>
+<span class="t-dim">│   │   └── </span><span class="t-file">User.java          </span><span class="t-dim"># pure POJO</span>
+<span class="t-dim">│   └── </span><span class="t-domain">port/</span>
+<span class="t-dim">│       └── </span><span class="t-file">UserRepository.java </span><span class="t-dim"># interface</span>
+<span class="t-dim">│</span>
+<span class="t-app">├── application/</span>
+<span class="t-dim">│   ├── </span><span class="t-app">service/</span>
+<span class="t-dim">│   │   └── </span><span class="t-file">UserService.java</span>
+<span class="t-dim">│   └── </span><span class="t-app">dto/</span>
+<span class="t-dim">│       ├── </span><span class="t-file">UserRequest.java</span>
+<span class="t-dim">│       └── </span><span class="t-file">UserResponse.java</span>
+<span class="t-dim">│</span>
+<span class="t-infra">├── infrastructure/</span>
+<span class="t-dim">│   ├── </span><span class="t-infra">persistence/</span>
+<span class="t-dim">│   │   ├── </span><span class="t-file">UserEntity.java    </span><span class="t-dim"># @Entity</span>
+<span class="t-dim">│   │   └── </span><span class="t-file">UserJpaRepository.java</span>
+<span class="t-dim">│   ├── </span><span class="t-infra">web/rest/</span>
+<span class="t-dim">│   │   └── </span><span class="t-file">UserController.java</span><span class="t-dim"># @RestController</span>
+<span class="t-dim">│   └── </span><span class="t-infra">config/</span>
+<span class="t-dim">│       └── </span><span class="t-file">BeanConfig.java</span>
+<span class="t-dim">│</span>
+<span class="t-shared">└── shared/</span>
+<span class="t-dim">    └── </span><span class="t-shared">exception/</span>
+<span class="t-dim">        └── </span><span class="t-file">GlobalExceptionHandler.java</span></pre>
+      </div>
+      <div class="ca-split-panel">
+        <h4>React &middot; Vite &middot; TypeScript (Clean Architecture)</h4>
+<pre class="tree"><span class="t-root">src/</span>
+<span class="t-dim">│</span>
+<span class="t-domain">├── domain/</span>
+<span class="t-dim">│   └── </span><span class="t-domain">model/</span>
+<span class="t-dim">│       └── </span><span class="t-file">user.ts             </span><span class="t-dim"># TS interface</span>
+<span class="t-dim">│</span>
+<span class="t-app">├── application/</span>
+<span class="t-dim">│   ├── </span><span class="t-app">use-case/</span>
+<span class="t-dim">│   │   └── </span><span class="t-file">getUser.ts</span>
+<span class="t-dim">│   └── </span><span class="t-app">store/</span>
+<span class="t-dim">│       └── </span><span class="t-file">userStore.ts        </span><span class="t-dim"># Zustand/Pinia</span>
+<span class="t-dim">│</span>
+<span class="t-infra">├── infrastructure/</span>
+<span class="t-dim">│   ├── </span><span class="t-infra">api/</span>
+<span class="t-dim">│   │   └── </span><span class="t-file">userApi.ts          </span><span class="t-dim"># fetch/axios</span>
+<span class="t-dim">│   └── </span><span class="t-infra">storage/</span>
+<span class="t-dim">│       └── </span><span class="t-file">localStorage.ts</span>
+<span class="t-dim">│</span>
+<span class="t-pres">├── presentation/</span>
+<span class="t-dim">│   ├── </span><span class="t-pres">components/         </span><span class="t-dim"># reusable UI</span>
+<span class="t-dim">│   ├── </span><span class="t-pres">pages/              </span><span class="t-dim"># route-level views</span>
+<span class="t-dim">│   └── </span><span class="t-pres">layout/             </span><span class="t-dim"># shell / nav</span>
+<span class="t-dim">│</span>
+<span class="t-shared">└── shared/</span>
+<span class="t-dim">    ├── </span><span class="t-shared">hooks/</span>
+<span class="t-dim">    └── </span><span class="t-shared">utils/</span></pre>
+      </div>
+    </div>
+
+    <!-- Spring Fullstack tree -->
+    <div style="margin-top:16px;">
+      <div class="ca-split-panel" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;">
+        <h4>Spring Boot + React &middot; Full-Stack Monorepo</h4>
+<pre class="tree"><span class="t-root">my-project/</span>
+<span class="t-dim">│</span>
+<span class="t-infra">├── backend/                          </span><span class="t-dim"># Spring Boot (Maven)</span>
+<span class="t-dim">│   └── src/main/java/com/example/</span>
+<span class="t-dim">│       ├── </span><span class="t-domain">domain/</span><span class="t-dim">               # model + port (no Spring deps)</span>
+<span class="t-dim">│       ├── </span><span class="t-app">application/</span><span class="t-dim">          # service + dto</span>
+<span class="t-dim">│       ├── </span><span class="t-infra">infrastructure/</span><span class="t-dim">       # web/rest + persistence + config</span>
+<span class="t-dim">│       └── </span><span class="t-shared">shared/</span><span class="t-dim">               # exception + util</span>
+<span class="t-dim">│</span>
+<span class="t-app">├── frontend/                         </span><span class="t-dim"># React + Vite (Clean Architecture)</span>
+<span class="t-dim">│   └── src/</span>
+<span class="t-dim">│       ├── </span><span class="t-domain">domain/</span><span class="t-dim">               # TS interfaces (pure)</span>
+<span class="t-dim">│       ├── </span><span class="t-app">application/</span><span class="t-dim">          # use-case + store</span>
+<span class="t-dim">│       ├── </span><span class="t-infra">infrastructure/</span><span class="t-dim">       # api + storage</span>
+<span class="t-dim">│       ├── </span><span class="t-pres">presentation/</span><span class="t-dim">         # components + pages + layout</span>
+<span class="t-dim">│       └── </span><span class="t-shared">shared/</span><span class="t-dim">               # hooks + utils</span>
+<span class="t-dim">│</span>
+<span class="t-dim">├── docker-compose.yml</span>
+<span class="t-dim">└── spec.md</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. SDD Pipeline -->
+  <div class="arch-subsection">
+    <h3>4. SDD Task Execution Pipeline</h3>
+    <p>When you drag a task card to "In Progress," this is the exact sequence of operations inside the extension.</p>
+    <div class="pipeline">
+      <div class="pl-step">
+        <div class="pl-num">1</div>
+        <div class="pl-body">
+          <strong>Drag event (WebView)</strong>
+          <p>The SPA fires <code>task:start</code> over postMessage with the task ID and full title from spec.md.</p>
+        </div>
+      </div>
+      <div class="pl-step">
+        <div class="pl-num">2</div>
+        <div class="pl-body">
+          <strong>Context assembly (Extension Host)</strong>
+          <p>ProjectContextBuilder reads stack files (package.json, pom.xml, go.mod&hellip;) and builds the master prompt. HierarchicalMemory injects known classes, exports, and completed features from <code>.alpaquitay/memory.json</code>.</p>
+        </div>
+      </div>
+      <div class="pl-step">
+        <div class="pl-num">3</div>
+        <div class="pl-body">
+          <strong>File plan &mdash; AI round-trip 1</strong>
+          <p>DeepAgentSkill sends the task + context to the AI and requests a JSON file plan: which paths to create or modify, in what order, with what Clean Architecture layer each file belongs to.</p>
+        </div>
+      </div>
+      <div class="pl-step">
+        <div class="pl-num">4</div>
+        <div class="pl-body">
+          <strong>Code generation &mdash; AI round-trip 2+</strong>
+          <p>For each file in the plan, a second AI call generates the full content. SSE streaming sends tokens to the Chat tab in real time so you can watch the implementation happen.</p>
+        </div>
+      </div>
+      <div class="pl-step">
+        <div class="pl-num">5</div>
+        <div class="pl-body">
+          <strong>Write to workspace (MCP)</strong>
+          <p>MCPExecutor calls the filesystem MCP server to write each file at the planned path. Directories are created as needed, preserving the Clean Architecture layout.</p>
+        </div>
+      </div>
+      <div class="pl-step">
+        <div class="pl-num">6</div>
+        <div class="pl-body">
+          <strong>spec.md update + git commit</strong>
+          <p>The task checkbox is ticked in spec.md. A git commit is created via MCP with message <code>feat: [task title] #SPEC-XXX</code> for full traceability.</p>
+        </div>
+      </div>
+      <div class="pl-step">
+        <div class="pl-num">7</div>
+        <div class="pl-body">
+          <strong>Memory extraction</strong>
+          <p>HierarchicalMemory scans the new files for class names, exported functions, and interfaces. These are appended to <code>.alpaquitay/memory.json</code> so the next task has full context.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. AI Provider Chain -->
+  <div class="arch-subsection">
+    <h3>5. AI Provider Chain</h3>
+    <p>Every provider is abstracted behind the same <code>AIClient</code> interface. The active provider, model, and token limit are resolved from <code>AlpaquitayConfig</code> &mdash; zero hardcoded values in the pipeline.</p>
+    <div class="ext-diagram">
+      <div class="ext-row">
+        <div class="ext-box webview" style="flex:1;max-width:none;">User message or task drag &rarr; <code>AIClient.streamChat(messages, { provider, model, maxTokens })</code></div>
+      </div>
+      <div class="ext-arrow">&#8595;&nbsp; provider routing from <code>AlpaquitayConfig.preferredProvider</code> &nbsp;+&nbsp; <code>ModelCatalog</code></div>
+      <div class="ext-row">
+        <div class="ext-box ai">Anthropic<small>SSE &middot; Messages API</small></div>
+        <div class="ext-box ai">OpenAI<small>SSE &middot; Chat Completions</small></div>
+        <div class="ext-box ai">Ollama<small>local SSE &middot; /api/chat</small></div>
+        <div class="ext-box ai">LM Studio<small>local &middot; OpenAI-compatible</small></div>
+      </div>
+      <div class="ext-arrow">&#8595;&nbsp; async token stream &nbsp;&rarr;&nbsp; <code>chat:token</code> events &nbsp;&rarr;&nbsp; WebView renders live</div>
+      <div class="ext-row">
+        <div class="ext-box webview" style="flex:1;max-width:none;"><code>chat:done</code> &rarr; task marked complete &middot; spec.md updated &middot; git commit created</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Domain Agent Architecture -->
+<section id="domains">
+  <h2>The Architecture to Win a Vertical</h2>
+  <p class="section-sub">Stop building better prompts. Build autonomous agents that own entire workflows end-to-end. Every industry will have a winner &mdash; the moat is domain knowledge, not the LLM.</p>
+
+  <!-- Hexagonal diagram -->
+  <div class="arch-subsection">
+    <h3>Domain Agent Shell &mdash; Hexagonal Architecture (Ports &amp; Adapters)</h3>
+    <p>Based on TOGAF ADM, ArchiMate 3.2, and BIAN Service Domain patterns. Dependencies always point inward; adapters implement ports; the core never touches infrastructure.</p>
+    <div class="hex-outer">
+      <div class="hex-frame-label">DOMAIN AGENT SHELL</div>
+      <div class="hex-top-row">
+        <div class="hex-cell hex-process">
+          <div class="hex-cell-icon">&#9776;</div>
+          <div class="hex-cell-title">Process Definition</div>
+          <div class="hex-cell-sub">Replaces spec.md<br>SOP / BPMN</div>
+        </div>
+        <div class="hex-cell hex-tools">
+          <div class="hex-cell-icon">&#9881;</div>
+          <div class="hex-cell-title">Domain Tools</div>
+          <div class="hex-cell-sub">Real APIs<br>ERP / CRM / TMS</div>
+        </div>
+      </div>
+      <div class="hex-engine">
+        <div class="hex-engine-label">ALPAQUITAY AGENT ENGINE</div>
+        <div class="hex-engine-flow">
+          <span class="hex-flow-step">decompose</span>
+          <span class="hex-flow-arrow">&rarr;</span>
+          <span class="hex-flow-step">execute</span>
+          <span class="hex-flow-arrow">&rarr;</span>
+          <span class="hex-flow-step">validate</span>
+        </div>
+      </div>
+      <div class="hex-top-row">
+        <div class="hex-cell hex-memory">
+          <div class="hex-cell-icon">&#129504;</div>
+          <div class="hex-cell-title">Domain Memory</div>
+          <div class="hex-cell-sub">Persistent context<br>per learner / case</div>
+        </div>
+        <div class="hex-cell hex-guardrails">
+          <div class="hex-cell-icon">&#128274;</div>
+          <div class="hex-cell-title">Compliance Guardrails</div>
+          <div class="hex-cell-sub">Domain-specific<br>validation rules</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Framework badges -->
+    <div class="framework-badges">
+      <div class="fw-badge fw-togaf">TOGAF ADM<span>B &rarr; C &rarr; D &rarr; E</span></div>
+      <div class="fw-badge fw-archimate">ArchiMate 3.2<span>Application Layer</span></div>
+      <div class="fw-badge fw-bian">BIAN<span>Service Domain</span></div>
+      <div class="fw-badge fw-hexagonal">Hexagonal Arch<span>Ports &amp; Adapters</span></div>
+      <div class="fw-badge fw-41">4+1 Views<span>Logical &middot; Process &middot; Physical</span></div>
+      <div class="fw-badge fw-iso">ISO Aligned<span>per Vertical</span></div>
+    </div>
+  </div>
+
+  <!-- 4+1 Views compact -->
+  <div class="arch-subsection">
+    <h3>4+1 Architectural Views Applied to Every Domain Shell</h3>
+    <div class="views-grid">
+      <div class="view-card">
+        <div class="view-num">1</div>
+        <div class="view-name">Logical View</div>
+        <div class="view-desc">Pure domain model &mdash; entities, value objects, aggregates. Zero framework imports. The business language of the vertical encoded in TypeScript types.</div>
+        <code class="view-tag">domain/model.ts</code>
+      </div>
+      <div class="view-card">
+        <div class="view-num">2</div>
+        <div class="view-name">Development View</div>
+        <div class="view-desc">Hexagonal package structure: <code>domain/</code> &rarr; <code>ports/</code> &rarr; <code>application/</code> &rarr; <code>infrastructure/</code>. Dependency rule enforced at compile time.</div>
+        <code class="view-tag">src/domains/{vertical}/</code>
+      </div>
+      <div class="view-card">
+        <div class="view-num">3</div>
+        <div class="view-name">Process View</div>
+        <div class="view-desc">Objective &rarr; decompose &rarr; primary port &rarr; use case &rarr; secondary port &rarr; adapter &rarr; API. Guardrails check before every output commit.</div>
+        <code class="view-tag">IDomainAgentShell.run()</code>
+      </div>
+      <div class="view-card">
+        <div class="view-num">4</div>
+        <div class="view-name">Physical View</div>
+        <div class="view-desc">VS Code Extension Host (in-process). Local storage at <code>.alpaquitay/{vertical}/</code>. Any Alpaquitay AI provider as the generation backend.</div>
+        <code class="view-tag">infrastructure/adapters/</code>
+      </div>
+      <div class="view-card view-card-wide">
+        <div class="view-num">+1</div>
+        <div class="view-name">Scenarios</div>
+        <div class="view-desc">Each use case is a named scenario: <em>"Practice past perfect at B1"</em>, <em>"Assess my level from this text"</em>, <em>"Give me 5 business phrases"</em>. Scenarios drive port design &mdash; not the other way around.</div>
+        <code class="view-tag">shell.run('use-case-id', params)</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- Impact domains grid -->
+  <div class="arch-subsection">
+    <h3>Impact Domains &mdash; One Agent to Win Each Vertical</h3>
+    <p>The question is not which AI model you use. The question is: <strong style="color:var(--heading)">which repetitive process do you know better than anyone in your industry?</strong></p>
+    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px;"><strong style="color:var(--accent2)">14 Live shells</strong> &middot; 5 planned &middot; All extending <code>BaseDomainShell</code> &middot; 0 TypeScript errors</p>
+    <div class="domains-grid">
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#127468;&#127463;</div>
+        <div class="domain-name">English Mastery</div>
+        <div class="domain-iso">CEFR &middot; ISO 17024 &middot; ISO 21001</div>
+        <div class="domain-desc">CEFR A1&rarr;C2 grammar drills, IPA pronunciation, daily business phrases, level assessment from free text.</div>
+        <div class="domain-tools">practice-grammar &middot; assess-level &middot; get-daily-phrases</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#128187;</div>
+        <div class="domain-name">Software Engineer</div>
+        <div class="domain-iso">ISO/IEC 25010 &middot; 12207 &middot; SOLID</div>
+        <div class="domain-desc">Code review, SOLID analysis, tech debt detection, design pattern suggestions, complexity estimation.</div>
+        <div class="domain-tools">review-code &middot; analyze-solid &middot; detect-tech-debt</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#127963;</div>
+        <div class="domain-name">Software Architect</div>
+        <div class="domain-iso">ISO/IEC 42010 &middot; TOGAF &middot; C4</div>
+        <div class="domain-desc">Architecture assessments, ADR generation, C4 diagrams, tech radar, quality attribute evaluation.</div>
+        <div class="domain-tools">assess-architecture &middot; create-adr &middot; generate-c4</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#9881;</div>
+        <div class="domain-name">Developer</div>
+        <div class="domain-iso">ISO/IEC 12207 &middot; Clean Code</div>
+        <div class="domain-desc">Feature implementation, bug debugging, code refactoring, explanation, and test generation.</div>
+        <div class="domain-tools">implement-feature &middot; debug-issue &middot; generate-tests</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#9989;</div>
+        <div class="domain-name">QA</div>
+        <div class="domain-iso">ISO/IEC 29119 &middot; IEEE 829</div>
+        <div class="domain-desc">Test plans, test case generation, bug triage, coverage evaluation, quality gate definition.</div>
+        <div class="domain-tools">create-test-plan &middot; triage-bug &middot; define-quality-gate</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#128640;</div>
+        <div class="domain-name">DevOps</div>
+        <div class="domain-iso">DORA Metrics &middot; ISO/IEC 27001</div>
+        <div class="domain-desc">CI/CD pipeline design, DORA assessment, deployment planning, IaC generation, runbooks.</div>
+        <div class="domain-tools">design-pipeline &middot; assess-dora &middot; generate-iac</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#128737;</div>
+        <div class="domain-name">DevSecOps</div>
+        <div class="domain-iso">OWASP SAMM &middot; ISO/IEC 27001</div>
+        <div class="domain-desc">Secure pipeline design, threat modelling, SAMM assessment, findings triage, SBOM generation.</div>
+        <div class="domain-tools">threat-model &middot; assess-samm &middot; generate-sbom</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#128274;</div>
+        <div class="domain-name">Security</div>
+        <div class="domain-iso">NIST CSF &middot; ISO/IEC 27001/27005</div>
+        <div class="domain-desc">Compliance audit, penetration test planning, risk register, incident response, CSF assessment.</div>
+        <div class="domain-tools">audit-compliance &middot; plan-pentest &middot; respond-incident</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#128293;</div>
+        <div class="domain-name">Infrastructure</div>
+        <div class="domain-iso">ISO/IEC 27001 &middot; ITIL v4</div>
+        <div class="domain-desc">Capacity planning, network design, SLA creation, disaster recovery, monitoring configuration.</div>
+        <div class="domain-tools">plan-capacity &middot; design-network &middot; plan-dr</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#9729;</div>
+        <div class="domain-name">Cloud (AWS/Azure/GCP)</div>
+        <div class="domain-iso">AWS WAF &middot; ISO/IEC 27017</div>
+        <div class="domain-desc">Multi-cloud architecture design, Well-Architected reviews, cost optimisation, migration planning, IaC.</div>
+        <div class="domain-tools">well-architected-review &middot; optimize-cost &middot; plan-migration</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#128202;</div>
+        <div class="domain-name">Marketing</div>
+        <div class="domain-iso">ISO 9001 &middot; IAB Standards</div>
+        <div class="domain-desc">Campaign planning, audience segmentation, SEO analysis, content creation, ROI measurement.</div>
+        <div class="domain-tools">plan-campaign &middot; analyze-seo &middot; measure-roi</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#128260;</div>
+        <div class="domain-name">Process</div>
+        <div class="domain-iso">ISO 9001 &middot; BPM CBOK &middot; Six Sigma</div>
+        <div class="domain-desc">Process mapping, gap analysis, value stream mapping, ISO compliance audit, Six Sigma optimisation.</div>
+        <div class="domain-tools">map-process &middot; value-stream-map &middot; iso-compliance</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#129504;</div>
+        <div class="domain-name">AI Expert</div>
+        <div class="domain-iso">ISO/IEC 42001 &middot; EU AI Act &middot; NIST AI RMF</div>
+        <div class="domain-desc">LLM evaluation, RAG architecture, prompt engineering, AI system design, EU AI Act governance &amp; MLOps.</div>
+        <div class="domain-tools">evaluate-llm &middot; design-rag &middot; assess-governance</div>
+      </div>
+      <div class="domain-card domain-live">
+        <div class="domain-badge">LIVE</div>
+        <div class="domain-icon">&#128200;</div>
+        <div class="domain-name">Business Expert</div>
+        <div class="domain-iso">ISO 56002 &middot; OKR Framework &middot; BMC</div>
+        <div class="domain-desc">Business Model Canvas, SWOT/PESTLE analysis, OKR definition, financial modeling, market analysis, business cases.</div>
+        <div class="domain-tools">design-business-model &middot; define-okrs &middot; financial-model</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-badge domain-soon">ROADMAP</div>
+        <div class="domain-icon">&#128176;</div>
+        <div class="domain-name">Finance</div>
+        <div class="domain-iso">ISO 20022 &middot; BIAN</div>
+        <div class="domain-desc">Invoice &rarr; reconciliation &rarr; accounting entry. Credit assessment, regulatory reporting, multi-jurisdiction tax rules.</div>
+        <div class="domain-tools">ERP API &middot; QuickBooks &middot; Tax DB</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-badge domain-soon">ROADMAP</div>
+        <div class="domain-icon">&#9878;</div>
+        <div class="domain-name">Legal</div>
+        <div class="domain-iso">ISO/IEC 27001 &middot; GDPR</div>
+        <div class="domain-desc">Contract &rarr; clause extraction &rarr; risk flagging. Jurisdiction-specific clause library. Chain of custody for discovery documents.</div>
+        <div class="domain-tools">Legal DB &middot; NLP &middot; eSign API</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-badge domain-soon">ROADMAP</div>
+        <div class="domain-icon">&#128666;</div>
+        <div class="domain-name">Logistics</div>
+        <div class="domain-iso">ISO 9001 &middot; GS1</div>
+        <div class="domain-desc">Order &rarr; routing optimization &rarr; carrier assignment. Exception detection, SLA monitoring, customs classification by HS code.</div>
+        <div class="domain-tools">TMS API &middot; Carrier APIs &middot; GS1 DB</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-badge domain-soon">ROADMAP</div>
+        <div class="domain-icon">&#128101;</div>
+        <div class="domain-name">Recruiting</div>
+        <div class="domain-iso">ISO 30405</div>
+        <div class="domain-desc">JD &rarr; candidate sourcing &rarr; bias-free scoring &rarr; interview scheduling. GDPR-compliant candidate data lifecycle.</div>
+        <div class="domain-tools">ATS API &middot; Calendar &middot; LinkedIn</div>
+      </div>
+      <div class="domain-card">
+        <div class="domain-badge domain-soon">ROADMAP</div>
+        <div class="domain-icon">&#9877;</div>
+        <div class="domain-name">Healthcare</div>
+        <div class="domain-iso">ISO 13485 &middot; HL7 FHIR</div>
+        <div class="domain-desc">Patient intake &rarr; triage &rarr; care plan. Clinical protocol adherence, medication safety guardrails, outcome tracking.</div>
+        <div class="domain-tools">FHIR API &middot; Clinical DB &middot; Safety Rules</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orchestration stack -->
+  <div class="arch-subsection">
+    <h3>Multi-Agent Orchestration Stack</h3>
+    <p>Every request flows through a unified pipeline: privacy protection &rarr; knowledge augmentation &rarr; multi-agent execution &rarr; recursive refinement &rarr; learning.</p>
+    <div class="orch-stack">
+      <div class="orch-layer orch-brain">
+        <span class="orch-label">CentralBrainAgent</span>
+        <span class="orch-desc">Unified entry point &mdash; session history, RAG augmentation, pipeline orchestration, self-learning</span>
+      </div>
+      <div class="orch-arrow">&#8595;</div>
+      <div class="orch-row">
+        <div class="orch-side">
+          <div class="orch-layer orch-privacy">
+            <span class="orch-label">PrivacyGuard</span>
+            <span class="orch-desc">12 PII patterns &middot; GDPR Articles 5 &amp; 17 &middot; ISO 27018 &middot; Masks before AI calls</span>
+          </div>
+        </div>
+        <div class="orch-side">
+          <div class="orch-layer orch-rag">
+            <span class="orch-label">RAGEngine</span>
+            <span class="orch-desc">BM25-lite retrieval &middot; ISO seed chunks &middot; Learns from high-score outputs (&#8805;80)</span>
+          </div>
+        </div>
+      </div>
+      <div class="orch-arrow">&#8595;</div>
+      <div class="orch-layer orch-orchestrator">
+        <span class="orch-label">OrchestratorAgent</span>
+        <span class="orch-desc">Decomposes objectives &rarr; assigns tasks to best-scoring shells &rarr; parallel execution respecting dependency graph</span>
+      </div>
+      <div class="orch-arrow">&#8595;</div>
+      <div class="orch-layer orch-meta">
+        <span class="orch-label">MetaheuristicEngine &mdash; auto-selects algorithm by problem size</span>
+        <div class="meta-row">
+          <span class="meta-algo">n &le; 3 &rarr; Greedy</span>
+          <span class="meta-algo">n &le; 10 &rarr; Genetic Algorithm<br><small>pop=20, gen=50, elitism 10%</small></span>
+          <span class="meta-algo">n &gt; 10 &rarr; Simulated Annealing<br><small>T&#8320;=1.0, &alpha;=0.95, 200 iter</small></span>
+        </div>
+      </div>
+      <div class="orch-arrow">&#8595;</div>
+      <div class="orch-layer orch-refinement">
+        <span class="orch-label">RecursiveRefinement</span>
+        <span class="orch-desc">Rubric-based quality scoring &rarr; if score &lt; threshold and depth &lt; max &rarr; regenerate and recurse</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- English shell spotlight -->
+  <div class="arch-subsection">
+    <h3>Reference Implementation: English Mastery Shell</h3>
+    <p>The reference implementation &mdash; every architectural layer demonstrated with production-ready TypeScript. CEFR A1&rarr;C2.</p>
+
+    <div class="english-grid">
+      <!-- CEFR levels -->
+      <div class="english-panel">
+        <h4>CEFR Levels (ISO 17024 Aligned)</h4>
+        <div class="cefr-levels">
+          <div class="cefr-row cefr-a"><span class="cefr-badge">A1</span><span class="cefr-label">Beginner</span><span class="cefr-vocab">~500 words</span></div>
+          <div class="cefr-row cefr-a"><span class="cefr-badge">A2</span><span class="cefr-label">Elementary</span><span class="cefr-vocab">~1,500 words</span></div>
+          <div class="cefr-row cefr-b"><span class="cefr-badge">B1</span><span class="cefr-label">Intermediate</span><span class="cefr-vocab">~3,500 words</span></div>
+          <div class="cefr-row cefr-b"><span class="cefr-badge">B2</span><span class="cefr-label">Upper-Intermediate</span><span class="cefr-vocab">~7,000 words</span></div>
+          <div class="cefr-row cefr-c"><span class="cefr-badge">C1</span><span class="cefr-label">Advanced</span><span class="cefr-vocab">~12,000 words</span></div>
+          <div class="cefr-row cefr-c"><span class="cefr-badge">C2</span><span class="cefr-label">Proficient</span><span class="cefr-vocab">~20,000 words</span></div>
+        </div>
+      </div>
+
+      <!-- Use cases -->
+      <div class="english-panel">
+        <h4>Use Cases (Primary Ports)</h4>
+        <div class="usecase-list">
+          <div class="usecase-item">
+            <span class="usecase-id">practice-grammar</span>
+            <span class="usecase-desc">CEFR-level grammar drill session with explanations</span>
+          </div>
+          <div class="usecase-item">
+            <span class="usecase-id">get-daily-phrases</span>
+            <span class="usecase-desc">5 phrases with IPA transcription &amp; practice script</span>
+          </div>
+          <div class="usecase-item">
+            <span class="usecase-id">assess-level</span>
+            <span class="usecase-desc">Detect CEFR level from free text or exercise history</span>
+          </div>
+          <div class="usecase-item">
+            <span class="usecase-id">submit-exercise</span>
+            <span class="usecase-desc">Evaluate answer, give feedback, update progress</span>
+          </div>
+          <div class="usecase-item">
+            <span class="usecase-id">get-progress</span>
+            <span class="usecase-desc">Weekly insight, skill scores, streak, next milestone</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hexagonal layers -->
+      <div class="english-panel english-panel-full">
+        <h4>Hexagonal Package Structure</h4>
+        <div class="hex-layers">
+          <div class="hex-layer hex-domain-layer">
+            <span class="hex-layer-badge">domain/</span>
+            <span class="hex-layer-desc">model.ts &mdash; CEFRLevel, Exercise, Lesson, DailyPhrase, LearnerProgress &mdash; zero framework imports</span>
+          </div>
+          <div class="hex-layer-arrow">&darr; ports expose, ports require</div>
+          <div class="hex-layer hex-ports-layer">
+            <span class="hex-layer-badge">ports/</span>
+            <span class="hex-layer-desc">input.ts (primary) &mdash; IPracticeGrammar, IGetDailyPhrases, IAssessLevel &nbsp;|&nbsp; output.ts (secondary) &mdash; IEnglishAIPort, ILessonRepository, ISpeechPort</span>
+          </div>
+          <div class="hex-layer-arrow">&darr; use cases implement input ports, depend on output ports</div>
+          <div class="hex-layer hex-app-layer">
+            <span class="hex-layer-badge">application/</span>
+            <span class="hex-layer-desc">PracticeGrammarUseCase &middot; GetDailyPhrasesUseCase &middot; AssessLevelUseCase &middot; SubmitExerciseUseCase</span>
+          </div>
+          <div class="hex-layer-arrow">&darr; adapters implement output ports</div>
+          <div class="hex-layer hex-infra-layer">
+            <span class="hex-layer-badge">infrastructure/</span>
+            <span class="hex-layer-desc">AIProviderAdapter (wraps Alpaquitay AI) &middot; LessonStorageAdapter (.alpaquitay/english/data.json)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── Hex shell diagram ── */
+  .hex-outer { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; position: relative; margin-bottom: 20px; }
+  .hex-frame-label { text-align: center; font-size: 0.68rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  .hex-top-row { display: flex; gap: 12px; justify-content: center; margin-bottom: 12px; }
+  .hex-cell { flex: 1; max-width: 280px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; text-align: center; }
+  .hex-cell-icon { font-size: 1.4rem; margin-bottom: 6px; }
+  .hex-cell-title { font-size: 0.88rem; font-weight: 600; color: var(--heading); margin-bottom: 4px; }
+  .hex-cell-sub { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+  .hex-process  { border-color: rgba(88,166,255,0.4); }
+  .hex-tools    { border-color: rgba(255,166,87,0.4); }
+  .hex-memory   { border-color: rgba(188,140,255,0.4); }
+  .hex-guardrails { border-color: rgba(126,231,135,0.4); }
+  .hex-engine { background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(188,140,255,0.08)); border: 1px solid rgba(88,166,255,0.25); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; text-align: center; }
+  .hex-engine-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .hex-engine-flow { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .hex-flow-step { background: var(--bg); border: 1px solid rgba(88,166,255,0.3); border-radius: 6px; padding: 6px 16px; font-size: 0.85rem; color: var(--heading); font-weight: 600; }
+  .hex-flow-arrow { color: var(--accent); font-size: 1.1rem; }
+
+  /* ── Framework badges ── */
+  .framework-badges { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+  .fw-badge { display: flex; flex-direction: column; align-items: center; padding: 8px 16px; border-radius: var(--radius); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.3px; min-width: 110px; text-align: center; }
+  .fw-badge span { font-size: 0.68rem; font-weight: 400; margin-top: 2px; opacity: 0.8; }
+  .fw-togaf     { background: rgba(88,166,255,0.12);  border: 1px solid rgba(88,166,255,0.3);  color: var(--accent); }
+  .fw-archimate { background: rgba(255,166,87,0.12);  border: 1px solid rgba(255,166,87,0.3);  color: var(--accent4); }
+  .fw-bian      { background: rgba(188,140,255,0.12); border: 1px solid rgba(188,140,255,0.3); color: var(--accent3); }
+  .fw-hexagonal { background: rgba(126,231,135,0.1);  border: 1px solid rgba(126,231,135,0.3); color: var(--accent2); }
+  .fw-41        { background: rgba(240,136,62,0.12);  border: 1px solid rgba(240,136,62,0.3);  color: var(--accent5); }
+  .fw-iso       { background: rgba(139,148,158,0.1);  border: 1px solid rgba(139,148,158,0.25); color: var(--muted); }
+
+  /* ── 4+1 views grid ── */
+  .views-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .view-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; position: relative; }
+  .view-card-wide { grid-column: 1 / -1; }
+  .view-num { font-size: 1.5rem; font-weight: 800; color: rgba(88,166,255,0.25); line-height: 1; margin-bottom: 6px; }
+  .view-name { font-size: 0.95rem; font-weight: 700; color: var(--heading); margin-bottom: 8px; }
+  .view-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.55; margin-bottom: 10px; }
+  .view-tag { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; font-family: "SFMono-Regular", Consolas, monospace; color: #f0883e; }
+
+  /* ── Impact domains grid ── */
+  .domains-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; }
+  .domain-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; position: relative; transition: border-color 0.15s, transform 0.1s; }
+  .domain-card:hover { transform: translateY(-2px); }
+  .domain-live { border-color: rgba(126,231,135,0.5); background: rgba(126,231,135,0.03); }
+  .domain-badge { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; background: rgba(126,231,135,0.2); color: var(--accent2); border: 1px solid rgba(126,231,135,0.35); margin-bottom: 10px; }
+  .domain-soon { background: rgba(139,148,158,0.15); color: var(--muted); border-color: rgba(139,148,158,0.2); }
+  .domain-icon { font-size: 1.8rem; margin-bottom: 8px; line-height: 1; }
+  .domain-name { font-size: 1rem; font-weight: 700; color: var(--heading); margin-bottom: 4px; }
+  .domain-iso { font-size: 0.7rem; color: var(--accent3); font-weight: 600; letter-spacing: 0.3px; margin-bottom: 10px; }
+  .domain-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.55; margin-bottom: 10px; }
+  .domain-tools { font-size: 0.72rem; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 4px 10px; display: inline-block; font-family: "SFMono-Regular", Consolas, monospace; }
+
+  /* ── Orchestration stack ── */
+  .orch-stack { display: flex; flex-direction: column; gap: 0; }
+  .orch-layer { border-radius: var(--radius); padding: 14px 18px; margin: 0; }
+  .orch-label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--heading); margin-bottom: 4px; letter-spacing: 0.3px; }
+  .orch-desc { font-size: 0.76rem; color: var(--muted); line-height: 1.5; }
+  .orch-brain { background: rgba(188,140,255,0.08); border: 1px solid rgba(188,140,255,0.4); }
+  .orch-privacy { background: rgba(255,165,0,0.06); border: 1px solid rgba(255,165,0,0.3); }
+  .orch-rag { background: rgba(126,231,135,0.06); border: 1px solid rgba(126,231,135,0.3); }
+  .orch-orchestrator { background: rgba(99,179,237,0.06); border: 1px solid rgba(99,179,237,0.3); }
+  .orch-meta { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.3); }
+  .orch-refinement { background: rgba(251,211,141,0.06); border: 1px solid rgba(251,211,141,0.3); }
+  .orch-arrow { text-align: center; font-size: 1.1rem; color: var(--muted); line-height: 1.8; }
+  .orch-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .orch-side { display: flex; flex-direction: column; }
+  .meta-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .meta-algo { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 0.74rem; color: var(--muted); flex: 1; min-width: 120px; line-height: 1.5; }
+  .meta-algo small { display: block; font-size: 0.68rem; margin-top: 2px; opacity: 0.7; }
+
+  /* ── English shell ── */
+  .english-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .english-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .english-panel h4 { font-size: 0.88rem; font-weight: 600; color: var(--heading); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .english-panel-full { grid-column: 1 / -1; }
+
+  .cefr-levels { display: flex; flex-direction: column; gap: 6px; }
+  .cefr-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 5px; background: var(--bg); }
+  .cefr-badge { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 4px; min-width: 28px; text-align: center; }
+  .cefr-a .cefr-badge { background: rgba(126,231,135,0.15); color: var(--accent2); }
+  .cefr-b .cefr-badge { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .cefr-c .cefr-badge { background: rgba(188,140,255,0.15); color: var(--accent3); }
+  .cefr-label { font-size: 0.82rem; color: var(--text); flex: 1; }
+  .cefr-vocab { font-size: 0.72rem; color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; }
+
+  .usecase-list { display: flex; flex-direction: column; gap: 8px; }
+  .usecase-item { display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 5px; }
+  .usecase-id { font-size: 0.75rem; font-family: "SFMono-Regular", Consolas, monospace; color: #f0883e; font-weight: 600; }
+  .usecase-desc { font-size: 0.78rem; color: var(--muted); }
+
+  .hex-layers { display: flex; flex-direction: column; gap: 0; }
+  .hex-layer { border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; }
+  .hex-layer-badge { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 4px; white-space: nowrap; font-family: "SFMono-Regular", Consolas, monospace; flex-shrink: 0; }
+  .hex-layer-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
+  .hex-layer-arrow { text-align: center; font-size: 0.75rem; color: var(--muted); padding: 4px 0; }
+  .hex-domain-layer  { background: rgba(188,140,255,0.05); border-color: rgba(188,140,255,0.3); }
+  .hex-domain-layer  .hex-layer-badge { background: rgba(188,140,255,0.15); color: var(--accent3); }
+  .hex-ports-layer   { background: rgba(126,231,135,0.04); border-color: rgba(126,231,135,0.3); }
+  .hex-ports-layer   .hex-layer-badge { background: rgba(126,231,135,0.12); color: var(--accent2); }
+  .hex-app-layer     { background: rgba(88,166,255,0.05);  border-color: rgba(88,166,255,0.3); }
+  .hex-app-layer     .hex-layer-badge { background: rgba(88,166,255,0.15);  color: var(--accent); }
+  .hex-infra-layer   { background: rgba(255,166,87,0.05);  border-color: rgba(255,166,87,0.3); }
+  .hex-infra-layer   .hex-layer-badge { background: rgba(255,166,87,0.15);  color: var(--accent4); }
+
+  @media (max-width: 700px) {
+    .hex-top-row { flex-direction: column; }
+    .english-grid { grid-template-columns: 1fr; }
+    .english-panel-full { grid-column: 1; }
+    .framework-badges { gap: 6px; }
+    .fw-badge { min-width: 90px; }
+  }
+</style>
+
+<!-- Providers -->
+<section id="providers">
+  <h2>AI Providers &amp; Models</h2>
+  <p class="section-sub">Choose your provider in Settings. The model list, context window, and max-tokens field update dynamically from the built-in <code>ModelCatalog</code> &mdash; no hardcoded values.</p>
+  <div class="providers-grid">
+    <div class="provider-card">
+      <div class="pname">Anthropic Claude</div>
+      <span class="ptype cloud">Cloud</span>
+      <div class="model-list">
+        <div class="model-item"><span class="model-name">claude-opus-4-7</span><span class="model-ctx">200k ctx &middot; 32k out</span></div>
+        <div class="model-item"><span class="model-name">claude-sonnet-4-6</span><span class="model-ctx">200k ctx &middot; 64k out</span></div>
+        <div class="model-item"><span class="model-name">claude-haiku-4-5</span><span class="model-ctx">200k ctx &middot; 8k out</span></div>
+      </div>
+    </div>
+    <div class="provider-card">
+      <div class="pname">OpenAI</div>
+      <span class="ptype cloud">Cloud</span>
+      <div class="model-list">
+        <div class="model-item"><span class="model-name">gpt-4o</span><span class="model-ctx">128k ctx &middot; 16k out</span></div>
+        <div class="model-item"><span class="model-name">gpt-4o-mini</span><span class="model-ctx">128k ctx &middot; 16k out</span></div>
+        <div class="model-item"><span class="model-name">o1 / o1-mini</span><span class="model-ctx">200k ctx &middot; 32k out</span></div>
+        <div class="model-item"><span class="model-name">gpt-3.5-turbo</span><span class="model-ctx">16k ctx &middot; 4k out</span></div>
+      </div>
+    </div>
+    <div class="provider-card">
+      <div class="pname">Ollama</div>
+      <span class="ptype local">Local &middot; Free</span>
+      <p>Runs any GGUF/GGML model on-device. Auto-detected at <code>localhost:11434</code>. No API key required. Small-model mode activates automatically for models under 4B params.</p>
+    </div>
+    <div class="provider-card">
+      <div class="pname">LM Studio</div>
+      <span class="ptype local">Local &middot; Free</span>
+      <p>GUI model manager with OpenAI-compatible API. Auto-detected at <code>localhost:1234</code>. Supports any model loaded in LM Studio.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Memory -->
+<section id="memory">
+  <h2>Hierarchical Memory</h2>
+  <p class="section-sub">A living index of your project that grows as the AI works &mdash; stored locally in <code>.alpaquitay/memory.json</code>. Never sent to any server.</p>
+  <table>
+    <thead>
+      <tr><th>Level</th><th>What is stored</th><th>Example key</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>project</code></td><td>Name, description, architecture decisions</td><td><code>goal</code>, <code>stack</code></td></tr>
+      <tr><td><code>component</code></td><td>Major subsystems</td><td><code>auth</code>, <code>dashboard</code></td></tr>
+      <tr><td><code>module</code></td><td>Specific modules within a component</td><td><code>jwt-provider</code></td></tr>
+      <tr><td><code>section</code></td><td>Logical sections within a module</td><td><code>token-refresh</code></td></tr>
+      <tr><td><code>feature</code></td><td>Completed spec tasks + output files</td><td><code>SPEC-001</code></td></tr>
+      <tr><td><code>package</code></td><td>External packages and why chosen</td><td><code>jsonwebtoken</code></td></tr>
+      <tr><td><code>class</code></td><td>Class names and their source files</td><td><code>UserService</code></td></tr>
+      <tr><td><code>method</code></td><td>Exported functions and their files</td><td><code>calculateTotal</code></td></tr>
+      <tr><td><code>annotation</code></td><td>Interfaces, types, enums</td><td><code>AuthPayload</code></td></tr>
+      <tr><td><code>keyvalue</code></td><td>Ad-hoc key-value facts</td><td><code>db_url</code></td></tr>
+      <tr><td><code>config</code></td><td>Configuration entries</td><td><code>max_upload_mb</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Get started -->
+<section>
+  <div class="get-started">
+    <h2>Get started in 2 minutes</h2>
+    <p>Install the extension, open your project folder, and press <span class="kbd">Ctrl+Shift+A</span> to open the hub or <span class="kbd">Ctrl+Alt+A</span> for the command menu.</p>
+    <div class="install-cmd">code --install-extension alpaquitay-ai-2.0.0.vsix</div>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:20px;">Download the <code>.vsix</code> from GitHub Releases, then run the command above in your terminal.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/sergioide007/alpaquitay-ai/releases">
+        Download VSIX
+      </a>
+      <a class="btn btn-secondary" href="https://github.com/sergioide007/alpaquitay-ai#readme">
+        Read the docs
+      </a>
+      <a class="btn btn-secondary" href="https://github.com/sergioide007/alpaquitay-ai">
+        View source
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>
+    <strong>Alpaquitay AI</strong> is open source software released under the
+    <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/LICENSE">MIT License</a>.
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/sergioide007/alpaquitay-ai">GitHub</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/PRIVACY.md">Privacy</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a>
+  </p>
+  <p style="margin-top:8px;font-size:0.78rem;">
+    Your code never touches Alpaquitay servers. All AI calls go directly to your chosen provider.
+  </p>
+</footer>
+
+</body>
+</html>

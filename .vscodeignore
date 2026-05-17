@@ -1,0 +1,28 @@
+# Dev tooling
+.github/**
+.vscode/**
+.claude/**
+.gitignore
+.eslintrc.json
+tsconfig.json
+jest.config*
+
+# Source (compiled output lives in out/)
+src/**
+**/*.ts
+**/*.map
+
+# Dependencies
+node_modules/**
+
+# Test artifacts
+coverage/**
+out/test/**
+
+# Website / repo assets (not part of the extension)
+index.html
+media/**
+images/**
+
+# Package artifacts
+*.vsix

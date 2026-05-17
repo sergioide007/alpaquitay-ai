@@ -1,0 +1,288 @@
+{
+  "name": "alpaquitay-ai",
+  "displayName": "Alpaquitay AI",
+  "description": "Spec-Driven Development hub: AI chat, Kanban board, spec.md, git history, skills — on a single panel. Privacy-first, GDPR/CCPA compliant.",
+  "version": "2.0.0",
+  "publisher": "alpaquitay-ai",
+  "icon": "resources/icon.png",
+  "galleryBanner": {
+    "color": "#0d1117",
+    "theme": "dark"
+  },
+  "qna": "https://github.com/sergioide007/alpaquitay-ai/issues",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Machine Learning",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "coding-assistant",
+    "spec-driven",
+    "scrum",
+    "kanban",
+    "claude",
+    "ollama",
+    "local-ai",
+    "mcp",
+    "skills",
+    "privacy",
+    "gdpr"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sergioide007/alpaquitay-ai"
+  },
+  "bugs": {
+    "url": "https://github.com/sergioide007/alpaquitay-ai/issues"
+  },
+  "homepage": "https://www.specsolid.com",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "alpaquitay-ai.open",
+        "title": "Open Alpaquitay Hub",
+        "category": "Alpaquitay AI",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "alpaquitay-ai.showMenu",
+        "title": "Show Alpaquitay Commands",
+        "category": "Alpaquitay AI",
+        "icon": "$(list-unordered)"
+      },
+      {
+        "command": "alpaquitay-ai.configureProvider",
+        "title": "Configurar proveedor AI",
+        "category": "Alpaquitay AI",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "alpaquitay-ai.newSpecification",
+        "title": "New Specification",
+        "category": "Alpaquitay AI",
+        "icon": "$(file-add)"
+      },
+      {
+        "command": "alpaquitay-ai.generateFromSpec",
+        "title": "Generate from Specification",
+        "category": "Alpaquitay AI",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "alpaquitay-ai.validateAgainstSpec",
+        "title": "Validate Against Specification",
+        "category": "Alpaquitay AI",
+        "icon": "$(pass-filled)"
+      }
+    ],
+    "configuration": {
+      "title": "Alpaquitay AI",
+      "properties": {
+        "alpaquitay-ai.preferredProvider": {
+          "type": "string",
+          "default": "auto",
+          "enum": ["auto", "anthropic", "openai", "ollama", "lmstudio"],
+          "enumDescriptions": [
+            "Auto: prefiere modelos locales por privacidad",
+            "Anthropic Claude",
+            "OpenAI GPT",
+            "Ollama (local, privado)",
+            "LM Studio (local, privado)"
+          ],
+          "description": "Proveedor AI preferido. 'auto' selecciona modelos locales primero."
+        },
+        "alpaquitay-ai.anthropic.model": {
+          "type": "string",
+          "default": "claude-sonnet-4-6",
+          "description": "Modelo de Anthropic a usar"
+        },
+        "alpaquitay-ai.openai.model": {
+          "type": "string",
+          "default": "gpt-4o",
+          "description": "Modelo de OpenAI a usar"
+        },
+        "alpaquitay-ai.ollama.endpoint": {
+          "type": "string",
+          "default": "http://localhost:11434",
+          "description": "Endpoint del servidor Ollama"
+        },
+        "alpaquitay-ai.ollama.model": {
+          "type": "string",
+          "default": "codellama",
+          "description": "Modelo Ollama (e.g. codellama, deepseek-coder, mistral, llama3)"
+        },
+        "alpaquitay-ai.lmstudio.endpoint": {
+          "type": "string",
+          "default": "http://localhost:1234",
+          "description": "Endpoint del servidor LM Studio"
+        },
+        "alpaquitay-ai.maxTokens": {
+          "type": "number",
+          "default": 4096,
+          "minimum": 256,
+          "maximum": 128000,
+          "description": "Máximo de tokens por request AI"
+        },
+        "alpaquitay-ai.temperature": {
+          "type": "number",
+          "default": 0.3,
+          "minimum": 0,
+          "maximum": 2,
+          "description": "Temperatura de respuesta AI (menor = más determinista)"
+        },
+        "alpaquitay-ai.enableTelemetry": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enviar estadísticas anónimas de uso. Ningún código ni prompt se envía nunca. Ver PRIVACY.md."
+        },
+        "alpaquitay-ai.anthropic.baseUrl": {
+          "type": "string",
+          "default": "https://api.anthropic.com/v1",
+          "description": "Base URL de la API de Anthropic (útil para proxies o deployments custom)"
+        },
+        "alpaquitay-ai.openai.baseUrl": {
+          "type": "string",
+          "default": "https://api.openai.com/v1",
+          "description": "Base URL de la API de OpenAI (útil para Azure OpenAI o proxies)"
+        },
+        "alpaquitay-ai.requestTimeout": {
+          "type": "number",
+          "default": 120000,
+          "minimum": 10000,
+          "maximum": 600000,
+          "description": "Timeout de requests AI en milisegundos (default: 120s)"
+        },
+        "alpaquitay-ai.skill.maxParallel": {
+          "type": "number",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Máximo de sub-skills ejecutados en paralelo en CompositeSkill/ParallelSkill"
+        },
+        "alpaquitay-ai.mcp.filesystem.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Habilitar MCP Filesystem (leer/escribir archivos)"
+        },
+        "alpaquitay-ai.mcp.git.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Habilitar MCP Git (operaciones git)"
+        },
+        "alpaquitay-ai.systemPrompt": {
+          "type": "string",
+          "default": "",
+          "description": "System prompt global que se inyecta en todas las conversaciones AI"
+        },
+        "alpaquitay-ai.orgContext": {
+          "type": "string",
+          "default": "",
+          "description": "Nombre o contexto de la organización/equipo para personalizar respuestas"
+        },
+        "alpaquitay-ai.indexing.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Habilitar indexado del workspace para contexto enriquecido (próximamente)"
+        },
+        "alpaquitay-ai.specFile": {
+          "type": "string",
+          "default": "spec.md",
+          "description": "Nombre del archivo spec en el workspace (e.g. tasks.md, backlog.md). Si no existe, Alpaquitay busca automáticamente archivos similares."
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "alpaquitay-ai.showMenu",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
+      },
+      {
+        "command": "alpaquitay-ai.open",
+        "key": "ctrl+alt+a",
+        "mac": "cmd+alt+a"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "alpaquitay-ai.open"
+        },
+        {
+          "command": "alpaquitay-ai.showMenu"
+        },
+        {
+          "command": "alpaquitay-ai.configureProvider"
+        },
+        {
+          "command": "alpaquitay-ai.newSpecification"
+        },
+        {
+          "command": "alpaquitay-ai.generateFromSpec"
+        },
+        {
+          "command": "alpaquitay-ai.validateAgainstSpec"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "build": "npm run compile",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test": "jest --passWithNoTests",
+    "test:coverage": "jest --coverage --passWithNoTests",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src/test"
+    ],
+    "testMatch": [
+      "**/*.test.ts"
+    ],
+    "moduleNameMapper": {
+      "^vscode$": "<rootDir>/src/test/__mocks__/vscode.ts"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/test/**",
+      "!src/extension.ts",
+      "!src/panel/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 60,
+        "functions": 70,
+        "lines": 70,
+        "statements": 70
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vscode/vsce": "^2.23.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.9",
+    "typescript": "^5.3.0"
+  }
+}
