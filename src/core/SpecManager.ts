@@ -148,4 +148,98 @@ export class SpecManager {
     this.boardState.clear();
     await fs.writeFile(this.specPath, content, 'utf-8');
   }
+
+  async addTask(epicTitle: string, taskTitle: string): Promise<void> {
+    let markdown = '';
+    try { markdown = await fs.readFile(this.specPath, 'utf-8'); } catch {
+      markdown = `# Project\n\n## ${epicTitle}\n\n- [ ] ${taskTitle}\n`;
+      await fs.writeFile(this.specPath, markdown, 'utf-8');
+      return;
+    }
+    const lines = markdown.split('\n');
+    let epicLineIdx = -1;
+    for (let i = 0; i < lines.length; i++) {
+      const m = lines[i].match(/^(#{1,6})\s+(.+)/);
+      if (m) {
+        const name = m[2].trim().replace(/^Epic:\s*/i, '').trim();
+        if (name === epicTitle || m[2].trim() === epicTitle) { epicLineIdx = i; break; }
+      }
+    }
+    if (epicLineIdx < 0) {
+      markdown = markdown.trimEnd() + `\n\n## ${epicTitle}\n\n- [ ] ${taskTitle}\n`;
+    } else {
+      let lastTaskLine = epicLineIdx;
+      for (let i = epicLineIdx + 1; i < lines.length; i++) {
+        if (/^#{1,6}\s+/.test(lines[i])) break;
+        if (/^\s*[-*]\s+\[[ x]\]/i.test(lines[i])) lastTaskLine = i;
+      }
+      lines.splice(lastTaskLine + 1, 0, `- [ ] ${taskTitle}`);
+      markdown = lines.join('\n');
+    }
+    this.boardState.clear();
+    await fs.writeFile(this.specPath, markdown, 'utf-8');
+  }
+
+  async updateTaskTitle(taskId: string, newTitle: string): Promise<void> {
+    let markdown = '';
+    try { markdown = await fs.readFile(this.specPath, 'utf-8'); } catch { return; }
+    const lines = markdown.split('\n');
+    const task = this._parse(markdown).find(t => t.id === taskId);
+    if (!task || lines[task.lineIndex] === undefined) return;
+    lines[task.lineIndex] = lines[task.lineIndex].replace(/(\[[ x]\]\s*)(.+)$/, `$1${newTitle}`);
+    await fs.writeFile(this.specPath, lines.join('\n'), 'utf-8');
+  }
+
+  async deleteTask(taskId: string): Promise<void> {
+    let markdown = '';
+    try { markdown = await fs.readFile(this.specPath, 'utf-8'); } catch { return; }
+    const lines = markdown.split('\n');
+    const task = this._parse(markdown).find(t => t.id === taskId);
+    if (!task) return;
+    lines.splice(task.lineIndex, 1);
+    this.boardState.delete(taskId);
+    await fs.writeFile(this.specPath, lines.join('\n'), 'utf-8');
+  }
+
+  async addEpic(epicTitle: string): Promise<void> {
+    let markdown = '';
+    try { markdown = await fs.readFile(this.specPath, 'utf-8'); } catch { markdown = `# Project\n`; }
+    markdown = markdown.trimEnd() + `\n\n## ${epicTitle}\n\n- [ ] Define tasks for this epic\n`;
+    this.boardState.clear();
+    await fs.writeFile(this.specPath, markdown, 'utf-8');
+  }
+
+  async updateEpicTitle(oldTitle: string, newTitle: string): Promise<void> {
+    let markdown = '';
+    try { markdown = await fs.readFile(this.specPath, 'utf-8'); } catch { return; }
+    const lines = markdown.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const m = lines[i].match(/^(#{1,6}\s+)(.+)/);
+      if (m) {
+        const name = m[2].trim().replace(/^Epic:\s*/i, '').trim();
+        if (name === oldTitle || m[2].trim() === oldTitle) { lines[i] = m[1] + newTitle; break; }
+      }
+    }
+    this.boardState.clear();
+    await fs.writeFile(this.specPath, lines.join('\n'), 'utf-8');
+  }
+
+  async deleteEpic(epicTitle: string): Promise<void> {
+    let markdown = '';
+    try { markdown = await fs.readFile(this.specPath, 'utf-8'); } catch { return; }
+    const lines = markdown.split('\n');
+    let epicStart = -1, epicEnd = lines.length;
+    for (let i = 0; i < lines.length; i++) {
+      const m = lines[i].match(/^(#{1,6})\s+(.+)/);
+      if (m) {
+        if (epicStart >= 0) { epicEnd = i; break; }
+        const name = m[2].trim().replace(/^Epic:\s*/i, '').trim();
+        if (name === epicTitle || m[2].trim() === epicTitle) epicStart = i;
+      }
+    }
+    if (epicStart < 0) return;
+    lines.splice(epicStart, epicEnd - epicStart);
+    this.boardState.clear();
+    await fs.writeFile(this.specPath, lines.join('\n'), 'utf-8');
+  }
 }

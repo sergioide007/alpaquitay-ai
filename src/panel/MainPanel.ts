@@ -124,6 +124,34 @@ export class MainPanel {
                                        (msg as { type: 'run-skill-on-task'; skillId: string; taskId: string }).skillId,
                                        (msg as { type: 'run-skill-on-task'; skillId: string; taskId: string }).taskId
                                      );
+      case 'add-spec-task':          return this._handleAddSpecTask(
+                                       (msg as { type: 'add-spec-task'; epicTitle: string; taskTitle: string }).epicTitle,
+                                       (msg as { type: 'add-spec-task'; epicTitle: string; taskTitle: string }).taskTitle
+                                     );
+      case 'update-spec-task':       return this._handleUpdateSpecTask(
+                                       (msg as { type: 'update-spec-task'; taskId: string; newTitle: string }).taskId,
+                                       (msg as { type: 'update-spec-task'; taskId: string; newTitle: string }).newTitle
+                                     );
+      case 'delete-spec-task':       return this._handleDeleteSpecTask(
+                                       (msg as { type: 'delete-spec-task'; taskId: string }).taskId
+                                     );
+      case 'add-spec-epic':          return this._handleAddSpecEpic(
+                                       (msg as { type: 'add-spec-epic'; epicTitle: string }).epicTitle
+                                     );
+      case 'update-spec-epic':       return this._handleUpdateSpecEpic(
+                                       (msg as { type: 'update-spec-epic'; oldTitle: string; newTitle: string }).oldTitle,
+                                       (msg as { type: 'update-spec-epic'; oldTitle: string; newTitle: string }).newTitle
+                                     );
+      case 'delete-spec-epic':       return this._handleDeleteSpecEpic(
+                                       (msg as { type: 'delete-spec-epic'; epicTitle: string }).epicTitle
+                                     );
+      case 'arch-create-adr':        return this._handleCreateAdr(
+                                       (msg as { type: 'arch-create-adr'; context: string; decision: string }).context,
+                                       (msg as { type: 'arch-create-adr'; context: string; decision: string }).decision
+                                     );
+      case 'arch-assess':            return this._handleArchAssess(
+                                       (msg as { type: 'arch-assess'; context: string }).context
+                                     );
     }
   }
 
@@ -1215,55 +1243,25 @@ export class MainPanel {
       this._post({ type: 'arch-chat-error', error: 'No AI provider available. Configure one in Settings.' });
       return;
     }
-
-    const hasNodes = currentDiagram.nodes.length > 0;
-    const nodeList = hasNodes
-      ? currentDiagram.nodes.map(n => `${n.name}(${n.type})`).join(', ')
-      : 'none';
-    const edgeList = hasNodes && currentDiagram.edges.length > 0
-      ? currentDiagram.edges.map(e => {
-          const from = currentDiagram.nodes.find(n => n.id === e.from)?.name ?? e.from;
-          const to   = currentDiagram.nodes.find(n => n.id === e.to)?.name   ?? e.to;
-          return `${from}→${to}${e.label ? `(${e.label})` : ''}`;
-        }).join(', ')
-      : 'none';
-
-    const systemPrompt = `You are a senior software architect (ISO/IEC 42010, TOGAF, C4 Model).
-Respond ONLY with valid JSON — no markdown fences, no extra text.
-
-Node types: lambda, function, api, db, storage, queue, cache, service, client, auth, cdn, container
-Node format: { "id": "slug", "type": "<type>", "name": "Max 16 chars", "x": <px>, "y": <px> }
-Edge format: { "id": "slug", "from": "<node-id>", "to": "<node-id>", "label": "optional" }
-Layout: x starts at 100, y at 80; space 200px horizontally, 150px vertically; flow left-to-right.
-IDs must be unique slugs like "api-gateway", "user-db", "redis-cache".
-
-Return this exact JSON structure:
-{ "explanation": "one-sentence description of what was designed/changed", "diagram": { "nodes": [...], "edges": [...] } }`;
-
-    const contextMsg = hasNodes
-      ? `Current diagram — nodes: ${nodeList}. Connections: ${edgeList}.`
-      : 'Starting from an empty canvas.';
-
     try {
-      const response = await provider.chat(
-        [{ role: 'user', content: `${contextMsg}\n\nInstruction: ${text}` }],
-        { systemPrompt, maxTokens: 2048 }
-      );
-
-      let patch: ArchDiagramPatch | null = null;
-      let explanation = 'Diagram updated.';
-
-      try {
-        const raw = response.content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        const jsonStr = raw.match(/\{[\s\S]*\}/)?.[0] ?? raw;
-        const parsed = JSON.parse(jsonStr) as { explanation?: string; diagram?: ArchDiagram; patch?: ArchDiagramPatch };
-        explanation = parsed.explanation ?? explanation;
-        if (parsed.diagram) { patch = { replace: parsed.diagram }; }
-        else if (parsed.patch) { patch = parsed.patch; }
-      } catch { /* keep default explanation, no patch */ }
-
-      this._post({ type: 'arch-chat-chunk', content: explanation });
-      this._post({ type: 'arch-chat-done', patch, model: response.model });
+      const { SoftwareArchitectShell } = await import('../domains/software-architect/SoftwareArchitectShell');
+      const shell = new SoftwareArchitectShell();
+      await shell.initialize(provider, this.workspaceRoot);
+      const result = await shell.run('interactive-diagram', { instruction: text, currentDiagram });
+      if (result.success && result.data) {
+        const data = result.data as { explanation?: string; diagram?: ArchDiagram };
+        let patch: ArchDiagramPatch | null = null;
+        const explanation = data.explanation ?? 'Diagram updated.';
+        if (data.diagram) { patch = { replace: data.diagram }; }
+        this._post({ type: 'arch-chat-chunk', content: explanation });
+        if (result.guardrailResults?.length) {
+          const warns = result.guardrailResults.map(g => `⚠ ${g.rule}: ${g.message}`).join('\n');
+          this._post({ type: 'arch-chat-chunk', content: `\n\n${warns}` });
+        }
+        this._post({ type: 'arch-chat-done', patch, model: provider.modelName });
+      } else {
+        this._post({ type: 'arch-chat-error', error: result.errors?.join('; ') ?? 'Unknown error' });
+      }
     } catch (err) {
       this._post({ type: 'arch-chat-error', error: err instanceof Error ? err.message : String(err) });
     }
@@ -1601,6 +1599,151 @@ Return this exact JSON structure:
       }
     });
     await this._sendSkills();
+  }
+
+  // -- Spec inline editing ----------------------------------------------------
+
+  private async _handleAddSpecTask(epicTitle: string, taskTitle: string): Promise<void> {
+    await this.specManager.addTask(epicTitle, taskTitle);
+    await this._sendSpec();
+  }
+
+  private async _handleUpdateSpecTask(taskId: string, newTitle: string): Promise<void> {
+    await this.specManager.updateTaskTitle(taskId, newTitle);
+    await this._sendSpec();
+  }
+
+  private async _handleDeleteSpecTask(taskId: string): Promise<void> {
+    await this.specManager.deleteTask(taskId);
+    this.specManager.setBoardStatus(taskId, 'backlog');
+    await this._sendSpec();
+  }
+
+  private async _handleAddSpecEpic(epicTitle: string): Promise<void> {
+    await this.specManager.addEpic(epicTitle);
+    await this._sendSpec();
+  }
+
+  private async _handleUpdateSpecEpic(oldTitle: string, newTitle: string): Promise<void> {
+    await this.specManager.updateEpicTitle(oldTitle, newTitle);
+    await this._sendSpec();
+  }
+
+  private async _handleDeleteSpecEpic(epicTitle: string): Promise<void> {
+    await this.specManager.deleteEpic(epicTitle);
+    await this._sendSpec();
+  }
+
+  // -- Architecture ADR & assessment ------------------------------------------
+
+  private async _handleCreateAdr(context: string, decision: string): Promise<void> {
+    const provider = this.aiManager.getActive();
+    if (!provider) {
+      this._post({ type: 'arch-chat-error', error: 'No AI provider available.' });
+      return;
+    }
+    try {
+      const { SoftwareArchitectShell } = await import('../domains/software-architect/SoftwareArchitectShell');
+      const shell = new SoftwareArchitectShell();
+      await shell.initialize(provider, this.workspaceRoot);
+      const result = await shell.run('create-adr', { context, decision });
+      if (result.success && result.data) {
+        const adr = result.data as {
+          id?: string; title?: string; status?: string; context?: string;
+          decision?: string; consequences?: string;
+          alternatives?: string[]; qualityAttributes?: string[]; isoReference?: string;
+        };
+        const adrId = adr.id ?? `ADR-${String(Date.now()).slice(-4)}`;
+        const title = adr.title ?? decision.slice(0, 60);
+        const content = [
+          `# ${adrId}: ${title}`,
+          ``,
+          `**Status:** ${adr.status ?? 'Proposed'}`,
+          `**Date:** ${new Date().toISOString().split('T')[0]}`,
+          `**ISO Reference:** ${adr.isoReference ?? 'ISO/IEC 42010'}`,
+          ``,
+          `## Context`,
+          ``,
+          adr.context ?? context,
+          ``,
+          `## Decision`,
+          ``,
+          adr.decision ?? decision,
+          ``,
+          `## Consequences`,
+          ``,
+          adr.consequences ?? '',
+          ``,
+          `## Alternatives Considered`,
+          ``,
+          ...(adr.alternatives ?? []).map((a: string) => `- ${a}`),
+          ``,
+          `## Quality Attributes`,
+          ``,
+          ...(adr.qualityAttributes ?? []).map((q: string) => `- ${q}`),
+        ].join('\n');
+        const { mkdir, writeFile } = await import('fs/promises');
+        const adrDir = nodePath.join(this.workspaceRoot, '.alpaquitay', 'adrs');
+        await mkdir(adrDir, { recursive: true });
+        const filename = `${adrId.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.md`;
+        await writeFile(nodePath.join(adrDir, filename), content, 'utf-8');
+        this._post({ type: 'arch-chat-chunk', content: `**ADR created:** \`.alpaquitay/adrs/${filename}\`\n\n${content.slice(0, 600)}` });
+        this._post({ type: 'arch-chat-done', patch: null, model: provider.modelName });
+      } else {
+        this._post({ type: 'arch-chat-error', error: result.errors?.join('; ') ?? 'Failed to create ADR' });
+      }
+    } catch (err) {
+      this._post({ type: 'arch-chat-error', error: err instanceof Error ? err.message : String(err) });
+    }
+  }
+
+  private async _handleArchAssess(context: string): Promise<void> {
+    const provider = this.aiManager.getActive();
+    if (!provider) {
+      this._post({ type: 'arch-chat-error', error: 'No AI provider available.' });
+      return;
+    }
+    try {
+      const { SoftwareArchitectShell } = await import('../domains/software-architect/SoftwareArchitectShell');
+      const shell = new SoftwareArchitectShell();
+      await shell.initialize(provider, this.workspaceRoot);
+      const result = await shell.run('assess-architecture', { context });
+      if (result.success && result.data) {
+        const data = result.data as {
+          currentStyle?: string; recommendedStyle?: string;
+          qualityScores?: Record<string, number>;
+          risks?: Array<{ risk: string; likelihood: string; impact: string; mitigation: string }>;
+          evolutionPath?: string[];
+        };
+        let report = `## Architecture Assessment (ISO/IEC 42010)\n\n`;
+        if (data.currentStyle)      report += `**Current style:** ${data.currentStyle}\n`;
+        if (data.recommendedStyle)  report += `**Recommended:** ${data.recommendedStyle}\n\n`;
+        if (data.qualityScores) {
+          report += `### Quality Attributes (ISO/IEC 25010)\n`;
+          for (const [attr, score] of Object.entries(data.qualityScores)) {
+            const n = Math.min(10, Math.max(0, Math.round(Number(score) / 10)));
+            report += `\`${attr.padEnd(16)}\` ${'█'.repeat(n)}${'░'.repeat(10 - n)} ${score}/100\n`;
+          }
+          report += '\n';
+        }
+        if (data.risks?.length) {
+          report += `### Risks\n`;
+          for (const r of data.risks.slice(0, 6)) {
+            report += `- **${r.risk}** (${r.likelihood}↑ / ${r.impact}⚡): ${r.mitigation}\n`;
+          }
+          report += '\n';
+        }
+        if (result.guardrailResults?.length) {
+          report += `### Guardrails\n` + result.guardrailResults.map(g => `⚠ ${g.rule}: ${g.message}`).join('\n');
+        }
+        this._post({ type: 'arch-chat-chunk', content: report });
+        this._post({ type: 'arch-chat-done', patch: null, model: provider.modelName });
+      } else {
+        this._post({ type: 'arch-chat-error', error: result.errors?.join('; ') ?? 'Assessment failed' });
+      }
+    } catch (err) {
+      this._post({ type: 'arch-chat-error', error: err instanceof Error ? err.message : String(err) });
+    }
   }
 
   // -- Settings ---------------------------------------------------------------
@@ -1955,6 +2098,31 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
 .cand-name{font-family:var(--mono);font-size:11px;color:var(--text);font-weight:600}
 .cand-count{font-size:10px;color:var(--muted);margin-left:4px}
 .cand-actions{display:flex;gap:4px;flex-shrink:0}
+.spec-epic-hd{display:flex;align-items:center;gap:4px;padding:5px 0 3px;border-bottom:1px solid var(--border);margin-bottom:5px}
+.epic-title-txt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-lt);flex:1;cursor:text;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.epic-title-txt:hover{color:var(--text)}
+.epic-hd-btn{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0 2px;line-height:1;opacity:0;transition:opacity .1s,color .1s;flex-shrink:0}
+.spec-epic-hd:hover .epic-hd-btn{opacity:1}
+.epic-hd-btn:hover{color:var(--signal)}
+.epic-hd-btn.del-btn:hover{color:#ff4b6e}
+.ta-del{color:var(--muted)}
+.ta-del:hover{color:#ff4b6e !important;border-color:rgba(255,75,110,.3) !important}
+.add-task-row{padding:2px 0}
+.add-task-btn{background:none;border:1px dashed var(--border);color:var(--muted);font-size:10px;padding:2px 7px;border-radius:var(--radius);cursor:pointer;width:100%;text-align:left;transition:color .15s,border-color .15s}
+.add-task-btn:hover{color:var(--signal);border-color:rgba(0,229,160,.3)}
+.add-epic-row{padding:8px 0 4px;border-top:1px solid var(--border);margin-top:8px}
+.inline-edit-input{background:var(--bg3);border:1.5px solid rgba(0,229,160,.5);color:var(--text);font-family:var(--sans);font-size:11px;padding:2px 5px;border-radius:3px;outline:none;width:100%}
+.inline-edit-input:focus{border-color:var(--signal)}
+.arch-toolbar-row{flex-shrink:0;background:var(--bg1);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.c4-tabs{display:flex;gap:2px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:2px}
+.c4-tab{background:none;border:none;color:var(--muted-lt);font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.c4-tab.active{background:rgba(0,229,160,.12);color:var(--signal)}
+.c4-tab:hover:not(.active){color:var(--text)}
+.arch-adr-form{background:var(--bg1);border-top:1px solid var(--border);padding:10px;display:none;flex-direction:column;gap:6px}
+.arch-adr-form.visible{display:flex}
+.arch-adr-form label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.arch-adr-form textarea{background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:11px;padding:5px 7px;border-radius:var(--radius);outline:none;resize:vertical;min-height:48px;font-family:var(--sans)}
+.arch-adr-form textarea:focus{border-color:rgba(0,229,160,.5)}
 `; }
 
   private _htmlBody(): string { return `
@@ -2046,9 +2214,26 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
     <div class="arch-toolbar-row">
       <button class="btn btn-o btn-sm" id="archSaveBtn">Save</button>
       <button class="btn btn-o btn-sm" id="archClearBtn">Clear</button>
-      <button class="btn btn-ai btn-sm" id="archAiToggle">&#9650; AI</button>
+      <button class="btn btn-ai btn-sm" id="archAssessBtn">&#9650; Assess</button>
+      <button class="btn btn-o btn-sm" id="archAdrBtn">ADR</button>
       <span style="flex:1"></span>
-      <span style="font-size:10px;color:var(--muted)">Click to place &middot; Drag to move &middot; Shift+click to connect &middot; Delete to remove</span>
+      <div class="c4-tabs" title="C4 diagram level">
+        <button class="c4-tab active" data-c4="context">Context</button>
+        <button class="c4-tab" data-c4="container">Container</button>
+        <button class="c4-tab" data-c4="component">Component</button>
+      </div>
+      <button class="btn btn-ai btn-sm" id="archAiToggle">&#9650; AI</button>
+      <span style="font-size:10px;color:var(--muted)">Click&middot;Drag&middot;Shift+click&middot;Delete</span>
+    </div>
+    <div class="arch-adr-form" id="archAdrForm">
+      <label>Context (current architecture situation)</label>
+      <textarea id="archAdrCtx" placeholder="We are using a monolithic Spring Boot application..."></textarea>
+      <label>Decision (what are you considering?)</label>
+      <textarea id="archAdrDec" placeholder="We will extract the payment module into a microservice..."></textarea>
+      <div style="display:flex;gap:6px;justify-content:flex-end">
+        <button class="btn btn-o btn-sm" id="archAdrCancel">Cancel</button>
+        <button class="btn btn-p btn-sm" id="archAdrSubmit">Create ADR</button>
+      </div>
     </div>
     <div class="arch-layout">
       <div class="arch-palette">
@@ -2490,19 +2675,30 @@ function renderSpec() {
   const epics = {};
   for (const t of S.spec.tasks) { if (!epics[t.epicTitle]) epics[t.epicTitle]=[]; epics[t.epicTitle].push(t); }
   const epicHtml = Object.entries(epics).map(([epic, tasks]) => \`
-    <div class="spec-epic">
-      <div class="epic-title">\${esc(epic)}</div>
+    <div class="spec-epic" data-epic="\${esc(epic)}">
+      <div class="spec-epic-hd">
+        <span class="epic-title-txt" data-epic="\${esc(epic)}" title="Double-click to rename">\${esc(epic)}</span>
+        <button class="epic-hd-btn" data-edit-epic="\${esc(epic)}" title="Rename epic">&#9998;</button>
+        <button class="epic-hd-btn del-btn" data-del-epic="\${esc(epic)}" title="Delete epic">&times;</button>
+      </div>
       \${tasks.map(t => \`<div class="spec-task \${t.done?'done':''}" data-id="\${esc(t.id)}">
         <input type="checkbox" id="cb-\${esc(t.id)}" data-id="\${esc(t.id)}" \${t.done?'checked':''}>
-        <label for="cb-\${esc(t.id)}">\${esc(t.title)}</label>
+        <label for="cb-\${esc(t.id)}" class="task-lbl" data-id="\${esc(t.id)}" title="Double-click to edit">\${esc(t.title)}</label>
         <span class="tid">\${esc(t.id)}</span>
         <div class="task-actions">
-          <button class="ta-btn" data-run-task="\${esc(t.id)}" data-skill="generate-tests">Test</button>
-          <button class="ta-btn" data-run-task="\${esc(t.id)}" data-skill="refactor">Refactor</button>
+          <button class="ta-btn" data-edit-task="\${esc(t.id)}" title="Edit title">&#9998;</button>
+          <button class="ta-btn" data-run-task="\${esc(t.id)}" data-skill="generate-tests" title="Generate tests">Test</button>
+          <button class="ta-btn" data-run-task="\${esc(t.id)}" data-skill="refactor" title="Refactor">Refactor</button>
+          <button class="ta-btn ta-del" data-del-task="\${esc(t.id)}" title="Delete task">&times;</button>
         </div>
       </div>\`).join('')}
+      <div class="add-task-row">
+        <button class="add-task-btn" data-add-task="\${esc(epic)}">+ Add task</button>
+      </div>
     </div>\`).join('');
-  body.innerHTML = epicHtml || \`<div class="spec-empty"><div class="wm">ALPAQUITAY</div><p>No tasks in spec.</p></div>\`;
+  body.innerHTML = (epicHtml || \`<div class="spec-empty"><div class="wm">ALPAQUITAY</div><p>No tasks in spec.</p></div>\`) +
+    \`<div class="add-epic-row"><button class="btn btn-o btn-sm" id="addEpicBtn" style="width:100%">+ Add Epic</button></div>\`;
+
   body.querySelectorAll('input[type=checkbox]').forEach(cb => cb.addEventListener('change', () => {
     vscode.postMessage({ type:'update-task-status', taskId:cb.dataset.id, status:cb.checked?'done':'backlog' });
   }));
@@ -2511,6 +2707,90 @@ function renderSpec() {
     vscode.postMessage({ type:'run-skill-on-task', skillId:btn.dataset.skill, taskId:btn.dataset.runTask });
     toast('Running '+btn.dataset.skill+' on '+btn.dataset.runTask,'info');
   }));
+
+  // -- Inline task edit (pencil button or double-click label)
+  const startEditTask = (taskId, labelEl) => {
+    const current = S.spec.tasks.find(t => t.id === taskId)?.title ?? '';
+    const inp = document.createElement('input');
+    inp.className = 'inline-edit-input'; inp.value = current;
+    labelEl.replaceWith(inp); inp.focus(); inp.select();
+    const commit = () => {
+      const v = inp.value.trim();
+      if (v && v !== current) vscode.postMessage({ type:'update-spec-task', taskId, newTitle:v });
+      else if (!v) inp.replaceWith(labelEl); // cancelled
+      else { vscode.postMessage({ type:'load-spec' }); }
+    };
+    inp.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();commit();} if(e.key==='Escape'){inp.replaceWith(labelEl);} });
+    inp.addEventListener('blur', commit, { once:true });
+  };
+  body.querySelectorAll('[data-edit-task]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const id = btn.dataset.editTask;
+    const lbl = btn.closest('.spec-task')?.querySelector('.task-lbl');
+    if (lbl) startEditTask(id, lbl);
+  }));
+  body.querySelectorAll('.task-lbl').forEach(lbl => lbl.addEventListener('dblclick', e => {
+    e.preventDefault();
+    const id = lbl.dataset.id;
+    startEditTask(id, lbl);
+  }));
+
+  // -- Delete task
+  body.querySelectorAll('[data-del-task]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation();
+    vscode.postMessage({ type:'delete-spec-task', taskId:btn.dataset.delTask });
+  }));
+
+  // -- Add task inline per epic
+  body.querySelectorAll('[data-add-task]').forEach(btn => btn.addEventListener('click', () => {
+    const epic = btn.dataset.addTask;
+    const inp = document.createElement('input');
+    inp.className = 'inline-edit-input'; inp.placeholder = 'New task title...';
+    btn.replaceWith(inp); inp.focus();
+    const commit = () => {
+      const v = inp.value.trim();
+      if (v) vscode.postMessage({ type:'add-spec-task', epicTitle:epic, taskTitle:v });
+      else vscode.postMessage({ type:'load-spec' });
+    };
+    inp.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();commit();} if(e.key==='Escape'){vscode.postMessage({type:'load-spec'});} });
+    inp.addEventListener('blur', commit, { once:true });
+  }));
+
+  // -- Inline epic rename (pencil or double-click title)
+  const startEditEpic = (oldTitle, titleEl) => {
+    const inp = document.createElement('input');
+    inp.className = 'inline-edit-input'; inp.value = oldTitle;
+    titleEl.replaceWith(inp); inp.focus(); inp.select();
+    const commit = () => {
+      const v = inp.value.trim();
+      if (v && v !== oldTitle) vscode.postMessage({ type:'update-spec-epic', oldTitle, newTitle:v });
+      else vscode.postMessage({ type:'load-spec' });
+    };
+    inp.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();commit();} if(e.key==='Escape'){vscode.postMessage({type:'load-spec'});} });
+    inp.addEventListener('blur', commit, { once:true });
+  };
+  body.querySelectorAll('[data-edit-epic]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const old = btn.dataset.editEpic;
+    const hd = btn.closest('.spec-epic-hd')?.querySelector('.epic-title-txt');
+    if (hd) startEditEpic(old, hd);
+  }));
+  body.querySelectorAll('.epic-title-txt').forEach(el => el.addEventListener('dblclick', e => {
+    e.preventDefault();
+    startEditEpic(el.dataset.epic, el);
+  }));
+
+  // -- Delete epic
+  body.querySelectorAll('[data-del-epic]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation();
+    vscode.postMessage({ type:'delete-spec-epic', epicTitle:btn.dataset.delEpic });
+  }));
+
+  // -- Add epic
+  document.getElementById('addEpicBtn')?.addEventListener('click', () => {
+    const name = prompt('New epic name:')?.trim();
+    if (name) vscode.postMessage({ type:'add-spec-epic', epicTitle:name });
+  });
 }
 (function initBoardDrag() {
   document.querySelectorAll('.board-cols').forEach(board => {
@@ -2722,6 +3002,43 @@ document.getElementById('s-reset').addEventListener('click',()=>{
   });
   toast('Defaults restored — click Save to apply','info');
 });
+// -- Arch Assess + ADR --------------------------------------------------------
+document.getElementById('archAssessBtn').addEventListener('click', () => {
+  const nodes = S.arch.nodes.map(n => \`\${n.name}(\${n.type})\`).join(', ') || 'empty canvas';
+  const edges = S.arch.edges.map(e => { const f=S.arch.nodes.find(n=>n.id===e.from)?.name??e.from; const t=S.arch.nodes.find(n=>n.id===e.to)?.name??e.to; return \`\${f}→\${t}\`; }).join(', ');
+  const ctx = \`Nodes: \${nodes}. Connections: \${edges}.\`;
+  const hint=document.getElementById('archAiHint'); if(hint) hint.style.display='none';
+  addArchAiMsg('u','Assess this architecture');
+  _archAiThinking=true; archAiSend.disabled=true; _archAiThinkDiv=addArchAiThinking();
+  const panel=document.getElementById('archAiChat'); if(panel.classList.contains('ai-hidden')){ panel.classList.remove('ai-hidden'); document.getElementById('archAiToggle').textContent='\\u25bc AI'; }
+  vscode.postMessage({ type:'arch-assess', context:ctx });
+});
+document.getElementById('archAdrBtn').addEventListener('click', () => {
+  const form=document.getElementById('archAdrForm');
+  form.classList.toggle('visible');
+});
+document.getElementById('archAdrCancel').addEventListener('click', () => { document.getElementById('archAdrForm').classList.remove('visible'); });
+document.getElementById('archAdrSubmit').addEventListener('click', () => {
+  const ctx=document.getElementById('archAdrCtx').value.trim();
+  const dec=document.getElementById('archAdrDec').value.trim();
+  if(!ctx||!dec){ toast('Fill in context and decision','err'); return; }
+  document.getElementById('archAdrForm').classList.remove('visible');
+  document.getElementById('archAdrCtx').value='';
+  document.getElementById('archAdrDec').value='';
+  const hint=document.getElementById('archAiHint'); if(hint) hint.style.display='none';
+  addArchAiMsg('u','Create ADR: '+dec.slice(0,60));
+  _archAiThinking=true; archAiSend.disabled=true; _archAiThinkDiv=addArchAiThinking();
+  const panel=document.getElementById('archAiChat'); if(panel.classList.contains('ai-hidden')){ panel.classList.remove('ai-hidden'); document.getElementById('archAiToggle').textContent='\\u25bc AI'; }
+  vscode.postMessage({ type:'arch-create-adr', context:ctx, decision:dec });
+});
+// -- C4 level tabs -----------------------------------------------------------
+let currentC4Level='context';
+document.querySelectorAll('.c4-tab').forEach(tab => tab.addEventListener('click', () => {
+  document.querySelectorAll('.c4-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  currentC4Level = tab.dataset.c4;
+  toast('C4 level: '+currentC4Level,'info');
+}));
 let archTool=null, archSelected=null, archDragging=null, archConnecting=null;
 let archPan={x:0,y:0}, archZoom=1, archPanning=false, archPanStart=null;
 const archSvg=document.getElementById('archCanvas');

@@ -2,7 +2,7 @@
   "name": "alpaquitay-ai",
   "displayName": "Alpaquitay AI",
   "description": "Spec-Driven Development hub: AI chat, Kanban board, spec.md, git history, skills — on a single panel. Privacy-first, GDPR/CCPA compliant.",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "publisher": "alpaquitay-ai",
   "icon": "resources/icon.png",
   "galleryBanner": {
@@ -61,7 +61,7 @@
       },
       {
         "command": "alpaquitay-ai.configureProvider",
-        "title": "Configurar proveedor AI",
+        "title": "Configure AI Provider",
         "category": "Alpaquitay AI",
         "icon": "$(settings-gear)"
       },

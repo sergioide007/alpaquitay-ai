@@ -199,7 +199,15 @@ export type WebviewMessage =
   | { type: 'arch-load' }
   | { type: 'arch-export'; diagram: ArchDiagram; format: string }
   | { type: 'arch-chat'; text: string; currentDiagram: ArchDiagram }
-  | { type: 'run-skill-on-task'; skillId: string; taskId: string };
+  | { type: 'run-skill-on-task'; skillId: string; taskId: string }
+  | { type: 'add-spec-task'; epicTitle: string; taskTitle: string }
+  | { type: 'update-spec-task'; taskId: string; newTitle: string }
+  | { type: 'delete-spec-task'; taskId: string }
+  | { type: 'add-spec-epic'; epicTitle: string }
+  | { type: 'update-spec-epic'; oldTitle: string; newTitle: string }
+  | { type: 'delete-spec-epic'; epicTitle: string }
+  | { type: 'arch-create-adr'; context: string; decision: string }
+  | { type: 'arch-assess'; context: string };
 
 export type ExtensionMessage =
   | { type: 'chat-chunk'; content: string }

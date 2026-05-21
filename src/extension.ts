@@ -156,7 +156,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
       const ai = aiManager.getActive();
       if (!ai) {
-        vscode.window.showWarningMessage('Alpaquitay: No AI provider configured. Use "Configurar proveedor AI" first.');
+        vscode.window.showWarningMessage('Alpaquitay: No AI provider configured. Use "Configure AI Provider" first.');
         return;
       }
 
@@ -199,7 +199,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
       const ai = aiManager.getActive();
       if (!ai) {
-        vscode.window.showWarningMessage('Alpaquitay: No AI provider configured. Use "Configurar proveedor AI" first.');
+        vscode.window.showWarningMessage('Alpaquitay: No AI provider configured. Use "Configure AI Provider" first.');
         return;
       }
 
