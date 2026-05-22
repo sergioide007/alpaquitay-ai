@@ -6,6 +6,33 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.0.0] — 2026-05-21
+
+### Added
+- **SDD inline editing** — double-click any task or epic to edit it directly in the Spec pane; changes persist to `spec.md` immediately
+- **Task controls** — `✎` (rename) and `×` (delete) buttons per task; `+ Add task` button per epic
+- **Epic controls** — `✎` (rename) and `×` (delete) buttons per epic; `+ Add Epic` button at the bottom of the Spec pane
+- **SoftwareArchitectShell wired** — Arch tab AI chat now routes through `SoftwareArchitectShell.run('interactive-diagram', ...)` instead of raw `provider.chat()`; respects ISO/IEC 42010 guardrail SA-001 (high-risk warning)
+- **Assess button** — runs `SoftwareArchitectShell.run('assess-architecture', ...)` and returns a quality report mapped to ISO/IEC 25010 criteria
+- **ADR button** — embedded context + decision form in the panel; runs `SoftwareArchitectShell.run('create-adr', ...)` and writes `.alpaquitay/adrs/ADR-XXXX.md` (auto-numbered)
+- **C4 level selector** — Arch Canvas now supports Context / Container / Component levels (C4 model)
+- 10 new `WebviewMessage` types for spec inline editing and ADR/assess actions
+
+### Changed
+- `configureProvider` command title: "Configurar proveedor AI" → "Configure AI Provider"
+- README version badge: 2.0.0 → 3.0.0
+- Performance table: "v2.1" → "v3.0"
+- ADR form is embedded in the panel (no popup)
+
+### Fixed
+- Spec pane was read-only; all editing operations now write back to `spec.md` without leaving the panel
+
+### Tests
+- 207 tests passing (up from 114 in v2.0.0)
+- New coverage: inline editing handlers, ADR creation pipeline, SoftwareArchitectShell integration
+
+---
+
 ## [2.0.0] — 2026-05-16
 
 ### Added
