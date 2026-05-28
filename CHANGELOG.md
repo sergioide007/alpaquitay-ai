@@ -6,6 +6,64 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.1.0] — 2026-05-26
+
+### Added — Security & Cloud Excellence Domain Agents
+
+#### New Domain Agent Shells (3)
+
+- **Quantum Readiness Agent** (`quantum-readiness`) — NIST FIPS 203/204/205 · NSA CNSA 2.0
+  - `crypto-inventory` — maps all classical crypto (RSA/ECC/DH) to PQC replacements
+  - `quantum-threat-timeline` — HNDL risk window + industry mandate deadlines
+  - `pqc-migration-plan` — phased hybrid classical→PQC migration (crypto agility layer first)
+  - `cbom-generate` — Cryptography Bill of Materials (CBOM), analogous to SBOM
+  - `assess-crypto-agility` — evaluates algorithm negotiation, key length flexibility, hybrid mode
+  - Guardrails: blocks RSA < 4096 in certificates; blocks quantum risk score ≥ 80
+
+- **Well-Architected Agent** (`well-architected`) — AWS WAF 2023 · Azure WAF 2024 · GCP CAF · FinOps Foundation · DORA
+  - `aws-waf-full-review` — all 6 pillars (OE, Security, Reliability, Performance, Cost, Sustainability)
+  - `azure-waf-review` — all 5 Azure pillars with Azure-native service guidance
+  - `gcp-caf-review` — GCP CAF with BeyondProd, SRE, and Andromeda SDN patterns
+  - `multi-cloud-comparison` — vendor-neutral scoring across AWS/Azure/GCP
+  - `operational-excellence-scorecard` — DORA elite tier + SRE Golden Signals + observability maturity (L1-L5)
+  - `sustainability-assessment` — SCI score (Green Software Foundation) + SDG 7/12/13 alignment
+  - `finops-review` — FinOps Inform/Optimize/Operate lifecycle + unit economics
+  - Guardrails: blocks security pillar < 60; warns reliability < 70; warns wasted spend > 30%
+
+- **Zero Trust Architecture Agent** (`zero-trust`) — NIST SP 800-207 · CISA ZTMM v2.0 · BeyondCorp
+  - `assess-ztmm` — CISA ZTMM v2.0 across 5 pillars (Identity, Devices, Networks, Apps, Data) × 4 stages
+  - `design-identity-fabric` — MFA + conditional access + JIT + PAM (BeyondCorp model)
+  - `microsegmentation-plan` — eliminates implicit east-west trust (eBPF/Cilium/Istio/VPC)
+  - `continuous-verification-policy` — per-request trust signal scoring + adaptive access rules
+  - `privileged-access-design` — tiered PAM (Tier 0-3), ZSP, session recording, break-glass
+  - Guardrails: blocks implicit trust zones; blocks missing MFA on privileged access; warns lateral movement risk
+
+#### Enhanced Domain Agent Shells (3)
+
+- **SecurityShell v2.0** — added:
+  - `assess-quantum-risk` — HNDL exposure + Shor/Grover algorithm mapping + NSA CNSA 2.0 timeline
+  - `supply-chain-security` — SLSA levels + OpenSSF Scorecard + NIST SP 800-161 + provenance attestation
+
+- **DevSecOpsShell v2.0** — added:
+  - `assess-slsa` — SLSA 0-4 gap analysis across Source/Build/Provenance/Common tracks
+  - `generate-sigstore-policy` — keyless cosign signing + Policy Controller + Rekor transparency log
+  - `assess-cnapp` — CSPM + CWPP + CIEM + KSPM convergence (Defender for Cloud / Security Hub / SCC)
+
+- **CloudShell v2.0** — added:
+  - `chaos-engineering-plan` — AWS FIS / Azure Chaos Studio / LitmusChaos experiments + Game Day design
+  - `sustainability-review` — AWS SUS 1-6 + SCI score + CO₂ savings per action
+
+---
+
+## [3.0.1] — 2026-05-26
+
+### Fixed
+- Landing page: replaced outdated "Marketplace coming soon" notice with direct install buttons for VS Code Marketplace and Open VSX
+- Landing page: updated displayed version from v2.0 to v3.0
+- `package.json` homepage aligned to `https://alpaquitay-ai.specsolid.com` (matches CNAME/DNS)
+
+---
+
 ## [3.0.0] — 2026-05-21
 
 ### Added

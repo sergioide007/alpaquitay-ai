@@ -28,6 +28,9 @@ import { MarketingShell }           from '../marketing/MarketingShell';
 import { ProcessShell }             from '../process/ProcessShell';
 import { AIExpertShell }            from '../ai-expert/AIExpertShell';
 import { BusinessShell }            from '../business/BusinessShell';
+import { QuantumReadinessShell }    from '../quantum-readiness/QuantumReadinessShell';
+import { WellArchitectedShell }     from '../well-architected/WellArchitectedShell';
+import { ZeroTrustShell }           from '../zero-trust/ZeroTrustShell';
 
 export interface AgentCapability {
   useCaseId: string;
@@ -274,6 +277,56 @@ export class AgentRegistry {
         { useCaseId: 'build-business-case',   description: 'Business case with ROI and risk analysis',   inputSchema: { initiative: 'string', budget: 'string' } },
       ],
       factory: () => new BusinessShell(),
+    },
+    {
+      domainId: 'quantum-readiness',
+      name: 'Quantum Readiness Agent',
+      description: 'Post-Quantum Cryptography migration, CBOM generation, crypto agility assessment, HNDL risk. NIST FIPS 203/204/205 · NSA CNSA 2.0.',
+      version: '1.0.0',
+      isoStandards: ['NIST FIPS 203', 'NIST FIPS 204', 'NIST FIPS 205', 'NIST SP 800-131A', 'NSA CNSA 2.0'],
+      tags: ['quantum', 'pqc', 'cryptography', 'cbom', 'crypto-agility', 'security', 'nist', 'hndl'],
+      capabilities: [
+        { useCaseId: 'crypto-inventory',        description: 'Inventory all classical crypto assets and map to PQC replacements', inputSchema: { system: 'string' }, isoReference: 'NIST SP 800-131A' },
+        { useCaseId: 'quantum-threat-timeline', description: 'Quantum computing threat timeline and HNDL risk window',            inputSchema: { industry: 'string', dataLifespanYears: 'number' } },
+        { useCaseId: 'pqc-migration-plan',      description: 'Post-Quantum Cryptography migration plan (hybrid approach)',        inputSchema: { system: 'string', cbom: 'object' }, isoReference: 'NIST FIPS 203/204/205' },
+        { useCaseId: 'cbom-generate',           description: 'Cryptography Bill of Materials (CBOM)',                             inputSchema: { system: 'string', context: 'string' } },
+        { useCaseId: 'assess-crypto-agility',   description: 'Crypto agility assessment — readiness for algorithm swap',          inputSchema: { system: 'string', stack: 'string' }, isoReference: 'NIST NCCoE SP 1800-38' },
+      ],
+      factory: () => new QuantumReadinessShell(),
+    },
+    {
+      domainId: 'well-architected',
+      name: 'Well-Architected Agent',
+      description: 'AWS/Azure/GCP Well-Architected reviews, FinOps, Operational Excellence scorecard, Sustainability. DORA · SRE · FinOps Foundation.',
+      version: '1.0.0',
+      isoStandards: ['AWS WAF 2023', 'Azure WAF 2024', 'GCP CAF', 'FinOps Foundation', 'ISO/IEC 25010', 'DORA Metrics'],
+      tags: ['well-architected', 'aws', 'azure', 'gcp', 'finops', 'dora', 'sre', 'sustainability', 'chaos', 'operational-excellence'],
+      capabilities: [
+        { useCaseId: 'aws-waf-full-review',              description: 'AWS WAF 2023 full review — all 6 pillars',                   inputSchema: { workload: 'string' }, isoReference: 'AWS WAF 2023' },
+        { useCaseId: 'azure-waf-review',                 description: 'Azure WAF 2024 review — all 5 pillars',                     inputSchema: { workload: 'string' }, isoReference: 'Azure WAF 2024' },
+        { useCaseId: 'gcp-caf-review',                   description: 'Google Cloud Architecture Framework review',                  inputSchema: { workload: 'string' }, isoReference: 'GCP CAF' },
+        { useCaseId: 'multi-cloud-comparison',           description: 'Multi-cloud WAF comparison (AWS vs Azure vs GCP)',            inputSchema: { workload: 'string', providers: 'array' } },
+        { useCaseId: 'operational-excellence-scorecard', description: 'DORA metrics + SRE Golden Signals + observability maturity', inputSchema: { workload: 'string', metrics: 'object' }, isoReference: 'DORA 2023' },
+        { useCaseId: 'sustainability-assessment',        description: 'Cloud carbon footprint + SCI score + green region guidance', inputSchema: { workload: 'string', provider: 'string' } },
+        { useCaseId: 'finops-review',                    description: 'FinOps Foundation lifecycle review + unit economics',         inputSchema: { context: 'string' }, isoReference: 'FinOps Foundation' },
+      ],
+      factory: () => new WellArchitectedShell(),
+    },
+    {
+      domainId: 'zero-trust',
+      name: 'Zero Trust Architecture Agent',
+      description: 'CISA ZTMM assessment, identity fabric design, microsegmentation, continuous verification, PAM. NIST SP 800-207 · BeyondCorp.',
+      version: '1.0.0',
+      isoStandards: ['NIST SP 800-207', 'CISA ZTMM v2.0', 'DoD ZT Strategy 2022', 'ISO/IEC 27001 A.9', 'BeyondCorp'],
+      tags: ['zero-trust', 'ztmm', 'identity', 'microsegmentation', 'pam', 'ztna', 'beyondcorp', 'security', 'nist'],
+      capabilities: [
+        { useCaseId: 'assess-ztmm',                   description: 'CISA ZTMM v2.0 maturity assessment — 5 pillars × 4 stages', inputSchema: { organization: 'string', context: 'string' }, isoReference: 'CISA ZTMM v2.0' },
+        { useCaseId: 'design-identity-fabric',         description: 'Identity fabric design — MFA, CAP, JIT, PAM (BeyondCorp)',   inputSchema: { system: 'string', idpStack: 'string' }, isoReference: 'NIST SP 800-207 §3.2' },
+        { useCaseId: 'microsegmentation-plan',         description: 'Network microsegmentation — eliminate east-west trust',      inputSchema: { system: 'string', workloads: 'string' } },
+        { useCaseId: 'continuous-verification-policy', description: 'Continuous verification policy with adaptive access',        inputSchema: { system: 'string' }, isoReference: 'NIST SP 800-207 §3.1' },
+        { useCaseId: 'privileged-access-design',       description: 'PAM tiered model — ZSP, JIT, JEA, session recording',       inputSchema: { system: 'string', cloud: 'string' }, isoReference: 'ISO/IEC 27001 A.9.4' },
+      ],
+      factory: () => new ZeroTrustShell(),
     },
   ];
 

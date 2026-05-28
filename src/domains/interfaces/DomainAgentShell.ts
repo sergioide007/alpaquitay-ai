@@ -37,7 +37,10 @@ export type DomainId =
   | 'marketing'
   | 'process'
   | 'ai-expert'
-  | 'business';
+  | 'business'
+  | 'quantum-readiness'
+  | 'well-architected'
+  | 'zero-trust';
 
 /** Severity levels for compliance guardrail results (TOGAF Risk Classification). */
 export type GuardrailSeverity = 'block' | 'warn' | 'pass';
