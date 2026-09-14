@@ -1,0 +1,82 @@
+name: Build, Test & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+# Cancelar runs anteriores del mismo branch/PR para ahorro de cuota
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run compile
+      - run: npm test
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+
+  # Package + Publish en un solo job (ahorra ~30s de overhead por job separado)
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run compile
+
+      - name: Install vsce + ovsx
+        run: npm install -g @vscode/vsce ovsx
+
+      - name: Package extension
+        run: npx vsce package --out alpaquitay-ai-${{ github.ref_name }}.vsix
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: '*.vsix'
+          retention-days: 30
+
+      - name: Publish to VS Code Marketplace
+        run: npx vsce publish --packagePath alpaquitay-ai-${{ github.ref_name }}.vsix
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Publish to Open VSX
+        if: success()
+        run: npx ovsx publish alpaquitay-ai-${{ github.ref_name }}.vsix
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+

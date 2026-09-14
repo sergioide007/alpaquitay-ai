@@ -6,6 +6,68 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.0] — 2026-09-14
+
+### Added — Astra-Style Harness Engineering (FABLE-5)
+
+A complete reception-and-trust layer built on Código Sintético principles. The extension is now a full AI harness, not just a prompt wrapper.
+
+#### Core Harness Architecture (FABLE-5)
+
+- **Fingerprint-first**: `WorkspaceFingerprinter` — never assumes `src/`, detects stack from markers (`package.json`, `pom.xml`, `manage.py`, `go.mod`, `Cargo.toml`, `.csproj`, etc.) with cache in `.alpaquitay/fingerprint.json`
+- **Ask-before-act**: `Decider` with 3 lanes — ⚡ Flash (chat/ideate, no LLM cost), 🔨 Build (preview + checkpoint + SDD), 🧠 Deep (specialist orchestration)
+- **Bounded preview**: `FileDiff` with unified diff (LCS-based) before any write, capped at 6 files, 120 lines
+- **Legible-first**: every response shows chip: lane · stack · sourceDirs · SDLC phase · gate · DoD · economy
+- **Evidence-always**: `DecisionLog` writes every decision to `.alpaquitay/decisions.jsonl`
+
+#### SDLC with Executable Gates
+
+- `SdlcRouter`: 6 phases (requisitos → diseño → implementación → pruebas → despliegue → mantenimiento) each with exit gate
+- `DefinitionOfDone`: done is blocked if diffs pending or platform contract unverified
+- `AgentReview`: pre-apply review (security, scope, SRP, hygiene) — local, no LLM
+- `Postmortem`: blameless failure classification (build/test/lint/write/diagnostics) with suggested fix
+
+#### Platform Engineering
+
+- `PlatformContract`: verified golden paths per stack (npm/pip/maven/gradle/go/cargo/dotnet) — never invents commands
+- `CheckpointManager`: git stash before every write (reversible, non-blocking)
+- `PolicyGuard`: denies secrets (`.env`, `*.pem`, `id_rsa`), confirms spec.md writes
+- `IdeaInbox`: capture unstructured ideas before spec.md, promote with `promover`
+- `Onboard`: one-command legacy onboarding (fingerprint + platform + ADR-001 + DORA)
+
+#### Observability (DORA + Economy)
+
+- `DebtTracker`: measures agentic debt (dod-blocked +15, postmortem +10, deploy w/o rollback +25; onboard/done/apply pay it down). Ceiling at 100 blocks Build
+- `Economy`: tracks LLM calls vs free local operations, shows 💰 chip per response
+- `DORA`: metrics from git log alone (frequency, lead time via #SPEC, change failure rate)
+
+#### New Chat Commands (all free, no LLM)
+
+| Command | Effect |
+|---------|--------|
+| `onboard` | Legacy onboarding report |
+| `dora` | DORA metrics from git |
+| `deuda` | Agentic debt meter |
+| `economía` | Session cost tracker |
+| `postmortem <log>` | Classify a pasted failure |
+| `diff <ruta>` | Show pending diff |
+| `si aplicar` | Review + checkpoint + write |
+| `no` | Discard pending diffs |
+| `promover` | Idea → spec.md epic |
+
+#### Diff-First Writes
+
+- Build no longer writes directly — generates diffs, shows preview, waits for `si aplicar`
+- Each file reviewed before write (secrets, scope, size, noise)
+- PolicyGuard blocks protected paths before even showing diff
+
+#### CI/CD Pipeline
+
+- GitHub Actions: test → package → publish (VS Code Marketplace + Open VSX)
+- Secrets needed: `VSCE_PAT`, `OVSX_PAT`
+
+---
+
 ## [3.1.0] — 2026-05-26
 
 ### Added — Security & Cloud Excellence Domain Agents

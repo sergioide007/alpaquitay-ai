@@ -1,0 +1,21 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "files.exclude": {
+    "out": false
+  },
+  "search.exclude": {
+    "out": true,
+    "**/node_modules": true
+  },
+  "alpaquitay-ai.preferredProvider": "auto",
+  "alpaquitay-ai.specFile": "spec.md"
+}

@@ -7,7 +7,25 @@ import { SpecManager } from '../core/SpecManager';
 import { GitIntegration } from '../core/GitIntegration';
 import { MCPManager } from '../mcp/MCPManager';
 import { SecretManager } from '../core/SecretManager';
+import { WorkspaceFingerprinter } from '../core/context/WorkspaceFingerprinter';
 import { ProjectContextBuilder } from '../core/ProjectContextBuilder';
+import { decide } from '../core/reception/Decider';
+import { sdlcPhase } from '../core/sdlc/SdlcRouter';
+import { loadOrBuild, dodFor } from '../core/platform/PlatformContract';
+import { doraFrom, doraMarkdown } from '../core/platform/Dora';
+import { classifyFailure, postmortemMarkdown } from '../core/platform/Postmortem';
+import { dodGateForDone, dodGateMarkdown } from '../core/sdlc/DefinitionOfDone';
+import { emptyDebt, applyDelta, debtMarkdown, DEBT_FILE } from '../core/platform/DebtTracker';
+import { onboard } from '../core/platform/Onboard';
+import { IdeaInbox } from '../core/reception/IdeaInbox';
+import { unifiedDiff, diffMarkdown } from '../core/harness/FileDiff';
+import { reviewDiff, reviewMarkdown, debtBlocksBuild } from '../core/harness/AgentReview';
+import { guardWrite } from '../core/harness/PolicyGuard';
+import { logDecision } from '../core/harness/DecisionLog';
+import { buildPreview } from '../core/harness/DiffPreview';
+import { CheckpointManager } from '../core/harness/CheckpointManager';
+import { emptyEcon, recordLlm, recordLocal, econChip, ECON_FILE, EconState } from '../core/platform/Economy';
+
 import { generateCode, isSmallModel, deduplicateSpecTasks, normalizeSpecContent } from '../prompts/codeUtils';
 import { HierarchicalMemory } from '../core/HierarchicalMemory';
 import { WebviewMessage, ModelOption, TaskStatus, SkillContext, SpecTask, ProviderType, ArchDiagram, ArchDiagramPatch, ArchNode, ArchEdge, ArchNodeType, AIProvider } from '../core/interfaces';
@@ -23,8 +41,12 @@ export class MainPanel {
   private readonly _panel: vscode.WebviewPanel;
   private _disposables: vscode.Disposable[] = [];
   private _workedTasks = new Set<string>();
+  private _fingerprinter!: WorkspaceFingerprinter;
+  private _inbox!: IdeaInbox;
+  private _checkpoints!: CheckpointManager;
   private _contextBuilder!: ProjectContextBuilder;
   private _memory!: HierarchicalMemory;
+  private _econ: EconState = emptyEcon(`s-${Date.now().toString(36)}`);
   private readonly config = new AlpaquitayConfig();
 
   private constructor(
@@ -39,6 +61,9 @@ export class MainPanel {
     private readonly workspaceRoot: string
   ) {
     this._panel = panel;
+    this._fingerprinter = new WorkspaceFingerprinter(mcpManager);
+    this._inbox = new IdeaInbox(mcpManager);
+    this._checkpoints = new CheckpointManager(workspaceRoot);
     this._contextBuilder = new ProjectContextBuilder(workspaceRoot, mcpManager);
     this._memory = new HierarchicalMemory(mcpManager);
     this._memory.load().catch(() => {/* non-fatal */});
@@ -262,12 +287,204 @@ export class MainPanel {
     } catch { /* provider not available - selector stays, no crash */ }
   }
 
-  // -- Chat -------------------------------------------------------------------
+  // -- Chat: Flash lane con decision visible (harness) --------------------------
+  // Uncle Bob (Twitter): "The only way to go fast is to go well."
+  // Fowler: small safe steps. Codigo Sintetico Cap.05: el arnes decide y deja traza.
 
   private async _handleChat(text: string, _modelId: string): Promise<void> {
     const provider = this.aiManager.getActive();
     if (!provider) {
       this._post({ type: 'chat-error', error: 'No hay proveedor AI disponible. Configura uno en ⚙ o inicia Ollama/LM Studio.' });
+      return;
+    }
+    // Confirmacion pendiente del harness ("si" continua la ruta propuesta)
+    if (/^\s*(si|sí|dale|ok|confirmo|confirmado)\s*[!.]?$/i.test(text)) {
+      const pending = this._memory.get('config', 'pending-route');
+      if (pending) {
+        this._memory.delete('config', 'pending-route');
+        const saved = JSON.parse(pending.value) as { text: string; route: string };
+        this._post({ type: 'chat-chunk', content: `*Ruta confirmada (${saved.route}) — ejecutando…*` });
+        await this._handleChatConfirmed(saved.text, saved.route);
+        return;
+      }
+    }
+    let fp = null;
+    try { fp = await this._fingerprinter.fingerprint(); } catch { /* chat sigue */ }
+    // Experto: `dora` muestra el estado DevOps real del repo (solo git, sin inventos).
+    // `postmortem <texto>` clasifica un fallo pegado sin ejecutar nada (triage local).
+    if (/^\s*dora\s*$/i.test(text)) {
+      const log = await this.git.getLog(40);
+      const md = doraMarkdown(doraFrom(log.commits));
+      this._post({ type: 'chat-chunk', content: `${md}\n\n_Comando verificado: \`git log\`. Mejora el nivel con commits \`#SPEC-xxx\` y menos hotfix._` });
+      this._post({ type: 'chat-done', model: provider.modelName });
+      this._econLocal();
+      return;
+    }
+    // Cap.11: `deuda` muestra el medidor local (sin LLM). Pagar = onboard/aplicar/dones.
+    if (/^\s*deuda\s*$/i.test(text)) {
+      try {
+        const f = await this.mcpManager.executeTool('filesystem', 'read_file', { path: DEBT_FILE }) as { content: string };
+        this._post({ type: 'chat-chunk', content: debtMarkdown({ ...emptyDebt(), ...JSON.parse(f.content) }) });
+      } catch { this._post({ type: 'chat-chunk', content: '> 🧾 Deuda agentica: **0/100** ✅ sana\n> `(sin eventos aun — el harness la mide desde ahora)`' }); }
+      this._post({ type: 'chat-done', model: provider.modelName });
+      this._econLocal();
+      return;
+    }
+    // Cap.01/18: `economia` muestra el costo de sesion (local gratis vs LLM).
+    if (/^\s*econom[ií]a\s*$/i.test(text)) {
+      this._post({ type: 'chat-chunk', content: `> 💰 Economia de sesion — ${this._econLine()}\n> _Local gratis (dora/deuda/postmortem/diff/review/economia): ${this._econ.localOps}. Cada Build confirmado = 2-4 llamadas LLM._\n> _Ahorra con: preguntas cortas en Flash, \`onboard\` una vez, diffs en lote._` });
+      this._post({ type: 'chat-done', model: provider.modelName });
+      this._econLocal();
+      return;
+    }
+    const pmMatch = text.match(/^\s*postmortem\s+([\s\S]{5,})$/i);
+    if (pmMatch) {
+      let testCmd = 'npm test';
+      try { if (fp) { testCmd = (await loadOrBuild(this.mcpManager, fp)).commands.test; } } catch { /* default */ }
+      this._post({ type: 'chat-chunk', content: postmortemMarkdown('fallo pegado', classifyFailure(pmMatch[1]), testCmd) });
+      this._post({ type: 'chat-done', model: provider.modelName });
+      this._econLocal();
+      return;
+    }
+    // Experto ambos aspectos:
+    // 1) `onboard` — reporte legado en un comando (fingerprint + platform + ADR + DORA).
+    // Experto: `diff <ruta>` muestra el diff pendiente o actual vs disco (legible-first).
+    if (/^\s*onboard\s*$/i.test(text)) {
+      this._post({ type: 'chat-chunk', content: '_Generando onboard del proyecto…_' });
+      try {
+        const r = await onboard(this.mcpManager, this.git);
+        this._fingerprinter.invalidate();
+        this._post({ type: 'chat-chunk', content: r.markdown });
+      } catch (e) { this._post({ type: 'chat-error', error: e instanceof Error ? e.message : String(e) }); }
+      this._post({ type: 'chat-done', model: provider.modelName });
+      this._econLocal();
+      return;
+    }
+    // `si aplicar` escribe el pendiente con checkpoint. `no` lo descarta.
+    const diffMatch = text.match(/^\s*diff\s+([^\s`'"]+)\s*$/i);
+    if (diffMatch) {
+      const rel = diffMatch[1].replace(/[`'"]/g, '');
+      const pending = this._memory.get('config', `pending-diff:${rel}`);
+      if (pending) {
+        try {
+          const { before, after } = JSON.parse(pending.value) as { before: string; after: string };
+          this._post({ type: 'chat-chunk', content: diffMarkdown(unifiedDiff(rel, before, after)) });
+        } catch { this._post({ type: 'chat-chunk', content: 'Diff pendiente corrupto. Regenera el archivo.' }); }
+      } else {
+        this._post({ type: 'chat-chunk', content: `No hay diff pendiente para \`${rel}\`. El proximo Build lo mostrara antes de escribir.` });
+      }
+      this._post({ type: 'chat-done', model: provider.modelName });
+      return;
+    }
+    if (/^\s*si aplicar\s*$/i.test(text)) {
+      // Cap.09 techo real: con deuda rota no hay Build hasta pagar.
+      try {
+        const f = await this.mcpManager.executeTool('filesystem', 'read_file', { path: DEBT_FILE }) as { content: string };
+        const st = { ...emptyDebt(), ...JSON.parse(f.content) };
+        if (debtBlocksBuild(st)) {
+          this._post({ type: 'chat-chunk', content: `${debtMarkdown(st)}\n\n_Build bloqueado por techo de deuda. Paga con: \`onboard\`, dones verificados, o descarta diffs con \`no\`._` });
+          this._post({ type: 'chat-done', model: provider.modelName });
+          return;
+        }
+      } catch { /* sin deuda: sigue */ }
+      const pendings = this._memory.search('pending-diff:');
+      if (pendings.length === 0) { this._post({ type: 'chat-chunk', content: 'No hay diffs pendientes.' }); this._post({ type: 'chat-done', model: provider.modelName }); return; }
+      const cp = await this._checkpoints.save('apply-diffs');
+      let ok = 0;
+      let blocked = 0;
+      let fpSources: string[] = [];
+      try { fpSources = (await this._fingerprinter.fingerprint()).sourceDirs; } catch { /* review sigue */ }
+      for (const p of pendings) {
+        const rel = p.key.replace('pending-diff:', '');
+        const v = guardWrite(rel);
+        if (v.verdict === 'deny') { this._post({ type: 'chat-chunk', content: `🛡️ Bloqueado: ${v.reason}` }); blocked++; continue; }
+        try {
+          const { before, after } = JSON.parse(p.value) as { before: string; after: string };
+          // Cap.12: review con agente antes de escribir (local, sin LLM).
+          const rev = reviewDiff(rel, before, after, fpSources);
+          this._post({ type: 'chat-chunk', content: reviewMarkdown(rel, rev) });
+          if (!rev.pass) { blocked++; logDecision(this.mcpManager, `review-blocked:${rel}`, { route: 'code', lane: 'build', confidence: 1, reasons: rev.findings.map(f => f.detail), needsConfirm: false, chip: '⛔ review' }, {}).catch(() => {}); continue; }
+          await this.mcpManager.executeTool('filesystem', 'write_file', { path: rel, content: after });
+          this._memory.delete('config', p.key);
+          ok++;
+        } catch (e) { this._post({ type: 'chat-chunk', content: `(!) No se pudo escribir \`${rel}\`: ${e}` }); }
+      }
+      await this._memory.save().catch(() => {});
+      this._post({ type: 'chat-chunk', content: `> 🛡️ checkpoint \`${cp}\`\n\n**${ok} archivo(s) aplicados${blocked ? `, ${blocked} bloqueado(s) por review` : ''}.**` });
+      this._post({ type: 'chat-done', model: provider.modelName });
+      this._trackDebt('apply').catch(() => {});
+      return;
+    }
+    if (/^\s*no\s*$/i.test(text)) {
+      const pendings = this._memory.search('pending-diff:');
+      for (const p of pendings) { this._memory.delete('config', p.key); }
+      await this._memory.save().catch(() => {});
+      this._post({ type: 'chat-chunk', content: `Diffs descartados (${pendings.length}). Nada se escribio.` });
+      this._post({ type: 'chat-done', model: provider.modelName });
+      return;
+    }
+    if (/^\s*promover\s*$/i.test(text)) {
+      const ideas = await this._inbox.list();
+      const last = [...ideas].reverse().find(i => !i.promoted);
+      if (!last) { this._post({ type: 'chat-chunk', content: 'No hay ideas pendientes. Escribe tu idea desordenada primero.' }); this._post({ type: 'chat-done', model: provider.modelName }); return; }
+      const cp = await this._checkpoints.save('promote-idea');
+      await this.specManager.addEpic(`${last.id} ${last.structured?.objetivo ?? last.raw.slice(0, 80)}`);
+      last.promoted = true;
+      try { await this.mcpManager.executeTool('filesystem', 'write_file', { path: '.alpaquitay/ideas.json', content: JSON.stringify(ideas, null, 2) }); } catch { /* best-effort */ }
+      this._post({ type: 'chat-chunk', content: `> 🛡️ checkpoint \`${cp}\`\n\n**${last.id} promovida a spec.md.** Revisa el tablero.` });
+      await this._sendSpec();
+      this._post({ type: 'chat-done', model: provider.modelName });
+      return;
+    }
+    const d = decide(text, fp);
+    // Platform senior: contrato verificado + DoD por fase (golden path, no inventos).
+    let platformChip = '';
+    let dod = '';
+    if (fp) {
+      try {
+        const c = await loadOrBuild(this.mcpManager, fp);
+        const sdlc0 = sdlcPhase(text, fp);
+        dod = dodFor(sdlc0.phase, c);
+        platformChip = ` · 🏭 ${c.stack} · \`${c.commands.test}\`${c.verified ? '' : ' (sin verificar)'}`;
+      } catch { /* chat sigue sin plataforma */ }
+    }
+    // SDLC experto: cada pedido entra a una fase con gate visible (FABLE-5 L/E).
+    // Platform: + contrato verificado + DoD ejecutable (senior: pavimentar, no improvisar).
+    const sdlc = sdlcPhase(text, fp);
+    const sdlcChip = sdlc.phase !== 'ninguna' ? ` · 📐 ${sdlc.phase} (gate: ${sdlc.gate})` : '';
+    const stackChip = (fp ? ` · ${fp.frameworks[0] ?? 'stack?'} · \`${fp.sourceDirs.join(', ') || '.'}\`` : '') + platformChip;
+    const dodLine = dod ? `\n> ✅ ${dod}` : '';
+    // FABLE-5 (E): toda decision queda en decisions.jsonl (best-effort).
+    logDecision(this.mcpManager, text, d, { stack: fp?.frameworks[0], sources: fp?.sourceDirs.join(','), policy: d.needsConfirm ? 'confirm' : 'allow', checkpoint: `sdlc:${sdlc.phase}` }).catch(() => {});
+    // Rutas que tocan disco o delegan: piden confirmacion, no ejecutan directo.
+    // FABLE-5 (B/L): code muestra preview legible acotado a fuentes evidenciadas.
+    // SDLC: el chip incluye fase + gate para que el usuario sepa en que etapa esta.
+    if (d.route === 'code' && fp && !d.needsConfirm) {
+      const hintPaths = this._extractPathHints(text).filter(p => !p.includes('..')).slice(0, 6);
+      const preview = buildPreview(text.slice(0, 120), hintPaths.length ? hintPaths : [`${fp.sourceDirs[0] || '.'}/<nuevo-archivo>`], fp.sourceDirs);
+      this._post({ type: 'chat-chunk', content: `> ${d.chip}${stackChip}${sdlcChip}${dodLine}\n\n${preview}` });
+      this._memory.set('config', 'pending-route', JSON.stringify({ text, route: d.route, lane: d.lane }), { tags: ['harness'] });
+      this._memory.save().catch(() => {});
+      this._post({ type: 'chat-done', model: provider.modelName });
+      return;
+    }
+    // Ideate es la excepcion Flash: guarda en inbox y ordena sin tocar codigo.
+    if (d.route === 'ideate') {
+      const idea = await this._inbox.add(text);
+      this._post({ type: 'chat-chunk', content: `> ${d.chip}${stackChip}\n\n${this._inbox.toMarkdown(idea)}` });
+      this._post({ type: 'chat-done', model: provider.modelName });
+      return;
+    }
+    if (d.needsConfirm || d.route === 'code' || d.route === 'specialist' || d.route === 'spec') {
+      const hint = d.route === 'code'
+        ? `Lo implemento en \`${fp?.sourceDirs[0] ?? '.'}\` con preview + checkpoint.`
+        : d.route === 'spec' ? 'Lo llevo al flujo spec.md + tablero.'
+        : d.route === 'specialist' ? 'Lo derivo al especialista con arnes completo.'
+        : 'Te pido un dato mas para no alucinar.';
+      this._post({ type: 'chat-chunk', content: `> ${d.chip}${stackChip}${sdlcChip}${dodLine}\n\n**¿Confirmas esta ruta?** ${hint}\n\nResponde \`si\` para continuar o reformula.` });
+      this._memory.set('config', 'pending-route', JSON.stringify({ text, route: d.route, lane: d.lane }), { tags: ['harness'] });
+      this._memory.save().catch(() => {});
+      this._post({ type: 'chat-done', model: provider.modelName });
       return;
     }
 
@@ -278,10 +495,17 @@ export class MainPanel {
     );
     if (deleteMatch) {
       const rawPath = deleteMatch[1].replace(/[`'"]/g, '').trim();
+      const v = guardWrite(rawPath);
+      if (v.verdict === 'deny') {
+        this._post({ type: 'chat-chunk', content: `🛡️ Bloqueado por PolicyGuard: ${v.reason}` });
+        this._post({ type: 'chat-done', model: provider.modelName });
+        return;
+      }
+      const cp = await this._checkpoints.save('delete-file');
       try {
         const abs = nodePath.isAbsolute(rawPath) ? rawPath : nodePath.join(this.workspaceRoot, rawPath);
         await this.mcpManager.executeTool('filesystem', 'delete_file', { path: abs });
-        this._post({ type: 'chat-chunk', content: `Archivo \`${rawPath}\` eliminado correctamente.` });
+        this._post({ type: 'chat-chunk', content: `🛡️ checkpoint \`${cp}\`\n\nArchivo \`${rawPath}\` eliminado correctamente.` });
       } catch (e) {
         this._post({ type: 'chat-chunk', content: `No se pudo eliminar \`${rawPath}\`: ${e instanceof Error ? e.message : String(e)}` });
       }
@@ -291,10 +515,61 @@ export class MainPanel {
 
     try {
       const systemPrompt = await this._contextBuilder.getChatSystemPrompt();
+      const fpLine = fp ? `\n\nContexto detectado: ${fp.frameworks.join(', ') || 'stack por detectar'} · fuentes: ${fp.sourceDirs.join(', ') || '.'}.` : '';
+      const promptChars = (text + fpLine + systemPrompt).length;
       const response = await provider.chat(
-        [{ role: 'user', content: text }],
+        [{ role: 'user', content: text + fpLine }],
         { systemPrompt }
       );
+      this._econLlm(promptChars, response.content.length);
+      this._post({ type: 'chat-chunk', content: `> ${d.chip}${stackChip}${sdlcChip}${dodLine} · ${this._econLine()}\n\n${response.content}` });
+      this._post({ type: 'chat-done', model: response.model });
+    } catch (err) {
+      this._post({ type: 'chat-error', error: err instanceof Error ? err.message : String(err) });
+    }
+  }
+
+  // Cap.11: el harness cobra/paga deuda en cada evento (best-effort, nunca bloquea el chat).
+  // Cap.01/18: economia de sesion — local gratis vs LLM con costo (best-effort).
+  private async _econLocal(): Promise<void> {
+    this._econ = recordLocal(this._econ);
+    try { await this.mcpManager.executeTool('filesystem', 'write_file', { path: ECON_FILE, content: JSON.stringify(this._econ, null, 2) }); } catch { /* nunca bloquea */ }
+  }
+  private async _econLlm(promptChars: number, completionChars: number): Promise<void> {
+    this._econ = recordLlm(this._econ, promptChars, completionChars);
+    try { await this.mcpManager.executeTool('filesystem', 'write_file', { path: ECON_FILE, content: JSON.stringify(this._econ, null, 2) }); } catch { /* nunca bloquea */ }
+  }
+  private _econLine(): string { return econChip(this._econ); }
+
+  // Cap.11: el harness cobra/paga deuda en cada evento (best-effort, nunca bloquea el chat).
+  private async _trackDebt(reason: string): Promise<void> {
+    try {
+      let state = emptyDebt();
+      try {
+        const f = await this.mcpManager.executeTool('filesystem', 'read_file', { path: DEBT_FILE }) as { content: string };
+        const p = JSON.parse(f.content);
+        if (typeof p?.score === 'number') { state = { ...emptyDebt(), ...p }; }
+      } catch { /* nuevo */ }
+      const next = applyDelta(state, reason);
+      await this.mcpManager.executeTool('filesystem', 'write_file', { path: DEBT_FILE, content: JSON.stringify(next, null, 2) });
+    } catch { /* traza nunca rompe el flujo */ }
+  }
+
+  // Continuacion confirmada del harness (Build/Deep): reutiliza el flujo SDD.
+  // Checkpoint antes de generar (Fowler: reversible; Cap.05: arnes resiliente).
+  private async _handleChatConfirmed(text: string, route: string): Promise<void> {
+    if (route === 'code' || route === 'spec') {
+      const cp = await this._checkpoints.save(route);
+      this._post({ type: 'chat-chunk', content: `> 🛡️ checkpoint \`${cp}\`\n\n_Generando spec y plan desde tu pedido…_` });
+      await this._handleRegenSpec(text);
+      return;
+    }
+    // chat/ideate/specialist confirmado -> respuesta directa con contexto
+    const provider = this.aiManager.getActive();
+    if (!provider) { return; }
+    try {
+      const systemPrompt = await this._contextBuilder.getChatSystemPrompt();
+      const response = await provider.chat([{ role: 'user', content: text }], { systemPrompt });
       this._post({ type: 'chat-chunk', content: response.content });
       this._post({ type: 'chat-done', model: response.model });
     } catch (err) {
@@ -313,11 +588,24 @@ export class MainPanel {
     this.specManager.setBoardStatus(taskId, status);
 
     if (status === 'done') {
+      // Experto: DoD gate ejecutable. Done manual sin gate pasado se bloquea y se explica.
+      const pendings = this._memory.search('pending-diff:');
+      let contract = null;
+      try { contract = await loadOrBuild(this.mcpManager, await this._fingerprinter.fingerprint()); } catch { /* sin contrato */ }
+      const gate = dodGateForDone(pendings.length, contract);
+      if (!gate.pass) {
+        this._post({ type: 'chat-chunk', content: `${dodGateMarkdown(gate)}\n\n_La tarea **${task.id}** no se marca done. Aplica o descarta diffs primero._` });
+        await this._sendSpec();
+        logDecision(this.mcpManager, `dod-blocked:${task.id}`, { route: 'spec', lane: 'build', confidence: 1, reasons: gate.blockers, needsConfirm: false, chip: '⛔ DoD gate' }, { checkpoint: 'sdlc:pruebas' }).catch(() => {});
+        this._trackDebt(`dod-blocked:${task.id}`).catch(() => {});
+        return;
+      }
       // Fast path: update cached data and send immediately, write disk in background
       const doneTask = data.tasks.find(t => t.id === taskId);
       if (doneTask) { doneTask.done = true; doneTask.status = 'done'; }
       this._post({ type: 'spec-data', data });
       this.specManager.updateTaskDone(task, true).catch(() => {});
+      this._trackDebt('done-verificado').catch(() => {});
       return;
     }
 
@@ -412,6 +700,7 @@ export class MainPanel {
         this._post({ type: 'chat-chunk', content: `\n${text}\n` });
       }
       this._contextBuilder.invalidate();
+      this._fingerprinter.invalidate();
     } catch { /* non-fatal — continue to task generation */ }
   }
 
@@ -923,10 +1212,26 @@ export class MainPanel {
           const abs = nodePath.isAbsolute(filePath)
             ? filePath
             : nodePath.join(this.workspaceRoot, filePath);
-          await this.mcpManager.executeTool('filesystem', 'write_file', { path: abs, content });
+          const rel = nodePath.isAbsolute(filePath) ? nodePath.relative(this.workspaceRoot, filePath) : filePath;
+          // Experto: diff-first (FABLE-5 B). No se escribe directo: se guarda pendiente
+          // y se muestra el diff. `si aplicar` lo escribe con checkpoint.
+          let before = '';
+          try {
+            const cur = await this.mcpManager.executeTool('filesystem', 'read_file', { path: rel }) as { content: string };
+            before = cur.content;
+          } catch { before = ''; }
+          const v = guardWrite(rel);
+          if (v.verdict === 'deny') {
+            this._post({ type: 'chat-chunk', content: `\n🛡️ Bloqueado: ${v.reason}` });
+            continue;
+          }
+          this._memory.set('config', `pending-diff:${rel}`, JSON.stringify({ before, after: content }), { tags: ['diff', 'pending'] });
+          await this._memory.save().catch(() => {});
           written.push(filePath);
           this._memory.extractFromCode(filePath, content, language);
-          this._post({ type: 'chat-chunk', content: `\n[ok] \`${filePath}\`` });
+          const fd = unifiedDiff(rel, before, content);
+          const preview = fd.diff.split('\n').slice(0, 25).join('\n');
+          this._post({ type: 'chat-chunk', content: `\n**Diff \`${rel}\` (+${fd.added}/-${fd.removed}) — pendiente**\n\`\`\`diff\n${preview}\n\`\`\`\n_si aplicar_ para escribir · _no_ para descartar · _diff ${rel}_ para ver completo` });
           // Defer format + validate to background quality pipeline (non-blocking for Kanban)
           const _abs = abs, _lang = language, _fp = filePath, _desc = description;
           qualityTasks.push(() =>
@@ -940,7 +1245,7 @@ export class MainPanel {
       }
 
       if (written.length > 0) {
-        this._post({ type: 'chat-chunk', content: `\n\n**Archivos creados/modificados (${written.length}):**\n${written.map(f => `- \`${f}\``).join('\n')}` });
+        this._post({ type: 'chat-chunk', content: `\n\n**Diffs pendientes (${written.length}) — nada escrito aun:**\n${written.map(f => `- \`${f}\``).join('\n')}\n\n_si aplicar_ escribe todo con checkpoint · revisa cada uno con _diff <ruta>_` });
 
         // -- Fast Kanban completion: mark Done immediately after files are written --
         // Quality pipeline (format → validate → build → test) runs asynchronously.
@@ -974,10 +1279,21 @@ export class MainPanel {
       }
 
     } catch (err) {
+      // Experto: postmortem blameless + traza en decisions.jsonl (Cap.13 triaje).
+      const msg = err instanceof Error ? err.message : String(err);
+      let testCmd = 'npm test';
+      try {
+        const fprint = await this._fingerprinter.fingerprint();
+        testCmd = (await loadOrBuild(this.mcpManager, fprint)).commands.test;
+      } catch { /* default */ }
+      const pm = classifyFailure(msg);
+      this._post({ type: 'chat-chunk', content: `${postmortemMarkdown(task.title, pm, testCmd)}\n\n_Detalle: ${msg.slice(0, 300)}_` });
+      logDecision(this.mcpManager, `postmortem:${task.id}`, { route: 'code', lane: 'build', confidence: 1, reasons: [`postmortem:${pm.kind}`, pm.cause], needsConfirm: false, chip: '🔬 postmortem' }, { checkpoint: `sdlc:implementacion` }).catch(() => {});
+      this._trackDebt(`postmortem:${pm.kind}`).catch(() => {});
       this._post({
         type: 'task-work-error',
         taskId: task.id,
-        error: err instanceof Error ? err.message : String(err)
+        error: msg
       });
     }
   }

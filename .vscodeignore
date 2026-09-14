@@ -6,6 +6,7 @@
 .eslintrc.json
 tsconfig.json
 jest.config*
+.vscodeignore
 
 # Source (compiled output lives in out/)
 src/**
@@ -18,6 +19,9 @@ node_modules/**
 # Test artifacts
 coverage/**
 out/test/**
+
+# CI/CD scripts (not part of extension)
+scripts/**
 
 # Website / repo assets (not part of the extension)
 index.html

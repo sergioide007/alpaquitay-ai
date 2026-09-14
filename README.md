@@ -1,12 +1,14 @@
 # Alpaquitay AI
 
-> **Spec-Driven Development inside VS Code — one panel, five tabs, AI that works autonomously on your backlog.**
+> **Astra-style AI harness for VS Code — SDLC gates, DORA metrics, debt tracking, diff-first writes, specialist routing.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
-[![Version](https://img.shields.io/badge/version-3.1.0-green)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.2.0-green)](./CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-328%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
+[![Stars](https://img.shields.io/github/stars/sergioide007/alpaquitay-ai?style=social)](https://github.com/sergioide007/alpaquitay-ai/stargazers)
 [![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red)](./LICENSE)
 [![Website](https://img.shields.io/badge/Website-specsolid.com-blueviolet)](https://www.specsolid.com)
 
@@ -16,14 +18,119 @@
 
 ## What is Alpaquitay AI?
 
-Alpaquitay AI turns your VS Code into a complete Spec-Driven Development environment. Instead of context-switching between chat windows, Jira boards, GitHub, and your IDE, everything lives in **one panel**: a `spec.md` file that defines your project, a Kanban board that tracks progress, an AI that implements tasks autonomously, and a git history that connects commits to requirements.
+Alpaquitay AI turns VS Code into a complete **harness-driven development environment**. Built on principles from Robert C. Martin (Uncle Bob), Martin Fowler, and Sergio Pérez Ruiz's *Código Sintético*, it's not just a chatbot — it's a reception, routing, and trust layer that:
 
-The central concept is **SDD (Spec-Driven Development)**: `spec.md` is the single source of truth. The AI reads it, works from it, updates it, and every commit references it.
+1. **Perceives** your project — fingerprint, stack, sources (never assumes `src/`)
+2. **Decides** the right lane — Flash (free), Build (SDD), Deep (specialist)
+3. **Shows** a preview before any write — diff-first, bounded
+4. **Guards** with policy, checkpoints, and debt tracking
+5. **Verifies** with DORA metrics, DoD gates, and agent review
+6. **Leaves evidence** in `.alpaquitay/` (decisions, economy, debt)
 
 **100% open source · MIT license · Privacy-first** — your code and prompts go directly to your chosen AI provider. No Alpaquitay servers exist.
 
-**Website:** [specsolid.com](https://www.specsolid.com)
+**Website:** [specsolid.com](https://www.specsolid.com) · **Book:** [Código Sintético](https://codigosintetico.specsolid.com)
 
+---
+
+## Quick Start
+
+1. Install the extension from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
+2. Open any project (legacy or greenfield)
+3. Press `Ctrl+Alt+A` (or `Cmd+Alt+A` on Mac) to open Alpaquitay Hub
+4. Type `onboard` in the chat — get your project fingerprint + DORA baseline
+5. Describe your idea naturally → say `promover` to create a spec.md epic
+6. Drag task to **In Progress** → review the diff → say `si aplicar`
+
+---
+
+## Harness Commands (free, no LLM)
+
+| Command | Effect |
+|---------|--------|
+| `onboard` | Legacy onboarding: fingerprint + platform + ADR-001 + DORA |
+| `dora` | DORA metrics from git log (frequency, lead time, change failure) |
+| `deuda` | Agentic debt meter (ceiling at 100 blocks Build) |
+| `economía` | Session cost: LLM calls vs free local operations |
+| `postmortem <log>` | Classify a pasted failure (build/test/lint/write) |
+| `diff <ruta>` | Show pending diff for a file |
+| `si aplicar` | Review + checkpoint + write all pending diffs |
+| `no` | Discard all pending diffs |
+| `promover` | Promote last idea to spec.md epic |
+| `si` | Confirm proposed route |
+
+---
+
+## FABLE-5 Framework
+
+| Letter | Principle | Implementation |
+|--------|-----------|----------------|
+| **F** | **Fingerprint-first** | Detects stack from markers, never assumes `src/` |
+| **A** | **Ask-before-act** | Every risky action asks for confirmation |
+| **B** | **Bounded preview** | Unified diff capped at 6 files, 120 lines |
+| **L** | **Legible-first** | Every response shows: lane · stack · phase · gate · DoD · economy |
+| **E** | **Evidence-always** | Every decision in `.alpaquitay/decisions.jsonl` |
+
+---
+
+## Why Alpaquitay?
+
+| Feature | Alpaquitay | GitHub Copilot | ChatGPT |
+|---------|-----------|----------------|---------|
+| Works offline (Ollama/LM Studio) | ✅ | ❌ | ❌ |
+| Privacy-first (no servers) | ✅ | ❌ | ❌ |
+| SDLC with executable gates | ✅ | ❌ | ❌ |
+| DORA metrics from git | ✅ | ❌ | ❌ |
+| Debt tracking | ✅ | ❌ | ❌ |
+| Diff-first writes (review before apply) | ✅ | ❌ | ❌ |
+| Legacy project support (no `src/` assumption) | ✅ | ⚠️ | ⚠️ |
+| Open source (MIT) | ✅ | ❌ | ❌ |
+
+---
+
+## Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+### Quick start for contributors
+
+```bash
+git clone https://github.com/sergioide007/alpaquitay-ai.git
+cd alpaquitay-ai
+npm install
+npm run compile
+npm test
+# Press F5 in VS Code to launch Extension Development Host
+```
+
+### Ways to contribute
+
+- 🐛 Report bugs via [GitHub Issues](https://github.com/sergioide007/alpaquitay-ai/issues)
+- 💡 Suggest features via [GitHub Discussions](https://github.com/sergioide007/alpaquitay-ai/discussions)
+- 📝 Improve documentation
+- 🌍 Translate to other languages
+- ⭐ Star the repo if you find it useful!
+
+---
+
+## Community
+
+- ⭐ [Star on GitHub](https://github.com/sergioide007/alpaquitay-ai/stargazers)
+- 🐦 [Follow on Twitter/X](https://twitter.com/specsolid)
+- 💬 [Discord](https://discord.gg/specsolid)
+- 📧 [Email](mailto:hello@specsolid.com)
+
+---
+
+## License
+
+MIT © [Sergio Pérez Ruiz](https://github.com/sergioide007)
+
+Built with ❤️ for the developer community.
+
+---
+
+**If Alpaquitay helps you, please ⭐ star the repo — it helps others discover it!**
 ---
 
 ## Core SDD Workflow
