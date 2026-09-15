@@ -2,7 +2,7 @@
   "name": "alpaquitay-ai",
   "displayName": "Alpaquitay AI",
   "description": "Astra-style AI harness for VS Code: SDLC gates, DORA metrics, debt tracking, diff-first writes, specialist routing. Privacy-first, GDPR/CCPA compliant.",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "publisher": "alpaquitay-ai",
   "icon": "resources/icon.png",
   "galleryBanner": {
@@ -98,7 +98,13 @@
         "alpaquitay-ai.preferredProvider": {
           "type": "string",
           "default": "auto",
-          "enum": ["auto", "anthropic", "openai", "ollama", "lmstudio"],
+          "enum": [
+            "auto",
+            "anthropic",
+            "openai",
+            "ollama",
+            "lmstudio"
+          ],
           "enumDescriptions": [
             "Auto: prefiere modelos locales por privacidad",
             "Anthropic Claude",

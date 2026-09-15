@@ -6,6 +6,34 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.3.0] — 2026-09-15
+
+### Added — Privacy boundary for cloud providers
+
+- New `PrivacyBoundaryProvider` (`src/providers/PrivacyBoundaryProvider.ts`): a redaction facade wrapped around every **cloud** provider (Anthropic, OpenAI, and non-loopback Ollama/LM Studio endpoints). PII (emails, phones, cards, SSN, IBAN, tokens) is redacted before the prompt leaves the machine; the response is detokenized back transparently.
+- Local providers (loopback Ollama / LM Studio) run **undecorated** — zero overhead, zero egress.
+- `AIProviderManager.getLastPrivacyDisclosure()` exposes value-free metadata (counts only, never content) for the Hub's Privacy boundary card.
+- Phone PII regex rewritten with a lookbehind guard — no more false positives on plain numbers/dates.
+
+### Added — Specialist routing (Flash / Build / Deep lanes)
+
+- New `SpecialistRouter` (`src/core/reception/SpecialistRouter.ts`): the reception layer routes each request to exactly one lane — **Flash** (local, zero-cost), **Build** (diff-first implementation) or **Deep** (registered specialist: security · QA · architecture · DevOps) — with one auditable receipt per route.
+
+### Added — Executable quality gates (DoD v2)
+
+- New `QualityEvidence` (`src/core/sdlc/QualityEvidence.ts`): `Done` on the Kanban board now requires **proof** — a real `build` command and a real `test` command that both ran with green exit codes. The platform contract checklist alone is no longer sufficient for mutation flows.
+
+### Added — Harness tab (delivery control plane)
+
+- New Hub section with live evidence: repository DORA signal (labeled as repo-derived proxies), agentic debt ceiling with event log, diff-first review queue (review → apply → verify), session economy (local ops vs LLM calls), privacy boundary status, and specialist routing quick-actions.
+- Kanban cards now surface a **"Review required"** state while a task's diffs await approval.
+
+### Tests
+
+- Suite total: **372 tests / 41 suites**, all green.
+
+---
+
 ## [3.2.1] — 2026-09-15
 
 ### Fixed — `EROFS: read-only file system, open 'spec.md'`
