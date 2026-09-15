@@ -18,7 +18,7 @@
 
 ## What is Alpaquitay AI?
 
-Alpaquitay AI turns VS Code into a complete **harness-driven development environment**. Built on principles from Robert C. Martin (Uncle Bob), Martin Fowler, and Sergio Pérez Ruiz's *Código Sintético*, it's not just a chatbot — it's a reception, routing, and trust layer that:
+Alpaquitay AI turns VS Code into a complete **harness-driven development environment**. Built on principles from Robert C. Martin (Uncle Bob), Martin Fowler, and Sergio Perez Ruiz's *Código Sintético*, it's not just a chatbot — it's a reception, routing, and trust layer that:
 
 1. **Perceives** your project — fingerprint, stack, sources (never assumes `src/`)
 2. **Decides** the right lane — Flash (free), Build (SDD), Deep (specialist)
@@ -124,7 +124,7 @@ npm test
 
 ## License
 
-MIT © [Sergio Pérez Ruiz](https://github.com/sergioide007)
+MIT © [Sergio Perez Ruiz](https://github.com/sergioide007)
 
 Built with ❤️ for the developer community.
 

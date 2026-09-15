@@ -10,11 +10,13 @@ import { SecretManager } from '../core/SecretManager';
 import { WorkspaceFingerprinter } from '../core/context/WorkspaceFingerprinter';
 import { ProjectContextBuilder } from '../core/ProjectContextBuilder';
 import { decide } from '../core/reception/Decider';
+import { SpecialistRouter } from '../core/reception/SpecialistRouter';
 import { sdlcPhase } from '../core/sdlc/SdlcRouter';
 import { loadOrBuild, dodFor } from '../core/platform/PlatformContract';
 import { doraFrom, doraMarkdown } from '../core/platform/Dora';
 import { classifyFailure, postmortemMarkdown } from '../core/platform/Postmortem';
 import { dodGateForDone, dodGateMarkdown } from '../core/sdlc/DefinitionOfDone';
+import { parseQualityEvidence, QualityEvidence, QualityCheck } from '../core/sdlc/QualityEvidence';
 import { emptyDebt, applyDelta, debtMarkdown, DEBT_FILE } from '../core/platform/DebtTracker';
 import { onboard } from '../core/platform/Onboard';
 import { IdeaInbox } from '../core/reception/IdeaInbox';
@@ -39,6 +41,15 @@ const PATH_SKILLS = new Set(['create-file', 'refactor', 'generate-tests']);
 const SPEC_SKILLS = new Set(['generate-from-spec', 'validate-against-spec']);
 const GOAL_SKILLS = new Set(['project-builder']);
 
+interface PendingChange {
+  before: string;
+  after: string;
+  taskId?: string;
+  taskTitle?: string;
+  epicTitle?: string;
+  language?: string;
+}
+
 export class MainPanel {
   public static current: MainPanel | undefined;
   private readonly _panel: vscode.WebviewPanel;
@@ -48,6 +59,7 @@ export class MainPanel {
   private _inbox!: IdeaInbox;
   private _checkpoints!: CheckpointManager;
   private _contextBuilder!: ProjectContextBuilder;
+  private _specialists!: SpecialistRouter;
   private _memory!: HierarchicalMemory;
   private _econ: EconState = emptyEcon(`s-${Date.now().toString(36)}`);
   private readonly config = new AlpaquitayConfig();
@@ -68,12 +80,13 @@ export class MainPanel {
     this._inbox = new IdeaInbox(mcpManager);
     this._checkpoints = new CheckpointManager(workspaceRoot);
     this._contextBuilder = new ProjectContextBuilder(workspaceRoot, mcpManager);
+    this._specialists = new SpecialistRouter(mcpManager, workspaceRoot);
     this._memory = new HierarchicalMemory(mcpManager);
-    this._memory.load().catch(() => {/* non-fatal */});
+    this._memory.load().catch(() => {/* non-fatal */ });
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
     this._panel.onDidChangeViewState(e => {
       if (e.webviewPanel.visible) {
-        this._sendSpec().catch(() => {/* non-fatal */});
+        this._sendSpec().catch(() => {/* non-fatal */ });
       }
     }, null, this._disposables);
     this._panel.webview.onDidReceiveMessage(
@@ -85,7 +98,7 @@ export class MainPanel {
     this._watchSpecFile();
     // Proactive spec push: ensures spec is sent even if the webview's
     // initial load-spec message is delayed or missed on first render.
-    setImmediate(() => this._sendSpec().catch(() => {}));
+    setImmediate(() => this._sendSpec().catch(() => { }));
   }
 
   static show(
@@ -138,68 +151,69 @@ export class MainPanel {
 
   private async _dispatch(msg: WebviewMessage): Promise<void> {
     switch (msg.type) {
-      case 'get-models':             return this._sendModels();
-      case 'load-spec':              return this._sendSpec();
-      case 'load-git':               return this._sendGit();
-      case 'load-skills':            return this._sendSkills();
-      case 'switch-provider':        return this._handleSwitchProvider(msg.providerType);
-      case 'chat':                   return this._handleChat(msg.text, msg.modelId);
-      case 'update-task-status':     return this._handleTaskStatus(msg.taskId, msg.status);
-      case 'run-skill':              return this._handleRunSkill(msg.skillId, {});
-      case 'run-skill-with-params':  return this._handleRunSkill(msg.skillId, msg.params);
-      case 'task-correction':        return this._handleTaskCorrection(msg.taskId, msg.correction);
-      case 'regenerate-spec':        return this._handleRegenSpec(msg.context);
-      case 'create-skill':           return this._handleCreateSkill(msg.name, msg.description, msg.prompt);
+      case 'get-models': return this._sendModels();
+      case 'load-spec': return this._sendSpec();
+      case 'load-git': return this._sendGit();
+      case 'load-harness': return this._sendHarnessStatus();
+      case 'load-skills': return this._sendSkills();
+      case 'switch-provider': return this._handleSwitchProvider(msg.providerType);
+      case 'chat': return this._handleChat(msg.text, msg.modelId);
+      case 'update-task-status': return this._handleTaskStatus(msg.taskId, msg.status);
+      case 'run-skill': return this._handleRunSkill(msg.skillId, {});
+      case 'run-skill-with-params': return this._handleRunSkill(msg.skillId, msg.params);
+      case 'task-correction': return this._handleTaskCorrection(msg.taskId, msg.correction);
+      case 'regenerate-spec': return this._handleRegenSpec(msg.context);
+      case 'create-skill': return this._handleCreateSkill(msg.name, msg.description, msg.prompt);
       case 'configure-provider':
         vscode.commands.executeCommand('alpaquitay-ai.configureProvider')
           .then(() => this._sendModels(), () => { /* cancelled */ });
         return;
-      case 'load-settings':          return this._handleLoadSettings();
-      case 'save-settings':          return this._handleSaveSettings((msg as { type: 'save-settings'; settings: Record<string, unknown> }).settings);
-      case 'use-spec-file':          return this._handleUseSpecFile((msg as { type: 'use-spec-file'; filename: string }).filename);
-      case 'convert-spec-file':      return this._handleConvertSpecFile((msg as { type: 'convert-spec-file'; sourcePath: string }).sourcePath);
-      case 'arch-save':              return this._handleArchSave((msg as { type: 'arch-save'; diagram: object }).diagram);
-      case 'arch-load':              return this._handleArchLoad();
-      case 'arch-export':            return this._handleArchExport(
-                                       (msg as { type: 'arch-export'; diagram: ArchDiagram; format: string }).diagram,
-                                       (msg as { type: 'arch-export'; diagram: ArchDiagram; format: string }).format
-                                     );
-      case 'arch-chat':              return this._handleArchChat(
-                                       (msg as { type: 'arch-chat'; text: string; currentDiagram: ArchDiagram }).text,
-                                       (msg as { type: 'arch-chat'; text: string; currentDiagram: ArchDiagram }).currentDiagram
-                                     );
-      case 'run-skill-on-task':      return this._handleRunSkillOnTask(
-                                       (msg as { type: 'run-skill-on-task'; skillId: string; taskId: string }).skillId,
-                                       (msg as { type: 'run-skill-on-task'; skillId: string; taskId: string }).taskId
-                                     );
-      case 'add-spec-task':          return this._handleAddSpecTask(
-                                       (msg as { type: 'add-spec-task'; epicTitle: string; taskTitle: string }).epicTitle,
-                                       (msg as { type: 'add-spec-task'; epicTitle: string; taskTitle: string }).taskTitle
-                                     );
-      case 'update-spec-task':       return this._handleUpdateSpecTask(
-                                       (msg as { type: 'update-spec-task'; taskId: string; newTitle: string }).taskId,
-                                       (msg as { type: 'update-spec-task'; taskId: string; newTitle: string }).newTitle
-                                     );
-      case 'delete-spec-task':       return this._handleDeleteSpecTask(
-                                       (msg as { type: 'delete-spec-task'; taskId: string }).taskId
-                                     );
-      case 'add-spec-epic':          return this._handleAddSpecEpic(
-                                       (msg as { type: 'add-spec-epic'; epicTitle: string }).epicTitle
-                                     );
-      case 'update-spec-epic':       return this._handleUpdateSpecEpic(
-                                       (msg as { type: 'update-spec-epic'; oldTitle: string; newTitle: string }).oldTitle,
-                                       (msg as { type: 'update-spec-epic'; oldTitle: string; newTitle: string }).newTitle
-                                     );
-      case 'delete-spec-epic':       return this._handleDeleteSpecEpic(
-                                       (msg as { type: 'delete-spec-epic'; epicTitle: string }).epicTitle
-                                     );
-      case 'arch-create-adr':        return this._handleCreateAdr(
-                                       (msg as { type: 'arch-create-adr'; context: string; decision: string }).context,
-                                       (msg as { type: 'arch-create-adr'; context: string; decision: string }).decision
-                                     );
-      case 'arch-assess':            return this._handleArchAssess(
-                                       (msg as { type: 'arch-assess'; context: string }).context
-                                     );
+      case 'load-settings': return this._handleLoadSettings();
+      case 'save-settings': return this._handleSaveSettings((msg as { type: 'save-settings'; settings: Record<string, unknown> }).settings);
+      case 'use-spec-file': return this._handleUseSpecFile((msg as { type: 'use-spec-file'; filename: string }).filename);
+      case 'convert-spec-file': return this._handleConvertSpecFile((msg as { type: 'convert-spec-file'; sourcePath: string }).sourcePath);
+      case 'arch-save': return this._handleArchSave((msg as { type: 'arch-save'; diagram: object }).diagram);
+      case 'arch-load': return this._handleArchLoad();
+      case 'arch-export': return this._handleArchExport(
+        (msg as { type: 'arch-export'; diagram: ArchDiagram; format: string }).diagram,
+        (msg as { type: 'arch-export'; diagram: ArchDiagram; format: string }).format
+      );
+      case 'arch-chat': return this._handleArchChat(
+        (msg as { type: 'arch-chat'; text: string; currentDiagram: ArchDiagram }).text,
+        (msg as { type: 'arch-chat'; text: string; currentDiagram: ArchDiagram }).currentDiagram
+      );
+      case 'run-skill-on-task': return this._handleRunSkillOnTask(
+        (msg as { type: 'run-skill-on-task'; skillId: string; taskId: string }).skillId,
+        (msg as { type: 'run-skill-on-task'; skillId: string; taskId: string }).taskId
+      );
+      case 'add-spec-task': return this._handleAddSpecTask(
+        (msg as { type: 'add-spec-task'; epicTitle: string; taskTitle: string }).epicTitle,
+        (msg as { type: 'add-spec-task'; epicTitle: string; taskTitle: string }).taskTitle
+      );
+      case 'update-spec-task': return this._handleUpdateSpecTask(
+        (msg as { type: 'update-spec-task'; taskId: string; newTitle: string }).taskId,
+        (msg as { type: 'update-spec-task'; taskId: string; newTitle: string }).newTitle
+      );
+      case 'delete-spec-task': return this._handleDeleteSpecTask(
+        (msg as { type: 'delete-spec-task'; taskId: string }).taskId
+      );
+      case 'add-spec-epic': return this._handleAddSpecEpic(
+        (msg as { type: 'add-spec-epic'; epicTitle: string }).epicTitle
+      );
+      case 'update-spec-epic': return this._handleUpdateSpecEpic(
+        (msg as { type: 'update-spec-epic'; oldTitle: string; newTitle: string }).oldTitle,
+        (msg as { type: 'update-spec-epic'; oldTitle: string; newTitle: string }).newTitle
+      );
+      case 'delete-spec-epic': return this._handleDeleteSpecEpic(
+        (msg as { type: 'delete-spec-epic'; epicTitle: string }).epicTitle
+      );
+      case 'arch-create-adr': return this._handleCreateAdr(
+        (msg as { type: 'arch-create-adr'; context: string; decision: string }).context,
+        (msg as { type: 'arch-create-adr'; context: string; decision: string }).decision
+      );
+      case 'arch-assess': return this._handleArchAssess(
+        (msg as { type: 'arch-assess'; context: string }).context
+      );
     }
   }
 
@@ -288,6 +302,67 @@ export class MainPanel {
   private async _sendGit(): Promise<void> {
     const data = await this.git.getLog();
     this._post({ type: 'git-log', data });
+  }
+
+  private async _sendHarnessStatus(): Promise<void> {
+    const [gitLog, spec] = await Promise.all([
+      this.git.getLog(40).catch(() => ({ available: false, commits: [] })),
+      this.specManager.load().catch(() => ({ exists: false, markdown: '', tasks: [] })),
+    ]);
+
+    let fingerprint: WorkspaceFingerprint | null = null;
+    try { fingerprint = await this._fingerprinter.fingerprint(); } catch { /* report unknown */ }
+
+    let debt = emptyDebt();
+    try {
+      const file = await this.mcpManager.executeTool('filesystem', 'read_file', { path: DEBT_FILE }) as { content: string };
+      const parsed = JSON.parse(file.content) as Partial<typeof debt>;
+      if (typeof parsed.score === 'number') { debt = { ...debt, ...parsed }; }
+    } catch { /* new workspace */ }
+
+    const pending = this._memory.search('pending-diff:').map(entry => {
+      const path = entry.key.replace('pending-diff:', '');
+      try {
+        const change = JSON.parse(entry.value) as PendingChange;
+        const diff = unifiedDiff(path, change.before, change.after);
+        return { path, added: diff.added, removed: diff.removed, taskId: change.taskId ?? null };
+      } catch {
+        return { path, added: 0, removed: 0, taskId: null };
+      }
+    });
+
+    const active = this.aiManager.getActive();
+    const disclosure = this.aiManager.getLastPrivacyDisclosure();
+    const dora = doraFrom(gitLog.commits);
+    const done = spec.tasks.filter(task => task.done).length;
+    const telemetry = vscode.workspace.getConfiguration('alpaquitay-ai').get<boolean>('enableTelemetry', false);
+
+    this._post({
+      type: 'harness-status',
+      data: {
+        workspace: {
+          name: isUsableRoot(this.workspaceRoot) ? nodePath.basename(this.workspaceRoot) : 'No folder open',
+          writable: isUsableRoot(this.workspaceRoot),
+          stack: fingerprint?.frameworks[0] ?? 'Detecting',
+          sources: fingerprint?.sourceDirs ?? [],
+        },
+        spec: { exists: spec.exists, total: spec.tasks.length, done },
+        dora,
+        debt: { score: debt.score, ceiling: debt.ceiling, events: debt.events.slice(-5).reverse() },
+        pending,
+        economy: this._econ,
+        privacy: {
+          provider: active?.name ?? 'Not configured',
+          providerType: active?.type ?? null,
+          local: active ? active.type === 'ollama' || active.type === 'lmstudio' : null,
+          telemetry,
+          lastDisclosure: disclosure ? {
+            operation: disclosure.operation,
+            redactions: disclosure.redactionCount,
+          } : null,
+        },
+      },
+    });
   }
 
   private async _sendSkills(): Promise<void> {
@@ -418,6 +493,7 @@ export class MainPanel {
       const cp = await this._checkpoints.save('apply-diffs');
       let ok = 0;
       let blocked = 0;
+      const appliedByTask = new Map<string, { files: string[]; title: string; epicTitle: string }>();
       let fpSources: string[] = [];
       try { fpSources = (await this._fingerprinter.fingerprint()).sourceDirs; } catch { /* review sigue */ }
       for (const p of pendings) {
@@ -425,26 +501,81 @@ export class MainPanel {
         const v = guardWrite(rel);
         if (v.verdict === 'deny') { this._post({ type: 'chat-chunk', content: `🛡️ Bloqueado: ${v.reason}` }); blocked++; continue; }
         try {
-          const { before, after } = JSON.parse(p.value) as { before: string; after: string };
+          const pending = JSON.parse(p.value) as PendingChange;
+          const { before, after } = pending;
           // Cap.12: review con agente antes de escribir (local, sin LLM).
           const rev = reviewDiff(rel, before, after, fpSources);
           this._post({ type: 'chat-chunk', content: reviewMarkdown(rel, rev) });
-          if (!rev.pass) { blocked++; logDecision(this.mcpManager, `review-blocked:${rel}`, { route: 'code', lane: 'build', confidence: 1, reasons: rev.findings.map(f => f.detail), needsConfirm: false, chip: '⛔ review' }, {}).catch(() => {}); continue; }
+          if (!rev.pass) { blocked++; logDecision(this.mcpManager, `review-blocked:${rel}`, { route: 'code', lane: 'build', confidence: 1, reasons: rev.findings.map(f => f.detail), needsConfirm: false, chip: '⛔ review' }, {}).catch(() => { }); continue; }
           await this.mcpManager.executeTool('filesystem', 'write_file', { path: rel, content: after });
           this._memory.delete('config', p.key);
+          if (pending.taskId) {
+            const taskChanges = appliedByTask.get(pending.taskId) ?? {
+              files: [],
+              title: pending.taskTitle ?? pending.taskId,
+              epicTitle: pending.epicTitle ?? '',
+            };
+            taskChanges.files.push(rel);
+            appliedByTask.set(pending.taskId, taskChanges);
+          }
           ok++;
         } catch (e) { this._post({ type: 'chat-chunk', content: `(!) No se pudo escribir \`${rel}\`: ${friendlyFsError(e, rel)}` }); }
       }
-      await this._memory.save().catch(() => {});
+      await this._memory.save().catch(() => { });
       this._post({ type: 'chat-chunk', content: `> 🛡️ checkpoint \`${cp}\`\n\n**${ok} archivo(s) aplicados${blocked ? `, ${blocked} bloqueado(s) por review` : ''}.**` });
+
+      for (const [taskId, taskChanges] of appliedByTask) {
+        const remainingForTask = this._memory.search('pending-diff:').filter(entry => {
+          try { return (JSON.parse(entry.value) as PendingChange).taskId === taskId; } catch { return false; }
+        }).length;
+
+        let evidence: QualityEvidence | null = null;
+        if (remainingForTask === 0) {
+          evidence = await this._runBuildAndTests(taskId, taskChanges.files);
+          this._memory.set('config', `quality:${taskId}`, JSON.stringify(evidence), { tags: ['quality', 'evidence', taskId] });
+        }
+
+        let contract = null;
+        try { contract = await loadOrBuild(this.mcpManager, await this._fingerprinter.fingerprint()); } catch { /* gate explica */ }
+        const gate = dodGateForDone(remainingForTask, contract, evidence);
+        this._post({ type: 'chat-chunk', content: `\n\n${dodGateMarkdown(gate)}` });
+
+        if (gate.pass) {
+          const latest = await this.specManager.load();
+          const task = latest.tasks.find(t => t.id === taskId);
+          if (task) {
+            this.specManager.setBoardStatus(taskId, 'done');
+            await this.specManager.updateTaskDone(task, true);
+          }
+          this._memory.set(
+            'feature',
+            taskId,
+            `${taskChanges.title} - files: ${taskChanges.files.join(', ')}`,
+            { parentKey: taskChanges.epicTitle, tags: ['task', 'completed', 'verified'] }
+          );
+          this._post({ type: 'task-work-done', taskId, title: taskChanges.title });
+          this._trackDebt('done-verificado').catch(() => { });
+        } else {
+          this.specManager.setBoardStatus(taskId, 'in-progress');
+          this._post({ type: 'task-work-review', taskId, title: taskChanges.title, files: remainingForTask });
+          logDecision(this.mcpManager, `dod-blocked:${taskId}`, {
+            route: 'code', lane: 'build', confidence: 1, reasons: gate.blockers,
+            needsConfirm: false, chip: '⛔ DoD gate',
+          }, { checkpoint: cp }).catch(() => { });
+          this._trackDebt(`dod-blocked:${taskId}`).catch(() => { });
+        }
+      }
+
+      await this._memory.save().catch(() => { });
+      if (appliedByTask.size > 0) { await this._sendSpec(); }
       this._post({ type: 'chat-done', model: provider.modelName });
-      this._trackDebt('apply').catch(() => {});
+      if (ok > 0) { this._trackDebt('apply').catch(() => { }); }
       return;
     }
     if (/^\s*no\s*$/i.test(text)) {
       const pendings = this._memory.search('pending-diff:');
       for (const p of pendings) { this._memory.delete('config', p.key); }
-      await this._memory.save().catch(() => {});
+      await this._memory.save().catch(() => { });
       this._post({ type: 'chat-chunk', content: `Diffs descartados (${pendings.length}). Nada se escribio.` });
       this._post({ type: 'chat-done', model: provider.modelName });
       return;
@@ -484,7 +615,7 @@ export class MainPanel {
     const stackChip = (fp ? ` · ${fp.frameworks[0] ?? 'stack?'} · \`${fp.sourceDirs.join(', ') || '.'}\`` : '') + platformChip;
     const dodLine = dod ? `\n> ✅ ${dod}` : '';
     // FABLE-5 (E): toda decision queda en decisions.jsonl (best-effort).
-    logDecision(this.mcpManager, text, d, { stack: fp?.frameworks[0], sources: fp?.sourceDirs.join(','), policy: d.needsConfirm ? 'confirm' : 'allow', checkpoint: `sdlc:${sdlc.phase}` }).catch(() => {});
+    logDecision(this.mcpManager, text, d, { stack: fp?.frameworks[0], sources: fp?.sourceDirs.join(','), policy: d.needsConfirm ? 'confirm' : 'allow', checkpoint: `sdlc:${sdlc.phase}` }).catch(() => { });
     // Rutas que tocan disco o delegan: piden confirmacion, no ejecutan directo.
     // FABLE-5 (B/L): code muestra preview legible acotado a fuentes evidenciadas.
     // SDLC: el chip incluye fase + gate para que el usuario sepa en que etapa esta.
@@ -493,7 +624,7 @@ export class MainPanel {
       const preview = buildPreview(text.slice(0, 120), hintPaths.length ? hintPaths : [`${fp.sourceDirs[0] || '.'}/<nuevo-archivo>`], fp.sourceDirs);
       this._post({ type: 'chat-chunk', content: `> ${d.chip}${stackChip}${sdlcChip}${dodLine}\n\n${preview}` });
       this._memory.set('config', 'pending-route', JSON.stringify({ text, route: d.route, lane: d.lane }), { tags: ['harness'] });
-      this._memory.save().catch(() => {});
+      this._memory.save().catch(() => { });
       this._post({ type: 'chat-done', model: provider.modelName });
       return;
     }
@@ -508,11 +639,11 @@ export class MainPanel {
       const hint = d.route === 'code'
         ? `Lo implemento en \`${fp?.sourceDirs[0] ?? '.'}\` con preview + checkpoint.`
         : d.route === 'spec' ? 'Lo llevo al flujo spec.md + tablero.'
-        : d.route === 'specialist' ? 'Lo derivo al especialista con arnes completo.'
-        : 'Te pido un dato mas para no alucinar.';
+          : d.route === 'specialist' ? 'Lo derivo al especialista con arnes completo.'
+            : 'Te pido un dato mas para no alucinar.';
       this._post({ type: 'chat-chunk', content: `> ${d.chip}${stackChip}${sdlcChip}${dodLine}\n\n**¿Confirmas esta ruta?** ${hint}\n\nResponde \`si\` para continuar o reformula.` });
       this._memory.set('config', 'pending-route', JSON.stringify({ text, route: d.route, lane: d.lane }), { tags: ['harness'] });
-      this._memory.save().catch(() => {});
+      this._memory.save().catch(() => { });
       this._post({ type: 'chat-done', model: provider.modelName });
       return;
     }
@@ -614,9 +745,42 @@ export class MainPanel {
       await this._handleRegenSpec(text);
       return;
     }
-    // chat/ideate/specialist confirmado -> respuesta directa con contexto
+    // Deep requests execute one real registered specialist. They never silently
+    // collapse back into generic chat after specialist routing was approved.
     const provider = this.aiManager.getActive();
     if (!provider) { return; }
+    if (route === 'specialist') {
+      const result = await this._specialists.route(text, provider);
+      if (!result.handled) {
+        this._post({
+          type: 'chat-chunk',
+          content: '> 🧠 Deep · routing stopped safely\n\nNo registered specialist met the confidence threshold. Add the target domain (for example: security, QA, architecture, DORA, or FinOps) and try again.',
+        });
+        this._post({ type: 'chat-done', model: provider.modelName });
+        return;
+      }
+
+      const guards = result.guardrailResults
+        .map(g => `- ${g.severity === 'pass' ? '✅' : g.severity === 'warn' ? '⚠️' : '⛔'} ${g.rule}: ${g.message}`)
+        .join('\n');
+      const receipt = [
+        `> 🧠 Deep · **${result.specialistName ?? result.specialistId}** · \`${result.useCaseId}\` · ${Math.round(result.confidence * 100)}% confidence`,
+        `> ${result.privacyRedacted ? 'PII redacted before routing' : 'privacy boundary checked'}`,
+      ].join('\n');
+      this._post({
+        type: 'chat-chunk',
+        content: `${receipt}\n\n${result.answer}${guards ? `\n\n**Guardrails**\n${guards}` : ''}`,
+      });
+      logDecision(this.mcpManager, `specialist:${result.specialistId}:${result.useCaseId}`, {
+        route: 'specialist', lane: 'deep', confidence: result.confidence,
+        reasons: result.reasons, needsConfirm: false, chip: `🧠 ${result.specialistName}`,
+      }, { checkpoint: 'sdlc:specialist' }).catch(() => { });
+      this._econLlm(text.length, result.answer.length).catch(() => { });
+      this._post({ type: 'chat-done', model: provider.modelName });
+      return;
+    }
+
+    // Confirmed non-mutating chat/ideation route.
     try {
       const systemPrompt = await this._contextBuilder.getChatSystemPrompt();
       const response = await provider.chat([{ role: 'user', content: text }], { systemPrompt });
@@ -642,20 +806,22 @@ export class MainPanel {
       const pendings = this._memory.search('pending-diff:');
       let contract = null;
       try { contract = await loadOrBuild(this.mcpManager, await this._fingerprinter.fingerprint()); } catch { /* sin contrato */ }
-      const gate = dodGateForDone(pendings.length, contract);
+      const evidenceEntry = this._memory.get('config', `quality:${task.id}`);
+      const evidence = parseQualityEvidence(evidenceEntry?.value);
+      const gate = dodGateForDone(pendings.length, contract, evidence);
       if (!gate.pass) {
         this._post({ type: 'chat-chunk', content: `${dodGateMarkdown(gate)}\n\n_La tarea **${task.id}** no se marca done. Aplica o descarta diffs primero._` });
         await this._sendSpec();
-        logDecision(this.mcpManager, `dod-blocked:${task.id}`, { route: 'spec', lane: 'build', confidence: 1, reasons: gate.blockers, needsConfirm: false, chip: '⛔ DoD gate' }, { checkpoint: 'sdlc:pruebas' }).catch(() => {});
-        this._trackDebt(`dod-blocked:${task.id}`).catch(() => {});
+        logDecision(this.mcpManager, `dod-blocked:${task.id}`, { route: 'spec', lane: 'build', confidence: 1, reasons: gate.blockers, needsConfirm: false, chip: '⛔ DoD gate' }, { checkpoint: 'sdlc:pruebas' }).catch(() => { });
+        this._trackDebt(`dod-blocked:${task.id}`).catch(() => { });
         return;
       }
       // Fast path: update cached data and send immediately, write disk in background
       const doneTask = data.tasks.find(t => t.id === taskId);
       if (doneTask) { doneTask.done = true; doneTask.status = 'done'; }
       this._post({ type: 'spec-data', data });
-      this.specManager.updateTaskDone(task, true).catch(() => {});
-      this._trackDebt('done-verificado').catch(() => {});
+      this.specManager.updateTaskDone(task, true).catch(() => { });
+      this._trackDebt('done-verificado').catch(() => { });
       return;
     }
 
@@ -671,7 +837,7 @@ export class MainPanel {
         this._post({ type: 'task-correction-needed', taskId: task.id, title: task.title });
       } else {
         // First time in-progress: start AI work automatically
-        this._startTaskWork(task).catch(() => {/* errors handled inside */});
+        this._startTaskWork(task).catch(() => {/* errors handled inside */ });
       }
     }
   }
@@ -883,10 +1049,10 @@ export class MainPanel {
         const pkg = JSON.parse(await readFile(p('package.json'), 'utf-8'));
         const s: Record<string, string> = pkg.scripts ?? {};
         const buildKey = ['build', 'compile', 'tsc', 'typecheck'].find(k => s[k]);
-        const testKey  = ['test', 'test:unit', 'test:run', 'vitest'].find(k => s[k]);
+        const testKey = ['test', 'test:unit', 'test:run', 'vitest'].find(k => s[k]);
         return {
           build: buildKey ? `npm run ${buildKey}` : undefined,
-          test:  testKey  ? `npm run ${testKey}`  : undefined,
+          test: testKey ? `npm run ${testKey}` : undefined,
         };
       } catch { return {}; }
     }
@@ -930,9 +1096,11 @@ export class MainPanel {
     const { readFile, writeFile } = await import('fs/promises');
     const { existsSync } = await import('fs');
     const fixed: string[] = [];
-    const langOf = (fp: string) => (({ ts: 'TypeScript', tsx: 'TSX', js: 'JavaScript',
+    const langOf = (fp: string) => (({
+      ts: 'TypeScript', tsx: 'TSX', js: 'JavaScript',
       jsx: 'JSX', java: 'Java', py: 'Python', go: 'Go', rs: 'Rust',
-      kt: 'Kotlin', cs: 'C#' } as Record<string, string>)[fp.split('.').pop()?.toLowerCase() ?? ''] ?? 'code');
+      kt: 'Kotlin', cs: 'C#'
+    } as Record<string, string>)[fp.split('.').pop()?.toLowerCase() ?? ''] ?? 'code');
 
     const targets = candidateFiles
       .filter(fp => errorOutput.includes(nodePath.basename(fp)) || errorOutput.includes(fp));
@@ -968,54 +1136,67 @@ export class MainPanel {
     return fixed;
   }
 
-  private async _runBuildAndTests(
-    provider: AIProvider,
-    modelName: string,
-    taskContext: string,
-    writtenFiles: string[]
-  ): Promise<void> {
+  private async _runBuildAndTests(taskId: string, writtenFiles: string[]): Promise<QualityEvidence> {
     const cmds = await this._detectBuildCommands();
-    if (!cmds.build && !cmds.test) { return; }
+    let build: QualityCheck = {
+      status: 'not-run',
+      detail: cmds.build ? 'pendiente' : 'no se detecto un comando de build',
+      ...(cmds.build ? { command: cmds.build } : {}),
+    };
+    let tests: QualityCheck = {
+      status: 'not-run',
+      detail: cmds.test ? 'pendiente' : 'no se detecto un comando de tests',
+      ...(cmds.test ? { command: cmds.test } : {}),
+    };
 
     // ── Build ──────────────────────────────────────────────────────────────────
     if (cmds.build) {
       this._post({ type: 'chat-chunk', content: `\n\n*Build: \`${cmds.build}\`...*` });
-      let res = await this._runCommand(cmds.build, 90_000);
-
-      for (let i = 0; i < 2 && !res.success; i++) {
-        this._post({ type: 'chat-chunk', content: `\n  build failed — fixing...` });
-        const f = await this._fixBuildErrors(provider, modelName, taskContext, writtenFiles, res.output);
-        if (f.length === 0) { break; }
-        res = await this._runCommand(cmds.build, 90_000);
-      }
+      const res = await this._runCommand(cmds.build, 90_000);
+      build = {
+        command: cmds.build,
+        status: res.success ? 'passed' : 'failed',
+        ...(!res.success ? { detail: res.output.slice(-500) || 'exit code no-cero' } : {}),
+      };
 
       this._post({
         type: 'chat-chunk',
         content: res.success
           ? `\n  build OK`
-          : `\n  build errors remain:\n\`\`\`\n${res.output.slice(-1500)}\n\`\`\``,
+          : `\n  build fallo; no se modifica codigo automaticamente:\n\`\`\`\n${res.output.slice(-1500)}\n\`\`\``,
       });
     }
 
     // ── Tests ──────────────────────────────────────────────────────────────────
-    if (cmds.test && await this._hasTestFiles()) {
-      this._post({ type: 'chat-chunk', content: `\n\n*Tests: \`${cmds.test}\`...*` });
-      let res = await this._runCommand(cmds.test, 120_000);
-
-      for (let i = 0; i < 2 && !res.success; i++) {
-        this._post({ type: 'chat-chunk', content: `\n  tests failed — fixing...` });
-        const f = await this._fixBuildErrors(provider, modelName, taskContext, writtenFiles, res.output);
-        if (f.length === 0) { break; }
-        res = await this._runCommand(cmds.test, 120_000);
+    if (cmds.test) {
+      if (await this._hasTestFiles()) {
+        this._post({ type: 'chat-chunk', content: `\n\n*Tests: \`${cmds.test}\`...*` });
+        const res = await this._runCommand(cmds.test, 120_000);
+        tests = {
+          command: cmds.test,
+          status: res.success ? 'passed' : 'failed',
+          ...(!res.success ? { detail: res.output.slice(-500) || 'exit code no-cero' } : {}),
+        };
+        this._post({
+          type: 'chat-chunk',
+          content: res.success
+            ? `\n  all tests pass`
+            : `\n  tests fallaron; se requiere un nuevo diff revisable:\n\`\`\`\n${res.output.slice(-1500)}\n\`\`\``,
+        });
+      } else {
+        tests = { command: cmds.test, status: 'not-run', detail: 'no se encontraron archivos de test' };
+        this._post({ type: 'chat-chunk', content: `\n\n⛔ Tests no ejecutados: no se encontraron archivos de test.` });
       }
-
-      this._post({
-        type: 'chat-chunk',
-        content: res.success
-          ? `\n  all tests pass`
-          : `\n  test failures remain:\n\`\`\`\n${res.output.slice(-1500)}\n\`\`\``,
-      });
     }
+
+    return {
+      version: 1,
+      taskId,
+      files: [...writtenFiles],
+      build,
+      tests,
+      recordedAt: new Date().toISOString(),
+    };
   }
 
   private _waitForDiagnostics(uri: vscode.Uri, timeoutMs = 5000): Promise<vscode.Diagnostic[]> {
@@ -1147,8 +1328,8 @@ export class MainPanel {
 
     const specData = await this.specManager.load();
     const epicContext = this._epicExcerpt(specData.markdown, task.epicTitle);
-    let tree = await this._workspaceTree();
-    let treeSection = tree ? `Project structure:\n${tree}\n\n` : '';
+    const tree = await this._workspaceTree();
+    const treeSection = tree ? `Project structure:\n${tree}\n\n` : '';
     const header = correction ? `**ðŸ”„ Correction:** ${task.title}` : `**> Implementando:** ${task.title}`;
 
     try {
@@ -1160,27 +1341,9 @@ export class MainPanel {
       // Handles spec annotations like "archivo src/feature/Service.ts" or backtick refs.
       let filePaths = this._extractPathHints(`${task.title}\n${epicContext}`);
 
-      // -- Phase 0b: Bootstrap empty workspace before first task ----------------
-      // Detects a brand-new project (only spec.md present) and scaffolds the canonical
-      // directory structure via ProjectBuilderSkill, then re-derives the tree.
-      if (this._isEmptyWorkspace(tree) && !correction) {
-        await this._bootstrapFromSpec(`${epicContext}\n\nTask: ${task.title}`);
-        tree = await this._workspaceTree();
-        treeSection = tree ? `Project structure:\n${tree}\n\n` : '';
-        if (filePaths.length === 0) {
-          filePaths = this._extractPathHints(`${task.title}\n${epicContext}`);
-        }
-      }
-
-      // -- Phase 0c: Skill routing — delegate to registered skill when applicable
-      // Avoids duplicating skill logic inline; corrections always use inline path.
-      if (!correction && !smallModel) {
-        const skillId = this._routeTaskToSkill(task, epicContext);
-        if (skillId) {
-          await this._runSkillForTask(task, epicContext, specData.tasks, skillId);
-          return;
-        }
-      }
+      // Mutating skills are not auto-run here: the inline path below is the single
+      // transaction that guarantees preview -> approval -> apply -> quality gate.
+      // Skills remain available explicitly from the Skills tab.
 
       // -- Build spec state context for prompts ---------------------------------
       const specState = !smallModel ? this._buildSpecStateContext(specData.tasks, task.id) : '';
@@ -1193,16 +1356,16 @@ export class MainPanel {
       if (filePaths.length === 0) {
         const planPrompt = smallModel
           ? `Task: "${task.title}"\n` +
-            (tree ? `Existing files:\n${tree}\n` : '') +
-            `Give ONE relative file path to create or modify. Output only the path, nothing else.`
+          (tree ? `Existing files:\n${tree}\n` : '') +
+          `Give ONE relative file path to create or modify. Output only the path, nothing else.`
           : `${correction ? 'Fix' : 'Implement'}: ${task.title}\n\n` +
-            treeSection +
-            `Task context:\n${epicContext}\n\n` +
-            specStateSection +
-            (correction ? `Problem to fix: ${correction}\n\n` : '') +
-            `List the relative file paths to create or modify (one per line).\n` +
-            `If no path is specified, infer a reasonable one from the task (e.g. index.html, src/main.ts).\n` +
-            `Output ONLY the paths, no explanations, no markdown.`;
+          treeSection +
+          `Task context:\n${epicContext}\n\n` +
+          specStateSection +
+          (correction ? `Problem to fix: ${correction}\n\n` : '') +
+          `List the relative file paths to create or modify (one per line).\n` +
+          `If no path is specified, infer a reasonable one from the task (e.g. index.html, src/main.ts).\n` +
+          `Output ONLY the paths, no explanations, no markdown.`;
 
         const plan = await provider.chat(
           [{ role: 'user', content: planPrompt }],
@@ -1227,10 +1390,8 @@ export class MainPanel {
 
       this._post({ type: 'chat-chunk', content: `${header}\n\n**Plan:**\n${filePaths.length > 0 ? filePaths.join('\n') : '_Sin rutas detectadas_'}` });
 
-      // -- Phase 2: Generate + write each file ----------------------------------
+      // -- Phase 2: Generate reviewable changes (no workspace writes) -----------
       const written: string[] = [];
-      // Quality tasks (format + validate) deferred to background pipeline
-      const qualityTasks: Array<() => Promise<void>> = [];
 
       // Spec file path for protection check
       const specAbsPath = nodePath.resolve(this.specManager.specPath);
@@ -1262,23 +1423,20 @@ export class MainPanel {
         // Use an ultra-minimal prompt that starts with a direct code instruction.
         const codePrompt = smallModel
           ? `Write ${language} source code for file: ${filePath}\n` +
-            `Purpose: ${task.title.slice(0, 120)}` +
-            (correction ? `\nFix: ${correction}` : '') +
-            `\nOutput ONLY the raw ${language} code. First line must be code, not prose.`
+          `Purpose: ${task.title.slice(0, 120)}` +
+          (correction ? `\nFix: ${correction}` : '') +
+          `\nOutput ONLY the raw ${language} code. First line must be code, not prose.`
           : `${masterPrompt}\n\n` +
-            `## NOW GENERATE:\n` +
-            `File: ${filePath}\n` +
-            `Language: ${language}\n` +
-            `Expected functional content: ${task.title}` +
-            (correction ? `\nFix: ${correction}` : '') +
-            `\nSpec context: ${epicContext.slice(0, 400)}` +
-            (specStateSection ? `\n\n${specStateSection.trim()}` : '');
+          `## NOW GENERATE:\n` +
+          `File: ${filePath}\n` +
+          `Language: ${language}\n` +
+          `Expected functional content: ${task.title}` +
+          (correction ? `\nFix: ${correction}` : '') +
+          `\nSpec context: ${epicContext.slice(0, 400)}` +
+          (specStateSection ? `\n\n${specStateSection.trim()}` : '');
 
         try {
           const content = await generateCode(provider, codePrompt, filePath, description, language, { maxTokens: 1024 }, activeModelName);
-          const abs = nodePath.isAbsolute(filePath)
-            ? filePath
-            : nodePath.join(this.workspaceRoot, filePath);
           const rel = nodePath.isAbsolute(filePath) ? nodePath.relative(this.workspaceRoot, filePath) : filePath;
           // Experto: diff-first (FABLE-5 B). No se escribe directo: se guarda pendiente
           // y se muestra el diff. `si aplicar` lo escribe con checkpoint.
@@ -1292,20 +1450,21 @@ export class MainPanel {
             this._post({ type: 'chat-chunk', content: `\n🛡️ Bloqueado: ${v.reason}` });
             continue;
           }
-          this._memory.set('config', `pending-diff:${rel}`, JSON.stringify({ before, after: content }), { tags: ['diff', 'pending'] });
-          await this._memory.save().catch(() => {});
+          const pending: PendingChange = {
+            before,
+            after: content,
+            taskId: task.id,
+            taskTitle: task.title,
+            epicTitle: task.epicTitle,
+            language,
+          };
+          this._memory.set('config', `pending-diff:${rel}`, JSON.stringify(pending), { tags: ['diff', 'pending', task.id] });
+          await this._memory.save().catch(() => { });
           written.push(filePath);
           this._memory.extractFromCode(filePath, content, language);
           const fd = unifiedDiff(rel, before, content);
           const preview = fd.diff.split('\n').slice(0, 25).join('\n');
           this._post({ type: 'chat-chunk', content: `\n**Diff \`${rel}\` (+${fd.added}/-${fd.removed}) — pendiente**\n\`\`\`diff\n${preview}\n\`\`\`\n_si aplicar_ para escribir · _no_ para descartar · _diff ${rel}_ para ver completo` });
-          // Defer format + validate to background quality pipeline (non-blocking for Kanban)
-          const _abs = abs, _lang = language, _fp = filePath, _desc = description;
-          qualityTasks.push(() =>
-            this._formatGeneratedFile(_abs)
-              .then(() => this._validateAndFixFile(_abs, _lang, provider, activeModelName, _fp, _desc))
-              .catch(() => {})
-          );
         } catch (e) {
           this._post({ type: 'chat-chunk', content: `\n(!)  No se pudo escribir \`${filePath}\`: ${e}` });
         }
@@ -1314,28 +1473,14 @@ export class MainPanel {
       if (written.length > 0) {
         this._post({ type: 'chat-chunk', content: `\n\n**Diffs pendientes (${written.length}) — nada escrito aun:**\n${written.map(f => `- \`${f}\``).join('\n')}\n\n_si aplicar_ escribe todo con checkpoint · revisa cada uno con _diff <ruta>_` });
 
-        // -- Fast Kanban completion: mark Done immediately after files are written --
-        // Quality pipeline (format → validate → build → test) runs asynchronously.
-        // setBoardStatus covers the transient window before spec.md is written to disk.
-        this.specManager.setBoardStatus(task.id, 'done');
+        // A generated change is not Done. Keep the task in review until the user
+        // applies the exact preview and executable quality gates pass.
+        this.specManager.setBoardStatus(task.id, 'in-progress');
         const taskRef = specData.tasks.find(t => t.id === task.id);
-        if (taskRef) { taskRef.done = true; taskRef.status = 'done'; }
+        if (taskRef) { taskRef.done = false; taskRef.status = 'in-progress'; }
         this._post({ type: 'spec-data', data: specData });
-        this._post({ type: 'task-work-done', taskId: task.id, title: task.title });
+        this._post({ type: 'task-work-review', taskId: task.id, title: task.title, files: written.length });
         this._post({ type: 'chat-done', model: planModel });
-
-        // Fire-and-forget: quality pipeline does not block the Kanban board
-        const _taskTitle = task.title, _taskId = task.id, _epicTitle = task.epicTitle;
-        const _taskCtx = `${task.title}: ${epicContext.slice(0, 200)}`;
-        void (async () => {
-          await Promise.allSettled(qualityTasks.map(fn => fn()));
-          await this._runBuildAndTests(provider, activeModelName, _taskCtx, written);
-          this._memory.set('feature', _taskId, `${_taskTitle} - files: ${written.join(', ')}`, { parentKey: _epicTitle, tags: ['task', 'completed'] });
-          await Promise.allSettled([
-            this._memory.save(),
-            this.specManager.updateTaskDone(task, true),
-          ]);
-        })().catch(() => {});
 
       } else if (filePaths.length === 0) {
         this._post({ type: 'chat-chunk', content: `\n\n[info] El AI no identified archivos para crear. Usa el skill \`create-file\` o especifica la ruta en la tarea.` });
@@ -1355,8 +1500,8 @@ export class MainPanel {
       } catch { /* default */ }
       const pm = classifyFailure(msg);
       this._post({ type: 'chat-chunk', content: `${postmortemMarkdown(task.title, pm, testCmd)}\n\n_Detalle: ${msg.slice(0, 300)}_` });
-      logDecision(this.mcpManager, `postmortem:${task.id}`, { route: 'code', lane: 'build', confidence: 1, reasons: [`postmortem:${pm.kind}`, pm.cause], needsConfirm: false, chip: '🔬 postmortem' }, { checkpoint: `sdlc:implementacion` }).catch(() => {});
-      this._trackDebt(`postmortem:${pm.kind}`).catch(() => {});
+      logDecision(this.mcpManager, `postmortem:${task.id}`, { route: 'code', lane: 'build', confidence: 1, reasons: [`postmortem:${pm.kind}`, pm.cause], needsConfirm: false, chip: '🔬 postmortem' }, { checkpoint: `sdlc:implementacion` }).catch(() => { });
+      this._trackDebt(`postmortem:${pm.kind}`).catch(() => { });
       this._post({
         type: 'task-work-error',
         taskId: task.id,
@@ -1449,33 +1594,33 @@ export class MainPanel {
     if (small) {
       return context
         ? `Write a spec.md for: ${ctxSlice}\n\n` +
-          `EXACT FORMAT (copy this structure):\n${template}\n` +
-          `Rules:\n` +
-          `- Use ## for epic headings ONLY (no ####, no RNF_XX, no numbered sections)\n` +
-          `- Each task line MUST start with "- [ ] " followed by a concrete file or action\n` +
-          `- ${rule}\n` +
-          `- Write 3 epics with 3 tasks each\n` +
-          `- Output ONLY the spec.md content`
+        `EXACT FORMAT (copy this structure):\n${template}\n` +
+        `Rules:\n` +
+        `- Use ## for epic headings ONLY (no ####, no RNF_XX, no numbered sections)\n` +
+        `- Each task line MUST start with "- [ ] " followed by a concrete file or action\n` +
+        `- ${rule}\n` +
+        `- Write 3 epics with 3 tasks each\n` +
+        `- Output ONLY the spec.md content`
         : `Write a spec.md for a software project.\n\n` +
-          `EXACT FORMAT:\n${template}\n` +
-          `Rules:\n- ${rule}\n` +
-          `Write 3 epics (Auth, Core Features, Testing) with 3 tasks each.\n` +
-          `Output ONLY the spec.md content.`;
+        `EXACT FORMAT:\n${template}\n` +
+        `Rules:\n- ${rule}\n` +
+        `Write 3 epics (Auth, Core Features, Testing) with 3 tasks each.\n` +
+        `Output ONLY the spec.md content.`;
     }
     return context
       ? `Genera un spec.md para implementar: ${ctxSlice}\n\n` +
-        `FORMATO EXACTO OBLIGATORIO — copia esta estructura:\n${template}\n` +
-        `Reglas estrictas:\n` +
-        `- Encabezados de épica SOLO con ## (prohibido ####, RNF_XX, numeración)\n` +
-        `- Cada tarea DEBE empezar con "- [ ] " seguido de un archivo o acción concreta implementable\n` +
-        `- ${rule}\n` +
-        `- Mínimo 3 épicas con 3-5 tareas cada una\n` +
-        `- Escribe ÚNICAMENTE el contenido del spec.md, sin texto adicional`
+      `FORMATO EXACTO OBLIGATORIO — copia esta estructura:\n${template}\n` +
+      `Reglas estrictas:\n` +
+      `- Encabezados de épica SOLO con ## (prohibido ####, RNF_XX, numeración)\n` +
+      `- Cada tarea DEBE empezar con "- [ ] " seguido de un archivo o acción concreta implementable\n` +
+      `- ${rule}\n` +
+      `- Mínimo 3 épicas con 3-5 tareas cada una\n` +
+      `- Escribe ÚNICAMENTE el contenido del spec.md, sin texto adicional`
       : `Genera un spec.md inicial para un proyecto de software.\n\n` +
-        `FORMATO EXACTO:\n${template}\n` +
-        `Reglas:\n- ${rule}\n` +
-        `Usa 4 épicas: Autenticación, Funcionalidades Core, Testing, Despliegue.\n` +
-        `3-4 tareas por épica. Solo el contenido del spec.md.`;
+      `FORMATO EXACTO:\n${template}\n` +
+      `Reglas:\n- ${rule}\n` +
+      `Usa 4 épicas: Autenticación, Funcionalidades Core, Testing, Despliegue.\n` +
+      `3-4 tareas por épica. Solo el contenido del spec.md.`;
   }
 
   private async _handleRegenSpec(context: string): Promise<void> {
@@ -1554,7 +1699,7 @@ export class MainPanel {
       const diagram = await this._inferArchitecture();
       this._post({ type: 'arch-data', diagram });
       if (diagram.nodes.length > 0) {
-        this._handleArchSave(diagram).catch(() => {});
+        this._handleArchSave(diagram).catch(() => { });
       }
     }
   }
@@ -1568,16 +1713,16 @@ export class MainPanel {
     const epics = [...new Set(specData.tasks.map(t => t.epicTitle))];
 
     const EPIC_KEYWORDS: Array<[RegExp, ArchNodeType]> = [
-      [/auth|login|user|session|oauth|jwt/i,            'auth'],
-      [/api|endpoint|route|rest|graphql/i,              'api'],
+      [/auth|login|user|session|oauth|jwt/i, 'auth'],
+      [/api|endpoint|route|rest|graphql/i, 'api'],
       [/database|db|postgres|mysql|mongo|sqlite|persist/i, 'db'],
-      [/cache|redis|memcach/i,                          'cache'],
-      [/queue|event|message|kafka|rabbit|pubsub/i,      'queue'],
-      [/storage|file|upload|s3|blob/i,                  'storage'],
-      [/frontend|ui|web|view|spa|react|vue|angular/i,   'client'],
-      [/cdn|static|asset|media/i,                       'cdn'],
-      [/lambda|serverless|function/i,                   'lambda'],
-      [/container|docker|kubernetes|k8s/i,              'container'],
+      [/cache|redis|memcach/i, 'cache'],
+      [/queue|event|message|kafka|rabbit|pubsub/i, 'queue'],
+      [/storage|file|upload|s3|blob/i, 'storage'],
+      [/frontend|ui|web|view|spa|react|vue|angular/i, 'client'],
+      [/cdn|static|asset|media/i, 'cdn'],
+      [/lambda|serverless|function/i, 'lambda'],
+      [/container|docker|kubernetes|k8s/i, 'container'],
     ];
 
     let x = 100, y = 80;
@@ -1595,14 +1740,14 @@ export class MainPanel {
       const entries = await this.mcpManager.executeTool('filesystem', 'list_files', { path: '.' }) as Array<{ name: string; isDirectory: boolean }>;
       const dirs = new Set(entries.filter(e => e.isDirectory).map(e => e.name.toLowerCase()));
       const FOLDER_MAP: Array<[string[], ArchNodeType, string]> = [
-        [['frontend', 'client', 'web', 'ui'],           'client',    'Frontend'],
-        [['backend', 'server', 'api'],                  'api',       'Backend API'],
-        [['db', 'database', 'migrations'],              'db',        'Database'],
-        [['cache', 'redis'],                            'cache',     'Cache'],
-        [['queue', 'events', 'messaging'],              'queue',     'Message Queue'],
-        [['storage', 'files', 'uploads'],               'storage',   'File Storage'],
-        [['auth', 'identity'],                          'auth',      'Auth Service'],
-        [['infra', 'terraform', 'k8s', 'kubernetes'],   'container', 'Infrastructure'],
+        [['frontend', 'client', 'web', 'ui'], 'client', 'Frontend'],
+        [['backend', 'server', 'api'], 'api', 'Backend API'],
+        [['db', 'database', 'migrations'], 'db', 'Database'],
+        [['cache', 'redis'], 'cache', 'Cache'],
+        [['queue', 'events', 'messaging'], 'queue', 'Message Queue'],
+        [['storage', 'files', 'uploads'], 'storage', 'File Storage'],
+        [['auth', 'identity'], 'auth', 'Auth Service'],
+        [['infra', 'terraform', 'k8s', 'kubernetes'], 'container', 'Infrastructure'],
       ];
       for (const [folders, nodeType, name] of FOLDER_MAP) {
         if (folders.some(f => dirs.has(f)) && !nodes.some(n => n.type === nodeType)) {
@@ -1620,11 +1765,11 @@ export class MainPanel {
 
     const client = find('client'), api = find('api') ?? find('service');
     const auth = find('auth'), db = find('db'), cache = find('cache'), queue = find('queue');
-    if (client && api)  { addEdge(client, api, 'HTTP'); }
-    if (api && auth)    { addEdge(api, auth, 'verify'); }
-    if (api && db)      { addEdge(api, db, 'read/write'); }
-    if (api && cache)   { addEdge(api, cache, 'cache'); }
-    if (api && queue)   { addEdge(api, queue, 'publish'); }
+    if (client && api) { addEdge(client, api, 'HTTP'); }
+    if (api && auth) { addEdge(api, auth, 'verify'); }
+    if (api && db) { addEdge(api, db, 'read/write'); }
+    if (api && cache) { addEdge(api, cache, 'cache'); }
+    if (api && queue) { addEdge(api, queue, 'publish'); }
 
     return { nodes, edges };
   }
@@ -1634,10 +1779,10 @@ export class MainPanel {
     let ext = 'tf';
     try {
       switch (format) {
-        case 'terraform': content = this._genTerraform(diagram); ext = 'tf';   break;
-        case 'cdk':       content = this._genCDK(diagram);       ext = 'ts';   break;
-        case 'bicep':     content = this._genBicep(diagram);     ext = 'bicep'; break;
-        case 'gcp':       content = this._genGCPYaml(diagram);   ext = 'yaml'; break;
+        case 'terraform': content = this._genTerraform(diagram); ext = 'tf'; break;
+        case 'cdk': content = this._genCDK(diagram); ext = 'ts'; break;
+        case 'bicep': content = this._genBicep(diagram); ext = 'bicep'; break;
+        case 'gcp': content = this._genGCPYaml(diagram); ext = 'yaml'; break;
         default: return;
       }
       const infraDir = this._absWritePath('infra');
@@ -2131,8 +2276,8 @@ export class MainPanel {
           evolutionPath?: string[];
         };
         let report = `## Architecture Assessment (ISO/IEC 42010)\n\n`;
-        if (data.currentStyle)      report += `**Current style:** ${data.currentStyle}\n`;
-        if (data.recommendedStyle)  report += `**Recommended:** ${data.recommendedStyle}\n\n`;
+        if (data.currentStyle) report += `**Current style:** ${data.currentStyle}\n`;
+        if (data.recommendedStyle) report += `**Recommended:** ${data.recommendedStyle}\n\n`;
         if (data.qualityScores) {
           report += `### Quality Attributes (ISO/IEC 25010)\n`;
           for (const [attr, score] of Object.entries(data.qualityScores)) {
@@ -2169,29 +2314,29 @@ export class MainPanel {
       type: 'settings-data',
       settings: {
         // LLM defaults
-        maxTokens:          cfg.get('maxTokens',          4096),
-        temperature:        cfg.get('temperature',        0.3),
-        requestTimeout:     cfg.get('requestTimeout',     120000),
-        systemPrompt:       cfg.get('systemPrompt',       ''),
-        orgContext:         cfg.get('orgContext',          ''),
+        maxTokens: cfg.get('maxTokens', 4096),
+        temperature: cfg.get('temperature', 0.3),
+        requestTimeout: cfg.get('requestTimeout', 120000),
+        systemPrompt: cfg.get('systemPrompt', ''),
+        orgContext: cfg.get('orgContext', ''),
         // Provider selection
-        preferredProvider:  cfg.get('preferredProvider',  'auto'),
+        preferredProvider: cfg.get('preferredProvider', 'auto'),
         // Anthropic
-        anthropicModel:     cfg.get('anthropic.model',    'claude-sonnet-4-6'),
-        anthropicBaseUrl:   cfg.get('anthropic.baseUrl',  'https://api.anthropic.com/v1'),
+        anthropicModel: cfg.get('anthropic.model', 'claude-sonnet-4-6'),
+        anthropicBaseUrl: cfg.get('anthropic.baseUrl', 'https://api.anthropic.com/v1'),
         // OpenAI
-        openaiModel:        cfg.get('openai.model',       'gpt-4o'),
-        openaiBaseUrl:      cfg.get('openai.baseUrl',     'https://api.openai.com/v1'),
+        openaiModel: cfg.get('openai.model', 'gpt-4o'),
+        openaiBaseUrl: cfg.get('openai.baseUrl', 'https://api.openai.com/v1'),
         // Ollama
-        ollamaModel:        cfg.get('ollama.model',       'codellama'),
-        ollamaEndpoint:     cfg.get('ollama.endpoint',    'http://localhost:11434'),
+        ollamaModel: cfg.get('ollama.model', 'codellama'),
+        ollamaEndpoint: cfg.get('ollama.endpoint', 'http://localhost:11434'),
         // LM Studio
-        lmstudioEndpoint:   cfg.get('lmstudio.endpoint',  'http://localhost:1234'),
+        lmstudioEndpoint: cfg.get('lmstudio.endpoint', 'http://localhost:1234'),
         // Tools
-        mcp_filesystem:     cfg.get('mcp.filesystem.enabled', true),
-        mcp_git:            cfg.get('mcp.git.enabled',         true),
-        indexing:           cfg.get('indexing.enabled',        false),
-        specFile:           cfg.get('specFile',                'spec.md'),
+        mcp_filesystem: cfg.get('mcp.filesystem.enabled', true),
+        mcp_git: cfg.get('mcp.git.enabled', true),
+        indexing: cfg.get('indexing.enabled', false),
+        specFile: cfg.get('specFile', 'spec.md'),
       }
     });
   }
@@ -2203,26 +2348,26 @@ export class MainPanel {
     const set = async (key: string, val: unknown, target = g) => {
       if (key in settings) { await cfg.update(key, val, target); }
     };
-    await set('maxTokens',              settings.maxTokens);
-    await set('temperature',            settings.temperature);
-    await set('requestTimeout',         settings.requestTimeout);
-    await set('systemPrompt',           settings.systemPrompt);
-    await set('orgContext',             settings.orgContext);
-    await set('preferredProvider',      settings.preferredProvider);
-    await set('anthropic.model',        settings.anthropicModel);
-    await set('anthropic.baseUrl',      settings.anthropicBaseUrl);
-    await set('openai.model',           settings.openaiModel);
-    await set('openai.baseUrl',         settings.openaiBaseUrl);
-    await set('ollama.model',           settings.ollamaModel);
-    await set('ollama.endpoint',        settings.ollamaEndpoint);
-    await set('lmstudio.endpoint',      settings.lmstudioEndpoint);
+    await set('maxTokens', settings.maxTokens);
+    await set('temperature', settings.temperature);
+    await set('requestTimeout', settings.requestTimeout);
+    await set('systemPrompt', settings.systemPrompt);
+    await set('orgContext', settings.orgContext);
+    await set('preferredProvider', settings.preferredProvider);
+    await set('anthropic.model', settings.anthropicModel);
+    await set('anthropic.baseUrl', settings.anthropicBaseUrl);
+    await set('openai.model', settings.openaiModel);
+    await set('openai.baseUrl', settings.openaiBaseUrl);
+    await set('ollama.model', settings.ollamaModel);
+    await set('ollama.endpoint', settings.ollamaEndpoint);
+    await set('lmstudio.endpoint', settings.lmstudioEndpoint);
     await set('mcp.filesystem.enabled', settings.mcp_filesystem);
-    await set('mcp.git.enabled',        settings.mcp_git);
-    await set('indexing.enabled',       settings.indexing);
-    await set('specFile',               settings.specFile, w);
+    await set('mcp.git.enabled', settings.mcp_git);
+    await set('indexing.enabled', settings.indexing);
+    await set('specFile', settings.specFile, w);
     // Re-initialize providers so the new model/endpoint takes effect immediately
     vscode.window.showInformationMessage('Alpaquitay AI: Settings saved.');
-    this._sendModels().catch(() => {/* panel may be disposed */});
+    this._sendModels().catch(() => {/* panel may be disposed */ });
   }
 
   // -- Utilities --------------------------------------------------------------
@@ -2242,7 +2387,7 @@ export class MainPanel {
       const specAbs = this.specManager.specPath;
       if (uri.fsPath === specAbs || nodePath.basename(uri.fsPath).toLowerCase() === nodePath.basename(specAbs).toLowerCase()) {
         if (this._panel.visible) {
-          this._sendSpec().catch(() => {/* non-fatal */});
+          this._sendSpec().catch(() => {/* non-fatal */ });
         }
       }
     };
@@ -2253,6 +2398,7 @@ export class MainPanel {
 
   public dispose(): void {
     MainPanel.current = undefined;
+    this._specialists.dispose();
     this._panel.dispose();
     this._disposables.forEach(d => d.dispose());
     this._disposables = [];
@@ -2268,11 +2414,9 @@ export class MainPanel {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'nonce-${nonce}';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Alpaquitay</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>${this._htmlStyles()}</style>
 </head>
 <body>
@@ -2283,7 +2427,8 @@ ${this._htmlBody()}
   }
 
 
-  private _htmlStyles(): string { return `
+  private _htmlStyles(): string {
+    return `
 :root{
   --bg0:#0a0f1e;--bg1:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#30363d;
   --signal:#00e5a0;--accent:#ff4b6e;--blue:#3b82f6;--warn:#f59e0b;
@@ -2348,11 +2493,13 @@ main{flex:1;overflow:hidden;position:relative}
 .card:hover{border-color:rgba(0,229,160,.3)}
 .card.dragging{opacity:.35}
 .card.working{border-color:rgba(0,229,160,.5);animation:pulse-border 1.5s infinite}
+.card.review-required{border-color:rgba(245,158,11,.55);box-shadow:inset 2px 0 0 var(--warn)}
 @keyframes pulse-border{0%,100%{border-color:rgba(0,229,160,.25)}50%{border-color:rgba(0,229,160,.7);box-shadow:0 0 8px rgba(0,229,160,.12)}}
 .card-id{font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:2px}
 .card-title{font-size:11px;font-weight:500;line-height:1.35;margin-bottom:2px}
 .card-epic{font-size:10px;color:var(--muted);font-style:italic}
 .card-working{display:flex;align-items:center;gap:4px;margin-top:3px;font-family:var(--mono);font-size:9px;color:var(--signal)}
+.card-review{margin-top:5px;padding-top:4px;border-top:1px solid rgba(245,158,11,.18);font-family:var(--mono);font-size:9px;color:var(--warn)}
 .board-empty{color:var(--muted);font-size:10px;text-align:center;padding:14px 5px;opacity:.5}
 .messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px}
 .msg{display:flex;gap:7px;max-width:100%;width:100%}
@@ -2538,16 +2685,73 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
 .arch-adr-form label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .arch-adr-form textarea{background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:11px;padding:5px 7px;border-radius:var(--radius);outline:none;resize:vertical;min-height:48px;font-family:var(--sans)}
 .arch-adr-form textarea:focus{border-color:rgba(0,229,160,.5)}
-`; }
+.harness-strip{height:31px;flex-shrink:0;display:flex;align-items:center;gap:8px;padding:0 14px;background:#0b1220;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--muted-lt);overflow-x:auto;white-space:nowrap}
+.hs-pulse{width:6px;height:6px;border-radius:50%;background:var(--signal);box-shadow:0 0 8px rgba(0,229,160,.7)}
+.hs-label{color:var(--signal);font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.hs-sep{width:1px;height:12px;background:var(--border);margin:0 3px}
+.hs-chip{display:inline-flex;align-items:center;gap:4px;color:var(--muted-lt)}
+.hs-chip strong{color:var(--text);font-weight:500}
+.hs-chip.warn strong{color:var(--warn)}
+.hs-chip.safe strong{color:var(--signal)}
+.evidence-scroll{flex:1;overflow-y:auto;padding:18px 20px 28px;background:var(--bg0)}
+.ev-shell{max-width:1180px;margin:0 auto}
+.ev-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:15px}
+.ev-kicker{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--signal);margin-bottom:4px}
+.ev-hero h2{font-size:22px;line-height:1.25;letter-spacing:-.02em;font-weight:600}
+.ev-hero p{font-size:11px;color:var(--muted-lt);margin-top:4px;max-width:580px}
+.ev-actions{display:flex;gap:6px;flex-shrink:0}
+.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:8px}
+.metric-card{position:relative;background:var(--bg1);border:1px solid var(--border);border-radius:8px;padding:12px 13px;min-height:92px;overflow:hidden}
+.metric-card::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--metric,var(--signal));opacity:.8}
+.metric-label{font-family:var(--mono);font-size:8px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.metric-value{font-family:var(--mono);font-size:19px;line-height:1.15;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.metric-note{font-size:9px;color:var(--muted-lt);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.evidence-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:8px;margin-bottom:8px}
+.ev-stack{display:flex;flex-direction:column;gap:8px;min-width:0}
+.ev-card{background:var(--bg1);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.ev-card-hd{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border)}
+.ev-card-hd h3{font-size:11px;font-weight:600;flex:1}
+.ev-tag{font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border:1px solid var(--border);border-radius:20px;padding:2px 7px}
+.ev-card-body{padding:11px 12px}
+.phase-rail{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.phase{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:9px 8px;min-width:0}
+.phase-num{font-family:var(--mono);font-size:8px;color:var(--signal);margin-bottom:5px}
+.phase-name{font-size:10px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phase-gate{font-size:8px;line-height:1.35;color:var(--muted);min-height:32px}
+.phase-state{display:flex;align-items:center;gap:4px;margin-top:7px;font-family:var(--mono);font-size:8px;color:var(--signal)}
+.phase-state::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor}
+.pending-list{display:flex;flex-direction:column;gap:5px}
+.pending-row{display:grid;grid-template-columns:minmax(120px,1fr) auto auto;gap:10px;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 9px}
+.pending-path{font-family:var(--mono);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.pending-task{font-family:var(--mono);font-size:8px;color:var(--muted)}
+.delta{font-family:var(--mono);font-size:9px}.delta .add{color:var(--signal)}.delta .del{color:var(--accent)}
+.empty-evidence{padding:13px;border:1px dashed var(--border);border-radius:6px;text-align:center;font-size:10px;color:var(--muted)}
+.review-actions{display:flex;gap:5px;margin-top:9px;justify-content:flex-end}
+.debt-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.debt-score{font-family:var(--mono);font-size:21px}.debt-score small{font-size:10px;color:var(--muted)}
+.debt-state{font-family:var(--mono);font-size:9px;color:var(--signal)}
+.meter{height:5px;border-radius:5px;background:var(--bg3);overflow:hidden;margin-bottom:10px}.meter>i{display:block;height:100%;background:var(--signal);border-radius:5px;transition:width .3s}
+.event-list{display:flex;flex-direction:column;gap:4px}.event-row{display:flex;gap:7px;font-family:var(--mono);font-size:8px;color:var(--muted-lt)}.event-delta{min-width:25px;color:var(--signal)}.event-delta.pos{color:var(--accent)}
+.privacy-flow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px;margin-bottom:10px}
+.privacy-node{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px;text-align:center;font-size:9px}.privacy-node strong{display:block;font-size:10px;margin-bottom:2px}.privacy-arrow{font-family:var(--mono);font-size:12px;color:var(--signal)}
+.privacy-list{display:grid;gap:5px}.privacy-line{display:flex;justify-content:space-between;gap:10px;font-size:9px;color:var(--muted-lt)}.privacy-line strong{color:var(--text);font-weight:500}
+.route-list{display:grid;gap:5px}.route-row{display:grid;grid-template-columns:42px 1fr auto;gap:7px;align-items:center;padding:7px;background:var(--bg2);border:1px solid var(--border);border-radius:6px}.route-lane{font-family:var(--mono);font-size:8px;text-transform:uppercase;color:#60a5fa}.route-row:nth-child(2) .route-lane{color:var(--signal)}.route-row:nth-child(3) .route-lane{color:#bc8cff}.route-copy strong{display:block;font-size:9px}.route-copy span{display:block;font-size:8px;color:var(--muted)}
+.git-section{margin-top:8px}.git-section .git-log{max-height:310px;min-height:120px;padding:8px}
+.proxy-note{font-size:9px;color:var(--muted);line-height:1.5;padding:0 12px 10px}
+@media(max-width:900px){.metric-grid{grid-template-columns:repeat(2,1fr)}.evidence-grid{grid-template-columns:1fr}.phase-rail{grid-template-columns:repeat(3,1fr)}.studio{grid-template-columns:220px minmax(360px,1fr)}.studio-pane:last-child{display:none}}
+@media(max-width:620px){.ev-hero{align-items:flex-start;flex-direction:column}.metric-grid{grid-template-columns:1fr 1fr}.phase-rail{grid-template-columns:repeat(2,1fr)}.evidence-scroll{padding:12px}.header-right{display:none}.tab{padding:0 9px}}
+`;
+  }
 
-  private _htmlBody(): string { return `
+  private _htmlBody(): string {
+    return `
 <header>
   <div class="brand">&#9650; ALPAQUITAY</div>
   <nav class="tabs">
-    <button class="tab active" data-tab="studio">Studio</button>
-    <button class="tab" data-tab="arch">Arch</button>
-    <button class="tab" data-tab="git">Git</button>
-    <button class="tab" data-tab="skills">Skills</button>
+    <button class="tab active" data-tab="studio">Work</button>
+    <button class="tab" data-tab="git">Evidence</button>
+    <button class="tab" data-tab="arch">Architecture</button>
+    <button class="tab" data-tab="skills">Agents</button>
     <button class="tab" data-tab="settings">Settings</button>
   </nav>
   <div class="header-right">
@@ -2555,6 +2759,14 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
     <button class="cfg-btn" id="cfgBtn" title="Configure provider">&#9881;</button>
   </div>
 </header>
+<div class="harness-strip" id="harnessStrip">
+  <span class="hs-pulse"></span><span class="hs-label">Harness active</span>
+  <span class="hs-sep"></span><span class="hs-chip">workspace <strong id="hsWorkspace">detecting</strong></span>
+  <span class="hs-sep"></span><span class="hs-chip">stack <strong id="hsStack">detecting</strong></span>
+  <span class="hs-sep"></span><span class="hs-chip" id="hsDebtChip">debt <strong id="hsDebt">0/100</strong></span>
+  <span class="hs-sep"></span><span class="hs-chip" id="hsDiffChip">review <strong id="hsDiffs">0 diffs</strong></span>
+  <span style="flex:1"></span><span class="hs-chip safe" id="hsPrivacyChip">privacy <strong id="hsPrivacy">local-first</strong></span>
+</div>
 <main>
   <div class="panel active" id="panel-studio">
     <div class="studio">
@@ -2708,12 +2920,95 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
     </div>
   </div>
   <div class="panel" id="panel-git">
-    <div class="pane-hd" style="border-bottom:1px solid var(--border)">
-      <span>Git History</span>
-      <button class="btn btn-o btn-sm" id="refreshGitBtn">&#8635; Refresh</button>
-    </div>
-    <div class="git-log" id="gitLog">
-      <div class="git-unavail"><p style="font-size:11px">Loading...</p></div>
+    <div class="evidence-scroll">
+      <div class="ev-shell">
+        <div class="ev-hero">
+          <div>
+            <div class="ev-kicker">Delivery control plane</div>
+            <h2>Evidence before autonomy.</h2>
+            <p>Every route, write, and Done transition is bounded by a reviewable gate. Repository metrics are labeled as signals—not invented deployment data.</p>
+          </div>
+          <div class="ev-actions">
+            <button class="btn btn-o" data-harness-command="onboard">Run onboarding</button>
+            <button class="btn btn-p" id="refreshHarnessBtn">&#8635; Refresh evidence</button>
+          </div>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric-card" style="--metric:#60a5fa"><div class="metric-label">Repository signal</div><div class="metric-value" id="evDoraLevel">—</div><div class="metric-note" id="evDoraNote">Waiting for git history</div></div>
+          <div class="metric-card" style="--metric:var(--signal)"><div class="metric-label">Agentic debt</div><div class="metric-value" id="evDebtScore">0 / 100</div><div class="metric-note" id="evDebtNote">Healthy operating range</div></div>
+          <div class="metric-card" style="--metric:var(--warn)"><div class="metric-label">Review queue</div><div class="metric-value" id="evPendingCount">0 files</div><div class="metric-note" id="evPendingNote">No workspace writes pending</div></div>
+          <div class="metric-card" style="--metric:#bc8cff"><div class="metric-label">Session economy</div><div class="metric-value" id="evEconomy">0 / 0</div><div class="metric-note">local operations / LLM calls</div></div>
+        </div>
+
+        <div class="evidence-grid">
+          <div class="ev-stack">
+            <section class="ev-card">
+              <div class="ev-card-hd"><h3>Executable SDLC gates</h3><span class="ev-tag">FABLE-5</span></div>
+              <div class="ev-card-body">
+                <div class="phase-rail">
+                  <div class="phase"><div class="phase-num">01</div><div class="phase-name">Requirements</div><div class="phase-gate">objective · scope · owner</div><div class="phase-state">routed</div></div>
+                  <div class="phase"><div class="phase-num">02</div><div class="phase-name">Design</div><div class="phase-gate">ADR · dependency check</div><div class="phase-state">enforced</div></div>
+                  <div class="phase"><div class="phase-num">03</div><div class="phase-name">Build</div><div class="phase-gate">preview · policy · checkpoint</div><div class="phase-state">enforced</div></div>
+                  <div class="phase"><div class="phase-num">04</div><div class="phase-name">Test</div><div class="phase-gate">real command · green exit</div><div class="phase-state">evidence</div></div>
+                  <div class="phase"><div class="phase-num">05</div><div class="phase-name">Deploy</div><div class="phase-gate">approval · rollback</div><div class="phase-state">human gate</div></div>
+                  <div class="phase"><div class="phase-num">06</div><div class="phase-name">Maintain</div><div class="phase-gate">runbook · owner · learning</div><div class="phase-state">tracked</div></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="ev-card">
+              <div class="ev-card-hd"><h3>Diff-first review queue</h3><span class="ev-tag" id="pendingTag">0 pending</span></div>
+              <div class="ev-card-body">
+                <div class="pending-list" id="pendingList"><div class="empty-evidence">No pending changes. The harness writes only after review.</div></div>
+                <div class="review-actions" id="pendingActions" style="display:none">
+                  <button class="btn btn-danger" data-harness-command="no">Discard all</button>
+                  <button class="btn btn-p" data-harness-command="si aplicar">Apply &amp; run gates</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="ev-card git-section">
+              <div class="ev-card-hd"><h3>Traceable Git history</h3><span class="ev-tag">#SPEC links</span><button class="btn btn-o btn-sm" id="refreshGitBtn">&#8635;</button></div>
+              <div class="proxy-note">DORA values above are repository-derived proxies. Connect deployment and incident events before treating them as operational DORA measurements.</div>
+              <div class="git-log" id="gitLog"><div class="git-unavail"><p style="font-size:11px">Loading...</p></div></div>
+            </section>
+          </div>
+
+          <div class="ev-stack">
+            <section class="ev-card">
+              <div class="ev-card-hd"><h3>Debt ceiling</h3><span class="ev-tag">blocks Build at 100</span></div>
+              <div class="ev-card-body">
+                <div class="debt-head"><div class="debt-score" id="debtScore">0 <small>/ 100</small></div><div class="debt-state" id="debtState">healthy</div></div>
+                <div class="meter"><i id="debtMeter" style="width:0%"></i></div>
+                <div class="event-list" id="debtEvents"><div class="empty-evidence">No debt events yet.</div></div>
+              </div>
+            </section>
+
+            <section class="ev-card">
+              <div class="ev-card-hd"><h3>Specialist routing</h3><span class="ev-tag">one agent · one receipt</span></div>
+              <div class="ev-card-body route-list">
+                <div class="route-row"><div class="route-lane">Flash</div><div class="route-copy"><strong>Local reception</strong><span>questions · ideas · zero-cost commands</span></div><button class="btn btn-o btn-sm" data-route-prompt="Explain this project">Try</button></div>
+                <div class="route-row"><div class="route-lane">Build</div><div class="route-copy"><strong>Diff-first implementation</strong><span>plan · preview · apply · verify</span></div><button class="btn btn-o btn-sm" data-route-prompt="Create tests for the selected task">Try</button></div>
+                <div class="route-row"><div class="route-lane">Deep</div><div class="route-copy"><strong>Registered specialist</strong><span>security · QA · architecture · DevOps</span></div><button class="btn btn-o btn-sm" data-route-prompt="Assess DORA and design a deployment plan">Try</button></div>
+              </div>
+            </section>
+
+            <section class="ev-card">
+              <div class="ev-card-hd"><h3>Privacy boundary</h3><span class="ev-tag" id="privacyTag">checking</span></div>
+              <div class="ev-card-body">
+                <div class="privacy-flow"><div class="privacy-node"><strong>Workspace</strong>local context</div><div class="privacy-arrow">&#8594;</div><div class="privacy-node"><strong id="privacyProvider">Provider</strong><span id="privacyDestination">sanitized boundary</span></div></div>
+                <div class="privacy-list">
+                  <div class="privacy-line"><span>Telemetry</span><strong id="privacyTelemetry">Off by default</strong></div>
+                  <div class="privacy-line"><span>Cloud redaction</span><strong id="privacyRedactions">Boundary ready</strong></div>
+                  <div class="privacy-line"><span>Keys</span><strong>VS Code SecretStorage</strong></div>
+                  <div class="privacy-line"><span>Intermediary servers</span><strong>None</strong></div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="panel" id="panel-settings">
@@ -2872,16 +3167,20 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
   </div>
 </main>
 <div class="toasts" id="toasts"></div>
-`; }
+`;
+  }
 
-  private _htmlScript(): string { return `
+  private _htmlScript(): string {
+    return `
 (function() {
 const vscode = acquireVsCodeApi();
-const S = { tab:'studio', messages:[], thinking:false, spec:null, git:null, skills:[], models:[], skillPickerOpen:false, settings:null, arch:{ nodes:[], edges:[] } };
+const S = { tab:'studio', messages:[], thinking:false, spec:null, git:null, harness:null, skills:[], models:[], skillPickerOpen:false, settings:null, arch:{ nodes:[], edges:[] } };
 const workingTasks = new Set();
+const reviewTasks = new Set();
 vscode.postMessage({ type:'get-models' });
 vscode.postMessage({ type:'load-skills' });
 vscode.postMessage({ type:'load-spec' });
+vscode.postMessage({ type:'load-harness' });
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
 function switchTab(tab) {
   S.tab = tab;
@@ -2889,7 +3188,7 @@ function switchTab(tab) {
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
   if (tab === 'studio')   { if (S.spec) { renderSpec(); renderBoard(); } else { vscode.postMessage({ type:'load-spec' }); } }
   if (tab === 'arch')     { vscode.postMessage({ type:'arch-load' }); }
-  if (tab === 'git')      { if (!S.git) vscode.postMessage({ type:'load-git' }); }
+  if (tab === 'git')      { if (!S.git) vscode.postMessage({ type:'load-git' }); vscode.postMessage({ type:'load-harness' }); }
   if (tab === 'settings') { if (!S.settings) vscode.postMessage({ type:'load-settings' }); }
 }
 window.addEventListener('message', e => {
@@ -2899,6 +3198,7 @@ window.addEventListener('message', e => {
     case 'skills-list':            S.skills = msg.skills; renderSkillsList(); renderSkillPicker(); break;
     case 'spec-data':              S.spec = msg.data; renderSpec(); renderBoard(); break;
     case 'git-log':                S.git = msg.data; renderGit(); break;
+    case 'harness-status':         S.harness = msg.data; renderHarness(msg.data); break;
     case 'chat-chunk':             appendChunk(msg.content); break;
     case 'chat-done':              finishChat(msg.model); break;
     case 'chat-error':             chatError(msg.error); break;
@@ -2906,6 +3206,7 @@ window.addEventListener('message', e => {
     case 'skill-needs-path':       showSkillParamForm(msg.skillId, msg.needsDesc, msg.needsSpecPath); break;
     case 'skill-needs-goal':       showSkillGoalForm(msg.skillId); break;
     case 'task-work-started':      onTaskWorkStarted(msg.taskId, msg.title); break;
+    case 'task-work-review':       onTaskWorkReview(msg.taskId, msg.title, msg.files); break;
     case 'task-work-done':         onTaskWorkDone(msg.taskId, msg.title); break;
     case 'task-work-error':        onTaskWorkError(msg.taskId, msg.error); break;
     case 'task-correction-needed': showCorrectionForm(msg.taskId, msg.title); break;
@@ -2925,6 +3226,69 @@ function renderModels(models) {
     ? models.map(m => \`<option value="\${esc(m.id)}">\${esc(m.label)}\${m.isLocal ? ' [local]' : ''}</option>\`).join('')
     : '<option value="">No provider available</option>';
 }
+function renderHarness(data) {
+  if (!data) return;
+  const setText = (id, value) => { const el=document.getElementById(id); if(el) el.textContent=String(value); };
+  const pending = Array.isArray(data.pending) ? data.pending : [];
+  const debt = data.debt || { score:0, ceiling:100, events:[] };
+  const dora = data.dora || {};
+  const economy = data.economy || { localOps:0, llmCalls:0 };
+  const privacy = data.privacy || {};
+  const ceiling = Math.max(1, Number(debt.ceiling)||100);
+  const score = Math.max(0, Number(debt.score)||0);
+  const debtPct = Math.min(100, Math.round((score/ceiling)*100));
+
+  setText('hsWorkspace', data.workspace?.name || 'No folder');
+  setText('hsStack', data.workspace?.stack || 'Unknown');
+  setText('hsDebt', score+'/'+ceiling);
+  setText('hsDiffs', pending.length+' diff'+(pending.length===1?'':'s'));
+  setText('hsPrivacy', privacy.local===true?'on-device':privacy.local===false?'cloud boundary':'not configured');
+  document.getElementById('hsDebtChip')?.classList.toggle('warn', debtPct>=70);
+  document.getElementById('hsDiffChip')?.classList.toggle('warn', pending.length>0);
+  document.getElementById('hsPrivacyChip')?.classList.toggle('safe', privacy.local===true || privacy.telemetry===false);
+
+  setText('evDoraLevel', dora.level || 'No data');
+  setText('evDoraNote', (dora.commits||0)+' commits · '+(dora.specLinked||0)+' linked to #SPEC');
+  setText('evDebtScore', score+' / '+ceiling);
+  setText('evDebtNote', score>=ceiling?'Build is blocked':debtPct>=70?'Review before new Build':'Healthy operating range');
+  setText('evPendingCount', pending.length+' file'+(pending.length===1?'':'s'));
+  setText('evPendingNote', pending.length?'Approval required before write':'No workspace writes pending');
+  setText('evEconomy', (economy.localOps||0)+' / '+(economy.llmCalls||0));
+
+  setText('pendingTag', pending.length+' pending');
+  const pendingList=document.getElementById('pendingList');
+  if(pendingList){
+    pendingList.innerHTML=pending.length?pending.map(change =>
+      '<div class="pending-row"><div><div class="pending-path">'+esc(change.path)+'</div><div class="pending-task">'+esc(change.taskId||'unlinked change')+'</div></div><div class="delta"><span class="add">+'+Number(change.added||0)+'</span> <span class="del">-'+Number(change.removed||0)+'</span></div><button class="btn btn-o btn-sm" data-diff-path="'+esc(change.path)+'">Review</button></div>'
+    ).join(''):'<div class="empty-evidence">No pending changes. The harness writes only after review.</div>';
+    pendingList.querySelectorAll('[data-diff-path]').forEach(btn=>btn.addEventListener('click',()=>runHarnessCommand('diff '+btn.dataset.diffPath)));
+  }
+  const pendingActions=document.getElementById('pendingActions'); if(pendingActions) pendingActions.style.display=pending.length?'flex':'none';
+
+  setText('debtScore', score+' / '+ceiling);
+  setText('debtState', score>=ceiling?'blocked':debtPct>=70?'elevated':'healthy');
+  const debtMeter=document.getElementById('debtMeter');
+  if(debtMeter){ debtMeter.style.width=debtPct+'%'; debtMeter.style.background=score>=ceiling?'var(--accent)':debtPct>=70?'var(--warn)':'var(--signal)'; }
+  const events=Array.isArray(debt.events)?debt.events:[];
+  const eventList=document.getElementById('debtEvents');
+  if(eventList) eventList.innerHTML=events.length?events.map(event=>
+    '<div class="event-row"><span class="event-delta '+(event.delta>0?'pos':'')+'">'+(event.delta>0?'+':'')+Number(event.delta||0)+'</span><span>'+esc(event.reason||'event')+'</span></div>'
+  ).join(''):'<div class="empty-evidence">No debt events yet.</div>';
+
+  setText('privacyProvider', privacy.provider || 'Provider');
+  setText('privacyDestination', privacy.local===true?'on-device':privacy.local===false?'sanitized cloud egress':'not configured');
+  setText('privacyTag', privacy.local===true?'local':privacy.local===false?'cloud guarded':'idle');
+  setText('privacyTelemetry', privacy.telemetry?'Opted in':'Off');
+  setText('privacyRedactions', privacy.lastDisclosure ? privacy.lastDisclosure.redactions+' in last request' : (privacy.local===true?'Not needed locally':'Boundary ready'));
+}
+function runHarnessCommand(command) {
+  switchTab('studio');
+  chatInput.value=command;
+  sendMessage();
+}
+document.querySelectorAll('[data-harness-command]').forEach(btn=>btn.addEventListener('click',()=>runHarnessCommand(btn.dataset.harnessCommand)));
+document.querySelectorAll('[data-route-prompt]').forEach(btn=>btn.addEventListener('click',()=>{ switchTab('studio'); chatInput.value=btn.dataset.routePrompt; chatInput.focus(); }));
+document.getElementById('refreshHarnessBtn')?.addEventListener('click',()=>{ vscode.postMessage({type:'load-harness'}); vscode.postMessage({type:'load-git'}); });
 document.getElementById('cfgBtn').addEventListener('click', () => vscode.postMessage({ type:'configure-provider' }));
 document.getElementById('modelSel').addEventListener('change', e => {
   const [pt] = e.target.value.split(':');
@@ -2982,14 +3346,16 @@ function finishChat(model) {
   if (window._thinkBubble) { window._thinkBubble.remove(); window._thinkBubble = null; }
   if (_streamDiv && model) { const m=document.createElement('div'); m.className='msg-meta'; m.textContent=model; _streamDiv.querySelector('div > div').appendChild(m); }
   _streamDiv=null; _streamContent=''; S.thinking=false; sendBtn.disabled=false;
+  vscode.postMessage({ type:'load-harness' });
 }
 function chatError(err) {
   if (window._thinkBubble) { window._thinkBubble.remove(); window._thinkBubble=null; }
   toast('Error: ' + err, 'err'); S.thinking=false; sendBtn.disabled=false;
 }
-function onTaskWorkStarted(taskId, title) { workingTasks.add(taskId); renderBoard(); hideEmpty(); addSystemMessage('Starting: ' + title); }
-function onTaskWorkDone(taskId, title)    { workingTasks.delete(taskId); renderBoard(); toast('Done: ' + title, 'ok'); }
-function onTaskWorkError(taskId, error)   { workingTasks.delete(taskId); renderBoard(); toast('Task error: ' + error, 'err'); }
+function onTaskWorkStarted(taskId, title) { reviewTasks.delete(taskId); workingTasks.add(taskId); renderBoard(); hideEmpty(); addSystemMessage('Starting: ' + title); }
+function onTaskWorkReview(taskId, title, files) { workingTasks.delete(taskId); reviewTasks.add(taskId); renderBoard(); vscode.postMessage({type:'load-harness'}); toast('Review required: ' + title + ' (' + files + ' file' + (files===1?'':'s') + ')','info'); }
+function onTaskWorkDone(taskId, title)    { workingTasks.delete(taskId); reviewTasks.delete(taskId); renderBoard(); toast('Verified: ' + title, 'ok'); }
+function onTaskWorkError(taskId, error)   { workingTasks.delete(taskId); reviewTasks.delete(taskId); renderBoard(); toast('Task error: ' + error, 'err'); }
 function showCorrectionForm(taskId, title) {
   hideEmpty();
   const div = document.createElement('div'); div.className = 'msg correction-msg';
@@ -3237,12 +3603,13 @@ function renderBoard() {
     const tasks=S.spec.tasks.filter(t=>t.status===st);
     document.getElementById('bdg-'+st).textContent=tasks.length;
     col.innerHTML = tasks.length ? tasks.map(t => {
-      const w=workingTasks.has(t.id);
-      return \`<div class="card\${w?' working':''}" draggable="true" data-id="\${esc(t.id)}">
+      const w=workingTasks.has(t.id), r=reviewTasks.has(t.id);
+      return \`<div class="card\${w?' working':''}\${r?' review-required':''}" draggable="true" data-id="\${esc(t.id)}">
         <div class="card-id">\${esc(t.id)}</div>
         <div class="card-title">\${esc(t.title)}</div>
         <div class="card-epic">\${esc(t.epicTitle)}</div>
         \${w ? '<div class="card-working"><div class="thinking"><span></span><span></span><span></span></div> working...</div>' : ''}
+        \${r ? '<div class="card-review">Review required · apply diff</div>' : ''}
       </div>\`;
     }).join('') : '<div class="board-empty">No tasks</div>';
   });
@@ -3587,5 +3954,6 @@ function applyArchPatch(patch){
   toast('Diagram updated by AI','ok');
 }
 })();
-`; }
+`;
+  }
 }

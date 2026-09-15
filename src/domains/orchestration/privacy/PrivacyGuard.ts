@@ -54,7 +54,6 @@ interface PIIPattern {
 
 const PII_PATTERNS: PIIPattern[] = [
   { category: 'email',          pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,                           placeholder: (i) => `[EMAIL_${i}]`,          gdprArticle: 'Art. 4(1)' },
-  { category: 'phone',          pattern: /\b(\+?[\d\s\-().]{7,20})\b(?=.*\d{3})/g,                                           placeholder: (i) => `[PHONE_${i}]`,          gdprArticle: 'Art. 4(1)' },
   { category: 'credit-card',    pattern: /\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b/g, placeholder: (i) => `[CC_${i}]`, gdprArticle: 'Art. 9' },
   { category: 'ssn',            pattern: /\b\d{3}-\d{2}-\d{4}\b/g,                                                           placeholder: (i) => `[SSN_${i}]`,            gdprArticle: 'Art. 9' },
   { category: 'national-id',    pattern: /\b[A-Z]{1,2}\d{6,9}\b/g,                                                           placeholder: (i) => `[NATIONAL_ID_${i}]`,    gdprArticle: 'Art. 9' },
@@ -62,6 +61,7 @@ const PII_PATTERNS: PIIPattern[] = [
   { category: 'iban',           pattern: /\b[A-Z]{2}\d{2}[A-Z0-9]{4}\d{7}([A-Z0-9]?){0,16}\b/g,                            placeholder: (i) => `[IBAN_${i}]`,           gdprArticle: 'Art. 9' },
   { category: 'date-of-birth',  pattern: /\b(0[1-9]|[12]\d|3[01])[/-](0[1-9]|1[012])[/-](19|20)\d\d\b/g,              placeholder: (i) => `[DOB_${i}]`,            gdprArticle: 'Art. 4(1)' },
   { category: 'medical-record', pattern: /\bMRN[-:\s]?\d{6,10}\b/gi,                                                         placeholder: (i) => `[MRN_${i}]`,            gdprArticle: 'Art. 9' },
+  { category: 'phone',          pattern: /(?<![\w])\+?\d(?:[ \t().-]*\d){6,14}(?![\w])/g,                                  placeholder: (i) => `[PHONE_${i}]`,          gdprArticle: 'Art. 4(1)' },
 ];
 
 const SENSITIVE_KEYWORDS = ['password', 'secret', 'token', 'api_key', 'apikey', 'private_key', 'credential', 'bearer'];

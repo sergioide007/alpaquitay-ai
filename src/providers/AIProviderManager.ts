@@ -7,9 +7,18 @@ import { OpenAIProvider } from './OpenAIProvider';
 import { OllamaProvider } from './OllamaProvider';
 import { LMStudioProvider } from './LMStudioProvider';
 import { ILLMIntegration, IObservabilityIntegration } from '../integrations/interfaces';
+import {
+  isLocalAIProvider,
+  isLoopbackAIEndpoint,
+  PrivacyBoundaryProvider,
+  PrivacyDisclosure,
+  ProviderDestination,
+  withPrivacyBoundary,
+} from './PrivacyBoundaryProvider';
 
 export class AIProviderManager {
   private providers: Map<ProviderType, AIProvider> = new Map();
+  private providerDestinations: Map<ProviderType, ProviderDestination> = new Map();
   private activeProvider: AIProvider | null = null;
   private readonly config: AlpaquitayConfig;
 
@@ -41,19 +50,19 @@ export class AIProviderManager {
 
     const ollama = new OllamaProvider(cfg.ollamaEndpoint, cfg.ollamaModel, cfg.requestTimeout);
     const lmstudio = new LMStudioProvider(cfg.lmstudioEndpoint, cfg.requestTimeout);
-    this.providers.set('ollama', ollama);
-    this.providers.set('lmstudio', lmstudio);
+    this.registerProvider(ollama, isLoopbackAIEndpoint(cfg.ollamaEndpoint) ? 'local' : 'cloud');
+    this.registerProvider(lmstudio, isLoopbackAIEndpoint(cfg.lmstudioEndpoint) ? 'local' : 'cloud');
 
     const anthropicKey = await this.secrets.getApiKey('anthropic');
     if (anthropicKey) {
-      this.providers.set('anthropic', new AnthropicProvider(
+      this.registerProvider(new AnthropicProvider(
         anthropicKey, cfg.anthropicModel, cfg.anthropicBaseUrl, cfg.requestTimeout
       ));
     }
 
     const openaiKey = await this.secrets.getApiKey('openai');
     if (openaiKey) {
-      this.providers.set('openai', new OpenAIProvider(
+      this.registerProvider(new OpenAIProvider(
         openaiKey, cfg.openaiModel, cfg.openaiBaseUrl, cfg.requestTimeout
       ));
     }
@@ -93,6 +102,13 @@ export class AIProviderManager {
     return this.activeProvider;
   }
 
+  /** Value-free metadata for the most recent request to the active cloud provider. */
+  getLastPrivacyDisclosure(): PrivacyDisclosure | null {
+    return this.activeProvider instanceof PrivacyBoundaryProvider
+      ? this.activeProvider.getLastDisclosure()
+      : null;
+  }
+
   async getProviderInfo(): Promise<ProviderInfo[]> {
     const infos: ProviderInfo[] = [];
     for (const [type, provider] of this.providers) {
@@ -100,7 +116,7 @@ export class AIProviderManager {
         type,
         name: provider.name,
         available: await provider.isAvailable(),
-        isLocal: type === 'ollama' || type === 'lmstudio'
+        isLocal: this.providerDestinations.get(type) === 'local'
       });
     }
     return infos;
@@ -129,8 +145,16 @@ export class AIProviderManager {
 
     const run = async (): Promise<string> => {
       // Hybrid routing: prefer the integration LLM if configured
-      if (this.hybridLLM && await this.hybridLLM.isAvailable()) {
-        return this.hybridLLM.complete(prompt, merged);
+      const hybridLLM = this.hybridLLM;
+      if (hybridLLM && await hybridLLM.isAvailable()) {
+        if (this.activeProvider instanceof PrivacyBoundaryProvider) {
+          return this.activeProvider.completeThrough(
+            prompt,
+            merged,
+            (sanitizedPrompt, sanitizedOptions) => hybridLLM.complete(sanitizedPrompt, sanitizedOptions)
+          );
+        }
+        return hybridLLM.complete(prompt, merged);
       }
       if (!this.activeProvider) {
         throw new Error(
@@ -154,8 +178,11 @@ export class AIProviderManager {
     }
   }
 
-  registerProvider(provider: AIProvider): void {
-    this.providers.set(provider.type, provider);
+  registerProvider(provider: AIProvider, destination?: ProviderDestination): void {
+    const resolvedDestination = destination
+      ?? (provider instanceof PrivacyBoundaryProvider || !isLocalAIProvider(provider) ? 'cloud' : 'local');
+    this.providerDestinations.set(provider.type, resolvedDestination);
+    this.providers.set(provider.type, withPrivacyBoundary(provider, resolvedDestination));
   }
 
   refreshProviders(): void {

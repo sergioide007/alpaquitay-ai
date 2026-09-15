@@ -1,7 +1,7 @@
 # Alpaquitay AI — Harness Architecture
 
 > **Version 3.2.1** | Astra-style AI harness for VS Code
-> Built on principles from Robert C. Martin (Uncle Bob), Martin Fowler, and Sergio Pérez Ruiz's *Código Sintético*.
+> Built on principles from Robert C. Martin (Uncle Bob), Martin Fowler, and Sergio Perez Ruiz's *Código Sintético*.
 
 ## What is Alpaquitay AI?
 

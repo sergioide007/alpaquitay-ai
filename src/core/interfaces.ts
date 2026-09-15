@@ -182,6 +182,7 @@ export type WebviewMessage =
   | { type: 'load-spec' }
   | { type: 'update-task-status'; taskId: string; status: TaskStatus }
   | { type: 'load-git' }
+  | { type: 'load-harness' }
   | { type: 'load-skills' }
   | { type: 'run-skill'; skillId: string }
   | { type: 'run-skill-with-params'; skillId: string; params: Record<string, unknown> }
@@ -215,12 +216,14 @@ export type ExtensionMessage =
   | { type: 'chat-error'; error: string }
   | { type: 'spec-data'; data: SpecData }
   | { type: 'git-log'; data: GitLog }
+  | { type: 'harness-status'; data: Record<string, unknown> }
   | { type: 'skills-list'; skills: Array<{ id: string; name: string; description: string; needsPath: boolean; needsSpecPath: boolean; needsGoal: boolean }> }
   | { type: 'models-list'; models: ModelOption[] }
   | { type: 'skill-result'; success: boolean; output?: unknown; errors?: string[] }
   | { type: 'skill-needs-path'; skillId: string; needsDesc: boolean; needsSpecPath?: boolean }
   | { type: 'skill-needs-goal'; skillId: string }
   | { type: 'task-work-started'; taskId: string; title: string }
+  | { type: 'task-work-review'; taskId: string; title: string; files: number }
   | { type: 'task-work-done'; taskId: string; title: string }
   | { type: 'task-work-error'; taskId: string; error: string }
   | { type: 'task-correction-needed'; taskId: string; title: string }

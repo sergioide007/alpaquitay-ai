@@ -1,6 +1,7 @@
 import { AIProviderManager } from '../../../providers/AIProviderManager';
 import { SecretManager } from '../../../core/SecretManager';
 import { AIProvider, ProviderType } from '../../../core/interfaces';
+import { PrivacyBoundaryProvider } from '../../../providers/PrivacyBoundaryProvider';
 import * as vscode from 'vscode';
 
 function makeProvider(type: ProviderType, available = false): jest.Mocked<AIProvider> {
@@ -67,12 +68,13 @@ describe('AIProviderManager', () => {
   });
 
   describe('registerProvider()', () => {
-    it('When a custom provider is registered and set active, Then getActive returns it', async () => {
+    it('When a custom cloud provider is registered, Then getActive returns its protected facade', async () => {
       const mgr = new AIProviderManager(makeSecrets());
       const custom = makeProvider('anthropic', true);
       mgr.registerProvider(custom);
       await mgr.switchProvider('anthropic');
-      expect(mgr.getActive()).toBe(custom);
+      expect(mgr.getActive()).toBeInstanceOf(PrivacyBoundaryProvider);
+      expect(mgr.getActive()).toMatchObject({ type: custom.type, name: custom.name });
     });
   });
 
@@ -123,12 +125,47 @@ describe('AIProviderManager', () => {
       await expect(mgr.switchProvider('anthropic')).rejects.toThrow("'anthropic'");
     });
 
-    it('When switching to an available provider, Then getActive() returns it', async () => {
+    it('When switching to an available cloud provider, Then getActive() returns its protected facade', async () => {
       const mgr = new AIProviderManager(makeSecrets());
       const provider = makeProvider('anthropic', true);
       mgr.registerProvider(provider);
       await mgr.switchProvider('anthropic');
+      expect(mgr.getActive()).toBeInstanceOf(PrivacyBoundaryProvider);
+      expect(mgr.getActive()).toMatchObject({ type: provider.type, name: provider.name });
+    });
+  });
+
+  describe('privacy boundary', () => {
+    it('Protects direct calls made through getActive() and exposes value-free disclosure metadata', async () => {
+      const mgr = new AIProviderManager(makeSecrets());
+      const provider = makeProvider('openai', true);
+      mgr.registerProvider(provider);
+      await mgr.switchProvider('openai');
+
+      await mgr.getActive()!.complete('Email owner@example.com; token=abcdefghijklmnop');
+
+      const transmittedPrompt = provider.complete.mock.calls[0][0];
+      expect(transmittedPrompt).not.toContain('owner@example.com');
+      expect(transmittedPrompt).not.toContain('abcdefghijklmnop');
+      expect(mgr.getLastPrivacyDisclosure()).toMatchObject({
+        providerType: 'openai',
+        operation: 'complete',
+        destination: 'cloud',
+        sanitized: true,
+      });
+      expect(JSON.stringify(mgr.getLastPrivacyDisclosure())).not.toContain('owner@example.com');
+    });
+
+    it('Leaves a registered local provider undecorated', async () => {
+      const mgr = new AIProviderManager(makeSecrets());
+      const provider = makeProvider('ollama', true);
+      mgr.registerProvider(provider);
+      await mgr.switchProvider('ollama');
+
       expect(mgr.getActive()).toBe(provider);
+      await mgr.getActive()!.complete('Email owner@example.com');
+      expect(provider.complete).toHaveBeenCalledWith('Email owner@example.com');
+      expect(mgr.getLastPrivacyDisclosure()).toBeNull();
     });
   });
 
