@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { isUsableRoot } from '../../core/WorkspaceRoot';
 import { BaseIntegration } from '../BaseIntegration';
 import { IEditorIntegration, IntegrationMetadata, ArchitectureRules, EditorContext } from '../interfaces';
 
@@ -37,10 +38,14 @@ export class CursorIntegration extends BaseIntegration implements IEditorIntegra
   }
 
   async writeRules(workspacePath: string, rules: ArchitectureRules): Promise<void> {
+    // Fix EROFS: sin carpeta de trabajo valida no se escribe (reglas best-effort).
+    if (!isUsableRoot(workspacePath)) { return; }
     const content = this.buildRulesContent(rules);
     const rulesDir = path.join(workspacePath, '.cursor');
-    if (!fs.existsSync(rulesDir)) { fs.mkdirSync(rulesDir, { recursive: true }); }
-    fs.writeFileSync(path.join(rulesDir, 'rules'), content, 'utf8');
+    try {
+      if (!fs.existsSync(rulesDir)) { fs.mkdirSync(rulesDir, { recursive: true }); }
+      fs.writeFileSync(path.join(rulesDir, 'rules'), content, 'utf8');
+    } catch { /* best-effort */ }
   }
 
   buildPromptContext(ctx: EditorContext): string {

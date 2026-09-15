@@ -1,6 +1,6 @@
 # Alpaquitay AI — Harness Architecture
 
-> **Version 3.2.0** | Astra-style AI harness for VS Code
+> **Version 3.2.1** | Astra-style AI harness for VS Code
 > Built on principles from Robert C. Martin (Uncle Bob), Martin Fowler, and Sergio Pérez Ruiz's *Código Sintético*.
 
 ## What is Alpaquitay AI?
@@ -42,3 +42,21 @@ Alpaquitay AI turns VS Code into a complete **harness-driven development environ
 | `no` | Discard pending diffs |
 | `promover` | Idea → spec.md epic |
 | `si` | Confirm proposed route |
+
+## Invariant: a validated workspace root (fix EROFS)
+
+*Código Sintético* Cap. 09 — invariants are encoded, not suggested.
+
+The harness never writes through a path it did not first validate. `src/core/WorkspaceRoot.ts` picks the root by priority (`workspaceFolders` → `workspaceFile` dir → `cwd`) and rejects empty, relative, `undefined` and filesystem roots (`/`, `C:\`, `\\share`). Empty `workspaceFolders` used to fall back to `process.cwd()`, which in the extension host is often `/` — turning `spec.md` into a *relative* path resolved against a read-only mount:
+
+```
+Error: EROFS: read-only file system, open 'spec.md'
+```
+
+Now:
+
+- `SpecManager.specPath` returns `''`; all spec writes funnel through one guarded `_write()`.
+- `FilesystemMCP` validates the root before resolving a path and translates `EROFS`/`EACCES`/`ENOENT`/`EISDIR` into actionable messages.
+- Every mutation path runs a preflight (chat Build, `regenerate-spec`, `si aplicar`, delete, arch/ADR/infra export, `specs/*` template, checkpoints, Git MCP).
+- With no writable root the harness degrades to **chat mode** — it explains the fix instead of failing.
+- Path containment uses `path.relative()`, not `startsWith()`, so `/tmp/app2` cannot masquerade as `/tmp/app`.

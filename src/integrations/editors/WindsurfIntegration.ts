@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { isUsableRoot } from '../../core/WorkspaceRoot';
 import { BaseIntegration } from '../BaseIntegration';
 import { IEditorIntegration, IntegrationMetadata, ArchitectureRules, EditorContext } from '../interfaces';
 
@@ -40,9 +41,13 @@ export class WindsurfIntegration extends BaseIntegration implements IEditorInteg
   }
 
   async writeRules(workspacePath: string, rules: ArchitectureRules): Promise<void> {
+    // Fix EROFS: sin carpeta de trabajo valida no se escribe (reglas best-effort).
+    if (!isUsableRoot(workspacePath)) { return; }
     const existing = this.readRulesFile(workspacePath);
     const content = this.mergeRules(existing, rules);
-    fs.writeFileSync(path.join(workspacePath, '.windsurfrules'), content, 'utf8');
+    try {
+      fs.writeFileSync(path.join(workspacePath, '.windsurfrules'), content, 'utf8');
+    } catch { /* best-effort */ }
   }
 
   /**

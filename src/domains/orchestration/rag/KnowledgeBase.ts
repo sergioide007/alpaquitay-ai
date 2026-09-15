@@ -10,6 +10,7 @@
 
 import * as fs   from 'fs';
 import * as path from 'path';
+import { isUsableRoot } from '../../../core/WorkspaceRoot';
 import type { DomainId } from '../../interfaces/DomainAgentShell';
 
 export type KnowledgeCategory =
@@ -44,7 +45,10 @@ export class KnowledgeBase {
   private loaded = false;
 
   constructor(workspacePath: string) {
-    this.storageFile = path.join(workspacePath, '.alpaquitay', 'orchestration', 'knowledge.json');
+    // Fix EROFS: sin carpeta de trabajo valida, la KB vive solo en memoria (no escribe).
+    this.storageFile = isUsableRoot(workspacePath)
+      ? path.join(workspacePath, '.alpaquitay', 'orchestration', 'knowledge.json')
+      : '';
   }
 
   async add(chunk: Omit<KnowledgeChunk, 'useCount' | 'createdAt'>): Promise<void> {
@@ -127,6 +131,8 @@ export class KnowledgeBase {
   }
 
   private async persist(): Promise<void> {
+    // Fix EROFS: sin carpeta de trabajo valida no se escribe (memoria en-sesion basta).
+    if (!this.storageFile) { return; }
     const dir = path.dirname(this.storageFile);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(this.storageFile, JSON.stringify(this.chunks, null, 2), 'utf-8');

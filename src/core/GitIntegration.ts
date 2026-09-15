@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { GitLog, GitCommit } from './interfaces';
+import { isUsableRoot } from './WorkspaceRoot';
 
 const execAsync = promisify(exec);
 
@@ -8,6 +9,9 @@ export class GitIntegration {
   constructor(private readonly workspaceRoot: string) {}
 
   async getLog(limit = 40): Promise<GitLog> {
+    // Fix EROFS: sin carpeta real, `cwd: ''` leeria el repo del cwd del extension host
+    // (DORA con datos ajenos). Es preferible `available: false` a metricas falsas.
+    if (!isUsableRoot(this.workspaceRoot)) { return { available: false, commits: [] }; }
     try {
       const { stdout } = await execAsync(
         `git log --format="%H|%an|%ar|%s" -${limit}`,

@@ -8,6 +8,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { isUsableRoot } from '../../../core/WorkspaceRoot';
 import type { ILessonRepository } from '../ports/output';
 import type { ExerciseResult, Lesson, LearnerProgress, DailyPhrase, SkillArea, CEFRLevel } from '../domain/model';
 
@@ -27,8 +28,10 @@ export class LessonStorageAdapter implements ILessonRepository {
   private loaded = false;
 
   constructor(workspacePath: string) {
-    this.storageDir = path.join(workspacePath, '.alpaquitay', 'english');
-    this.storageFile = path.join(this.storageDir, 'data.json');
+    this.storageDir = workspacePath && isUsableRoot(workspacePath)
+      ? path.join(workspacePath, '.alpaquitay', 'english')
+      : '';
+    this.storageFile = this.storageDir ? path.join(this.storageDir, 'data.json') : '';
   }
 
   async saveLesson(lesson: Lesson): Promise<void> {
@@ -97,6 +100,8 @@ export class LessonStorageAdapter implements ILessonRepository {
   }
 
   private async persist(): Promise<void> {
+    // Fix EROFS: sin carpeta de trabajo valida no se escribe (memoria en-sesion basta).
+    if (!this.storageDir) { return; }
     fs.mkdirSync(this.storageDir, { recursive: true });
     fs.writeFileSync(this.storageFile, JSON.stringify(this.cache, null, 2), 'utf-8');
   }

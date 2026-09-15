@@ -1,18 +1,25 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { MCPServer, MCPTool } from '../core/interfaces';
+import { assertWritableRoot, friendlyFsError, isUsableRoot } from '../core/WorkspaceRoot';
 
 /**
  * Filesystem MCP server — safe read/write operations scoped to the workspace.
  * Path traversal is prevented by resolving against the workspace root.
+ *
+ * Fix EROFS: la raiz se valida antes de tocar disco. Si no hay carpeta de trabajo
+ * usable, las herramientas lanzan un error accionable en vez de resolver rutas
+ * relativas contra el cwd del extension host (que puede ser un FS de solo lectura).
  */
 export class FilesystemMCP implements MCPServer {
   readonly id = 'filesystem';
   readonly name = 'Filesystem';
   readonly description = 'Read and write files within the workspace';
   readonly tools: MCPTool[];
+  private readonly root: string;
 
   constructor(private readonly workspaceRoot: string) {
+    this.root = normalizeRoot(workspaceRoot);
     this.tools = [
       {
         name: 'read_file',
@@ -31,7 +38,12 @@ export class FilesystemMCP implements MCPServer {
         execute: async (params) => {
           const filePath = this.safePath(params.path as string);
           await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
-          await fs.promises.writeFile(filePath, params.content as string, 'utf-8');
+          try {
+            await fs.promises.writeFile(filePath, params.content as string, 'utf-8');
+          } catch (err) {
+            // Fix EROFS/EACCES: mensaje accionable en vez de un stack crudo en el chat.
+            throw new Error(friendlyFsError(err, filePath));
+          }
           return { success: true, path: filePath };
         }
       },
@@ -83,8 +95,15 @@ export class FilesystemMCP implements MCPServer {
   }
 
   private safePath(relativePath: string): string {
-    const resolved = path.resolve(this.workspaceRoot, relativePath);
-    if (!resolved.startsWith(this.workspaceRoot)) {
+    // Invariante Cap.09: sin raiz valida no se resuelve nada. `path.resolve('', 'spec.md')`
+    // caeria en el cwd del extension host (p. ej. `/` -> EROFS).
+    assertWritableRoot(this.root);
+    const target = typeof relativePath === 'string' ? relativePath : '';
+    const resolved = path.resolve(this.root, target);
+    const rel = path.relative(this.root, resolved);
+    // Contencion real: `path.relative` evita el falso positivo de `startsWith`
+    // (`/tmp/app2`.startsWith(`/tmp/app`) === true).
+    if (rel.startsWith('..') || path.isAbsolute(rel)) {
       throw new Error('Path traversal attempt detected.');
     }
     return resolved;
@@ -97,4 +116,13 @@ export class FilesystemMCP implements MCPServer {
   async disconnect(): Promise<void> {
     // No cleanup needed
   }
+}
+
+/**
+ * Normaliza la raiz: solo se acepta una carpeta absoluta y real de trabajo.
+ * Cualquier otra cosa (vacia, relativa, `/`, `C:\`) se guarda como `''` para que
+ * `assertWritableRoot` produzca un error accionable en vez de escribir en el cwd.
+ */
+function normalizeRoot(workspaceRoot: string): string {
+  return isUsableRoot(workspaceRoot) ? path.resolve(workspaceRoot.trim()) : '';
 }

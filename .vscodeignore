@@ -28,5 +28,15 @@ index.html
 media/**
 images/**
 
+# GH Pages / repo-only artifacts
+CNAME
+favicon.ico
+RELEASE-COMPLETED.md
+RELEASE-READY.md
+GITHUB-DEPLOY.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+
 # Package artifacts
 *.vsix

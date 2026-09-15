@@ -2,6 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { SpecData, SpecTask, SpecCandidate, TaskStatus } from './interfaces';
 import { AlpaquitayConfig } from './config';
+import { assertWritableRoot, friendlyFsError, isUsableRoot } from './WorkspaceRoot';
 
 const IGNORED_NAMES = new Set([
   'readme.md', 'changelog.md', 'contributing.md', 'license.md',
@@ -16,12 +17,41 @@ export class SpecManager {
     private readonly config: AlpaquitayConfig
   ) {}
 
+  /**
+   * Ruta absoluta del spec. Devuelve `''` cuando no hay carpeta de trabajo usable:
+   * es preferible "sin spec" a la ruta relativa `'spec.md'` resuelta contra el cwd
+   * del extension host (causa del error `EROFS: read-only file system`).
+   */
   get specPath(): string {
+    if (!isUsableRoot(this.workspaceRoot)) { return ''; }
     return path.join(this.workspaceRoot, this.config.specFile);
   }
 
+  /** true cuando la raiz del workspace admite escritura (preflight del harness). */
+  isWritable(): boolean {
+    return isUsableRoot(this.workspaceRoot);
+  }
+
+  /**
+   * Escritura unica y verificada del spec: valida la raiz, crea el directorio y
+   * traduce errores de FS (EROFS/EACCES) a mensajes accionables.
+   */
+  private async _write(markdown: string): Promise<void> {
+    assertWritableRoot(this.workspaceRoot);
+    const target = this.specPath;
+    try {
+      await fs.mkdir(path.dirname(target), { recursive: true });
+      await fs.writeFile(target, markdown, 'utf-8');
+    } catch (err) {
+      throw new Error(friendlyFsError(err, target));
+    }
+  }
+
   async load(): Promise<SpecData> {
-    const specFile = path.basename(this.specPath);
+    const specFile = path.basename(this.specPath) || this.config.specFile;
+    if (!this.isWritable()) {
+      return { exists: false, markdown: '', tasks: [], specFile };
+    }
     let markdown = '';
     try {
       markdown = await fs.readFile(this.specPath, 'utf-8');
@@ -32,6 +62,7 @@ export class SpecManager {
   }
 
   async discover(): Promise<SpecCandidate[]> {
+    if (!this.isWritable()) { return []; }
     const candidates: SpecCandidate[] = [];
     const currentName = path.basename(this.specPath).toLowerCase();
     await this._scanForCandidates(this.workspaceRoot, candidates, currentName, '');
@@ -83,7 +114,7 @@ export class SpecManager {
     const content = await fs.readFile(abs, 'utf-8');
     // Normalize * [ ] / * [x] → - [ ] / - [x]
     const normalized = content.replace(/^(\s*)\*\s+(\[[ x]\])/gim, '$1- $2');
-    await fs.writeFile(this.specPath, normalized, 'utf-8');
+    await this._write(normalized);
     this.boardState.clear();
   }
 
@@ -140,20 +171,20 @@ export class SpecManager {
     const line = lines[task.lineIndex];
     if (line !== undefined) {
       lines[task.lineIndex] = line.replace(/\[[ x]\]/i, done ? '[x]' : '[ ]');
-      await fs.writeFile(this.specPath, lines.join('\n'), 'utf-8');
+      await this._write(lines.join('\n'));
     }
   }
 
   async create(content: string): Promise<void> {
     this.boardState.clear();
-    await fs.writeFile(this.specPath, content, 'utf-8');
+    await this._write(content);
   }
 
   async addTask(epicTitle: string, taskTitle: string): Promise<void> {
     let markdown = '';
     try { markdown = await fs.readFile(this.specPath, 'utf-8'); } catch {
       markdown = `# Project\n\n## ${epicTitle}\n\n- [ ] ${taskTitle}\n`;
-      await fs.writeFile(this.specPath, markdown, 'utf-8');
+      await this._write(markdown);
       return;
     }
     const lines = markdown.split('\n');
@@ -177,7 +208,7 @@ export class SpecManager {
       markdown = lines.join('\n');
     }
     this.boardState.clear();
-    await fs.writeFile(this.specPath, markdown, 'utf-8');
+    await this._write(markdown);
   }
 
   async updateTaskTitle(taskId: string, newTitle: string): Promise<void> {
@@ -187,7 +218,7 @@ export class SpecManager {
     const task = this._parse(markdown).find(t => t.id === taskId);
     if (!task || lines[task.lineIndex] === undefined) return;
     lines[task.lineIndex] = lines[task.lineIndex].replace(/(\[[ x]\]\s*)(.+)$/, `$1${newTitle}`);
-    await fs.writeFile(this.specPath, lines.join('\n'), 'utf-8');
+    await this._write(lines.join('\n'));
   }
 
   async deleteTask(taskId: string): Promise<void> {
@@ -198,7 +229,7 @@ export class SpecManager {
     if (!task) return;
     lines.splice(task.lineIndex, 1);
     this.boardState.delete(taskId);
-    await fs.writeFile(this.specPath, lines.join('\n'), 'utf-8');
+    await this._write(lines.join('\n'));
   }
 
   async addEpic(epicTitle: string): Promise<void> {
@@ -206,7 +237,7 @@ export class SpecManager {
     try { markdown = await fs.readFile(this.specPath, 'utf-8'); } catch { markdown = `# Project\n`; }
     markdown = markdown.trimEnd() + `\n\n## ${epicTitle}\n\n- [ ] Define tasks for this epic\n`;
     this.boardState.clear();
-    await fs.writeFile(this.specPath, markdown, 'utf-8');
+    await this._write(markdown);
   }
 
   async updateEpicTitle(oldTitle: string, newTitle: string): Promise<void> {
@@ -221,7 +252,7 @@ export class SpecManager {
       }
     }
     this.boardState.clear();
-    await fs.writeFile(this.specPath, lines.join('\n'), 'utf-8');
+    await this._write(lines.join('\n'));
   }
 
   async deleteEpic(epicTitle: string): Promise<void> {
@@ -240,6 +271,6 @@ export class SpecManager {
     if (epicStart < 0) return;
     lines.splice(epicStart, epicEnd - epicStart);
     this.boardState.clear();
-    await fs.writeFile(this.specPath, lines.join('\n'), 'utf-8');
+    await this._write(lines.join('\n'));
   }
 }

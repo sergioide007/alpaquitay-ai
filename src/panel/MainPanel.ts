@@ -25,6 +25,9 @@ import { logDecision } from '../core/harness/DecisionLog';
 import { buildPreview } from '../core/harness/DiffPreview';
 import { CheckpointManager } from '../core/harness/CheckpointManager';
 import { emptyEcon, recordLlm, recordLocal, econChip, ECON_FILE, EconState } from '../core/platform/Economy';
+import { isUsableRoot, friendlyFsError, workspaceRootHelp, assertWritableRoot } from '../core/WorkspaceRoot';
+import { specPathHints, sourceRule } from '../core/context/PathHints';
+import type { WorkspaceFingerprint } from '../core/context/WorkspaceFingerprinter';
 
 import { generateCode, isSmallModel, deduplicateSpecTasks, normalizeSpecContent } from '../prompts/codeUtils';
 import { HierarchicalMemory } from '../core/HierarchicalMemory';
@@ -113,7 +116,27 @@ export class MainPanel {
 
   // -- Message dispatcher -----------------------------------------------------
 
+  /**
+   * Fix EROFS: wrapper unico del dispatcher. Cualquier fallo del harness (FS de solo
+   * lectura, sin carpeta de trabajo, skill que revienta) se reporta en el chat como
+   * mensaje accionable en vez de perderse como promesa rechazada.
+   */
   private async _handle(msg: WebviewMessage): Promise<void> {
+    try {
+      await this._dispatch(msg);
+    } catch (err) {
+      const target = msg.type === 'chat' && (msg as { text?: string }).text
+        ? (msg as { text: string }).text.slice(0, 60)
+        : msg.type;
+      const detail = friendlyFsError(err, target);
+      this._post({ type: 'chat-error', error: detail });
+      if (!isUsableRoot(this.workspaceRoot)) {
+        this._post({ type: 'chat-chunk', content: workspaceRootHelp() });
+      }
+    }
+  }
+
+  private async _dispatch(msg: WebviewMessage): Promise<void> {
     switch (msg.type) {
       case 'get-models':             return this._sendModels();
       case 'load-spec':              return this._sendSpec();
@@ -389,6 +412,9 @@ export class MainPanel {
       } catch { /* sin deuda: sigue */ }
       const pendings = this._memory.search('pending-diff:');
       if (pendings.length === 0) { this._post({ type: 'chat-chunk', content: 'No hay diffs pendientes.' }); this._post({ type: 'chat-done', model: provider.modelName }); return; }
+      // Fix EROFS: aplicar = escribir. Preflight antes de checkpoint y loop.
+      const applyGuard = this._preflightWrite();
+      if (applyGuard) { this._post({ type: 'chat-chunk', content: applyGuard }); this._post({ type: 'chat-done', model: provider.modelName }); return; }
       const cp = await this._checkpoints.save('apply-diffs');
       let ok = 0;
       let blocked = 0;
@@ -407,7 +433,7 @@ export class MainPanel {
           await this.mcpManager.executeTool('filesystem', 'write_file', { path: rel, content: after });
           this._memory.delete('config', p.key);
           ok++;
-        } catch (e) { this._post({ type: 'chat-chunk', content: `(!) No se pudo escribir \`${rel}\`: ${e}` }); }
+        } catch (e) { this._post({ type: 'chat-chunk', content: `(!) No se pudo escribir \`${rel}\`: ${friendlyFsError(e, rel)}` }); }
       }
       await this._memory.save().catch(() => {});
       this._post({ type: 'chat-chunk', content: `> 🛡️ checkpoint \`${cp}\`\n\n**${ok} archivo(s) aplicados${blocked ? `, ${blocked} bloqueado(s) por review` : ''}.**` });
@@ -427,6 +453,9 @@ export class MainPanel {
       const ideas = await this._inbox.list();
       const last = [...ideas].reverse().find(i => !i.promoted);
       if (!last) { this._post({ type: 'chat-chunk', content: 'No hay ideas pendientes. Escribe tu idea desordenada primero.' }); this._post({ type: 'chat-done', model: provider.modelName }); return; }
+      // Fix EROFS: promover escribe spec.md -> preflight antes de checkpoint y LLM.
+      const promoteGuard = this._preflightWrite();
+      if (promoteGuard) { this._post({ type: 'chat-chunk', content: promoteGuard }); this._post({ type: 'chat-done', model: provider.modelName }); return; }
       const cp = await this._checkpoints.save('promote-idea');
       await this.specManager.addEpic(`${last.id} ${last.structured?.objetivo ?? last.raw.slice(0, 80)}`);
       last.promoted = true;
@@ -501,13 +530,16 @@ export class MainPanel {
         this._post({ type: 'chat-done', model: provider.modelName });
         return;
       }
+      // Fix EROFS: borrar es una mutacion -> preflight antes del checkpoint.
+      const delGuard = this._preflightWrite();
+      if (delGuard) { this._post({ type: 'chat-chunk', content: delGuard }); this._post({ type: 'chat-done', model: provider.modelName }); return; }
       const cp = await this._checkpoints.save('delete-file');
       try {
         const abs = nodePath.isAbsolute(rawPath) ? rawPath : nodePath.join(this.workspaceRoot, rawPath);
         await this.mcpManager.executeTool('filesystem', 'delete_file', { path: abs });
         this._post({ type: 'chat-chunk', content: `🛡️ checkpoint \`${cp}\`\n\nArchivo \`${rawPath}\` eliminado correctamente.` });
       } catch (e) {
-        this._post({ type: 'chat-chunk', content: `No se pudo eliminar \`${rawPath}\`: ${e instanceof Error ? e.message : String(e)}` });
+        this._post({ type: 'chat-chunk', content: `No se pudo eliminar \`${rawPath}\`: ${friendlyFsError(e, rawPath)}` });
       }
       this._post({ type: 'chat-done', model: provider.modelName });
       return;
@@ -540,6 +572,24 @@ export class MainPanel {
     try { await this.mcpManager.executeTool('filesystem', 'write_file', { path: ECON_FILE, content: JSON.stringify(this._econ, null, 2) }); } catch { /* nunca bloquea */ }
   }
   private _econLine(): string { return econChip(this._econ); }
+
+  // Fix EROFS: preflight unico. Si no hay carpeta de trabajo escribible, el harness
+  // explica como resolverlo y NO ejecuta (modo chat puro, sin escritura).
+  private _preflightWrite(): string | null {
+    if (isUsableRoot(this.workspaceRoot)) { return null; }
+    return workspaceRootHelp();
+  }
+
+  /**
+   * Fix EROFS: ruta absoluta verificada para escrituras directas a disco.
+   * `nodePath.join('', 'infra/main.tf')` devolveria una ruta relativa que Node resuelve
+   * contra el cwd del extension host (posible FS de solo lectura).
+   */
+  private _absWritePath(rel: string): string {
+    if (nodePath.isAbsolute(rel)) { return rel; }
+    assertWritableRoot(this.workspaceRoot);
+    return nodePath.join(this.workspaceRoot, rel);
+  }
 
   // Cap.11: el harness cobra/paga deuda en cada evento (best-effort, nunca bloquea el chat).
   private async _trackDebt(reason: string): Promise<void> {
@@ -747,6 +797,11 @@ export class MainPanel {
   private async _runSkillForTask(task: SpecTask, epicContext: string, specTasks: SpecTask[], skillId: string): Promise<void> {
     const provider = this.aiManager.getActive();
     if (!provider) { return; }
+    // Fix EROFS: un skill siempre termina escribiendo -> sin carpeta valida no se ejecuta.
+    if (this._preflightWrite()) {
+      this._post({ type: 'task-work-error', taskId: task.id, error: 'Sin carpeta de trabajo escribible — modo chat.' });
+      return;
+    }
 
     const specState = this._buildSpecStateContext(specTasks, task.id);
     const goalContext = `${epicContext}\n\nCurrent task: ${task.title}${specState ? `\n\nSpec state:\n${specState}` : ''}`;
@@ -818,6 +873,9 @@ export class MainPanel {
   private async _detectBuildCommands(): Promise<{ build?: string; test?: string }> {
     const { existsSync } = await import('fs');
     const { readFile } = await import('fs/promises');
+    // Fix EROFS: sin raiz real, `'package.json'` relativo resolveria al cwd del
+    // extension host y reportaria comandos de OTRO proyecto (peligroso: build/test falsos).
+    if (!isUsableRoot(this.workspaceRoot)) { return {}; }
     const p = (f: string) => nodePath.join(this.workspaceRoot, f);
 
     if (existsSync(p('package.json'))) {
@@ -881,6 +939,7 @@ export class MainPanel {
     const toFix = (targets.length > 0 ? targets : candidateFiles).slice(0, 4);
 
     for (const fp of toFix) {
+      if (!isUsableRoot(this.workspaceRoot) && !nodePath.isAbsolute(fp)) { continue; }
       const abs = nodePath.isAbsolute(fp) ? fp : nodePath.join(this.workspaceRoot, fp);
       if (!existsSync(abs)) { continue; }
       const currentCode = await readFile(abs, 'utf-8').catch(() => null);
@@ -1073,6 +1132,14 @@ export class MainPanel {
     const provider = this.aiManager.getActive();
     if (!provider) {
       this._post({ type: 'task-work-error', taskId: task.id, error: 'No hay proveedor AI disponible.' });
+      return;
+    }
+
+    // Fix EROFS: Build termina escribiendo -> preflight antes de gastar tokens.
+    const buildGuard = this._preflightWrite();
+    if (buildGuard) {
+      this._post({ type: 'chat-chunk', content: buildGuard });
+      this._post({ type: 'task-work-error', taskId: task.id, error: 'Sin carpeta de trabajo escribible — modo chat.' });
       return;
     }
 
@@ -1315,6 +1382,13 @@ export class MainPanel {
       this._post({ type: 'skill-result', success: false, errors: ['No hay proveedor AI disponible.'] });
       return;
     }
+    // Fix EROFS: los skills escriben en el workspace -> preflight antes de gastar tokens.
+    const guard = this._preflightWrite();
+    if (guard) {
+      this._post({ type: 'chat-chunk', content: guard });
+      this._post({ type: 'skill-result', success: false, errors: ['Sin carpeta de trabajo escribible — modo chat.'] });
+      return;
+    }
 
     // Auto-fill 'path' from active editor when not provided
     const resolved = { ...params };
@@ -1355,40 +1429,51 @@ export class MainPanel {
 
   // Canonical format template injected into every spec-generation prompt so the model
   // knows exactly what structure is required and doesn't invent RNF_XX / #### styles.
-  private static readonly SPEC_FORMAT_TEMPLATE =
-    `## Epic: [nombre de la épica]\n` +
-    `- [ ] Implementar archivo src/feature/Component.ts\n` +
-    `- [ ] Crear endpoint GET /api/resource en src/routes/resource.ts\n` +
-    `- [ ] Agregar validación en src/services/validator.ts\n\n` +
-    `## Epic: [nombre de otra épica]\n` +
-    `- [ ] ...\n`;
+  // Fix legados: los ejemplos usan las carpetas fuente EVIDENCIADAS (nunca `src/` hardcodeado).
+  private _specFormatTemplate(fp: WorkspaceFingerprint | null): string {
+    const h = specPathHints(fp);
+    return (
+      `## Epic: [nombre de la épica]\n` +
+      `- [ ] Implementar archivo ${h.component}\n` +
+      `- [ ] Crear endpoint GET /api/resource en ${h.endpoint}\n` +
+      `- [ ] Agregar validación en ${h.validator}\n\n` +
+      `## Epic: [nombre de otra épica]\n` +
+      `- [ ] ...\n`
+    );
+  }
 
-  private _buildSpecPrompt(context: string, small: boolean): string {
+  private _buildSpecPrompt(context: string, small: boolean, fp: WorkspaceFingerprint | null = null): string {
     const ctxSlice = context.slice(0, 300);
+    const template = this._specFormatTemplate(fp);
+    const rule = sourceRule(fp);
     if (small) {
       return context
         ? `Write a spec.md for: ${ctxSlice}\n\n` +
-          `EXACT FORMAT (copy this structure):\n${MainPanel.SPEC_FORMAT_TEMPLATE}\n` +
+          `EXACT FORMAT (copy this structure):\n${template}\n` +
           `Rules:\n` +
           `- Use ## for epic headings ONLY (no ####, no RNF_XX, no numbered sections)\n` +
           `- Each task line MUST start with "- [ ] " followed by a concrete file or action\n` +
+          `- ${rule}\n` +
           `- Write 3 epics with 3 tasks each\n` +
           `- Output ONLY the spec.md content`
         : `Write a spec.md for a software project.\n\n` +
-          `EXACT FORMAT:\n${MainPanel.SPEC_FORMAT_TEMPLATE}\n` +
+          `EXACT FORMAT:\n${template}\n` +
+          `Rules:\n- ${rule}\n` +
           `Write 3 epics (Auth, Core Features, Testing) with 3 tasks each.\n` +
           `Output ONLY the spec.md content.`;
     }
     return context
       ? `Genera un spec.md para implementar: ${ctxSlice}\n\n` +
-        `FORMATO EXACTO OBLIGATORIO — copia esta estructura:\n${MainPanel.SPEC_FORMAT_TEMPLATE}\n` +
+        `FORMATO EXACTO OBLIGATORIO — copia esta estructura:\n${template}\n` +
         `Reglas estrictas:\n` +
         `- Encabezados de épica SOLO con ## (prohibido ####, RNF_XX, numeración)\n` +
         `- Cada tarea DEBE empezar con "- [ ] " seguido de un archivo o acción concreta implementable\n` +
+        `- ${rule}\n` +
         `- Mínimo 3 épicas con 3-5 tareas cada una\n` +
         `- Escribe ÚNICAMENTE el contenido del spec.md, sin texto adicional`
       : `Genera un spec.md inicial para un proyecto de software.\n\n` +
-        `FORMATO EXACTO:\n${MainPanel.SPEC_FORMAT_TEMPLATE}\n` +
+        `FORMATO EXACTO:\n${template}\n` +
+        `Reglas:\n- ${rule}\n` +
         `Usa 4 épicas: Autenticación, Funcionalidades Core, Testing, Despliegue.\n` +
         `3-4 tareas por épica. Solo el contenido del spec.md.`;
   }
@@ -1397,9 +1482,20 @@ export class MainPanel {
     const provider = this.aiManager.getActive();
     if (!provider) { return; }
 
+    // Fix EROFS: sin carpeta escribible no se llama al LLM (ni se escribe `spec.md`).
+    const guard = this._preflightWrite();
+    if (guard) {
+      this._post({ type: 'chat-chunk', content: guard });
+      this._post({ type: 'chat-done', model: provider.modelName });
+      return;
+    }
+
     const activeModelName = provider.modelName;
     const small = isSmallModel(activeModelName);
-    const prompt = this._buildSpecPrompt(context, small);
+    // Fix legados: el prompt de spec usa las carpetas fuente evidenciadas (nunca `src/`).
+    let specFp: WorkspaceFingerprint | null = null;
+    try { specFp = await this._fingerprinter.fingerprint(); } catch { /* sin fingerprint: placeholders neutros */ }
+    const prompt = this._buildSpecPrompt(context, small, specFp);
 
     try {
       let content = await provider.complete(prompt, { maxTokens: small ? 800 : 2048, temperature: small ? 0.05 : 0.3 });
@@ -1435,8 +1531,11 @@ export class MainPanel {
   // -- Architecture diagram persistence & export ------------------------------
 
   private async _handleArchSave(diagram: object): Promise<void> {
+    // Fix EROFS: sin raiz escribible no se persiste el diagrama (mensaje, no silencio).
+    const guard = this._preflightWrite();
+    if (guard) { this._post({ type: 'chat-chunk', content: guard }); return; }
     const { mkdir, writeFile } = await import('fs/promises');
-    const dir = nodePath.join(this.workspaceRoot, '.alpaquitay');
+    const dir = this._absWritePath('.alpaquitay');
     const file = nodePath.join(dir, 'arch.json');
     try {
       await mkdir(dir, { recursive: true });
@@ -1541,9 +1640,9 @@ export class MainPanel {
         case 'gcp':       content = this._genGCPYaml(diagram);   ext = 'yaml'; break;
         default: return;
       }
-      const infraDir = nodePath.join(this.workspaceRoot, 'infra');
+      const infraDir = this._absWritePath('infra');
       const filename = `infra/main.${ext}`;
-      const abs = nodePath.join(this.workspaceRoot, filename);
+      const abs = nodePath.join(infraDir, `main.${ext}`);
       const { mkdir, writeFile } = await import('fs/promises');
       await mkdir(infraDir, { recursive: true });
       await writeFile(abs, content, 'utf-8');
@@ -1999,7 +2098,7 @@ export class MainPanel {
           ...(adr.qualityAttributes ?? []).map((q: string) => `- ${q}`),
         ].join('\n');
         const { mkdir, writeFile } = await import('fs/promises');
-        const adrDir = nodePath.join(this.workspaceRoot, '.alpaquitay', 'adrs');
+        const adrDir = this._absWritePath(nodePath.join('.alpaquitay', 'adrs'));
         await mkdir(adrDir, { recursive: true });
         const filename = `${adrId.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.md`;
         await writeFile(nodePath.join(adrDir, filename), content, 'utf-8');

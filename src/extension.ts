@@ -21,6 +21,7 @@ import { SPEC_TEMPLATES } from './prompts/SpecTemplates';
 import { MainPanel } from './panel/MainPanel';
 import { SpecManager } from './core/SpecManager';
 import { GitIntegration } from './core/GitIntegration';
+import { pickWorkspaceRoot, workspaceRootHelp, isUsableRoot, friendlyFsError } from './core/WorkspaceRoot';
 
 let mcpManager: MCPManager;
 
@@ -30,7 +31,26 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const privacy = new PrivacyManager(context.globalState, outputChannel);
   const config = new AlpaquitayConfig();
   const aiManager = new AIProviderManager(secrets, config);
-  const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? process.cwd();
+  // Fix EROFS: la raiz se valida (absoluta, no raiz de FS) antes de usarla.
+  // Antes: `?? process.cwd()` -> en el extension host puede ser `/` (FS de solo lectura)
+  // y `path.join('/', 'spec.md')` fallaba con `EROFS: read-only file system, open 'spec.md'`.
+  const folderUri = vscode.workspace.workspaceFolders?.[0]?.uri;
+  const fileUri = vscode.workspace.workspaceFile;
+  const resolved = pickWorkspaceRoot([
+    { source: 'workspaceFolders', path: folderUri?.fsPath ?? folderUri?.path ?? '' },
+    { source: 'workspaceFile', path: fileUri && fileUri.scheme === 'file' ? path.dirname(fileUri.fsPath) : '' },
+    { source: 'cwd', path: process.cwd() },
+  ]);
+  const workspaceRoot = resolved.root;
+  if (!resolved.writable) {
+    void vscode.window.showWarningMessage(
+      'Alpaquitay AI: no hay carpeta de trabajo escribible. Se activa el modo chat (sin escritura).',
+      'Abrir carpeta'
+    ).then(pick => {
+      if (pick) { void vscode.commands.executeCommand('vscode.openFolder'); }
+    });
+    outputChannel.appendLine(workspaceRootHelp().replace(/^> ?/gm, ''));
+  }
   mcpManager = new MCPManager();
 
   const skillRegistry = new SkillRegistry(config);
@@ -120,7 +140,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       });
       if (!name?.trim()) { return; }
 
-      const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? process.cwd();
+      // Fix EROFS: sin carpeta de trabajo valida no se escribe `specs/<file>` (evita
+      // resolver la ruta contra el cwd del extension host, que puede ser de solo lectura).
+      if (!isUsableRoot(workspaceRoot)) {
+        vscode.window.showErrorMessage('Alpaquitay: abre una carpeta de trabajo escribible antes de crear una especificacion.');
+        return;
+      }
       const tmpl = SPEC_TEMPLATES.find(t => t.id === templatePick.id)!;
       const slug = name.trim().toLowerCase().replace(/\s+/g, '-');
       const fileName = slug + tmpl.extension;
@@ -134,7 +159,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         await vscode.window.showTextDocument(doc);
         vscode.window.showInformationMessage(`Alpaquitay: Specification created at specs/${fileName}`);
       } catch (err) {
-        vscode.window.showErrorMessage(`Alpaquitay: Failed to create spec — ${String(err)}`);
+        // Fix EROFS: mensaje accionable en vez del stack crudo de Node.
+        vscode.window.showErrorMessage(`Alpaquitay: Failed to create spec — ${friendlyFsError(err, filePath)}`);
       }
     }),
 
@@ -151,12 +177,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       if (!specUri?.length) { return; }
 
       const specPath = specUri[0].fsPath;
-      const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? process.cwd();
       const relPath = path.relative(workspaceRoot, specPath);
 
       const ai = aiManager.getActive();
       if (!ai) {
         vscode.window.showWarningMessage('Alpaquitay: No AI provider configured. Use "Configure AI Provider" first.');
+        return;
+      }
+      // Fix EROFS: generar escribe archivos -> requiere raiz escribible verificada.
+      if (!isUsableRoot(workspaceRoot)) {
+        vscode.window.showErrorMessage('Alpaquitay: abre una carpeta de trabajo escribible antes de generar desde el spec.');
         return;
       }
 
@@ -194,12 +224,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       if (!specUri?.length) { return; }
 
       const specPath = specUri[0].fsPath;
-      const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? process.cwd();
       const relPath = path.relative(workspaceRoot, specPath);
 
       const ai = aiManager.getActive();
       if (!ai) {
         vscode.window.showWarningMessage('Alpaquitay: No AI provider configured. Use "Configure AI Provider" first.');
+        return;
+      }
+      // Fix EROFS: la validacion lee el proyecto via MCP (root verificado).
+      if (!isUsableRoot(workspaceRoot)) {
+        vscode.window.showErrorMessage('Alpaquitay: abre la carpeta de trabajo para validar contra el spec.');
         return;
       }
 

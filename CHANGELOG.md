@@ -6,6 +6,36 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.1] — 2026-09-15
+
+### Fixed — `EROFS: read-only file system, open 'spec.md'`
+
+Reported flow: **Describe the project → Generar** failed with `Error: EROFS: read-only file system, open 'spec.md'`.
+
+**Root cause.** When `vscode.workspace.workspaceFolders` was empty (single-file window, virtual workspace, remote/Codespaces without folder), `extension.activate()` fell back to `process.cwd()`. In the extension host that value is frequently `/` (or another read-only mount), so `path.join(root, 'spec.md')` produced the **relative** path `'spec.md'`, which Node resolved against that read-only cwd.
+
+**Fix.** The workspace root is now a validated harness invariant (`src/core/WorkspaceRoot.ts`):
+
+- `pickWorkspaceRoot()` resolves the root by priority — `workspaceFolders` → `workspaceFile` (dir) → `cwd` — and **rejects** empty, relative, `undefined` and filesystem roots (`/`, `C:\`, `\\share`).
+- `SpecManager.specPath` returns `''` instead of a relative `'spec.md'`; every spec write funnels through one guarded `_write()`.
+- `FilesystemMCP` validates the root before resolving any path, and translates `EROFS`/`EACCES`/`ENOENT`/`EISDIR` into actionable messages.
+- All mutation paths now run a preflight (`_preflightWrite()`): chat Build, `regenerate-spec`, `si aplicar`, delete-file, arch/ADR/infra export, `specs/*` template command, Checkpoints and Git MCP.
+- When no writable root exists, the extension degrades to **chat mode** (never writes), warns once with an "Open Folder" action, and explains the fix in the output channel.
+
+### Fixed — other latent filesystem defects found in the same audit
+
+- `LessonStorageAdapter` and `BaseDomainShell.saveMemory()`: `path.join('', '.alpaquitay', …)` silently produced **relative** paths — the same latent `EROFS`/cwd leak. They now keep data in memory when the root is unusable.
+- `KnowledgeBase`, `CodeIndexer`, `CursorIntegration`, `WindsurfIntegration`: guarded writes (best-effort persistence; in-memory index/search still works).
+- `FilesystemMCP.safePath`: path containment now uses `path.relative()` instead of `startsWith()`, closing a sibling-prefix traversal hole (`/tmp/app2` vs `/tmp/app`).
+
+### Tests
+
+- `WorkspaceRoot.test.ts` (18 tests) — root selection/validation, actionable error translation, labels.
+- `SpecManagerRoot.test.ts` (6 tests) — fail-safe persistence with/without a writable root, sibling-prefix traversal block.
+- Suite total: **357 tests / 38 suites**, all green.
+
+---
+
 ## [3.2.0] — 2026-09-14
 
 ### Added — Astra-Style Harness Engineering (FABLE-5)

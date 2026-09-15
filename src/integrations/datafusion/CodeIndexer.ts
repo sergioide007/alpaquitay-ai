@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { isUsableRoot } from '../../core/WorkspaceRoot';
 import { BaseIntegration } from '../BaseIntegration';
 import { ICodeIndexIntegration, IntegrationMetadata, CodeSymbol, IndexQuery } from '../interfaces';
 
@@ -169,10 +170,15 @@ export class IndexPersistence {
   }
 
   static save(workspacePath: string, symbols: CodeSymbol[], manifest: Record<string, number>): void {
+    // Fix EROFS: el indice es best-effort. Sin carpeta de trabajo valida no se escribe
+    // (la indexacion en memoria sigue funcionando).
+    if (!isUsableRoot(workspacePath)) { return; }
     const dir = path.join(workspacePath, '.alpaquitay');
-    if (!fs.existsSync(dir)) { fs.mkdirSync(dir, { recursive: true }); }
-    fs.writeFileSync(path.join(workspacePath, INDEX_FILENAME), JSON.stringify(symbols), 'utf8');
-    fs.writeFileSync(path.join(workspacePath, MANIFEST_FILENAME), JSON.stringify(manifest), 'utf8');
+    try {
+      if (!fs.existsSync(dir)) { fs.mkdirSync(dir, { recursive: true }); }
+      fs.writeFileSync(path.join(workspacePath, INDEX_FILENAME), JSON.stringify(symbols), 'utf8');
+      fs.writeFileSync(path.join(workspacePath, MANIFEST_FILENAME), JSON.stringify(manifest), 'utf8');
+    } catch { /* best-effort: el indice se reconstruye en memoria */ }
   }
 }
 

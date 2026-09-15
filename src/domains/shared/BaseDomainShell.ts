@@ -11,6 +11,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { isUsableRoot } from '../../core/WorkspaceRoot';
 import type { AIProvider } from '../../core/interfaces';
 import type {
   IDomainAgentShell,
@@ -60,6 +61,9 @@ export abstract class BaseDomainShell implements IDomainAgentShell {
   }
 
   async saveMemory(): Promise<void> {
+    // Fix EROFS: con raiz invalida `path.join('', ...)` seria relativa al cwd del
+    // extension host. La memoria es best-effort: sin carpeta de trabajo no se escribe.
+    if (!isUsableRoot(this.workspacePath)) { return; }
     const dir  = path.join(this.workspacePath, '.alpaquitay', this.domainId);
     const file = path.join(dir, 'memory.json');
     fs.mkdirSync(dir, { recursive: true });
@@ -67,6 +71,7 @@ export abstract class BaseDomainShell implements IDomainAgentShell {
   }
 
   async loadMemory(): Promise<void> {
+    if (!isUsableRoot(this.workspacePath)) { return; }
     const file = path.join(this.workspacePath, '.alpaquitay', this.domainId, 'memory.json');
     try {
       if (fs.existsSync(file)) {
