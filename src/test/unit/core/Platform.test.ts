@@ -1,8 +1,6 @@
 import { WorkspaceFingerprinter } from '../../../core/context/WorkspaceFingerprinter';
 import { contractFor, dodFor } from '../../../core/platform/PlatformContract';
-function mcp() {
-  return { executeTool: async () => ({ content: '{}' }) } as never;
-}
+
 describe('Platform senior', () => {
   it('Django/pip tiene golden path verificable', async () => {
     const fp = await new WorkspaceFingerprinter({ executeTool: async (s: string, t: string) => {
