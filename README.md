@@ -353,20 +353,38 @@ AnthropicProvider                              OllamaProvider
 ### Architecture Diagram Module (Arch Tab)
 
 ```
-User places nodes on SVG canvas
-            │
-            ▼
-  S.arch = { nodes: ArchNode[], edges: ArchEdge[] }
-            │
-  arch-save ──► _handleArchSave() ──► .alpaquitay/arch.json
-  arch-load ──► _handleArchLoad() ──► reads .alpaquitay/arch.json
-  arch-export ──► _handleArchExport(diagram, format)
-                        │
-              ┌─────────┼─────────┬─────────────┐
-              ▼         ▼         ▼             ▼
-          Terraform  AWS CDK   Azure Bicep   GCP YAML
-           (AWS)    (TypeScript)  (.bicep)   (.yaml)
+Tab open (no saved diagram) ──► _inferSystemArchitecture()          ↻ Re-infer = regenerate on demand
+                                        │
+      ┌─────────────────────────────────┼──────────────────────────────────┐
+      ▼                                 ▼                                  ▼
+ workspace manifests             docker-compose services          full spec.md text
+ (package.json root+monorepo,    (postgres, redis, kafka,         (epic titles + tasks + body,
+  requirements.txt, pyproject,    rabbitmq, nginx, keycloak,       Spanish & English keywords,
+  pom.xml, build.gradle,          minio…) → real infrastructure    accent-normalized) → the
+  go.mod, composer.json,          nodes                            system the project will build
+  Gemfile, *.csproj,             │                                 │
+  serverless.yml) → real stack   │                                 │
+      └───────────────┬──────────┴───────────────┬─────────────────┘
+                      ▼                          ▼
+            system nodes (concrete wins    +  epic modules (only component
+            over generic, deduplicated)       types not already covered)
+                      │
+                      ▼
+      auto-wiring: client → main API/service → auth / db / cache / queue
+                      │
+   S.arch = { nodes: ArchNode[], edges: ArchEdge[] }   ← toast summary: "System: React SPA · Node/Express API · …"
+                      │
+   arch-save ──► _handleArchSave() ──► .alpaquitay/arch.json
+   arch-load ──► _handleArchLoad() ──► reads .alpaquitay/arch.json
+   arch-export ──► _handleArchExport(diagram, format)
+                         │
+               ┌─────────┼─────────┬─────────────┐
+               ▼         ▼         ▼             ▼
+           Terraform  AWS CDK   Azure Bicep   GCP YAML
+            (AWS)    (TypeScript)  (.bicep)   (.yaml)
 ```
+
+Manual editing (drag, rename, connect, add nodes from the palette) always wins; **Save** persists your layout to `.alpaquitay/arch.json` and **↻ Re-infer** rebuilds the detected system diagram from current workspace + spec evidence.
 
 ---
 

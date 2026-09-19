@@ -30,6 +30,12 @@ import { emptyEcon, recordLlm, recordLocal, econChip, ECON_FILE, EconState } fro
 import { isUsableRoot, friendlyFsError, workspaceRootHelp, assertWritableRoot } from '../core/WorkspaceRoot';
 import { specPathHints, sourceRule } from '../core/context/PathHints';
 import type { WorkspaceFingerprint } from '../core/context/WorkspaceFingerprinter';
+import {
+  SystemEvidence, SystemNodeSpec,
+  systemNodesFromEvidence, systemNodesFromSpecText,
+  composeServiceNodes, mergeSystemNodes, epicNodeType, architectureSummary,
+  MAX_EPIC_MODULES
+} from '../core/context/SystemArchitecture';
 
 import { generateCode, isSmallModel, deduplicateSpecTasks, normalizeSpecContent } from '../prompts/codeUtils';
 import { HierarchicalMemory } from '../core/HierarchicalMemory';
@@ -48,6 +54,35 @@ interface PendingChange {
   taskTitle?: string;
   epicTitle?: string;
   language?: string;
+}
+
+// ── System evidence parsing (IO-free helpers for _scanSystemEvidence) ────────
+
+function packageJsonDeps(content: string): string[] {
+  try {
+    const pkg = JSON.parse(content) as { dependencies?: Record<string, string>; devDependencies?: Record<string, string> };
+    if (!pkg || typeof pkg !== 'object') { return []; }
+    return [...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.devDependencies ?? {})];
+  } catch { return []; }
+}
+
+/** Claves de servicios + imágenes base de un docker-compose (en minúscula). */
+function parseComposeServices(content: string): string[] {
+  const out = new Set<string>();
+  let inServices = false;
+  for (const line of content.split('\n')) {
+    if (/^services:\s*$/.test(line)) { inServices = true; continue; }
+    if (inServices && /^\S/.test(line)) { break; }
+    if (!inServices) { continue; }
+    const key = line.match(/^ {2}([a-zA-Z0-9_-]+):\s*$/);
+    if (key) { out.add(key[1].toLowerCase()); }
+    const img = line.match(/^\s*image:\s*"?([^\s"]+)/);
+    if (img) {
+      const base = (img[1].split('/').pop() ?? img[1]).split(':')[0];
+      if (base) { out.add(base.toLowerCase()); }
+    }
+  }
+  return [...out];
 }
 
 export class MainPanel {
@@ -174,6 +209,7 @@ export class MainPanel {
       case 'convert-spec-file': return this._handleConvertSpecFile((msg as { type: 'convert-spec-file'; sourcePath: string }).sourcePath);
       case 'arch-save': return this._handleArchSave((msg as { type: 'arch-save'; diagram: object }).diagram);
       case 'arch-load': return this._handleArchLoad();
+      case 'arch-reinfer': return this._handleArchReinfer();
       case 'arch-export': return this._handleArchExport(
         (msg as { type: 'arch-export'; diagram: ArchDiagram; format: string }).diagram,
         (msg as { type: 'arch-export'; diagram: ArchDiagram; format: string }).format
@@ -1695,83 +1731,138 @@ export class MainPanel {
       const content = await readFile(file, 'utf-8');
       this._post({ type: 'arch-data', diagram: JSON.parse(content) });
     } catch {
-      // No saved diagram — auto-infer from spec + workspace structure
-      const diagram = await this._inferArchitecture();
-      this._post({ type: 'arch-data', diagram });
+      // Sin diagrama guardado: infiere la arquitectura del SISTEMA (workspace + spec).
+      const { diagram, summary } = await this._inferSystemArchitecture();
+      this._post({ type: 'arch-data', diagram, summary });
       if (diagram.nodes.length > 0) {
         this._handleArchSave(diagram).catch(() => { });
       }
     }
   }
 
-  private async _inferArchitecture(): Promise<ArchDiagram> {
-    const nodes: ArchNode[] = [];
-    const edges: ArchEdge[] = [];
+  /** Re-infer: regenera el diagrama del sistema aunque exista un arch.json guardado. */
+  private async _handleArchReinfer(): Promise<void> {
+    const { diagram, summary } = await this._inferSystemArchitecture();
+    this._post({ type: 'arch-data', diagram, summary });
+    this._handleArchSave(diagram).catch(() => {});
+  }
 
-    // Derive epic-level components from spec.md
+  /**
+   * Infiere la arquitectura del SISTEMA para el lienzo (no solo las épicas):
+   *  1. Lo que el workspace YA TIENE — manifiestos de dependencias (package.json,
+   *     requirements.txt, pyproject.toml, pom.xml, build.gradle, go.mod,
+   *     composer.json, Gemfile, *.csproj, serverless.yml), servicios de
+   *     docker-compose y carpetas de IaC.
+   *  2. Lo que el spec VA A CREAR — tecnologías citadas en el texto completo del
+   *     spec.md (títulos de épicas, tareas y cuerpo), no solo los encabezados.
+   *  3. Módulos de épica — cada épica mapea a un tipo de componente y solo se
+   *     conserva si el sistema aún no lo cubre; se conecta al punto de entrada.
+   */
+  private async _inferSystemArchitecture(): Promise<{ diagram: ArchDiagram; summary: string }> {
+    // 1) Sistema actual (workspace) + infraestructura (compose) + sistema a crear (spec)
+    const evidence = await this._scanSystemEvidence();
+    const fromWorkspace = systemNodesFromEvidence(evidence);
+    const fromCompose = composeServiceNodes(evidence.composeServices);
     const specData = await this.specManager.load();
+    const fromSpec = systemNodesFromSpecText(specData.markdown);
+    const systemSpecs = mergeSystemNodes(mergeSystemNodes(fromWorkspace, fromCompose), fromSpec);
+
+    // 2) Módulos de épica: complemento funcional sin duplicar componentes del sistema
+    const systemTypes = new Set(systemSpecs.map(n => n.type));
     const epics = [...new Set(specData.tasks.map(t => t.epicTitle))];
-
-    const EPIC_KEYWORDS: Array<[RegExp, ArchNodeType]> = [
-      [/auth|login|user|session|oauth|jwt/i, 'auth'],
-      [/api|endpoint|route|rest|graphql/i, 'api'],
-      [/database|db|postgres|mysql|mongo|sqlite|persist/i, 'db'],
-      [/cache|redis|memcach/i, 'cache'],
-      [/queue|event|message|kafka|rabbit|pubsub/i, 'queue'],
-      [/storage|file|upload|s3|blob/i, 'storage'],
-      [/frontend|ui|web|view|spa|react|vue|angular/i, 'client'],
-      [/cdn|static|asset|media/i, 'cdn'],
-      [/lambda|serverless|function/i, 'lambda'],
-      [/container|docker|kubernetes|k8s/i, 'container'],
-    ];
-
-    let x = 100, y = 80;
-    const advance = () => { x += 210; if (x > 850) { x = 100; y += 160; } };
-
+    const moduleSpecs: SystemNodeSpec[] = [];
     for (const epic of epics) {
-      let nodeType: ArchNodeType = 'service';
-      for (const [re, t] of EPIC_KEYWORDS) { if (re.test(epic)) { nodeType = t; break; } }
-      nodes.push({ id: `node-${nodes.length + 1}`, type: nodeType, name: epic, x, y });
-      advance();
+      if (moduleSpecs.length >= MAX_EPIC_MODULES) { break; }
+      const type = epicNodeType(epic);
+      if (type !== 'service' && systemTypes.has(type)) { continue; }
+      systemTypes.add(type);
+      moduleSpecs.push({ type, name: epic, source: 'epic' });
     }
 
-    // Augment with folder-based detection when workspace has code
-    try {
-      const entries = await this.mcpManager.executeTool('filesystem', 'list_files', { path: '.' }) as Array<{ name: string; isDirectory: boolean }>;
-      const dirs = new Set(entries.filter(e => e.isDirectory).map(e => e.name.toLowerCase()));
-      const FOLDER_MAP: Array<[string[], ArchNodeType, string]> = [
-        [['frontend', 'client', 'web', 'ui'], 'client', 'Frontend'],
-        [['backend', 'server', 'api'], 'api', 'Backend API'],
-        [['db', 'database', 'migrations'], 'db', 'Database'],
-        [['cache', 'redis'], 'cache', 'Cache'],
-        [['queue', 'events', 'messaging'], 'queue', 'Message Queue'],
-        [['storage', 'files', 'uploads'], 'storage', 'File Storage'],
-        [['auth', 'identity'], 'auth', 'Auth Service'],
-        [['infra', 'terraform', 'k8s', 'kubernetes'], 'container', 'Infrastructure'],
-      ];
-      for (const [folders, nodeType, name] of FOLDER_MAP) {
-        if (folders.some(f => dirs.has(f)) && !nodes.some(n => n.type === nodeType)) {
-          nodes.push({ id: `node-${nodes.length + 1}`, type: nodeType, name, x, y });
-          advance();
-        }
-      }
-    } catch { /* workspace scan failed — spec-only diagram */ }
+    // 3) Layout: componentes del sistema primero, módulos de épica después
+    const nodes: ArchNode[] = [];
+    const edges: ArchEdge[] = [];
+    let x = 100, y = 80;
+    const advance = () => { x += 210; if (x > 850) { x = 100; y += 160; } };
+    const push = (spec: SystemNodeSpec) => {
+      nodes.push({ id: `node-${nodes.length + 1}`, type: spec.type, name: spec.name, x, y });
+      advance();
+    };
+    for (const s of systemSpecs) { push(s); }
+    const moduleStart = nodes.length;
+    for (const s of moduleSpecs) { push(s); }
 
-    // Auto-wire common dependency patterns
-    let edgeId = 1;
+    // 4) Cableado: cliente → entrada principal → datos/infra; módulos al principal
     const find = (type: ArchNodeType) => nodes.find(n => n.type === type);
     const addEdge = (from: ArchNode, to: ArchNode, label?: string) =>
-      edges.push({ id: `edge-${edgeId++}`, from: from.id, to: to.id, label });
+      edges.push({ id: `edge-${edges.length + 1}`, from: from.id, to: to.id, label });
 
-    const client = find('client'), api = find('api') ?? find('service');
+    const api = find('api');
+    const main = api ?? find('service') ?? find('lambda') ?? nodes[0];
+    const client = find('client');
+    const proxy = find('cdn');
     const auth = find('auth'), db = find('db'), cache = find('cache'), queue = find('queue');
-    if (client && api) { addEdge(client, api, 'HTTP'); }
-    if (api && auth) { addEdge(api, auth, 'verify'); }
-    if (api && db) { addEdge(api, db, 'read/write'); }
-    if (api && cache) { addEdge(api, cache, 'cache'); }
-    if (api && queue) { addEdge(api, queue, 'publish'); }
+    if (client && main && client !== main) { addEdge(client, main, proxy ? 'via proxy' : 'HTTP'); }
+    if (proxy && api && proxy !== api)     { addEdge(proxy, api, 'proxy'); }
+    if (main && auth && main !== auth)     { addEdge(main, auth, 'verify'); }
+    if (main && db && main !== db)         { addEdge(main, db, 'read/write'); }
+    if (main && cache && main !== cache)   { addEdge(main, cache, 'cache'); }
+    if (main && queue && main !== queue)   { addEdge(main, queue, 'publish'); }
+    // Los módulos de épica se conectan al punto de entrada del sistema.
+    for (let i = moduleStart; i < nodes.length; i++) {
+      const m = nodes[i];
+      if (main && m !== main && !edges.some(e => e.from === main.id && e.to === m.id)) {
+        addEdge(main, m, 'module');
+      }
+    }
 
-    return { nodes, edges };
+    return { diagram: { nodes, edges }, summary: architectureSummary(systemSpecs, moduleSpecs.length) };
+  }
+
+  /** Recolecta evidencia del stack real: manifiestos raíz + subpaquetes (monorepo), docker-compose y carpetas. */
+  private async _scanSystemEvidence(): Promise<SystemEvidence> {
+    const ev: SystemEvidence = { deps: [], manifestTexts: [], composeServices: [], dirNames: [] };
+    let top: Array<{ name: string; isDirectory: boolean }> = [];
+    try { top = await this.mcpManager.executeTool('filesystem', 'list_files', { path: '.' }) as typeof top; }
+    catch { return ev; }
+    const SKIP_DIRS = new Set(['node_modules', '.git', 'dist', 'build', 'out', 'target', 'vendor', '.venv', 'venv', '__pycache__', '.next', '.alpaquitay', '.github', '.vscode', 'coverage', 'icons', 'resources', 'media']);
+    const MANIFESTS = new Set(['package.json', 'requirements.txt', 'pyproject.toml', 'pom.xml', 'build.gradle', 'build.gradle.kts', 'go.mod', 'composer.json', 'gemfile', 'docker-compose.yml', 'docker-compose.yaml', 'compose.yaml', 'serverless.yml', 'serverless.yaml']);
+    const read = async (rel: string): Promise<string | null> => {
+      try {
+        const f = await this.mcpManager.executeTool('filesystem', 'read_file', { path: rel }) as { content?: string };
+        return typeof f?.content === 'string' ? f.content : null;
+      } catch { return null; }
+    };
+    ev.dirNames.push(...top.filter(e => e.isDirectory).map(e => e.name.toLowerCase()));
+
+    // Manifiestos en la raíz (deps JSON, texto de otros ecosistemas, servicios compose)
+    for (const m of top.filter(e => !e.isDirectory && MANIFESTS.has(e.name.toLowerCase())).slice(0, 8)) {
+      const c = await read(m.name);
+      if (c === null) { continue; }
+      const lname = m.name.toLowerCase();
+      if (lname.startsWith('docker-compose') || lname === 'compose.yaml') {
+        ev.composeServices.push(...parseComposeServices(c));
+      } else if (lname === 'package.json') {
+        ev.deps.push(...packageJsonDeps(c));
+      } else {
+        ev.manifestTexts.push(c);
+      }
+    }
+
+    // Subpaquetes (monorepo): <dir>/package.json y compañía, un nivel de profundidad
+    for (const d of top.filter(e => e.isDirectory && !SKIP_DIRS.has(e.name.toLowerCase())).slice(0, 12)) {
+      for (const m of ['package.json', 'requirements.txt', 'pyproject.toml', 'pom.xml', 'build.gradle']) {
+        const c = await read(`${d.name}/${m}`);
+        if (c === null) { continue; }
+        if (m === 'package.json') { ev.deps.push(...packageJsonDeps(c)); }
+        else { ev.manifestTexts.push(c); }
+      }
+      try {
+        const sub = await this.mcpManager.executeTool('filesystem', 'list_files', { path: d.name }) as Array<{ name: string; isDirectory: boolean }>;
+        ev.dirNames.push(...sub.filter(e => e.isDirectory).map(e => `${d.name}/${e.name}`.toLowerCase()));
+      } catch { /* ignore */ }
+    }
+    return ev;
   }
 
   private async _handleArchExport(diagram: ArchDiagram, format: string): Promise<void> {
@@ -2841,6 +2932,7 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
     <div class="arch-toolbar-row">
       <button class="btn btn-o btn-sm" id="archSaveBtn">Save</button>
       <button class="btn btn-o btn-sm" id="archClearBtn">Clear</button>
+      <button class="btn btn-o btn-sm" id="archReinferBtn" title="Re-detect the system architecture from the workspace and spec">&#8635; Re-infer</button>
       <button class="btn btn-ai btn-sm" id="archAssessBtn">&#9650; Assess</button>
       <button class="btn btn-o btn-sm" id="archAdrBtn">ADR</button>
       <span style="flex:1"></span>
@@ -3211,7 +3303,7 @@ window.addEventListener('message', e => {
     case 'task-work-error':        onTaskWorkError(msg.taskId, msg.error); break;
     case 'task-correction-needed': showCorrectionForm(msg.taskId, msg.title); break;
     case 'settings-data':          S.settings = msg.settings; renderSettings(msg.settings); break;
-    case 'arch-data':              S.arch = msg.diagram || { nodes:[], edges:[] }; renderArch(); break;
+    case 'arch-data':              S.arch = msg.diagram || { nodes:[], edges:[] }; renderArch(); if(msg.summary) toast(msg.summary,'ok'); break;
     case 'arch-exported':          toast('Exported: ' + msg.filename, 'ok'); break;
     case 'arch-export-error':      toast('Export error: ' + msg.error, 'err'); break;
     case 'arch-chat-chunk':        appendArchAiChunk(msg.content); break;
@@ -3832,6 +3924,7 @@ const NL={ lambda:'fn', function:'fn', container:'[]', service:'svc', api:'api',
 document.querySelectorAll('.arch-node-btn').forEach(btn=>btn.addEventListener('click',()=>{ archTool=btn.dataset.type; document.querySelectorAll('.arch-node-btn').forEach(b=>b.style.borderColor=''); btn.style.borderColor='var(--signal)'; toast('Click canvas to place '+archTool,'info'); }));
 document.getElementById('archSaveBtn').addEventListener('click',()=>{ vscode.postMessage({ type:'arch-save', diagram:S.arch }); toast('Architecture saved','ok'); });
 document.getElementById('archClearBtn').addEventListener('click',()=>{ S.arch={ nodes:[], edges:[] }; renderArch(); vscode.postMessage({ type:'arch-save', diagram:S.arch }); });
+document.getElementById('archReinferBtn').addEventListener('click',()=>{ toast('Re-inferring system architecture...','info'); vscode.postMessage({ type:'arch-reinfer' }); });
 document.querySelectorAll('[data-fmt]').forEach(btn=>btn.addEventListener('click',()=>{ vscode.postMessage({ type:'arch-export', diagram:S.arch, format:btn.dataset.fmt }); toast('Exporting '+btn.dataset.fmt+'...','info'); }));
 archSvg.addEventListener('click', e=>{
   if (!archTool) return;

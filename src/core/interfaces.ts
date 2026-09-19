@@ -198,6 +198,7 @@ export type WebviewMessage =
   | { type: 'convert-spec-file'; sourcePath: string }
   | { type: 'arch-save'; diagram: ArchDiagram }
   | { type: 'arch-load' }
+  | { type: 'arch-reinfer' }
   | { type: 'arch-export'; diagram: ArchDiagram; format: string }
   | { type: 'arch-chat'; text: string; currentDiagram: ArchDiagram }
   | { type: 'run-skill-on-task'; skillId: string; taskId: string }
@@ -228,7 +229,7 @@ export type ExtensionMessage =
   | { type: 'task-work-error'; taskId: string; error: string }
   | { type: 'task-correction-needed'; taskId: string; title: string }
   | { type: 'settings-data'; settings: Record<string, unknown> }
-  | { type: 'arch-data'; diagram: ArchDiagram }
+  | { type: 'arch-data'; diagram: ArchDiagram; summary?: string }
   | { type: 'arch-exported'; filename: string }
   | { type: 'arch-export-error'; error: string }
   | { type: 'arch-chat-chunk'; content: string }

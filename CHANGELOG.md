@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+---
+
 ## [3.3.0] — 2026-09-15
 
 ### Added — Privacy boundary for cloud providers
@@ -31,6 +33,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Tests
 
 - Suite total: **372 tests / 41 suites**, all green.
+
+---
+
+## [3.4.0] — 2026-09-19
+
+### Added — System Architecture inference (Arch Tab)
+
+The Arch canvas no longer draws only the spec's **epics**; it now infers the architecture of the **system itself** — what the workspace already has and what the spec will build.
+
+- **Inference engine** (`src/core/context/SystemArchitecture.ts`, pure + unit-tested):
+  - **Current workspace**: dependency manifests — `package.json` (root + monorepo subpackages), `requirements.txt`, `pyproject.toml`, `pom.xml`, `build.gradle(.kts)`, `go.mod`, `composer.json`, `Gemfile`, `*.csproj`, `serverless.yml` — mapped to system components: client frameworks (React/Vue/Angular/Next…), APIs (Express/NestJS/Spring/Django/FastAPI/Flask/Gin/Laravel/Rails/ASP.NET…), databases and ORMs (PostgreSQL/MySQL/MongoDB/SQLite/Prisma…), caches (Redis/Memcached), queues (Kafka/RabbitMQ/Celery/Bull/SQS…), auth (JWT/Passport/OAuth), object storage (S3), search/realtime/notifications services, serverless and IaC folders.
+  - **Docker Compose**: `docker-compose.yml` / `compose.yaml` services (registry- and tag-aware images) become real infrastructure nodes (PostgreSQL, Redis, Kafka, RabbitMQ, reverse proxy, Keycloak, MinIO, monitoring…).
+  - **Spec content**: technology keywords across the **full `spec.md` text** (epic titles, tasks and body) — Spanish and English, accent-normalized.
+  - Concrete detections win over generic ones; no duplicated components. Epic titles still appear as functional **modules**, but only when the system doesn't already cover that component type.
+- **"↻ Re-infer" button** in the Arch toolbar (+ `arch-reinfer` message): regenerates the diagram on demand — a stale saved `.alpaquitay/arch.json` no longer shadows the inference — and shows a toast summary (`System: React SPA · Node/Express API · PostgreSQL · …`).
+- **Auto-wiring**: client → main API/service (HTTP or via reverse proxy), main → auth/db/cache/queue, epic modules → main entry point.
+- Tests: `SystemArchitecture.test.ts` — 17 new unit tests. Suite total: **389 tests / 42 suites**, all green.
 
 ---
 

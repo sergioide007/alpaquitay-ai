@@ -12,13 +12,18 @@ function check(name, ok, detail = '') {
   else { fail++; console.log(`  ❌ ${name} ${detail}`); }
 }
 
-console.log('\n🔍 VERIFICACIÓN MARKETPLACE — Alpaquitay AI v3.2.0\n');
+const VERSION = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf-8')).version;
+const VSIX = `alpaquitay-ai-v${VERSION}.vsix`;
+
+console.log(`\n🔍 VERIFICACIÓN MARKETPLACE — Alpaquitay AI v${VERSION}\n`);
 
 // 1. package.json
 console.log('📦 Package.json:');
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf-8'));
 check('name', pkg.name === 'alpaquitay-ai');
-check('version', pkg.version === '3.2.0');
+check('version is semver', /^\d+\.\d+\.\d+$/.test(pkg.version), `(${pkg.version})`);
+check('CHANGELOG documents version', fs.existsSync(path.join(root, 'CHANGELOG.md')) &&
+  fs.readFileSync(path.join(root, 'CHANGELOG.md'), 'utf-8').includes(`## [${pkg.version}]`), `(${pkg.version})`);
 check('publisher', pkg.publisher === 'alpaquitay-ai');
 check('license', pkg.license === 'MIT');
 check('icon exists', pkg.icon && fs.existsSync(path.join(root, pkg.icon)));
@@ -76,9 +81,12 @@ check('no new Function()', !extContent.includes('new Function'));
 // 6. Tests
 console.log('\n🧪 Tests:');
 try {
-  const out = execSync('npm test 2>&1', { cwd: root, encoding: 'utf-8', timeout: 60000 });
-  const match = out.match(/Tests:\s+(\d+)\s+passed/);
-  check('all tests pass', !!match && match[1] === '328', match ? `(${match[1]})` : '');
+  const out = execSync('npm test 2>&1', { cwd: root, encoding: 'utf-8', timeout: 300000 });
+  const passed = out.match(/Tests:\s+(\d+)\s+passed/);
+  const failed = out.match(/(\d+)\s+failed/);
+  const suites = out.match(/Suites:\s+(\d+)\s+passed/);
+  check('all tests pass', !!passed && Number(passed[1]) > 0 && (!failed || Number(failed[1]) === 0),
+    passed ? `(${passed[1]} passed, ${suites ? suites[1] + ' suites' : '?'} )` : '');
 } catch (e) {
   check('all tests pass', false, '(test execution failed)');
 }
@@ -99,8 +107,8 @@ if (fail === 0) {
   console.log('✅ LISTO PARA PUBLICAR EN MARKETPLACE');
   console.log('\nPróximos pasos:');
   console.log('  1. F5 en VS Code → Extension Development Host');
-  console.log('  2. git tag v3.2.0 && git push origin v3.2.0');
-  console.log('  3. O publicar manual: npx vsce publish --packagePath alpaquitay-ai-v3.2.0.vsix');
+  console.log(`  2. git tag v${VERSION} && git push origin v${VERSION}`);
+  console.log(`  3. O publicar manual: npx vsce publish --packagePath ${VSIX}`);
 } else {
   console.log('❌ HAY ERRORES — corregir antes de publicar');
 }
