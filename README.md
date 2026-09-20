@@ -1,18 +1,23 @@
 # Alpaquitay AI
 
-> **Astra-style AI harness for VS Code — SDLC gates, DORA metrics, debt tracking, diff-first writes, specialist routing.**
+> **Astra-style AI harness for VS Code — SDLC gates, DORA metrics, debt tracking, diff-first writes, specialist routing, and now a Docs agent for Word, Markdown, EPUB and PDF.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
-[![Version](https://img.shields.io/badge/version-3.2.0-green)](./CHANGELOG.md)
-[![Tests](https://img.shields.io/badge/tests-328%20passing-brightgreen)](./package.json)
+[![Version](https://img.shields.io/badge/version-3.5.0-green)](./CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-431%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
 [![Stars](https://img.shields.io/github/stars/sergioide007/alpaquitay-ai?style=social)](https://github.com/sergioide007/alpaquitay-ai/stargazers)
-[![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red)](./LICENSE)
 [![Website](https://img.shields.io/badge/Website-specsolid.com-blueviolet)](https://www.specsolid.com)
 
-![Alpaquitay AI — 5-tab panel: Spec, Board, Chat, Git, Settings](https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/media/demo-hub.gif)
+![Alpaquitay AI — Hub with Work, Docs, Evidence, Architecture, Agents and Settings tabs](https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/media/demo-hub.gif)
+
+---
+
+## Contents
+
+[What is it](#what-is-alpaquitay-ai) · [Quick start](#quick-start) · [Harness](#the-harness-in-one-picture) · [Work tab (SDD)](#work-tab--spec-driven-development) · [Docs tab](#docs-tab--edit-word-markdown-epub-and-pdf-with-an-agent) · [Architecture](#architecture) · [Providers](#ai-providers) · [Skills](#skills) · [Memory](#hierarchical-memory) · [Domain agents](#domain-agent-architecture) · [Settings](#settings-reference) · [Contributing](#contributing) · [License](#license)
 
 ---
 
@@ -35,14 +40,22 @@ Alpaquitay AI turns VS Code into a complete **harness-driven development environ
 
 ## Quick Start
 
-1. Install the extension from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
-2. Open any project (legacy or greenfield)
-3. Press `Ctrl+Alt+A` (or `Cmd+Alt+A` on Mac) to open Alpaquitay Hub
-4. Type `onboard` in the chat — get your project fingerprint + DORA baseline
-5. Describe your idea naturally → say `promover` to create a spec.md epic
-6. Drag task to **In Progress** → review the diff → say `si aplicar`
+1. Install **Alpaquitay AI** from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai) or [Open VSX](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai).
+2. Press `Ctrl+Alt+A` to open the Hub, then add a provider in **Settings** — a local model ([Ollama](https://ollama.com) / LM Studio) keeps everything on your machine.
+3. **Code:** open the **Work** tab, generate a `spec.md`, and drag a task to *In Progress*.
+4. **Writing:** open the **Docs** tab, pick a `.docx`, `.md`, `.epub` or `.pdf`, and tell the agent what to do.
+
+The detailed, step-by-step version is [below](#step-by-step-setup).
 
 ---
+
+## The harness in one picture
+
+Every request is perceived, routed to exactly one lane, previewed before any write, guarded, verified and logged.
+
+
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/01-harness-pipeline.png" alt="Harness pipeline: perceive, decide, Flash / Build / Deep lanes, evidence layer"></p>
+
 
 ## Harness Commands (free, no LLM)
 
@@ -73,64 +86,14 @@ Alpaquitay AI turns VS Code into a complete **harness-driven development environ
 
 ---
 
-## Why Alpaquitay?
+### SDLC gates
 
-| Feature | Alpaquitay | GitHub Copilot | ChatGPT |
-|---------|-----------|----------------|---------|
-| Works offline (Ollama/LM Studio) | ✅ | ❌ | ❌ |
-| Privacy-first (no servers) | ✅ | ❌ | ❌ |
-| SDLC with executable gates | ✅ | ❌ | ❌ |
-| DORA metrics from git | ✅ | ❌ | ❌ |
-| Debt tracking | ✅ | ❌ | ❌ |
-| Diff-first writes (review before apply) | ✅ | ❌ | ❌ |
-| Legacy project support (no `src/` assumption) | ✅ | ⚠️ | ⚠️ |
-| Open source (MIT) | ✅ | ❌ | ❌ |
+The harness detects the SDLC phase from the request and only lets it advance when the exit gate passes.
 
----
 
-## Contributing
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/04-sdlc-gates.png" alt="Six SDLC phases with detection keywords, lane and exit gate"></p>
 
-We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
-### Quick start for contributors
-
-```bash
-git clone https://github.com/sergioide007/alpaquitay-ai.git
-cd alpaquitay-ai
-npm install
-npm run compile
-npm test
-# Press F5 in VS Code to launch Extension Development Host
-```
-
-### Ways to contribute
-
-- 🐛 Report bugs via [GitHub Issues](https://github.com/sergioide007/alpaquitay-ai/issues)
-- 💡 Suggest features via [GitHub Discussions](https://github.com/sergioide007/alpaquitay-ai/discussions)
-- 📝 Improve documentation
-- 🌍 Translate to other languages
-- ⭐ Star the repo if you find it useful!
-
----
-
-## Community
-
-- ⭐ [Star on GitHub](https://github.com/sergioide007/alpaquitay-ai/stargazers)
-- 🐦 [Follow on Twitter/X](https://twitter.com/specsolid)
-- 💬 [Discord](https://discord.gg/specsolid)
-- 📧 [Email](mailto:hello@specsolid.com)
-
----
-
-## License
-
-MIT © [Sergio Perez Ruiz](https://github.com/sergioide007)
-
-Built with ❤️ for the developer community.
-
----
-
-**If Alpaquitay helps you, please ⭐ star the repo — it helps others discover it!**
 ---
 
 ## Core SDD Workflow
@@ -152,245 +115,17 @@ Built with ❤️ for the developer community.
 
 ---
 
-## Architecture
+### How a task runs
 
-### Extension Host Overview
+Dragging a card to **In Progress** never writes silently. The agent plans up to 6 files, generates them, and stores the result as a **bounded diff**. Nothing touches disk until you answer `si aplicar` (or `no` to discard). On apply, PolicyGuard and AgentReview check each file, a git checkpoint is taken, files are written, and **real build and test commands** run. A card only reaches **Done** when the Definition-of-Done gate has evidence.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                            VS Code Extension Host                               │
-│                                                                                 │
-│  ┌──────────────┐    activates     ┌──────────────────────────────────────────┐ │
-│  │ extension.ts │─────────────────►│           MainPanel (WebviewPanel SPA)   │ │
-│  │              │                  │                                          │ │
-│  │  - Commands  │   postMessage    │  ┌──────────┐ ┌───────┐ ┌─────────────┐  │ │
-│  │  - Keybinds  │◄────────────────►│  │  Studio  │ │ Arch  │ │Git/Skills/  │  │ │
-│  │  - Secrets   │                  │  │ (3-col)  │ │Canvas │ │  Settings   │  │ │
-│  └──────┬───────┘                  │  └──────────┘ └───────┘ └─────────────┘  │ │
-│         │                          └──────────────────────────────────────────┘ │
-│         │                                           ▲ message bus               │
-│  ┌──────▼───────────────────────────────────────┐   │                           │
-│  │               Core Services                  │───┘                           │
-│  │                                              │                               │
-│  │  AIProviderManager ──► [active provider]     │                               │
-│  │       ├── AnthropicProvider (claude-*)       │                               │
-│  │       ├── OpenAIProvider    (gpt-4o / o1)    │                               │
-│  │       ├── OllamaProvider   (local, free)     │                               │
-│  │       └── LMStudioProvider (local, free)     │                               │
-│  │                                              │                               │
-│  │  SpecManager ──► spec.md (read/write/parse)  │                               │
-│  │  GitIntegration ──► git log + #SPEC links    │                               │
-│  │  HierarchicalMemory ──► .alpaquitay/         │                               │
-│  │  ProjectContextBuilder ──► stack detection   │                               │
-│  │  SecretManager ──► OS keychain (no plaintext)│                               │
-│  └──────────────────────────────────────────────┘                               │
-│                                                                                 │
-│  ┌──────────────────────────────────────────────┐                               │
-│  │             MCP Tool Layer                   │                               │
-│  │  MCPManager ──► FilesystemMCP (read/write)   │                               │
-│  │             └── GitMCP       (log/status)    │                               │
-│  └──────────────────────────────────────────────┘                               │
-│                                                                                 │
-│  ┌──────────────────────────────────────────────┐                               │
-│  │            Skill Pipeline                    │                               │
-│  │  SkillRegistry                               │                               │
-│  │    ├── CreateFileSkill                       │                               │
-│  │    ├── RefactorSkill                         │                               │
-│  │    ├── GenerateTestsSkill                    │                               │
-│  │    ├── ProjectBuilderSkill (DeepAgent)       │                               │
-│  │    ├── GenerateFromSpecSkill (DeepAgent)     │                               │
-│  │    ├── ValidateAgainstSpecSkill              │                               │
-│  │    ├── NewSpecificationSkill                 │                               │
-│  │    ├── DailyStandupSkill                     │                               │
-│  │    └── Custom skills (runtime-registered)    │                               │
-│  └──────────────────────────────────────────────┘                               │
-└─────────────────────────────────────────────────────────────────────────────────┘
-```
 
-### SDD Task Execution Pipeline — Deferred Quality Architecture
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/03-sdd-task-sequence.png" alt="Sequence diagram of task execution: plan, generate, diff preview, approve, apply, prove, outcome"></p>
 
-```
-User drags card to "In Progress"
-            │
-            ▼
-   _handleTaskStatus()
-            │
-            ▼
-  First time? ──No──► ask for correction text
-            │                   │
-           Yes                  ▼
-            │          _handleTaskCorrection()
-            ▼                   │
-   _startTaskWork()  ◄──────────┘
-            │
-            ├─── Phase 1: PLAN ──────────────────────────────────────────────────
-            │    AI prompt: "Task: {title}. List relative file paths to create."
-            │    maxTokens: 150   (tightly scoped — paths only)
-            │    Retry once if AI returns prose instead of paths
-            │
-            ├─── Phase 2: GENERATE + WRITE ─────────────────────────────────────
-            │    For each file path (max 6):
-            │      - Skip if path == spec.md (protected)
-            │      - Build prompt: masterPrompt + epic context + file description
-            │      - AI generates code (maxTokens: 1024)
-            │      - FilesystemMCP.write_file(path, content)
-            │      - HierarchicalMemory.extractFromCode(path, content)
-            │      - Queue format + validate as background task (non-blocking)
-            │
-            ├─── Phase 3: FAST KANBAN COMPLETION ◄── KEY OPTIMIZATION ──────────
-            │    ● setBoardStatus('done')  — in-memory, instant
-            │    ● patch specData in cache — no file re-read
-            │    ● post spec-data         — board moves to Done ✓
-            │    ● post task-work-done    — Kanban card updates ✓
-            │    ● post chat-done         — chat spinner stops ✓
-            │    ─────────────────────────────────────────────
-            │    Total time to Done: ~AI generation time only
-            │    (typically 3-15 s depending on model + files)
-            │
-            └─── Phase 4: BACKGROUND QUALITY PIPELINE (fire-and-forget) ────────
-                 Runs after Kanban is already Done — never blocks the board
-                 ● Promise.allSettled(qualityTasks)     format each file
-                   └── _formatGeneratedFile(abs)        LSP formatter
-                   └── _validateAndFixFile(abs)         diagnostics + AI fix
-                       └── _waitForDiagnostics(uri)     fast-exit if no errors
-                 ● _runBuildAndTests()                  build + test commands
-                 ● HierarchicalMemory.save()            persist context
-                 ● SpecManager.updateTaskDone(task)     write [x] to spec.md
-                 Results stream to chat panel as chat-chunk messages
-```
 
-#### Performance Gains
+### Step-by-step setup
 
-| Step | Before (v2.0) | After (v3.0) | Savings |
-|------|--------------|--------------|---------|
-| Diagnostics wait per file | 8 000 ms (blocking) | 0 ms (background) | **8 s/file** |
-| Build command | 0–90 000 ms (blocking) | 0 ms (background) | **up to 90 s** |
-| spec.md re-read after done | ~500 ms (extra read) | 0 ms (cache patch) | ~500 ms |
-| **Kanban card → Done** | **20–120 s** | **≈ AI gen time** | **>95%** |
-
-The AI generation time (Phase 1 + 2) is the irreducible cost: it depends on model speed and number of files. Quality validation, formatting, and builds continue in the background and their results appear in the chat panel.
-
-### Clean Architecture Project Generation
-
-When `ProjectBuilderSkill` runs, it detects the stack and applies the correct canonical structure:
-
-```
-Goal text ──► detectStyleFromGoal() ──► ArchitecturalStyle
-                                               │
-                              ┌────────────────┼────────────────┐
-                              ▼                ▼                ▼
-                         java-maven      spring-fullstack    react-clean
-                         java-gradle        (monorepo)       (+ others)
-
-Java (Clean Architecture — Robert C. Martin):
-┌─────────────────────────────────────────────────────────────┐
-│  src/main/java/com/company/project/                         │
-│  ├── domain/                                                │
-│  │   ├── model/        ← Pure Java POJOs (no @Entity)       │
-│  │   └── port/         ← Repository/service interfaces      │
-│  ├── application/                                           │
-│  │   ├── service/      ← Use cases (@Service, no HTTP/JPA)  │
-│  │   └── dto/          ← Request/response DTOs              │
-│  ├── infrastructure/                                        │
-│  │   ├── persistence/  ← @Entity + Spring Data JPA impls    │
-│  │   ├── web/rest/     ← @RestController (thin HTTP layer)  │
-│  │   └── config/       ← Security, CORS, Swagger            │
-│  └── shared/                                                │
-│      └── exception/    ← @ControllerAdvice + custom errors  │
-│                                                             │
-│  Dependency rule: infrastructure → application → domain     │
-└─────────────────────────────────────────────────────────────┘
-
-React (Clean Architecture / ISO 12207):
-┌─────────────────────────────────────────────────────────────┐
-│  src/                                                       │
-│  ├── domain/                                                │
-│  │   ├── model/        ← TypeScript types (no React/axios)  │
-│  │   └── service/      ← Pure domain logic                  │
-│  ├── application/                                           │
-│  │   ├── use-case/     ← Business use cases                 │
-│  │   └── store/        ← Zustand/Redux slices               │
-│  ├── infrastructure/                                        │
-│  │   ├── api/          ← Axios adapters (all HTTP here)     │
-│  │   └── storage/      ← localStorage adapters              │
-│  └── presentation/                                          │
-│      ├── components/   ← Reusable UI components             │
-│      ├── pages/        ← Route-level pages                  │
-│      └── layout/       ← Layout wrappers                    │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### AI Provider Chain
-
-```
-User selects model or sends chat
-            │
-            ▼
-   AIProviderManager.getActive()
-            │
-    preferred provider set? ──No──► try Ollama → LM Studio → Anthropic → OpenAI
-            │                              (first available wins)
-           Yes
-            │
-            ▼
-   provider.chat(messages, options)
-            │
-     ┌──────┴───────────────────────────────────────────┐
-     │                                                  │
-     ▼                                                  ▼
-AnthropicProvider                              OllamaProvider
-  POST /v1/messages                              POST /api/chat
-  model: claude-sonnet-4-6                       model: codellama
-  max_tokens: cfg.maxTokens                      num_predict: cfg.maxTokens
-  stream: true                                   stream: true
-     │                                                  │
-     └──────────────────┬───────────────────────────────┘
-                        ▼
-              SSE chunks → webview chat-chunk events
-              Final response → chat-done event
-```
-
-### Architecture Diagram Module (Arch Tab)
-
-```
-Tab open (no saved diagram) ──► _inferSystemArchitecture()          ↻ Re-infer = regenerate on demand
-                                        │
-      ┌─────────────────────────────────┼──────────────────────────────────┐
-      ▼                                 ▼                                  ▼
- workspace manifests             docker-compose services          full spec.md text
- (package.json root+monorepo,    (postgres, redis, kafka,         (epic titles + tasks + body,
-  requirements.txt, pyproject,    rabbitmq, nginx, keycloak,       Spanish & English keywords,
-  pom.xml, build.gradle,          minio…) → real infrastructure    accent-normalized) → the
-  go.mod, composer.json,          nodes                            system the project will build
-  Gemfile, *.csproj,             │                                 │
-  serverless.yml) → real stack   │                                 │
-      └───────────────┬──────────┴───────────────┬─────────────────┘
-                      ▼                          ▼
-            system nodes (concrete wins    +  epic modules (only component
-            over generic, deduplicated)       types not already covered)
-                      │
-                      ▼
-      auto-wiring: client → main API/service → auth / db / cache / queue
-                      │
-   S.arch = { nodes: ArchNode[], edges: ArchEdge[] }   ← toast summary: "System: React SPA · Node/Express API · …"
-                      │
-   arch-save ──► _handleArchSave() ──► .alpaquitay/arch.json
-   arch-load ──► _handleArchLoad() ──► reads .alpaquitay/arch.json
-   arch-export ──► _handleArchExport(diagram, format)
-                         │
-               ┌─────────┼─────────┬─────────────┐
-               ▼         ▼         ▼             ▼
-           Terraform  AWS CDK   Azure Bicep   GCP YAML
-            (AWS)    (TypeScript)  (.bicep)   (.yaml)
-```
-
-Manual editing (drag, rename, connect, add nodes from the palette) always wins; **Save** persists your layout to `.alpaquitay/arch.json` and **↻ Re-infer** rebuilds the detected system diagram from current workspace + spec evidence.
-
----
-
-## Quick Start
-
-### Step 1 — Install
+#### Step 1 — Install
 
 **Option A — VS Code Marketplace (recommended):**
 
@@ -408,7 +143,7 @@ Install from [open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai](https://open-v
 ovsx install alpaquitay-ai.alpaquitay-ai
 ```
 
-### Step 2 — Configure a provider
+#### Step 2 — Configure a provider
 
 ![Configuring an AI provider — local Ollama or cloud API key](https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/media/demo-providers.gif)
 
@@ -430,18 +165,18 @@ Keys are stored in the OS keychain via VS Code SecretStorage — never in plaint
 
 > **Small model note:** Models under ~4B parameters (`1.3b`, `3b`, `mini`, `nano`, `gemma:2b`, etc.) are detected automatically. Stricter no-comment rules are injected and generation temperature is lowered so they produce cleaner output.
 
-### Step 3 — Open the hub
+#### Step 3 — Open the hub
 
 ```
 Ctrl+Shift+A   →  Command menu (choose hub or other commands)
 Ctrl+Alt+A     →  Open Alpaquitay Hub directly
 ```
 
-### Step 4 — Create your spec
+#### Step 4 — Create your spec
 
-In the **Studio** tab → **Spec** pane → click **Generate with AI**. The AI analyzes your workspace and creates an initial `spec.md` with epics and tasks. Refine it by hand or via the chat pane.
+In the **Work** tab → **Spec** pane → click **Generate with AI**. The AI analyzes your workspace and creates an initial `spec.md` with epics and tasks. Refine it by hand or via the chat pane.
 
-### Step 5 — Work tasks
+#### Step 5 — Work tasks
 
 On the **Board** pane, all tasks start in **Backlog**. Drag one to **In Progress** — the AI immediately starts implementing it and streams progress to the **Chat** pane.
 
@@ -488,6 +223,77 @@ Handles token generation, expiry, and validation. Uses RS256.
 ```
 
 Both `#SPEC-001` and `[SPEC: 001]` formats are recognized. The Git tab shows a badge on that commit.
+
+---
+
+---
+
+## Docs tab — edit Word, Markdown, EPUB and PDF with an agent
+
+A main tab, next to **Work**, for everything that is not code: manuscripts, reports, articles, and the books you write and edit. You talk to the agent in plain language, in Spanish or English:
+
+> *"corrige la ortografía del capítulo 3"* · *"hazlo más directo, mantén mi voz"* · *"translate the book to English"* · *"revisa la coherencia entre capítulos"* · *"¿qué le falta a este capítulo?"*
+
+| Format | Read | Write | Notes |
+|---|---|---|---|
+| `.docx` | ✅ | ✅ | Edits are written as **Word tracked changes** (Review → Accept / Reject). Untouched paragraphs stay byte-identical. |
+| `.md` / `.txt` | ✅ | ✅ | Lossless outside the edited blocks; code blocks, tables and front matter are protected. |
+| `.epub` | ✅ | ✅ | Chapters follow the spine; `<em>` / `<strong>` survive a round trip. |
+| `.pdf` | ✅ | ➡️ `.md` | Read-only, best effort (text-based PDFs). Scanned PDFs need OCR first. |
+
+Convert any document to **Markdown, Word or EPUB** from the same tab, so a manuscript in Markdown becomes a publishable EPUB in one click.
+
+**What the agent can do**
+
+- **Edit:** proofread · improve style · shorten · expand · translate · any free-form instruction.
+- **Analyze:** summarize · outline · **cross-chapter consistency check** (names, dates, places, terminology) · developmental feedback · questions about the book.
+
+**Same guarantees as the code side**
+
+- The agent only **proposes**. You review a **word-level diff** per paragraph and select what to apply. Large rewrites, changed numbers and big length changes are flagged *review* and are **not pre-selected**.
+- Output goes to a **new file** by default (`name.edited.docx`). Overwriting makes a backup first in `.alpaquitay/backups/`.
+- Links, footnotes, fields, images, tables and code are **protected blocks** the agent never touches.
+- The written file is **re-read to verify** it parses and contains every accepted edit.
+- Whole-book runs over 20 model calls ask for confirmation (hard limit 60). Cloud providers go through the privacy boundary (PII and secrets redacted); a local model keeps the manuscript on your machine.
+- No dependencies: the ZIP, DOCX, EPUB and PDF readers/writers are built in, so the extension stays small and auditable.
+
+
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/10-docs-agent.png" alt="Docs agent flow: adapters, intent, confirmation, edit and analysis runs, review, apply, verify"></p>
+
+
+**Limits, stated plainly:** in a Word paragraph that the agent rewrites, inline formatting inside that paragraph (a bold word, for example) is replaced by the run formatting of its first run. The tracked-changes view shows exactly what changed. Paragraphs with hyperlinks, fields or notes are skipped instead of risking damage.
+
+---
+
+## Architecture
+
+### Extension host
+
+
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/02-extension-architecture.png" alt="Extension host: composition root, Hub, harness core, capability layers and external systems"></p>
+
+
+### AI provider chain and privacy boundary
+
+Local models run untouched. Anything that leaves the machine is redacted first, restored on return, and audited without values.
+
+
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/05-provider-privacy.png" alt="Provider selection: register, select, classify; local path vs cloud path with PrivacyBoundaryProvider"></p>
+
+
+### Architecture diagram module (Arch tab)
+
+The canvas infers the real system from manifests, Docker Compose and `spec.md`, then exports starter infrastructure code.
+
+
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/08-arch-inference.png" alt="Architecture inference pipeline from manifests, compose and spec to canvas and IaC export"></p>
+
+
+### Clean Architecture project generation
+
+
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/09-clean-architecture.png" alt="Clean Architecture layouts generated for Java Spring and React"></p>
+
 
 ---
 
@@ -570,7 +376,6 @@ export const MySkill = new DeepAgentSkill('my-skill', 'My Skill', 'Description',
 ```
 
 ---
-
 ## Hierarchical Memory
 
 Alpaquitay maintains a **hierarchical project memory** in `.alpaquitay/memory.json`. As the AI generates code, it automatically records:
@@ -589,7 +394,6 @@ Alpaquitay maintains a **hierarchical project memory** in `.alpaquitay/memory.js
 This memory persists across sessions. Future tasks can query it to maintain consistency — e.g., knowing that `UserService` is in `src/services/user.ts` before generating a file that imports it.
 
 ---
-
 ## Supported Project Architectures
 
 Alpaquitay auto-detects the stack from project files and generates architecture-specific prompts and directory structures.
@@ -616,7 +420,6 @@ Alpaquitay auto-detects the stack from project files and generates architecture-
 All Java projects follow **Clean Architecture** (Robert C. Martin) with strict dependency inversion: `infrastructure → application → domain`.
 
 ---
-
 ## Commands & Shortcuts
 
 | Command | Shortcut | Description |
@@ -690,6 +493,9 @@ A **Domain Agent Shell** wraps this engine in a vertical-specific layer and conn
 
 ### The Architecture to Win a Vertical
 
+<details>
+<summary>Text version of this diagram</summary>
+
 ```
 ┌──────────────────────────────────────────────────────┐
 │                 DOMAIN AGENT SHELL                   │
@@ -711,6 +517,8 @@ A **Domain Agent Shell** wraps this engine in a vertical-specific layer and conn
 │  └───────────────────┘  └────────────────────────┘   │
 └──────────────────────────────────────────────────────┘
 ```
+
+</details>
 
 | Layer | Alpaquitay Dev Tool | Domain Agent Shell |
 |---|---|---|
@@ -764,6 +572,9 @@ Phase F — Migration Planning       : Version-controlled domain memory
 
 #### ArchiMate 3.2 Notation
 
+<details>
+<summary>Text version of this diagram</summary>
+
 ```
 Business Layer   : Business Process ──► Business Service (domain workflow)
 Application Layer: Application Service ──► Application Component (use cases)
@@ -771,6 +582,8 @@ Application Layer: Application Service ──► Application Component (use case
                    Application Interface (secondary ports to infrastructure)
 Technology Layer : Technology Service (AI Provider, Storage, APIs)
 ```
+
+</details>
 
 #### BIAN Service Domain Pattern
 
@@ -815,6 +628,9 @@ src/domains/
 ```
 
 #### 3. Process View — Agent Execution Loop
+<details>
+<summary>Text version of this diagram</summary>
+
 ```
 Receive Objective
       │
@@ -832,7 +648,12 @@ Receive Objective
       └── Return DomainResult
 ```
 
+</details>
+
 #### 4. Physical View — Deployment
+<details>
+<summary>Text version of this diagram</summary>
+
 ```
 VS Code Extension Host
   ├── CentralBrainAgent          ← Unified entry point (RAG + Privacy + Orchestration)
@@ -855,8 +676,10 @@ VS Code Extension Host
   │           ├── AIExpertShell
   │           └── BusinessShell
   │                 └── AIProviderAdapter ──► Anthropic / Ollama / OpenAI
-  └── AgentRegistry              ← Lazy factory + semantic scoring for all 14 shells
+  └── AgentRegistry              ← Lazy factory + semantic scoring for all 17 shells
 ```
+
+</details>
 
 #### +1 Scenarios
 - *"Practice past perfect grammar at B1 level"* → English shell `practice-grammar`
@@ -871,6 +694,11 @@ VS Code Extension Host
 
 ### Hexagonal Architecture (Ports & Adapters)
 
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/07-hexagonal-domain-shell.png" alt="Hexagonal domain shell: primary ports, use cases, domain, guardrails, secondary ports and adapters"></p>
+
+<details>
+<summary>Text version of this diagram</summary>
+
 ```
            ┌───────────────────────────────────────────────┐
            │               APPLICATION CORE                │
@@ -880,6 +708,8 @@ VS Code Extension Host
            │                                               │
            └───────────────────────────────────────────────┘
 ```
+
+</details>
 
 **Primary ports** (input.ts): Typed interfaces the caller invokes. The shell never leaks implementation details outward.
 
@@ -891,9 +721,9 @@ VS Code Extension Host
 
 ---
 
-### 14 Live Domain Agent Shells
+### 17 Live Domain Agent Shells
 
-All 14 shells are production TypeScript with 0 compilation errors. Each extends `BaseDomainShell` (Template Method pattern), implements `IDomainAgentShell`, and runs through the unified CentralBrainAgent pipeline.
+All 17 shells are production TypeScript with 0 compilation errors. Each extends `BaseDomainShell` (Template Method pattern), implements `IDomainAgentShell`, and runs through the unified CentralBrainAgent pipeline.
 
 | # | Domain Shell | Status | Use Cases | Key Guardrails |
 |---|---|---|---|---|
@@ -911,16 +741,24 @@ All 14 shells are production TypeScript with 0 compilation errors. Each extends 
 | 12 | **Process** | ✅ LIVE | map-process, gap-analysis, value-stream-map, iso-compliance, optimize-process | ISO compliance gaps |
 | 13 | **AI Expert** | ✅ LIVE | evaluate-llm, design-rag, engineer-prompt, design-ai-system, assess-governance, design-mlops | EU AI Act risk tiers |
 | 14 | **Business** | ✅ LIVE | design-business-model, strategic-analysis, define-okrs, financial-model, market-analysis, build-business-case | LTV:CAC · runway · ROI |
+| 15 | **Quantum Readiness** | ✅ LIVE | crypto inventory, quantum-threat timeline, PQC migration plan, CBOM, crypto-agility assessment | QR-001…003 |
+| 16 | **Well-Architected** | ✅ LIVE | pillar reviews and improvement plans across the Well-Architected pillars | WAF-001…003 |
+| 17 | **Zero Trust** | ✅ LIVE | zero-trust posture assessment and roadmap | ZT-001…004 |
 
 ---
 
 ### Multi-Agent Orchestration Stack
 
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/06-domain-orchestration.png" alt="CentralBrainAgent pipeline, OrchestratorAgent algorithms and the AgentRegistry with 17 shells"></p>
+
+<details>
+<summary>Text version of this diagram</summary>
+
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │                        CentralBrainAgent                             │
 │                                                                      │
-│  1. PrivacyGuard.sanitize()     ← PII detection (12 pattern types)   │
+│  1. PrivacyGuard.sanitize()     ← PII detection (9 detectors)   │
 │  2. RAGEngine.augment()         ← BM25-lite knowledge retrieval      │
 │  3. OrchestratorAgent.execute() ← Multi-agent task dispatch          │
 │  4. RecursiveRefinement.refine()← Quality improvement loop           │
@@ -946,24 +784,28 @@ All 14 shells are production TypeScript with 0 compilation errors. Each extends 
 EnglishShell  SEShell  ArchShell  AIShell  BizShell  + 9 more shells
 ```
 
+</details>
+
 #### RAG Knowledge Base (BM25-lite)
 - 10 seed chunks: ISO/IEC 42010 · TOGAF · DORA Metrics · ISO 27001 · ISO 29119 · ISO 9001 · CEFR · AWS WAF · SOLID · Six Sigma
 - Persists to `.alpaquitay/orchestration/knowledge.json`
 - `RAGEngine.learn()` adds high-scoring outputs back (score ≥ 80)
 
 #### PrivacyGuard (GDPR / ISO 27001 / ISO 27018)
-- 12 PII pattern types: email, phone, SSN, credit card, passport, date of birth, IP, address, IBAN, health ID, NIF, name
+- 9 PII detectors: email, phone, SSN, national ID, credit card, IBAN, IP address, date of birth, medical record number
 - Sanitizes before AI calls; blocks storage of medium/high-risk content
 - GDPR Article 5 (data minimization) + Article 17 (right to erasure) mapped
 
 ---
 
-### Complete File Structure (46+ files, 0 TypeScript errors)
+### Complete File Structure (60+ files, 0 TypeScript errors)
+
+> **Docs tab (v3.5):** `src/documents/` holds `ZipLite`, `DocumentModel`, the Markdown / DOCX / EPUB adapters, `PdfReader`, `Documents` (load · apply · export), `DocumentAgent` and `DocsController`; the UI is `src/panel/DocsTab.ts`.
 
 ```
 src/domains/
   interfaces/
-    DomainAgentShell.ts           ← IDomainAgentShell, DomainId (14 live + 5 planned)
+    DomainAgentShell.ts           ← IDomainAgentShell, DomainId (17 live + 6 planned)
   shared/
     BaseDomainShell.ts            ← Template Method base: ask(), parseJSON(), guardrails
   english/
@@ -999,14 +841,14 @@ src/domains/
   business/
     model.ts · BusinessShell.ts
   orchestration/
-    AgentRegistry.ts              ← Catalog of 14 shells, semantic scoring, lazy factory
+    AgentRegistry.ts              ← Catalog of 17 shells, semantic scoring, lazy factory
     OrchestratorAgent.ts          ← Task decomposition, parallel batch execution
     CentralBrainAgent.ts          ← Unified pipeline: RAG + Privacy + Orchestration
     rag/
       KnowledgeBase.ts            ← BM25-lite retrieval, ISO seed chunks, persistence
       RAGEngine.ts                ← augment(), complete(), learn()
     privacy/
-      PrivacyGuard.ts             ← 12 PII patterns, GDPR Article mapping, risk scoring
+      PrivacyGuard.ts             ← 9 PII detectors, GDPR Article mapping, risk scoring
     metaheuristic/
       GeneticOptimizer.ts         ← Population 20, 50 gen, tournament selection, elitism
       RecursiveRefinement.ts      ← Bounded recursive quality improvement, rubric scoring
@@ -1073,7 +915,7 @@ const result = await brain.delegateTo('english', 'assess-level', {
 ```typescript
 // Discover all agents and their capabilities
 const catalog = brain.getAgentCatalog();
-// → 14 entries with domainId, version, capabilities[], standards[], tags[]
+// → 17 entries with domainId, version, capabilities[], standards[], tags[]
 
 // Semantic search for the right agent
 const registry = AgentRegistry.getInstance();
@@ -1083,21 +925,46 @@ const best = registry.findByUseCase('design a RAG pipeline');
 
 ---
 
+
+---
+
+## Why Alpaquitay?
+
+| Feature | Alpaquitay | GitHub Copilot | ChatGPT |
+|---------|-----------|----------------|---------|
+| Works offline (Ollama/LM Studio) | ✅ | ❌ | ❌ |
+| Privacy-first (no servers) | ✅ | ❌ | ❌ |
+| SDLC with executable gates | ✅ | ❌ | ❌ |
+| DORA metrics from git | ✅ | ❌ | ❌ |
+| Debt tracking | ✅ | ❌ | ❌ |
+| Diff-first writes (review before apply) | ✅ | ❌ | ❌ |
+| Legacy project support (no `src/` assumption) | ✅ | ⚠️ | ⚠️ |
+| Open source (MIT) | ✅ | ❌ | ❌ |
+
+---
+
+
+---
+
 ## Contributing
 
-```bash
-git clone https://github.com/sergioide007/alpaquitay-ai
-cd alpaquitay-ai
-npm install
-npm run compile      # or: npx tsc --watch
-# Press F5 in VS Code to launch the Extension Development Host
-```
-
-Tests live in `src/test/`. Run with:
+Contributions are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md). Quick start:
 
 ```bash
-npm test
+git clone https://github.com/sergioide007/alpaquitay-ai.git
+cd alpaquitay-ai && npm ci
+npm run compile && npm run lint && npm test
 ```
+
+Press `F5` in VS Code to launch the Extension Development Host. Diagram sources live in [`docs/diagrams/`](./docs/diagrams) (SVG for editing, PNG for the Marketplace README, plus the Python generators in `src/`).
+
+
+## Community
+
+- ⭐ [Star on GitHub](https://github.com/sergioide007/alpaquitay-ai/stargazers)
+- 🐦 [Follow on Twitter/X](https://twitter.com/specsolid)
+- 💬 [Discord](https://discord.gg/specsolid)
+- 📧 [Email](mailto:hello@specsolid.com)
 
 ---
 

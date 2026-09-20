@@ -8,6 +8,46 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.5.0] — 2026-09-20
+
+### Added — Docs tab: an agent for Word, Markdown, EPUB, PDF and text
+
+- New main tab **Docs** (next to Work). Plain-language requests in Spanish or English: proofread, improve style, shorten, expand, translate, or any free-form instruction; plus analysis (summarize, outline, cross-chapter consistency check, developmental feedback, questions about the book).
+- Formats: `.docx` (edits written as **Word tracked changes**), `.md`/`.txt` (lossless outside edited blocks), `.epub` (chapters via spine; `<em>`/`<strong>` preserved), `.pdf` (read-only, best effort; edits exported as Markdown).
+- Convert any document to Markdown, Word or EPUB from the tab.
+- Same harness contract as code: the agent proposes, a word-level diff is reviewed, risky rewrites are not pre-selected, output goes to a new file by default (overwrite makes a backup in `.alpaquitay/backups/`), PolicyGuard runs on the output path, and the written file is re-read to verify it. Whole-book runs above 20 model calls ask for confirmation (limit 60). Links, footnotes, fields, images, tables and code are protected blocks.
+- Zero runtime dependencies: own ZIP reader/writer (`ZipLite`), DOCX/EPUB adapters and a PDF text reader. Validated against LibreOffice and python-docx.
+- Documentation: 10 architecture and design diagrams in `docs/diagrams/` (PNG for the Marketplace README, SVG sources, Python generators).
+
+### Fixed
+
+- **Checkpoint removed the developer's uncommitted work.** `git stash push` takes changes out of the working tree; it is now followed by `git stash apply`, so a checkpoint is a snapshot, not a side effect. A clean tree no longer reports a checkpoint (or reuses an older stash).
+- **PolicyGuard denied any path containing `token`** (`tokenService.ts`, `TokenProvider.java`, `tokenizer/`). It now denies token *files* (`token.json`, `.token`, `access_token`…), not source that mentions tokens.
+- **AgentReview blocked ordinary auth code** because the words `token`/`password`/`secret` appeared. It now flags literal secrets only (assigned string literals, private keys, AWS/OpenAI/GitHub keys, JWTs).
+- **Decider routed unrelated text to the ops specialist**: `aws` matched “laws”, `iac` matched “cardiac”. Keywords now use word boundaries.
+- Mojibake in the correction header (`ðŸ”„` → 🔄).
+- README: version and test badges, duplicated sections, the outdated “deferred quality” pipeline (Done now requires evidence), 14 → 17 domain shells, and the PII detector count (9).
+- CHANGELOG: 3.4.0 entry was out of order.
+- `.vscodeignore` excludes `docs/**` from the VSIX.
+
+
+## [3.4.0] — 2026-09-19
+
+### Added — System Architecture inference (Arch Tab)
+
+The Arch canvas no longer draws only the spec's **epics**; it now infers the architecture of the **system itself** — what the workspace already has and what the spec will build.
+
+- **Inference engine** (`src/core/context/SystemArchitecture.ts`, pure + unit-tested):
+  - **Current workspace**: dependency manifests — `package.json` (root + monorepo subpackages), `requirements.txt`, `pyproject.toml`, `pom.xml`, `build.gradle(.kts)`, `go.mod`, `composer.json`, `Gemfile`, `*.csproj`, `serverless.yml` — mapped to system components: client frameworks (React/Vue/Angular/Next…), APIs (Express/NestJS/Spring/Django/FastAPI/Flask/Gin/Laravel/Rails/ASP.NET…), databases and ORMs (PostgreSQL/MySQL/MongoDB/SQLite/Prisma…), caches (Redis/Memcached), queues (Kafka/RabbitMQ/Celery/Bull/SQS…), auth (JWT/Passport/OAuth), object storage (S3), search/realtime/notifications services, serverless and IaC folders.
+  - **Docker Compose**: `docker-compose.yml` / `compose.yaml` services (registry- and tag-aware images) become real infrastructure nodes (PostgreSQL, Redis, Kafka, RabbitMQ, reverse proxy, Keycloak, MinIO, monitoring…).
+  - **Spec content**: technology keywords across the **full `spec.md` text** (epic titles, tasks and body) — Spanish and English, accent-normalized.
+  - Concrete detections win over generic ones; no duplicated components. Epic titles still appear as functional **modules**, but only when the system doesn't already cover that component type.
+- **"↻ Re-infer" button** in the Arch toolbar (+ `arch-reinfer` message): regenerates the diagram on demand — a stale saved `.alpaquitay/arch.json` no longer shadows the inference — and shows a toast summary (`System: React SPA · Node/Express API · PostgreSQL · …`).
+- **Auto-wiring**: client → main API/service (HTTP or via reverse proxy), main → auth/db/cache/queue, epic modules → main entry point.
+- Tests: `SystemArchitecture.test.ts` — 17 new unit tests. Suite total: **389 tests / 42 suites**, all green.
+
+---
+
 ## [3.3.0] — 2026-09-15
 
 ### Added — Privacy boundary for cloud providers
@@ -33,23 +73,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Tests
 
 - Suite total: **372 tests / 41 suites**, all green.
-
----
-
-## [3.4.0] — 2026-09-19
-
-### Added — System Architecture inference (Arch Tab)
-
-The Arch canvas no longer draws only the spec's **epics**; it now infers the architecture of the **system itself** — what the workspace already has and what the spec will build.
-
-- **Inference engine** (`src/core/context/SystemArchitecture.ts`, pure + unit-tested):
-  - **Current workspace**: dependency manifests — `package.json` (root + monorepo subpackages), `requirements.txt`, `pyproject.toml`, `pom.xml`, `build.gradle(.kts)`, `go.mod`, `composer.json`, `Gemfile`, `*.csproj`, `serverless.yml` — mapped to system components: client frameworks (React/Vue/Angular/Next…), APIs (Express/NestJS/Spring/Django/FastAPI/Flask/Gin/Laravel/Rails/ASP.NET…), databases and ORMs (PostgreSQL/MySQL/MongoDB/SQLite/Prisma…), caches (Redis/Memcached), queues (Kafka/RabbitMQ/Celery/Bull/SQS…), auth (JWT/Passport/OAuth), object storage (S3), search/realtime/notifications services, serverless and IaC folders.
-  - **Docker Compose**: `docker-compose.yml` / `compose.yaml` services (registry- and tag-aware images) become real infrastructure nodes (PostgreSQL, Redis, Kafka, RabbitMQ, reverse proxy, Keycloak, MinIO, monitoring…).
-  - **Spec content**: technology keywords across the **full `spec.md` text** (epic titles, tasks and body) — Spanish and English, accent-normalized.
-  - Concrete detections win over generic ones; no duplicated components. Epic titles still appear as functional **modules**, but only when the system doesn't already cover that component type.
-- **"↻ Re-infer" button** in the Arch toolbar (+ `arch-reinfer` message): regenerates the diagram on demand — a stale saved `.alpaquitay/arch.json` no longer shadows the inference — and shows a toast summary (`System: React SPA · Node/Express API · PostgreSQL · …`).
-- **Auto-wiring**: client → main API/service (HTTP or via reverse proxy), main → auth/db/cache/queue, epic modules → main entry point.
-- Tests: `SystemArchitecture.test.ts` — 17 new unit tests. Suite total: **389 tests / 42 suites**, all green.
 
 ---
 

@@ -1,7 +1,9 @@
 // Cap.05 El arnes + Cap.09 Invariantes + Cap.17 Seguridad.
 // Uncle Bob: "Functions should do one thing." PolicyGuard solo dice allow|confirm|deny.
 export type Verdict = 'allow' | 'confirm' | 'deny';
-const DENY_RE = /(\.env$|\.env\.|id_rsa|id_ed25519|\.pem$|\.key$|secrets?\/|credentials?\.|token)/i;
+// Only files that ARE secrets are denied. A bare `token` substring used to block legitimate
+// source such as `tokenService.ts` or `TokenProvider.java`; now only token *files* match.
+const DENY_RE = /(\.env$|\.env\.|id_rsa|id_ed25519|\.pem$|\.key$|secrets?\/|credentials?\.|(^|\/)\.?(access[_-]?|refresh[_-]?|api[_-]?|auth[_-]?)?tokens?(\.(json|txt|key|secret|yaml|yml))?$|\.token$)/i;
 const CONFIRM_RE = /(delete_file|write_file|create_directory|\.alpaquitay\/fingerprint)/;
 export function guardWrite(relPath: string): { verdict: Verdict; reason: string } {
   if (!relPath) { return { verdict: 'deny', reason: 'ruta vacía' }; }

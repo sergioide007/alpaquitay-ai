@@ -4,7 +4,15 @@
 import { DebtState } from '../platform/DebtTracker';
 export interface ReviewFinding { level: 'ok' | 'warn' | 'block'; rule: string; detail: string; }
 export interface ReviewReport { pass: boolean; findings: ReviewFinding[]; }
-const SECRET_RE = /(api[_-]?key|secret|password|passwd|token|BEGIN [A-Z ]*PRIVATE KEY|AKIA[0-9A-Z]{16})/i;
+// Flags LITERAL secrets, not the mere words "token" or "password" (which every auth module contains).
+const SECRET_RE = new RegExp([
+  /(?:api[_-]?key|secret|password|passwd|token)["']?\s*[:=]\s*["'`][A-Za-z0-9_\-+/=.]{12,}["'`]/i.source,
+  /BEGIN [A-Z ]*PRIVATE KEY/.source,
+  /AKIA[0-9A-Z]{16}/.source,
+  /\bsk-[A-Za-z0-9_-]{16,}/.source,
+  /\bgh[pousr]_[A-Za-z0-9]{20,}/.source,
+  /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/.source,
+].join('|'), 'i');
 export function reviewDiff(relPath: string, before: string, after: string, sources: string[]): ReviewReport {
   const findings: ReviewFinding[] = [];
   if (/\.env$|\.pem$|\.key$|id_rsa/i.test(relPath)) {

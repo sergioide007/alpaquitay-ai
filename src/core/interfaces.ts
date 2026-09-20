@@ -178,6 +178,11 @@ export interface ArchDiagramPatch {
 }
 
 export type WebviewMessage =
+  | { type: 'docs-init' | 'docs-pick' | 'docs-cancel' | 'docs-save-report' }
+  | { type: 'docs-open' | 'docs-reveal'; path: string }
+  | { type: 'docs-run'; instruction: string; scope?: string; op?: string; confirmed?: boolean }
+  | { type: 'docs-apply'; ids: string[]; output: 'new' | 'overwrite'; trackChanges?: boolean }
+  | { type: 'docs-export'; format: 'md' | 'docx' | 'epub' }
   | { type: 'chat'; text: string; modelId: string }
   | { type: 'load-spec' }
   | { type: 'update-task-status'; taskId: string; status: TaskStatus }

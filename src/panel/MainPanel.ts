@@ -24,6 +24,9 @@ import { unifiedDiff, diffMarkdown } from '../core/harness/FileDiff';
 import { reviewDiff, reviewMarkdown, debtBlocksBuild } from '../core/harness/AgentReview';
 import { guardWrite } from '../core/harness/PolicyGuard';
 import { logDecision } from '../core/harness/DecisionLog';
+import { DocsController } from '../documents/DocsController';
+import { SUPPORTED_EXTS, detectFormat } from '../documents/Documents';
+import { DOCS_CSS, DOCS_HTML, DOCS_JS, DOCS_TAB_BUTTON } from './DocsTab';
 import { buildPreview } from '../core/harness/DiffPreview';
 import { CheckpointManager } from '../core/harness/CheckpointManager';
 import { emptyEcon, recordLlm, recordLocal, econChip, ECON_FILE, EconState } from '../core/platform/Economy';
@@ -96,6 +99,7 @@ export class MainPanel {
   private _contextBuilder!: ProjectContextBuilder;
   private _specialists!: SpecialistRouter;
   private _memory!: HierarchicalMemory;
+  private _docs!: DocsController;
   private _econ: EconState = emptyEcon(`s-${Date.now().toString(36)}`);
   private readonly config = new AlpaquitayConfig();
 
@@ -118,6 +122,15 @@ export class MainPanel {
     this._specialists = new SpecialistRouter(mcpManager, workspaceRoot);
     this._memory = new HierarchicalMemory(mcpManager);
     this._memory.load().catch(() => {/* non-fatal */ });
+    this._docs = new DocsController({
+      post: m => this._post(m),
+      getProvider: () => this.aiManager.getActive(),
+      workspaceRoot,
+      econLlm: (p, c) => { void this._econLlm(p, c); },
+      trackDebt: r => this._trackDebt(r),
+      log: (input, chip, extra) => logDecision(this.mcpManager, input,
+        { route: 'docs', lane: 'build', confidence: 1, reasons: ['docs-tab'], needsConfirm: false, chip }, extra),
+    });
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
     this._panel.onDidChangeViewState(e => {
       if (e.webviewPanel.visible) {
@@ -186,6 +199,15 @@ export class MainPanel {
 
   private async _dispatch(msg: WebviewMessage): Promise<void> {
     switch (msg.type) {
+      case 'docs-init': return this._docsInit();
+      case 'docs-pick': return this._docsPick();
+      case 'docs-open': return this._docs.open(msg.path);
+      case 'docs-run': return this._docs.run({ instruction: msg.instruction, scope: msg.scope, op: msg.op as never, confirmed: msg.confirmed });
+      case 'docs-cancel': this._docs.cancel(); return;
+      case 'docs-apply': return this._docs.apply({ ids: msg.ids, output: msg.output, trackChanges: msg.trackChanges });
+      case 'docs-export': return this._docs.exportAs(msg.format);
+      case 'docs-save-report': return this._docs.saveReport();
+      case 'docs-reveal': return this._docsReveal(msg.path);
       case 'get-models': return this._sendModels();
       case 'load-spec': return this._sendSpec();
       case 'load-git': return this._sendGit();
@@ -1366,7 +1388,7 @@ export class MainPanel {
     const epicContext = this._epicExcerpt(specData.markdown, task.epicTitle);
     const tree = await this._workspaceTree();
     const treeSection = tree ? `Project structure:\n${tree}\n\n` : '';
-    const header = correction ? `**ðŸ”„ Correction:** ${task.title}` : `**> Implementando:** ${task.title}`;
+    const header = correction ? `**🔄 Correction:** ${task.title}` : `**> Implementando:** ${task.title}`;
 
     try {
       const activeModelName = provider.modelName;
@@ -2463,6 +2485,30 @@ export class MainPanel {
 
   // -- Utilities --------------------------------------------------------------
 
+  // ── Docs tab (file access lives here: the webview itself can never read the disk) ──
+  private async _docsInit(): Promise<void> {
+    let files: Array<{ path: string; rel: string }> = [];
+    try {
+      const glob = `**/*.{${SUPPORTED_EXTS.map(e => e.slice(1)).join(',')}}`;
+      const uris = await vscode.workspace.findFiles(glob, '{**/node_modules/**,**/.git/**,**/out/**,**/.alpaquitay/**}', 300);
+      files = uris.map(u => ({ path: u.fsPath, rel: vscode.workspace.asRelativePath(u) })).sort((a, b) => a.rel.localeCompare(b.rel));
+    } catch { /* no workspace: the Open button still works */ }
+    this._post({ type: 'docs-list', files, doc: this._docs.info() });
+  }
+
+  private async _docsPick(): Promise<void> {
+    const picked = await vscode.window.showOpenDialog({
+      canSelectMany: false, openLabel: 'Open in Alpaquitay',
+      filters: { Documents: SUPPORTED_EXTS.map(e => e.slice(1)) },
+    });
+    if (picked?.[0]) { await this._docs.open(picked[0].fsPath); }
+  }
+
+  private async _docsReveal(path: string): Promise<void> {
+    if (!detectFormat(path)) { return; }
+    await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(path));
+  }
+
   private _post(msg: object): void {
     this._panel.webview.postMessage(msg);
   }
@@ -2508,7 +2554,7 @@ export class MainPanel {
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Alpaquitay</title>
-<style>${this._htmlStyles()}</style>
+<style>${this._htmlStyles()}${DOCS_CSS}</style>
 </head>
 <body>
 ${this._htmlBody()}
@@ -2840,6 +2886,7 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
   <div class="brand">&#9650; ALPAQUITAY</div>
   <nav class="tabs">
     <button class="tab active" data-tab="studio">Work</button>
+    ${DOCS_TAB_BUTTON}
     <button class="tab" data-tab="git">Evidence</button>
     <button class="tab" data-tab="arch">Architecture</button>
     <button class="tab" data-tab="skills">Agents</button>
@@ -2928,6 +2975,7 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
       </div>
     </div>
   </div>
+${DOCS_HTML}
   <div class="panel" id="panel-arch">
     <div class="arch-toolbar-row">
       <button class="btn btn-o btn-sm" id="archSaveBtn">Save</button>
@@ -3279,12 +3327,14 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
   if (tab === 'studio')   { if (S.spec) { renderSpec(); renderBoard(); } else { vscode.postMessage({ type:'load-spec' }); } }
+  if (tab === 'docs')     { docsOnShow(); }
   if (tab === 'arch')     { vscode.postMessage({ type:'arch-load' }); }
   if (tab === 'git')      { if (!S.git) vscode.postMessage({ type:'load-git' }); vscode.postMessage({ type:'load-harness' }); }
   if (tab === 'settings') { if (!S.settings) vscode.postMessage({ type:'load-settings' }); }
 }
 window.addEventListener('message', e => {
   const msg = e.data;
+  if (msg && typeof msg.type === 'string' && msg.type.indexOf('docs-') === 0) { docsOnMessage(msg); return; }
   switch (msg.type) {
     case 'models-list':            renderModels(msg.models); break;
     case 'skills-list':            S.skills = msg.skills; renderSkillsList(); renderSkillPicker(); break;
@@ -4046,6 +4096,7 @@ function applyArchPatch(patch){
   vscode.postMessage({ type:'arch-save', diagram:S.arch });
   toast('Diagram updated by AI','ok');
 }
+${DOCS_JS}
 })();
 `;
   }

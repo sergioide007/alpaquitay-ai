@@ -40,3 +40,5 @@ SECURITY.md
 
 # Package artifacts
 *.vsix
+
+docs/**

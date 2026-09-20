@@ -2,7 +2,7 @@ import { WorkspaceFingerprint } from '../context/WorkspaceFingerprinter';
 export type { WorkspaceFingerprint };
 
 export type Lane = 'flash' | 'build' | 'deep';
-export type Route = 'chat' | 'ideate' | 'spec' | 'code' | 'specialist';
+export type Route = 'chat' | 'ideate' | 'spec' | 'code' | 'specialist' | 'docs';
 export interface Decision {
   route: Route; lane: Lane; confidence: number;
   reasons: string[]; needsConfirm: boolean; chip: string;
@@ -14,7 +14,8 @@ const CHAT_RE = /(hola|gracias|que es|qué es|explica|resume|duda|ayuda|como|Có
 const IDEATE_RE = /(idea|se me ocurre|ordena|brainstorm|no se por donde|empezar|alcance)/i;
 const SPEC_RE = /(spec|epica|épica|kanban|tablero|tarea SPEC|promover a spec)/i;
 const CODE_RE = /(crea|genera|implementa|corrige|arregla|refactor|test|error|falla|traceback|archivo|endpoint|componente|fix|bug)/i;
-const OPS_RE = /(deploy|pipeline|docker|terraform|aws|azure|gcp|iac|dora|pentest|threat)/i;
+// Word boundaries: bare `aws`/`iac` used to match "laws" and "cardiac" and send them to a specialist.
+const OPS_RE = /\b(deploy\w*|pipeline\w*|docker\w*|terraform|aws|azure|gcp|iac|dora|pentest\w*|threat\w*)\b/i;
 export function decide(text: string, fp: WorkspaceFingerprint | null): Decision {
   const t = text.toLowerCase();
   const reasons: string[] = [];
