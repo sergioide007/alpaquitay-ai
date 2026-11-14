@@ -45,6 +45,8 @@ describe('CheckpointManager — must not remove the developer\'s work', () => {
   beforeEach(() => {
     dir = fs.mkdtempSync(path.join(os.tmpdir(), 'alp-cp-'));
     git('init -q'); git('config user.email t@t.t'); git('config user.name t');
+    // On Windows a global core.autocrlf=true rewrites LF as CRLF on stash apply and breaks the byte comparison below.
+    git('config core.autocrlf false');
     fs.writeFileSync(path.join(dir, 'a.txt'), 'v1\n'); git('add .'); git('commit -qm init');
   });
   afterEach(() => fs.rmSync(dir, { recursive: true, force: true }));

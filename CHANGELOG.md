@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Security — local engine hardening
 
+- **Node.js security floor raised to the November 2026 security releases** (22.23.5 / 24.22.3 / 26.13.1, highest severity HIGH), verified against nodejs.org on 2026-11-14.
 - **The CDN is now untrusted by design.** Model manifests are schema 2, **signed with Ed25519**, and list a **SHA-256 per 8 MiB block** of every file. The extension host verifies the signature (keys in `src/local/trustedKeys.ts` + optional user keys) and hands the Webview only the verified manifest. The Webview refuses any block that does not match, any file that is not listed, and (anti-rollback) any older signed manifest.
 - **ONNX Runtime pinned by hash.** `npm run build:engine` records the SHA-256 of the exact runtime files in the bundle; the Webview verifies them and gives ONNX Runtime `blob:` URLs. The Webview CSP no longer allows any remote script origin. (transformers.js would swallow a failed preload and import the runtime unverified from the CDN; we do not use that path.)
 - **No decompressor before the signature check.** The manifest is fetched with `node:https`, `Accept-Encoding: identity`, and any `Content-Encoding` is rejected at the header stage. Context: Node's `fetch()` advertises `br` and decodes it transparently, and the [Node.js 2026-10-21 security release](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases) fixed an out-of-bounds write in the Brotli decoder (CVE-2026-111497).
@@ -33,6 +34,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 
+- README listed a Twitter/X account, a Discord server and `hello@specsolid.com`, none of which exist; it now lists the real contact channels. The README also said "No Alpaquitay servers exist", which the optional model CDN would make inaccurate: it now says no server ever receives code or prompts.
 - Documentation claimed the first download was "hundreds of MB" and that large files "never sit in memory": the real Gemma 4 E2B text-only download is ≈3.1 GB and transformers.js reads each file fully into memory.
 - A healthy download served with `Content-Encoding` was rejected because `Content-Length` holds the encoded size.
 - `ReadableStream` stall in the block verifier when upstream pieces are smaller than a block.
