@@ -14,14 +14,20 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: 'npm'
+
+      - name: Node security floor (CVE-2026-111497 and friends)
+        run: npm run check:node
 
       - name: Install dependencies
         run: npm ci
 
       - name: Compile
         run: npm run compile
+
+      - name: Unit tests
+        run: npm test
 
       - name: Publish to VS Code Marketplace
         run: npx @vscode/vsce publish --no-dependencies

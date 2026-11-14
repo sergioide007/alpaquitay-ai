@@ -78,6 +78,50 @@ const extContent = fs.readFileSync(path.join(root, 'src/extension.ts'), 'utf-8')
 check('no eval()', !extContent.includes('eval('));
 check('no new Function()', !extContent.includes('new Function'));
 
+// 5b. Motor local (Gemma WebGPU/Wasm)
+console.log('\n🧠 Motor local:');
+check('dist/engine-webview.js built', fs.existsSync(path.join(root, 'dist/engine-webview.js')) &&
+  fs.statSync(path.join(root, 'dist/engine-webview.js')).size > 100000, '(run: npm run build:engine)');
+for (const f of ['cdnPolicy', 'cdnHandler', 'enginePolicy', 'LocalEngineHost', 'LocalGemmaProvider', 'GenerateSpecLocal', 'webview/idbCache']) {
+  check(`out/local/${f}.js`, fs.existsSync(path.join(root, `out/local/${f}.js`)));
+}
+const declared = new Set((pkg.contributes?.commands ?? []).map(c => c.command));
+for (const cmd of ['alpaquitay-ai.generateSpecLocal', 'alpaquitay-ai.clearLocalModelCache']) {
+  check(`command declared: ${cmd}`, declared.has(cmd));
+  check(`command registered: ${cmd}`, fs.readFileSync(path.join(root, 'src/local/GenerateSpecLocal.ts'), 'utf-8').includes(`'${cmd}'`));
+}
+const props = pkg.contributes?.configuration?.properties ?? {};
+for (const k of ['enabled', 'cdnBaseUrl', 'modelId', 'device', 'maxNewTokens']) {
+  check(`setting alpaquitay-ai.localEngine.${k}`, !!props[`alpaquitay-ai.localEngine.${k}`]);
+}
+check('cdnBaseUrl is application-scoped (a workspace cannot redirect downloads)', props['alpaquitay-ai.localEngine.cdnBaseUrl']?.scope === 'application');
+check('default CDN is alpaquitay.specsolid.com', props['alpaquitay-ai.localEngine.cdnBaseUrl']?.default === 'https://alpaquitay.specsolid.com');
+const localSrc = ['LocalEngineHost', 'GenerateSpecLocal', 'LocalGemmaProvider', 'cdnPolicy', 'cdnHandler', 'enginePolicy', 'webview/idbCache']
+  .map(f => fs.readFileSync(path.join(root, `src/local/${f}.ts`), 'utf-8')).join('\n');
+check('src/local: no eval()/new Function()', !/\beval\(|new Function/.test(localSrc));
+check('src/local: no unsafe-eval / unsafe-inline in the CSP', !/'unsafe-(eval|inline)'/.test(localSrc.replace(/not\.toContain[^\n]*/g, '')));
+check('README badge matches package version', fs.readFileSync(path.join(root, 'README.md'), 'utf-8').includes(`badge/version-${pkg.version}-green`));
+check('.npmrc ignores install scripts', fs.existsSync(path.join(root, '.npmrc')) && /ignore-scripts\s*=\s*true/.test(fs.readFileSync(path.join(root, '.npmrc'), 'utf-8')));
+const trustedSrc = fs.readFileSync(path.join(root, 'src/local/trustedKeys.ts'), 'utf-8');
+const hasTrustedKey = /^\s*'[A-Za-z0-9+\/]{43}='/m.test(trustedSrc);
+check('a manifest-signing public key is set in src/local/trustedKeys.ts', hasTrustedKey, '(run: npm run cdn:keygen -- --out <path outside the repo>, paste the public key, rebuild)');
+const pinsPath = path.join(root, 'dist/runtime-pins.json');
+const pinsOk = fs.existsSync(pinsPath);
+check('dist/runtime-pins.json (ONNX Runtime hash pins) built', pinsOk, '(run: npm run build:engine)');
+if (pinsOk && fs.existsSync(path.join(root, 'dist/engine-webview.js'))) {
+  const pins = JSON.parse(fs.readFileSync(pinsPath, 'utf-8'));
+  check('pinned onnxruntime-web version is the one in the bundle', fs.readFileSync(path.join(root, 'dist/engine-webview.js'), 'utf-8').includes(pins.version));
+  check('all four ONNX Runtime files are pinned', Object.values(pins.files).length === 4 && Object.values(pins.files).every(h => /^[0-9a-f]{64}$/.test(h)));
+}
+const hostSrc = fs.readFileSync(path.join(root, 'src/local/LocalEngineHost.ts'), 'utf-8');
+check('Webview CSP script-src has no remote origin', /script-src \$\{opts\.cspSource\} blob:/.test(hostSrc) && !/script-src[^`]*\$\{cdn\}/.test(hostSrc));
+const trustSrc = fs.readFileSync(path.join(root, 'src/local/manifestTrust.ts'), 'utf-8') + fs.readFileSync(path.join(root, 'src/local/safeHttp.ts'), 'utf-8');
+check('manifest path never uses fetch() (no decompressor before the signature check)', !/\bawait\s+fetch\(|\bglobalThis\.fetch\(/.test(trustSrc));
+{
+  const node = require('./check-node-security.js').evaluate(process.versions.node);
+  check(`Node security floor: ${node.message}`, node.ok, '(use a patched Node: see scripts/node-security-floor.json)');
+}
+
 // 6. Tests
 console.log('\n🧪 Tests:');
 try {
@@ -98,6 +142,19 @@ check('.vsix exists', vsixFiles.length > 0, vsixFiles[0] || '');
 if (vsixFiles.length > 0) {
   const vsixStats = fs.statSync(path.join(root, vsixFiles[0]));
   check('.vsix size > 500KB', vsixStats.size > 500000, `(${(vsixStats.size/1024).toFixed(0)}KB)`);
+}
+
+
+// 7b. Contenido del VSIX (sin empaquetar): el bundle del motor entra, las fuentes del worker/engine no
+console.log('\n📦 Contenido del paquete:');
+try {
+  const listing = execSync('npx --no-install vsce ls --no-dependencies', { cwd: root, encoding: 'utf-8', timeout: 120000 })
+    .split('\n').map(l => l.trim().replace(/\\/g, '/'));
+  check('VSIX includes dist/engine-webview.js', listing.includes('dist/engine-webview.js'));
+  check('VSIX excludes engine/ and worker/', !listing.some(l => l.startsWith('engine/') || l.startsWith('worker/')));
+  check('VSIX excludes cdn-staging/ and .npmrc', !listing.some(l => l.startsWith('cdn-staging/') || l === '.npmrc'));
+} catch (e) {
+  check('vsce ls', false, '(' + String(e.message).split('\n')[0] + ')');
 }
 
 // Resumen

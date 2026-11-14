@@ -300,7 +300,9 @@ export class MainPanel {
         }
       } else {
         // Local providers: current configured model
-        const modelName = info.type === 'ollama' ? this.config.ollamaModel : 'local-model';
+        const modelName = info.type === 'ollama'
+          ? this.config.ollamaModel
+          : info.type === 'local-wasm' ? this.config.localEngine.modelId : 'local-model';
         models.push({ id: `${info.type}:${modelName}`, label: `${modelName} (${info.name})`, provider: info.type, isLocal: true });
       }
     }
@@ -412,7 +414,7 @@ export class MainPanel {
         privacy: {
           provider: active?.name ?? 'Not configured',
           providerType: active?.type ?? null,
-          local: active ? active.type === 'ollama' || active.type === 'lmstudio' : null,
+          local: active ? active.type === 'ollama' || active.type === 'lmstudio' || active.type === 'local-wasm' : null,
           telemetry,
           lastDisclosure: disclosure ? {
             operation: disclosure.operation,

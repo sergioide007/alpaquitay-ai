@@ -1,4 +1,4 @@
-export type ProviderType = 'anthropic' | 'openai' | 'ollama' | 'lmstudio';
+export type ProviderType = 'anthropic' | 'openai' | 'ollama' | 'lmstudio' | 'local-wasm';
 
 export interface Message {
   role: 'system' | 'user' | 'assistant';

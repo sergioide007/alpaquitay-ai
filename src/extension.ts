@@ -21,6 +21,8 @@ import { SPEC_TEMPLATES } from './prompts/SpecTemplates';
 import { MainPanel } from './panel/MainPanel';
 import { SpecManager } from './core/SpecManager';
 import { GitIntegration } from './core/GitIntegration';
+import { LocalEngineHost } from './local/LocalEngineHost';
+import { registerLocalEngineCommands, GENERATE_SPEC_LOCAL } from './local/GenerateSpecLocal';
 import { pickWorkspaceRoot, workspaceRootHelp, isUsableRoot, friendlyFsError } from './core/WorkspaceRoot';
 
 let mcpManager: MCPManager;
@@ -31,6 +33,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const privacy = new PrivacyManager(context.globalState, outputChannel);
   const config = new AlpaquitayConfig();
   const aiManager = new AIProviderManager(secrets, config);
+  const localEngine = new LocalEngineHost(context.extensionUri, context.globalState);
+  context.subscriptions.push(localEngine);
+  aiManager.setLocalEngine(localEngine);
   // Fix EROFS: la raiz se valida (absoluta, no raiz de FS) antes de usarla.
   // Antes: `?? process.cwd()` -> en el extension host puede ser `/` (FS de solo lectura)
   // y `path.join('/', 'spec.md')` fallaba con `EROFS: read-only file system, open 'spec.md'`.
@@ -81,6 +86,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         { label: '$(file-add)           New Specification',          description: 'Create a new spec file', cmd: 'alpaquitay-ai.newSpecification' },
         { label: '$(sparkle)            Generate from Spec',         description: 'AI generates code from a spec file', cmd: 'alpaquitay-ai.generateFromSpec' },
         { label: '$(pass-filled)        Validate Against Spec',      description: 'Check code compliance with spec', cmd: 'alpaquitay-ai.validateAgainstSpec' },
+        { label: '$(chip)               Generate Spec (local Gemma)', description: 'WebGPU/Wasm on this machine, $0 backend', cmd: GENERATE_SPEC_LOCAL },
         { label: '$(settings-gear)      Configure AI Provider',      description: 'Set API keys or local models', cmd: 'alpaquitay-ai.configureProvider' },
         { label: '$(extensions)         GitHub Copilot Chat',        description: 'Open Copilot agent panel', cmd: 'workbench.action.chat.open' },
       ];
@@ -261,6 +267,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       );
     })
   );
+
+  registerLocalEngineCommands(context, localEngine, () => config.localEngine, workspaceRoot);
 
   // Register MCP servers eagerly — connect() is a no-op for both, so this is fast and
   // avoids a race where the user opens the panel before initAsync finishes.

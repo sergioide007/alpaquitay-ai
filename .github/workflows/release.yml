@@ -24,6 +24,9 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Node security floor (CVE-2026-111497 and friends)
+        run: npm run check:node
+
       - run: npm ci
       - run: npm run compile
       - run: npm test
@@ -52,6 +55,9 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+
+      - name: Node security floor (CVE-2026-111497 and friends)
+        run: npm run check:node
 
       - run: npm ci
       - run: npm run compile

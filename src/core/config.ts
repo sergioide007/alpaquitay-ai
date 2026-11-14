@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import { DEFAULT_CDN_BASE } from '../local/cdnPolicy';
+import type { DtypeSetting, EngineDevice, LocalEngineSettings } from '../local/protocol';
 
 export class AlpaquitayConfig {
   private get cfg() {
@@ -27,6 +29,19 @@ export class AlpaquitayConfig {
 
   // ── LM Studio ─────────────────────────────────────────────────────────────
   get lmstudioEndpoint(): string { return this.cfg.get<string>('lmstudio.endpoint', 'http://localhost:1234'); }
+
+  // ── Local engine (Gemma ONNX in WebGPU/Wasm, weights from the static CDN) ──
+  get localEngine(): LocalEngineSettings {
+    return {
+      enabled: this.cfg.get<boolean>('localEngine.enabled', false),
+      cdnBase: this.cfg.get<string>('localEngine.cdnBaseUrl', DEFAULT_CDN_BASE),
+      modelId: this.cfg.get<string>('localEngine.modelId', 'gemma-4-e2b-it'),
+      device: this.cfg.get<EngineDevice>('localEngine.device', 'auto'),
+      dtype: this.cfg.get<DtypeSetting>('localEngine.dtype', 'auto'),
+      maxNewTokens: this.cfg.get<number>('localEngine.maxNewTokens', 1024),
+      extraTrustedKeys: this.cfg.get<string[]>('localEngine.extraTrustedKeys', []),
+    };
+  }
 
   // ── Skill execution ───────────────────────────────────────────────────────
   get skillMaxParallel(): number { return this.cfg.get<number>('skill.maxParallel', 3); }

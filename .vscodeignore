@@ -8,6 +8,12 @@ tsconfig.json
 jest.config*
 .vscodeignore
 
+# Webview engine + CDN worker sources (the built bundle dist/engine-webview.js IS shipped)
+engine/**
+worker/**
+cdn-staging/**
+.npmrc
+
 # Source (compiled output lives in out/)
 src/**
 **/*.ts

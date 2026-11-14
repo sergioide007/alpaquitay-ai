@@ -1,11 +1,11 @@
 # Alpaquitay AI
 
-> **Astra-style AI harness for VS Code — SDLC gates, DORA metrics, debt tracking, diff-first writes, specialist routing, and now a Docs agent for Word, Markdown, EPUB and PDF.**
+> **Astra-style AI harness for VS Code — SDLC gates, DORA metrics, debt tracking, diff-first writes, specialist routing, a Docs agent for Word, Markdown, EPUB and PDF, and now an on-device Gemma engine (WebGPU / Wasm).**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
-[![Version](https://img.shields.io/badge/version-3.5.0-green)](./CHANGELOG.md)
-[![Tests](https://img.shields.io/badge/tests-431%20passing-brightgreen)](./package.json)
+[![Version](https://img.shields.io/badge/version-3.6.1-green)](./CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-641%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
 [![Stars](https://img.shields.io/github/stars/sergioide007/alpaquitay-ai?style=social)](https://github.com/sergioide007/alpaquitay-ai/stargazers)
@@ -17,7 +17,7 @@
 
 ## Contents
 
-[What is it](#what-is-alpaquitay-ai) · [Quick start](#quick-start) · [Harness](#the-harness-in-one-picture) · [Work tab (SDD)](#work-tab--spec-driven-development) · [Docs tab](#docs-tab--edit-word-markdown-epub-and-pdf-with-an-agent) · [Architecture](#architecture) · [Providers](#ai-providers) · [Skills](#skills) · [Memory](#hierarchical-memory) · [Domain agents](#domain-agent-architecture) · [Settings](#settings-reference) · [Contributing](#contributing) · [Contact](#author--contact) · [License](#license)
+[What is it](#what-is-alpaquitay-ai) · [Quick start](#quick-start) · [Harness](#the-harness-in-one-picture) · [Work tab (SDD)](#work-tab--spec-driven-development) · [Docs tab](#docs-tab--edit-word-markdown-epub-and-pdf-with-an-agent) · [Local Gemma](#local-gemma-engine--webgpu--wasm-on-your-machine) · [Architecture](#architecture) · [Providers](#ai-providers) · [Skills](#skills) · [Memory](#hierarchical-memory) · [Domain agents](#domain-agent-architecture) · [Settings](#settings-reference) · [Contributing](#contributing) · [Contact](#author--contact) · [License](#license)
 
 ---
 
@@ -32,7 +32,7 @@ Alpaquitay AI turns VS Code into a complete **harness-driven development environ
 5. **Verifies** with DORA metrics, DoD gates, and agent review
 6. **Leaves evidence** in `.alpaquitay/` (decisions, economy, debt)
 
-**100% open source · MIT license · Privacy-first** — your code and prompts go directly to your chosen AI provider. No Alpaquitay servers exist.
+**100% open source · MIT license · Privacy-first** — your code and prompts go directly to your chosen AI provider. No Alpaquitay server ever receives them; the optional local engine only downloads signed model files and runs them on your machine.
 
 **Website:** [specsolid.com](https://www.specsolid.com) · **Book:** [Código Sintético](https://codigosintetico.specsolid.com) (Spanish) · [*Synthetic Code*](https://info-codigo-sintetico.specsolid.com/en/) (English) · **Videos:** [YouTube @codigosinteticolibro](https://www.youtube.com/@codigosinteticolibro) (Spanish)
 
@@ -265,6 +265,36 @@ Convert any document to **Markdown, Word or EPUB** from the same tab, so a manus
 
 ---
 
+## Local Gemma engine — WebGPU / Wasm on your machine
+
+Run a Gemma ONNX model **inside VS Code, on your own GPU**. Nothing is sent to a model server: the weights are static files from the project CDN (`alpaquitay.specsolid.com`), downloaded once and kept in IndexedDB. Inference cost on the backend side: **$0**.
+
+<p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/11-local-gemma-engine.png" alt="Local engine: extension host, Webview with GemmaWasmEngine and IndexedDB cache, static CDN served by a Cloudflare Worker, local GPU"></p>
+
+**Try it:** run **`Alpaquitay AI: Generate Specification (Local Gemma)`** from the Command Palette (or the `Ctrl+Shift+A` menu). Select some text first, or describe the feature in the prompt box. The first run shows the **verified download size** and license and asks for confirmation; after that it works offline. The result is written to `specs/<name>.md` in the same `spec.md` format the Work tab reads (existing specs are never overwritten).
+
+**Be realistic about it:**
+
+- The reference model is **Gemma 4 E2B (text only)**: **≈3.1 GB** to download (≈3.6 GB in the `q4` fallback) and room for it in memory and in the Webview's storage. It needs **WebGPU**: if the machine has none, the extension refuses *before* downloading.
+- Output is a **first draft**. A 2B-class model will not match a cloud model; if it ignores the spec format the command warns you.
+- It is **opt-in** and has not yet been exercised in every VS Code/GPU combination: see the checklist in [`docs/LOCAL-ENGINE.md`](./docs/LOCAL-ENGINE.md#8-what-is-not-verified-yet).
+
+**Security model, in one paragraph:** the CDN is treated as untrusted. Each model manifest is **signed with Ed25519** and lists a **SHA-256 for every 8 MiB block** of every file; the Webview refuses any byte that does not match, any file that is not listed, and any older signed manifest (anti-rollback). The ONNX Runtime files are **pinned by hash inside the extension**, and the Webview's CSP allows no remote script origin. The manifest is fetched **without any decompression**, so no decoder parses network bytes before the signature check. CDN address, model and trusted keys can only be set in *user* settings, never by a workspace. Threat model, failure register and the answers to the objections architects raise: [`docs/LOCAL-ENGINE.md`](./docs/LOCAL-ENGINE.md).
+
+**Use it as a provider:** set `alpaquitay-ai.localEngine.enabled: true`. The engine then appears as a local provider (`local-wasm`): `auto` tries Ollama and LM Studio first and falls back to it, and you can pick it with `alpaquitay-ai.preferredProvider: "local-wasm"`.
+
+**Set it up with a real model** (selective download of Gemma 4 E2B, staging, signing, deploying the Worker and verifying the live CDN): [`docs/LOCAL-ENGINE.md` §6](./docs/LOCAL-ENGINE.md#6-configure-it-with-a-real-model-gemma-4-e2b-text-only) and [`worker/README.md`](./worker/README.md). The signing key is generated on your machine (`npm run cdn:keygen`); the repository ships with none.
+
+**How it works**
+
+- **Webview, not the extension host.** The Node extension host has no WebGPU. The engine (`GemmaWasmEngine`, bundled to `dist/engine-webview.js`) runs in a Webview tab that can stay in the background.
+- **Device and precision.** `device: auto` uses WebGPU when a real adapter exists. `dtype: auto` uses `q4f16` only with WebGPU **and** `shader-f16`, otherwise `q4` (some Gemma exports produce garbage in fp16).
+- **IndexedDB cache.** Files are stored in 8 MiB chunks and a half-finished download is never served. When the manifest `revision` changes, old weights are dropped. transformers.js still reads each file fully into memory to build the ONNX session, so peak memory is roughly the model size. `Clear Local Model Cache` empties it.
+- **One inference at a time**, cancellable per request.
+- **The CDN is a Cloudflare Worker** (`worker/`) in front of an R2 bucket: CORS allow-list, `Cross-Origin-Embedder-Policy` / `Cross-Origin-Resource-Policy`, strict MIME types (anything else returns 415), `Range` and `ETag`, `no-transform`, immutable caching for weights and revalidation for the manifest. `npm run cdn:verify` checks the live CDN end to end.
+
+---
+
 ## Architecture
 
 ### Extension host
@@ -303,6 +333,7 @@ The canvas infers the real system from manifests, Docker Compose and `spec.md`, 
 |---|---|---|---|---|
 | Ollama | Local | 100% on-device | Free | `ollama pull <model>` |
 | LM Studio | Local | 100% on-device | Free | Load model, start server |
+| Gemma local (WebGPU / Wasm) | Local | 100% on-device (one-time model download from the CDN) | Free | `alpaquitay-ai.localEngine.enabled: true` |
 | Anthropic Claude | Cloud | Direct API | API pricing | API key in keychain |
 | OpenAI GPT | Cloud | Direct API | API pricing | API key in keychain |
 
@@ -430,6 +461,8 @@ All Java projects follow **Clean Architecture** (Robert C. Martin) with strict d
 | `Alpaquitay AI: Generate from Spec` | — | AI generates code from a selected spec |
 | `Alpaquitay AI: Validate Against Spec` | — | Check implementation vs spec |
 | `Alpaquitay AI: Configure AI Provider` | — | Set API key or local endpoint |
+| `Alpaquitay AI: Generate Specification (Local Gemma)` | — | Write a spec with the on-device Gemma engine |
+| `Alpaquitay AI: Clear Local Model Cache` | — | Delete the model files cached in IndexedDB |
 
 > `Ctrl+Shift+A` shows a popup menu so it does not conflict with GitHub Copilot's agent menu, which uses the same shortcut when Alpaquitay is not installed.
 
@@ -449,6 +482,13 @@ All settings are configurable in VS Code's settings UI or `settings.json`. Provi
 | `alpaquitay-ai.ollama.endpoint` | `http://localhost:11434` | Ollama server address |
 | `alpaquitay-ai.ollama.model` | `codellama` | Ollama model name |
 | `alpaquitay-ai.lmstudio.endpoint` | `http://localhost:1234` | LM Studio server address |
+| `alpaquitay-ai.localEngine.enabled` | `false` | Allow the local Gemma engine as an AI provider (the spec command works either way) |
+| `alpaquitay-ai.localEngine.cdnBaseUrl` | `https://alpaquitay.specsolid.com` | Origin that serves `/models/` (https; user settings only) |
+| `alpaquitay-ai.localEngine.modelId` | `gemma-4-e2b-it` | Folder under `/models/` with `manifest.json` + `manifest.sig.json` (user settings only) |
+| `alpaquitay-ai.localEngine.dtype` | `auto` | Weight precision: `auto`, `q4`, `q4f16`, `q8`, `fp16`, `fp32` |
+| `alpaquitay-ai.localEngine.extraTrustedKeys` | `[]` | Extra Ed25519 public keys for a self-hosted mirror (user settings only) |
+| `alpaquitay-ai.localEngine.device` | `auto` | `auto`, `webgpu` or `wasm` |
+| `alpaquitay-ai.localEngine.maxNewTokens` | `1024` | Max new tokens per local generation |
 | `alpaquitay-ai.maxTokens` | `4096` | Default max tokens per request |
 | `alpaquitay-ai.temperature` | `0.3` | 0 = deterministic, 2 = creative |
 | `alpaquitay-ai.requestTimeout` | `120000` | Request timeout in ms |

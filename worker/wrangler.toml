@@ -1,0 +1,14 @@
+# Cloudflare Worker for alpaquitay.specsolid.com/models/*
+# Deploy:  npx wrangler deploy --config worker/wrangler.toml
+name = "alpaquitay-models-cdn"
+main = "worker.ts"
+compatibility_date = "2026-09-01"
+workers_dev = false
+
+routes = [
+  { pattern = "alpaquitay.specsolid.com/models/*", zone_name = "specsolid.com" }
+]
+
+[[r2_buckets]]
+binding = "MODELS"
+bucket_name = "alpaquitay-models"

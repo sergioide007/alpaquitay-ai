@@ -6,6 +6,8 @@ import { AnthropicProvider } from './AnthropicProvider';
 import { OpenAIProvider } from './OpenAIProvider';
 import { OllamaProvider } from './OllamaProvider';
 import { LMStudioProvider } from './LMStudioProvider';
+import { LocalGemmaProvider } from '../local/LocalGemmaProvider';
+import type { LocalEngineApi } from '../local/LocalEngineHost';
 import { ILLMIntegration, IObservabilityIntegration } from '../integrations/interfaces';
 import {
   isLocalAIProvider,
@@ -25,6 +27,8 @@ export class AIProviderManager {
   // ── Hybrid integration hooks ──────────────────────────────────────────────
   /** When set, LLM calls are routed through this integration instead of the core provider */
   private hybridLLM: ILLMIntegration | null = null;
+  /** Webview-backed Gemma engine; when set, the opt-in 'local-wasm' provider is registered. */
+  private localEngine: LocalEngineApi | null = null;
   /** When set, every LLM call is automatically traced */
   private tracer: IObservabilityIntegration | null = null;
 
@@ -40,6 +44,11 @@ export class AIProviderManager {
     this.hybridLLM = integration;
   }
 
+  /** Wire in the local Gemma engine (WebGPU/Wasm) */
+  setLocalEngine(engine: LocalEngineApi | null): void {
+    this.localEngine = engine;
+  }
+
   /** Wire in an observability tracer (LangSmith) */
   setTracer(integration: IObservabilityIntegration | null): void {
     this.tracer = integration;
@@ -52,6 +61,10 @@ export class AIProviderManager {
     const lmstudio = new LMStudioProvider(cfg.lmstudioEndpoint, cfg.requestTimeout);
     this.registerProvider(ollama, isLoopbackAIEndpoint(cfg.ollamaEndpoint) ? 'local' : 'cloud');
     this.registerProvider(lmstudio, isLoopbackAIEndpoint(cfg.lmstudioEndpoint) ? 'local' : 'cloud');
+
+    if (this.localEngine) {
+      this.registerProvider(new LocalGemmaProvider(this.localEngine, () => this.config.localEngine), 'local');
+    }
 
     const anthropicKey = await this.secrets.getApiKey('anthropic');
     if (anthropicKey) {
@@ -79,7 +92,7 @@ export class AIProviderManager {
       }
     }
 
-    const priority: ProviderType[] = ['ollama', 'lmstudio', 'anthropic', 'openai'];
+    const priority: ProviderType[] = ['ollama', 'lmstudio', 'local-wasm', 'anthropic', 'openai'];
     const checks = await Promise.all(
       priority.map(async (type) => {
         const provider = this.providers.get(type);

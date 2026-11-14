@@ -5,7 +5,7 @@ import {
   PrivacyReport,
 } from '../domains/orchestration/privacy/PrivacyGuard';
 
-const LOCAL_PROVIDER_TYPES = new Set<ProviderType>(['ollama', 'lmstudio']);
+const LOCAL_PROVIDER_TYPES = new Set<ProviderType>(['ollama', 'lmstudio', 'local-wasm']);
 
 export type SecretCategory =
   | 'credential'

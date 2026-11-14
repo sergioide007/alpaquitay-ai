@@ -8,6 +8,58 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.6.1] — 2026-10-24
+
+### Security — local engine hardening
+
+- **The CDN is now untrusted by design.** Model manifests are schema 2, **signed with Ed25519**, and list a **SHA-256 per 8 MiB block** of every file. The extension host verifies the signature (keys in `src/local/trustedKeys.ts` + optional user keys) and hands the Webview only the verified manifest. The Webview refuses any block that does not match, any file that is not listed, and (anti-rollback) any older signed manifest.
+- **ONNX Runtime pinned by hash.** `npm run build:engine` records the SHA-256 of the exact runtime files in the bundle; the Webview verifies them and gives ONNX Runtime `blob:` URLs. The Webview CSP no longer allows any remote script origin. (transformers.js would swallow a failed preload and import the runtime unverified from the CDN; we do not use that path.)
+- **No decompressor before the signature check.** The manifest is fetched with `node:https`, `Accept-Encoding: identity`, and any `Content-Encoding` is rejected at the header stage. Context: Node's `fetch()` advertises `br` and decodes it transparently, and the [Node.js 2026-10-21 security release](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases) fixed an out-of-bounds write in the Brotli decoder (CVE-2026-111497).
+- CDN hosts must be DNS names: IP literals in any spelling are rejected (the same release fixed three TLS bugs that only affect IP-literal hosts).
+- `localEngine.enabled`, `cdnBaseUrl`, `modelId` and `extraTrustedKeys` are `application`-scoped: a workspace cannot redirect downloads or inject keys.
+- Guards: model/file/manifest size caps, prompt length cap, storage-quota preflight, capability checks (WebGPU, RAM) **before** the download, one inference at a time with per-request cancel, `O_EXCL` file creation, Gemma 4 reasoning blocks stripped.
+- **Node.js security floor** (`scripts/node-security-floor.json`, `npm run check:node`) enforced in CI, publish, release and `verify-marketplace.js`. CI and publish ran on **Node 20 (end-of-life, no patch)**; they now use Node 22. CI also runs the unit tests and the engine/worker type-checks.
+
+### Added
+
+- `npm run cdn:keygen`, `cdn:sign`, `cdn:verify` (post-deployment check of the live CDN: signature, headers, MIME, `Range`, every block hash, runtime pins). An end-to-end test runs the stager, signer, Worker handler and consumers against a real local HTTP server.
+- `docs/LOCAL-ENGINE.md`: architecture, threat model, failure register, objections and honest answers, setup with a real model (Gemma 4 E2B text-only), operations, and what is not verified yet.
+- Settings `localEngine.dtype` and `localEngine.extraTrustedKeys`; default model `gemma-4-e2b-it`.
+
+### Changed
+
+- **Breaking for anyone who staged with 3.6.0:** manifests must be schema 2 and signed. Re-run `cdn:stage` and `cdn:sign`. Unsigned or old manifests are refused.
+- The model precision is no longer hard-coded: it comes from the manifest and the device (`q4f16` only with `shader-f16`). The system role is native or folded per model.
+
+### Fixed
+
+- Documentation claimed the first download was "hundreds of MB" and that large files "never sit in memory": the real Gemma 4 E2B text-only download is ≈3.1 GB and transformers.js reads each file fully into memory.
+- A healthy download served with `Content-Encoding` was rejected because `Content-Length` holds the encoded size.
+- `ReadableStream` stall in the block verifier when upstream pieces are smaller than a block.
+
+## [3.6.0] — 2026-10-08
+
+### Added — Local Gemma engine (WebGPU / Wasm, $0 backend)
+
+- New command **Generate Specification (Local Gemma)** (`alpaquitay-ai.generateSpecLocal`): writes `specs/<name>.md` in `spec.md` format using a Gemma ONNX model that runs entirely on your machine, with a cancellable progress notification. The first run shows the download size (from the CDN `manifest.json`) and asks for confirmation.
+- New opt-in provider **`local-wasm`** (`alpaquitay-ai.localEngine.enabled`). `auto` tries Ollama and LM Studio first, then this one. It is classified as local by the privacy boundary.
+- **`GemmaWasmEngine`** (`engine/`, bundled to `dist/engine-webview.js`): singleton on transformers.js + onnxruntime-web, WebGPU with automatic Wasm fallback. Runs in a Webview because the Node extension host has no WebGPU; its CSP only allows connections to the CDN origin.
+- **IndexedDB model cache**: 8 MB chunks served back as a lazy stream, incomplete downloads never served, per-model invalidation through the manifest `revision`, works offline once cached. New command **Clear Local Model Cache**.
+- **CDN Worker** (`worker/`, Cloudflare Worker + R2) for `alpaquitay.specsolid.com/models/*`: CORS allow-list (project domains and VS Code Webviews), COEP/CORP/COOP, strict MIME for `.wasm` / `.onnx` / `.json` (415 otherwise), `Range` (206 with `Content-Range`), `ETag` (304), immutable caching. The policy lives in `src/local/cdnPolicy.ts`, shared by Worker, Webview and tests.
+- `npm run cdn:stage` prepares the files to upload (ONNX Runtime of the exact bundled version + model + manifest). Deployment guide in `worker/README.md`.
+- New settings: `localEngine.enabled`, `localEngine.cdnBaseUrl` (application scope, https only), `localEngine.modelId`, `localEngine.device`, `localEngine.maxNewTokens`.
+- Documentation: README section, architecture diagram 11, PRIVACY.md 2.1.1 (the CDN sees standard request metadata when weights are downloaded; never prompts).
+
+### Changed
+
+- `vscode:prepublish` now also builds the Webview bundle (`npm run build:engine`). New dev dependencies: `esbuild`, `@huggingface/transformers` (bundled, not a runtime dependency), `@cloudflare/workers-types`, `fake-indexeddb`. The extension still has zero runtime dependencies.
+- `.npmrc` sets `ignore-scripts=true`: `onnxruntime-node` (a transitive dependency of transformers.js, unused here) downloads native binaries in its install script and would fail or slow down `npm ci`.
+- `scripts/verify-marketplace.js` checks the engine bundle, the new commands and settings, and the VSIX contents.
+
+### Fixed
+
+- The Hub's privacy indicator now reports `local-wasm` as local, and the model picker lists its model.
+
 ## [3.5.0] — 2026-09-20
 
 ### Added — Docs tab: an agent for Word, Markdown, EPUB, PDF and text

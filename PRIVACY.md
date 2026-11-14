@@ -1,7 +1,7 @@
 # Privacy Policy — Alpaquitay AI VS Code Extension
 
-**Last updated:** 2026-05-16  
-**Version:** 2.0.0
+**Last updated:** 2026-10-08  
+**Version:** 2.1.0
 
 ---
 
@@ -23,6 +23,13 @@ Alpaquitay AI is open-source software distributed under the MIT License. The ext
 - Sent **directly** from your machine to your configured AI provider (Anthropic, OpenAI, Ollama, etc.)
 - We never proxy, store, or log your code or prompts
 - Local providers (Ollama, LM Studio) keep everything 100% on-device
+
+### 2.1.1 Local Gemma engine (opt-in)
+- Prompts and answers are processed **inside a Webview on your machine** (WebGPU or WebAssembly) and are never sent to any server.
+- The only network traffic is `GET` requests for static files (model weights, tokenizer, ONNX Runtime, `manifest.json`) to `alpaquitay.specsolid.com` (or the CDN you set in `alpaquitay-ai.localEngine.cdnBaseUrl`). Like any web server, the CDN operator and its provider (Cloudflare) can see standard request metadata such as your IP address and user agent. No identifiers, prompts or file contents are included.
+- Downloaded files are cached in your Webview's IndexedDB. Use **Clear Local Model Cache** to remove them. The first download always asks for confirmation.
+- The Webview's Content-Security-Policy only allows connections to the configured CDN origin and loads no remote scripts.
+- The model manifest is signed (Ed25519) and every downloaded block is hash-checked against it; the manifest is fetched without any decompression.
 
 ### 2.2 API Keys
 - Stored exclusively in **VS Code SecretStorage** (OS-level encrypted keychain)

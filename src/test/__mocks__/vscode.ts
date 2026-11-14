@@ -69,6 +69,11 @@ export class Uri {
     toString: () => `file://${p}`
   }));
 
+  static joinPath = jest.fn((base: { fsPath: string }, ...parts: string[]) => {
+    const p = [base.fsPath, ...parts].join('/');
+    return { fsPath: p, scheme: 'file', toString: () => `file://${p}` };
+  });
+
   static parse = jest.fn((str: string) => ({
     fsPath: str,
     scheme: 'https',
@@ -96,6 +101,8 @@ export const window = {
     webview: {
       html: '',
       options: {},
+      cspSource: 'vscode-webview-resource:',
+      asWebviewUri: jest.fn((u: { toString(): string }) => ({ toString: () => `webview:${u.toString()}` })),
       onDidReceiveMessage: jest.fn(),
       postMessage: jest.fn().mockResolvedValue(true)
     },

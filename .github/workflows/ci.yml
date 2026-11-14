@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [22.x]
 
     steps:
       - uses: actions/checkout@v4
@@ -22,6 +22,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      - name: Node security floor (CVE-2026-111497 and friends)
+        run: npm run check:node
+
       - name: Install dependencies
         run: npm ci
 
@@ -30,6 +33,14 @@ jobs:
 
       - name: Compile TypeScript
         run: npm run compile
+
+      - name: Type-check the Webview engine and the CDN worker
+        run: |
+          npm run typecheck:engine
+          npm run typecheck:worker
+
+      - name: Unit tests
+        run: npm test
 
       - name: Package extension
         run: npx @vscode/vsce package --no-dependencies
