@@ -16,7 +16,7 @@ Thank you for your interest in contributing! 🎉
 
 ### 💡 Feature Requests
 
-1. Check [GitHub Discussions](https://github.com/sergioide007/alpaquitay-ai/discussions)
+1. Check existing [GitHub Issues](https://github.com/sergioide007/alpaquitay-ai/issues?q=label%3Aenhancement) for similar requests
 2. Create a new discussion with:
    - Use case description
    - Proposed solution

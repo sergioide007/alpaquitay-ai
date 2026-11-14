@@ -68,7 +68,7 @@ El README incluye:
 ## Próximos pasos sugeridos
 
 1. **Verificar GitHub Actions** — confirmar que el publish fue exitoso
-2. **Compartir en redes** — Twitter/X, LinkedIn, Reddit (r/vscode, r/programming)
+2. **Compartir en los canales propios** — LinkedIn, Medium, YouTube (@codigosinteticolibro, para lo relacionado con el libro) y Reddit (r/vscode, r/programming)
 3. **Crear GitHub Discussion** — anunciar el release
 4. **Responder issues** — engagement temprano para estrellas
 5. **Documentar casos de uso** — screenshots/gifs de proyectos reales

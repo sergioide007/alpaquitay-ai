@@ -46,6 +46,11 @@
     "diff-first"
   ],
   "license": "MIT",
+  "author": {
+    "name": "Sergio Perez Ruiz",
+    "email": "sergio@specsolid.com",
+    "url": "https://www.specsolid.com"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/sergioide007/alpaquitay-ai"

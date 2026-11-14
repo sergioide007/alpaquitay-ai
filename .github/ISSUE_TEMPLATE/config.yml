@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/sergioide007/alpaquitay-ai/blob/main/SECURITY.md
+    about: Please report vulnerabilities privately by email (sergio@specsolid.com), not as a public issue.
+  - name: Contact the author on LinkedIn
+    url: https://www.linkedin.com/in/sergioide007/
+    about: Collaborations, questions about the project, professional contact.

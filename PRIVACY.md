@@ -99,6 +99,8 @@ We will update this document and increment the extension version when the privac
 
 ## 10. Contact
 
-Open an issue at: https://github.com/sergioide007/alpaquitay-ai/issues
+Email **[sergio@specsolid.com](mailto:sergio@specsolid.com)** (alternative: [sergioide007@gmail.com](mailto:sergioide007@gmail.com)).
 
-For GDPR data requests, include "GDPR Request" in the issue title.
+For GDPR/CCPA data requests, write "GDPR Request" or "CCPA Request" in the subject. Please do not put personal data in a
+public GitHub issue; questions that contain no personal data can go to
+[GitHub Issues](https://github.com/sergioide007/alpaquitay-ai/issues).

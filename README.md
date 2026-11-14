@@ -17,7 +17,7 @@
 
 ## Contents
 
-[What is it](#what-is-alpaquitay-ai) · [Quick start](#quick-start) · [Harness](#the-harness-in-one-picture) · [Work tab (SDD)](#work-tab--spec-driven-development) · [Docs tab](#docs-tab--edit-word-markdown-epub-and-pdf-with-an-agent) · [Architecture](#architecture) · [Providers](#ai-providers) · [Skills](#skills) · [Memory](#hierarchical-memory) · [Domain agents](#domain-agent-architecture) · [Settings](#settings-reference) · [Contributing](#contributing) · [License](#license)
+[What is it](#what-is-alpaquitay-ai) · [Quick start](#quick-start) · [Harness](#the-harness-in-one-picture) · [Work tab (SDD)](#work-tab--spec-driven-development) · [Docs tab](#docs-tab--edit-word-markdown-epub-and-pdf-with-an-agent) · [Architecture](#architecture) · [Providers](#ai-providers) · [Skills](#skills) · [Memory](#hierarchical-memory) · [Domain agents](#domain-agent-architecture) · [Settings](#settings-reference) · [Contributing](#contributing) · [Contact](#author--contact) · [License](#license)
 
 ---
 
@@ -34,7 +34,7 @@ Alpaquitay AI turns VS Code into a complete **harness-driven development environ
 
 **100% open source · MIT license · Privacy-first** — your code and prompts go directly to your chosen AI provider. No Alpaquitay servers exist.
 
-**Website:** [specsolid.com](https://www.specsolid.com) · **Book:** [Código Sintético](https://codigosintetico.specsolid.com)
+**Website:** [specsolid.com](https://www.specsolid.com) · **Book:** [Código Sintético](https://codigosintetico.specsolid.com) (Spanish) · [*Synthetic Code*](https://info-codigo-sintetico.specsolid.com/en/) (English) · **Videos:** [YouTube @codigosinteticolibro](https://www.youtube.com/@codigosinteticolibro) (Spanish)
 
 ---
 
@@ -959,12 +959,20 @@ npm run compile && npm run lint && npm test
 Press `F5` in VS Code to launch the Extension Development Host. Diagram sources live in [`docs/diagrams/`](./docs/diagrams) (SVG for editing, PNG for the Marketplace README, plus the Python generators in `src/`).
 
 
-## Community
+## Author & contact
 
-- ⭐ [Star on GitHub](https://github.com/sergioide007/alpaquitay-ai/stargazers)
-- 🐦 [Follow on Twitter/X](https://twitter.com/specsolid)
-- 💬 [Discord](https://discord.gg/specsolid)
-- 📧 [Email](mailto:hello@specsolid.com)
+Built by **Sergio Perez Ruiz**, Senior Software Engineer and author of *Código Sintético* (Spanish) / *Synthetic Code* (English). The harness applies the ideas of the book; the YouTube channel explains them.
+
+| Channel | Use it for |
+|---|---|
+| Email: [sergio@specsolid.com](mailto:sergio@specsolid.com) · [sergioide007@gmail.com](mailto:sergioide007@gmail.com) | Direct contact, collaborations, privacy requests |
+| [LinkedIn](https://www.linkedin.com/in/sergioide007/) | Professional contact and project news |
+| [Medium](https://medium.com/@sergioide007) | Articles on SpecSolid and agentic software engineering |
+| [YouTube: @codigosinteticolibro](https://www.youtube.com/@codigosinteticolibro) | Videos about the book *Código Sintético* (in Spanish) |
+| [GitHub Issues](https://github.com/sergioide007/alpaquitay-ai/issues) | Bugs and feature requests |
+| [SECURITY.md](SECURITY.md) | Vulnerabilities: report them privately by email, not in a public issue |
+
+If Alpaquitay is useful to you, a ⭐ [star on GitHub](https://github.com/sergioide007/alpaquitay-ai/stargazers) helps others find it.
 
 ---
 
