@@ -9,5 +9,6 @@
  * refuses to certify a release in that state.
  */
 export const PROJECT_PUBLIC_KEYS: readonly string[] = [
-  // 'BASE64_RAW_ED25519_PUBLIC_KEY',
+  // keyId 0150d2f28282ca35 — project signing key, generated 2026-11-14.
+  'gR3JZlILGT1hqikFnIgGmQOkHkHvcLWDCpcNeEoF0rI=',
 ];
