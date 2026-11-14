@@ -1,12 +1,14 @@
-# Cloudflare Worker for alpaquitay.specsolid.com/models/*
+# Cloudflare Worker for alpaquitay.specsolid.com (serves only /models/*)
 # Deploy:  npx wrangler deploy --config worker/wrangler.toml
 name = "alpaquitay-models-cdn"
 main = "worker.ts"
 compatibility_date = "2026-09-01"
 workers_dev = false
 
+# Custom Domain: Cloudflare creates and manages the DNS record. The whole host belongs to this Worker;
+# every path outside /models/ answers 404 (src/local/cdnHandler.ts).
 routes = [
-  { pattern = "alpaquitay.specsolid.com/models/*", zone_name = "specsolid.com" }
+  { pattern = "alpaquitay.specsolid.com", custom_domain = true }
 ]
 
 [[r2_buckets]]
