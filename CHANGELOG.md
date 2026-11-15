@@ -35,6 +35,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Spec prompt for small models:** a short example in the request's language (detected: Spanish or English) instead of rules alone. That fixed one giant epic and English tasks for Spanish requests. Numbered epic headings are normalised to `## Epic:`, and a last task cut off by the token limit is dropped.
 - `scripts/onnx-external-data.py` moves a single-file model's weights to `.onnx_data` (a 1.26 GB single-file model failed its first run in the Webview). `scripts/onnx-last-token-logits.py` now looks through a final `Cast` (fp16 exports).
 - A WebGPU device error that ONNX Runtime surfaces only as "reading 'destroy'" is reported as GPU exhaustion, in plain words.
+- The command is now **Generate Specification (Local Model)** (was "Local Gemma"), and the provider is listed as "Modelo local", because the default model is no longer Gemma. The command id `alpaquitay-ai.generateSpecLocal` is unchanged, so keybindings keep working.
 
 ### Fixed
 

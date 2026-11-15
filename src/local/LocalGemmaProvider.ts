@@ -3,11 +3,11 @@ import type { LocalEngineApi } from './LocalEngineHost';
 import type { LocalEngineSettings } from './protocol';
 
 /**
- * On-device provider: Gemma ONNX running in WebGPU/Wasm inside a Webview.
+ * On-device provider: a small ONNX language model running in WebGPU/Wasm inside a Webview.
  * Weights are downloaded once from the static CDN; prompts and answers never leave the machine.
  */
 export class LocalGemmaProvider implements AIProvider {
-  readonly name = 'Gemma local (WebGPU/Wasm)';
+  readonly name = 'Modelo local (WebGPU/Wasm)';
   readonly type = 'local-wasm' as const;
   get modelName(): string { return this.settings().modelId; }
 

@@ -44,7 +44,7 @@ export class AIProviderManager {
     this.hybridLLM = integration;
   }
 
-  /** Wire in the local Gemma engine (WebGPU/Wasm) */
+  /** Wire in the local engine (WebGPU/Wasm) */
   setLocalEngine(engine: LocalEngineApi | null): void {
     this.localEngine = engine;
   }

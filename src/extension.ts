@@ -86,7 +86,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         { label: '$(file-add)           New Specification',          description: 'Create a new spec file', cmd: 'alpaquitay-ai.newSpecification' },
         { label: '$(sparkle)            Generate from Spec',         description: 'AI generates code from a spec file', cmd: 'alpaquitay-ai.generateFromSpec' },
         { label: '$(pass-filled)        Validate Against Spec',      description: 'Check code compliance with spec', cmd: 'alpaquitay-ai.validateAgainstSpec' },
-        { label: '$(chip)               Generate Spec (local Gemma)', description: 'WebGPU/Wasm on this machine, $0 backend', cmd: GENERATE_SPEC_LOCAL },
+        { label: '$(chip)               Generate Spec (local model)', description: 'WebGPU/Wasm on this machine, $0 backend', cmd: GENERATE_SPEC_LOCAL },
         { label: '$(settings-gear)      Configure AI Provider',      description: 'Set API keys or local models', cmd: 'alpaquitay-ai.configureProvider' },
         { label: '$(extensions)         GitHub Copilot Chat',        description: 'Open Copilot agent panel', cmd: 'workbench.action.chat.open' },
       ];

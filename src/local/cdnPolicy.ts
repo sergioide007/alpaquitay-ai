@@ -1,5 +1,5 @@
 /**
- * CDN contract for the local Gemma engine. Pure (no vscode, no DOM): shared by the
+ * CDN contract for the local engine. Pure (no vscode, no DOM): shared by the
  * extension host, the Webview engine and the Cloudflare Worker, so the three sides
  * can never drift apart on paths, MIME types or CORS rules.
  */

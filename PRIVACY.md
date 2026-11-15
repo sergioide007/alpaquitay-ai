@@ -24,7 +24,7 @@ Alpaquitay AI is open-source software distributed under the MIT License. The ext
 - We never proxy, store, or log your code or prompts
 - Local providers (Ollama, LM Studio) keep everything 100% on-device
 
-### 2.1.1 Local Gemma engine (opt-in)
+### 2.1.1 Local AI engine (opt-in)
 - Prompts and answers are processed **inside a Webview on your machine** (WebGPU or WebAssembly) and are never sent to any server.
 - The only network traffic is `GET` requests for static files (model weights, tokenizer, ONNX Runtime, `manifest.json`) to `alpaquitay.specsolid.com` (or the CDN you set in `alpaquitay-ai.localEngine.cdnBaseUrl`). Like any web server, the CDN operator and its provider (Cloudflare) can see standard request metadata such as your IP address and user agent. No identifiers, prompts or file contents are included.
 - Downloaded files are cached in your Webview's IndexedDB. Use **Clear Local Model Cache** to remove them. The first download always asks for confirmation.

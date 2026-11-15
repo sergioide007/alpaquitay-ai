@@ -1,4 +1,4 @@
-# Local Gemma engine — architecture, threat model and setup
+# Local AI engine — architecture, threat model and setup
 
 > Status: implemented and unit/e2e-tested at code level (Node + Jest). **Not yet exercised in a real VS Code with a real
 > model** — see [What is not verified yet](#8-what-is-not-verified-yet). Facts about third parties were checked on 2026-10-24
@@ -160,7 +160,7 @@ on long prompts.
 
 **First run in VS Code (F5), in this order:**
 1. (Optional) user settings: `"alpaquitay-ai.localEngine.enabled": true`. The command works either way.
-2. Run **Alpaquitay AI: Generate Specification (Local Gemma)** (the command keeps its name; the default model is Qwen2.5-Coder). Expect the tab "Alpaquitay · Motor local" to open and a modal showing ≈1.26 GB, apache-2.0 and "manifiesto firmado".
+2. Run **Alpaquitay AI: Generate Specification (Local Model)** (default model: Qwen2.5-Coder). Expect the tab "Alpaquitay · Motor local" to open and a modal showing ≈1.26 GB, apache-2.0 and "manifiesto firmado".
 3. Watch the progress notification. The second run must start with no download prompt (cache hit).
 4. If it reports that WebGPU is unavailable, read the reason in the message. "Renderizado por software" means VS Code's GPU
    process crashed earlier in the session and Chromium disabled the GPU for the **whole app**: close **every** VS Code window

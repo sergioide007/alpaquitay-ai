@@ -1,6 +1,6 @@
 # Alpaquitay AI
 
-> **Astra-style AI harness for VS Code — SDLC gates, DORA metrics, debt tracking, diff-first writes, specialist routing, a Docs agent for Word, Markdown, EPUB and PDF, and now an on-device Gemma engine (WebGPU / Wasm).**
+> **Astra-style AI harness for VS Code — SDLC gates, DORA metrics, debt tracking, diff-first writes, specialist routing, a Docs agent for Word, Markdown, EPUB and PDF, and now an on-device AI engine (WebGPU / Wasm).**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
@@ -17,7 +17,7 @@
 
 ## Contents
 
-[What is it](#what-is-alpaquitay-ai) · [Quick start](#quick-start) · [Harness](#the-harness-in-one-picture) · [Work tab (SDD)](#work-tab--spec-driven-development) · [Docs tab](#docs-tab--edit-word-markdown-epub-and-pdf-with-an-agent) · [Local Gemma](#local-gemma-engine--webgpu--wasm-on-your-machine) · [Architecture](#architecture) · [Providers](#ai-providers) · [Skills](#skills) · [Memory](#hierarchical-memory) · [Domain agents](#domain-agent-architecture) · [Settings](#settings-reference) · [Contributing](#contributing) · [Contact](#author--contact) · [License](#license)
+[What is it](#what-is-alpaquitay-ai) · [Quick start](#quick-start) · [Harness](#the-harness-in-one-picture) · [Work tab (SDD)](#work-tab--spec-driven-development) · [Docs tab](#docs-tab--edit-word-markdown-epub-and-pdf-with-an-agent) · [Local engine](#local-ai-engine--webgpu--wasm-on-your-machine) · [Architecture](#architecture) · [Providers](#ai-providers) · [Skills](#skills) · [Memory](#hierarchical-memory) · [Domain agents](#domain-agent-architecture) · [Settings](#settings-reference) · [Contributing](#contributing) · [Contact](#author--contact) · [License](#license)
 
 ---
 
@@ -265,13 +265,13 @@ Convert any document to **Markdown, Word or EPUB** from the same tab, so a manus
 
 ---
 
-## Local Gemma engine — WebGPU / Wasm on your machine
+## Local AI engine — WebGPU / Wasm on your machine
 
-Run a Gemma ONNX model **inside VS Code, on your own GPU**. Nothing is sent to a model server: the weights are static files from the project CDN (`alpaquitay.specsolid.com`), downloaded once and kept in IndexedDB. Inference cost on the backend side: **$0**.
+Run a small ONNX language model (default: Qwen2.5-Coder 1.5B Instruct) **inside VS Code, on your own GPU**. Nothing is sent to a model server: the weights are static files from the project CDN (`alpaquitay.specsolid.com`), downloaded once and kept in IndexedDB. Inference cost on the backend side: **$0**.
 
 <p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/11-local-gemma-engine.png" alt="Local engine: extension host, Webview with GemmaWasmEngine and IndexedDB cache, static CDN served by a Cloudflare Worker, local GPU"></p>
 
-**Try it:** run **`Alpaquitay AI: Generate Specification (Local Gemma)`** from the Command Palette (or the `Ctrl+Shift+A` menu). Select some text first, or describe the feature in the prompt box. The first run shows the **verified download size** and license and asks for confirmation; after that it works offline. The result is written to `specs/<name>.md` in the same `spec.md` format the Work tab reads (existing specs are never overwritten).
+**Try it:** run **`Alpaquitay AI: Generate Specification (Local Model)`** from the Command Palette (or the `Ctrl+Shift+A` menu). Select some text first, or describe the feature in the prompt box. The first run shows the **verified download size** and license and asks for confirmation; after that it works offline. The result is written to `specs/<name>.md` in the same `spec.md` format the Work tab reads (existing specs are never overwritten).
 
 **Be realistic about it:**
 
@@ -333,7 +333,7 @@ The canvas infers the real system from manifests, Docker Compose and `spec.md`, 
 |---|---|---|---|---|
 | Ollama | Local | 100% on-device | Free | `ollama pull <model>` |
 | LM Studio | Local | 100% on-device | Free | Load model, start server |
-| Gemma local (WebGPU / Wasm) | Local | 100% on-device (one-time model download from the CDN) | Free | `alpaquitay-ai.localEngine.enabled: true` |
+| Local model (WebGPU / Wasm) | Local | 100% on-device (one-time model download from the CDN) | Free | `alpaquitay-ai.localEngine.enabled: true` |
 | Anthropic Claude | Cloud | Direct API | API pricing | API key in keychain |
 | OpenAI GPT | Cloud | Direct API | API pricing | API key in keychain |
 
@@ -461,7 +461,7 @@ All Java projects follow **Clean Architecture** (Robert C. Martin) with strict d
 | `Alpaquitay AI: Generate from Spec` | — | AI generates code from a selected spec |
 | `Alpaquitay AI: Validate Against Spec` | — | Check implementation vs spec |
 | `Alpaquitay AI: Configure AI Provider` | — | Set API key or local endpoint |
-| `Alpaquitay AI: Generate Specification (Local Gemma)` | — | Write a spec with the on-device Gemma engine |
+| `Alpaquitay AI: Generate Specification (Local Model)` | — | Write a spec with the on-device model |
 | `Alpaquitay AI: Clear Local Model Cache` | — | Delete the model files cached in IndexedDB |
 
 > `Ctrl+Shift+A` shows a popup menu so it does not conflict with GitHub Copilot's agent menu, which uses the same shortcut when Alpaquitay is not installed.
@@ -482,7 +482,7 @@ All settings are configurable in VS Code's settings UI or `settings.json`. Provi
 | `alpaquitay-ai.ollama.endpoint` | `http://localhost:11434` | Ollama server address |
 | `alpaquitay-ai.ollama.model` | `codellama` | Ollama model name |
 | `alpaquitay-ai.lmstudio.endpoint` | `http://localhost:1234` | LM Studio server address |
-| `alpaquitay-ai.localEngine.enabled` | `false` | Allow the local Gemma engine as an AI provider (the spec command works either way) |
+| `alpaquitay-ai.localEngine.enabled` | `false` | Allow the local engine as an AI provider (the spec command works either way) |
 | `alpaquitay-ai.localEngine.cdnBaseUrl` | `https://alpaquitay.specsolid.com` | Origin that serves `/models/` (https; user settings only) |
 | `alpaquitay-ai.localEngine.modelId` | `qwen2.5-coder-1.5b-instruct` | Folder under `/models/` with `manifest.json` + `manifest.sig.json` (user settings only) |
 | `alpaquitay-ai.localEngine.dtype` | `auto` | Weight precision: `auto`, `q4`, `q4f16`, `q8`, `fp16`, `fp32` |

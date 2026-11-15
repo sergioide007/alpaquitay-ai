@@ -108,7 +108,7 @@
       },
       {
         "command": "alpaquitay-ai.generateSpecLocal",
-        "title": "Generate Specification (Local Gemma)",
+        "title": "Generate Specification (Local Model)",
         "category": "Alpaquitay AI",
         "icon": "$(chip)"
       },
@@ -139,7 +139,7 @@
             "OpenAI GPT",
             "Ollama (local, privado)",
             "LM Studio (local, privado)",
-            "Gemma local (WebGPU/Wasm, 100% en tu equipo)"
+            "Modelo local (WebGPU/Wasm, 100% en tu equipo)"
           ],
           "description": "Proveedor AI preferido. 'auto' selecciona modelos locales primero."
         },
@@ -244,7 +244,7 @@
         "alpaquitay-ai.localEngine.enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Permite usar Gemma local (WebGPU/Wasm) como proveedor AI. La primera ejecucion descarga el modelo desde la CDN y pide confirmacion. El comando \"Generate Specification (Local Gemma)\" funciona aunque esto este desactivado.",
+          "description": "Permite usar el modelo local (WebGPU/Wasm) como proveedor AI. La primera ejecucion descarga el modelo desde la CDN y pide confirmacion. El comando \"Generate Specification (Local Model)\" funciona aunque esto este desactivado.",
           "scope": "application"
         },
         "alpaquitay-ai.localEngine.cdnBaseUrl": {
