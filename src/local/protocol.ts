@@ -25,7 +25,7 @@ export type HostToEngine =
 
 export type EngineToHost =
   | { type: 'ready' }
-  | { type: 'probe-result'; id: string; webgpu: boolean; shaderF16: boolean; cached: boolean }
+  | { type: 'probe-result'; id: string; webgpu: boolean; shaderF16: boolean; cached: boolean; gpuReason?: string }
   | { type: 'progress'; id: string; stage: string; pct: number }
   | { type: 'done'; id: string; text: string; device: 'webgpu' | 'wasm'; newTokens: number }
   | { type: 'error'; id: string; message: string }

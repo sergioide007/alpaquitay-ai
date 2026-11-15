@@ -68,6 +68,10 @@ Brotli, so the Node version string is not the right indicator. Keep VS Code curr
 | Download dies half way | IndexedDB meta record is written last | partial data is never served; chunks removed | tested |
 | `Content-Encoding` makes `Content-Length` lie | cache ignores the header when encoded | a healthy download is not rejected | tested |
 | Model needs WebGPU, machine has none | capability check on the verified manifest | error **before** any download | tested |
+| No WebGPU and the model is > 512 MiB (manifest allows CPU) | `gpuRequired()`: size ceiling for single-thread Wasm | error before download/generation instead of hours at ~0.15 tok/s | tested |
+| VS Code fell back to software rendering (GPU process crashed) | WebGL renderer string in the Webview (`noWebGpuReason`) | the error says why and to restart VS Code completely | tested (policy); diagnosed on a real machine |
+| Stream hands over a whole file as one piece (`new Response(uint8Array)` in Chromium) | IndexedDB records capped at 8 MiB regardless of the stream | — (a single 859 MB record hung the Webview) | fixed and tested; verified in VS Code |
+| GPU out of memory in prefill on a big-vocabulary model | graph patched to last-token logits (`scripts/onnx-last-token-logits.py`); session dropped after a failed run | plain-language error; the next run reloads the model | fixed; verified in VS Code with a 760-char request |
 | Model declares more RAM than the machine has | `os.totalmem()` vs `minRamBytes` | error before download | tested |
 | Webview storage quota too small | `navigator.storage.estimate()` preflight; `QuotaExceededError` mapping | clear message; partial data removed | tested (policy); not on a real quota |
 | `q4f16` garbage on some GPUs/models ([onnxruntime#26732](https://github.com/microsoft/onnxruntime/issues/26732)) | `dtype=auto` uses q4f16 only with WebGPU + `shader-f16`; `localEngine.dtype` override | safe default | tested (policy) |
@@ -139,11 +143,25 @@ because the Gemma 4 model card describes native system-role support (earlier Gem
 1. (Optional) user settings: `"alpaquitay-ai.localEngine.enabled": true`. The command works either way.
 2. Run **Alpaquitay AI: Generate Specification (Local Gemma)**. Expect the tab "Alpaquitay · Motor local" to open and a modal showing ≈3.1 GB, Apache-2.0 and "manifiesto firmado".
 3. Watch the progress notification. The second run must start with no download prompt (cache hit).
-4. If it reports that WebGPU is unavailable, open **Developer: Open Webview Developer Tools** on the engine tab and check `navigator.gpu`; then see §8.
+4. If it reports that WebGPU is unavailable, read the reason in the message. "Renderizado por software" means VS Code's GPU
+   process crashed earlier in the session and Chromium disabled the GPU for the **whole app**: close **every** VS Code window
+   and start it again. Check with `code --status` → "GPU Status" (`webgpu: enabled` is required). Note that the Extension
+   Development Host (F5) runs inside the VS Code that launched it, so Chromium switches in `launch.json` `args` have no effect,
+   and `argv.json` only accepts a short allow-list of switches (none of them enable WebGPU).
 5. **Clear Local Model Cache** must free the space, and the next run must ask for confirmation again.
 
-Smaller models (for example Gemma 3 270M or 1B from `onnx-community`) go through the same pipeline with `--system-role fold` and
-**without** `--requires-webgpu`. Check their sizes first, and for 270M prefer `q4` over `q4f16` (the onnxruntime issue above).
+Smaller models (for example Gemma 3 270M or 1B from `onnx-community`) go through the same pipeline with `--system-role fold`.
+Check their sizes first, and for 270M prefer `q4` over `q4f16` (the onnxruntime issue above). Anything above 512 MiB is GPU-only
+in the extension whatever the manifest says (`CPU_MAX_MODEL_BYTES`); pass `--requires-webgpu` so the manifest says so too.
+
+**Before staging a big-vocabulary model** (Gemma 3: 262 144 tokens), patch its graph so it computes logits for the last
+position only. The onnx-community exports compute them for every prompt position, 1 MiB per prompt token, and a few hundred
+tokens exhaust an integrated GPU. Only the small `.onnx` file changes; the weights keep their hashes:
+
+```bash
+pip install onnx onnxruntime numpy
+python scripts/onnx-last-token-logits.py ./gemma-3-1b/onnx/model_q4.onnx --verify   # idempotent; refuses to write on mismatch
+```
 
 ## 7. Operations
 
@@ -160,7 +178,13 @@ Smaller models (for example Gemma 3 270M or 1B from `onnx-community`) go through
 These are the facts the code cannot establish without a real VS Code and a real GPU. Each has a runtime guard, but each needs one real check:
 
 1. **WebGPU in a VS Code Webview** (`navigator.gpu`, secure-context rules). Guarded: probe → clear error or Wasm fallback.
-   *First real run (2026-11-14, Windows 11, VS Code stable, Gemma 3 1B q4):* consent, signed download (839 MB), block verification and model load all worked; the Webview reported **no WebGPU adapter**, so the engine fell back to Wasm with one thread and the old 15-minute total timeout expired during generation. Fixed with the inactivity timeout and token-by-token progress (CHANGELOG 3.6.1). Same model and runtime measured in Chrome on the same laptop (ThinkPad P1 Gen 3, Intel UHD gen-9 + NVIDIA): **Wasm, 1 thread: 0.15 tok/s** (prefill 10.6 s, so CPU is not a usable path for this model); **WebGPU (Intel iGPU): 5.4 tok/s** (prefill 3.0 s). That run also showed that onnxruntime-web 1.31 needs the *asyncify* runtime for WebGPU (`webgpuInit`), not the *jsep* one the build pinned; fixed, and `build:engine` now refuses a mismatched variant. Still to establish: why VS Code exposes no adapter to the Webview while Chrome does (try the "Run Extension (WebGPU flag)" launch configuration; the engine tab now prints the reason).
+   *First real run (2026-11-14, Windows 11, VS Code stable, Gemma 3 1B q4):* consent, signed download (839 MB), block verification and model load all worked; the Webview reported **no WebGPU adapter**, so the engine fell back to Wasm with one thread and the old 15-minute total timeout expired during generation. Fixed with the inactivity timeout and token-by-token progress (CHANGELOG 3.6.1). Same model and runtime measured in Chrome on the same laptop (ThinkPad P1 Gen 3, Intel UHD gen-9 + NVIDIA): **Wasm, 1 thread: 0.15 tok/s** (prefill 10.6 s, so CPU is not a usable path for this model); **WebGPU (Intel iGPU): 5.4 tok/s** (prefill 3.0 s). That run also showed that onnxruntime-web 1.31 needs the *asyncify* runtime for WebGPU (`webgpuInit`), not the *jsep* one the build pinned; fixed, and `build:engine` now refuses a mismatched variant. *Resolved 2026-11-15:* VS Code **does** expose WebGPU to Webviews. An isolated VS Code 1.145.2 on the same laptop, with no
+   flags, gives the Webview the Intel gen-9 adapter with `shader-f16`. The instance used for the first run had been open for days
+   and its GPU process had crashed four times (`D3D11 ... Error allocating Texture2D`, `GL_OUT_OF_MEMORY`). After that, Chromium
+   switched the whole app to software rendering (`code --status`: `webgpu: disabled_off`), and the Extension Development Host
+   inherits that state. Fix: restart VS Code completely. A real run in VS Code then found two more defects, both fixed (see the
+   failure register): the IndexedDB single-record write and prefill OOM from full-sequence logits. **Measured in VS Code:
+   3.8–4.2 tok/s** on WebGPU with a 760-character request (gemma-3-1b-it q4, patched graph); first run about two minutes.
 2. **IndexedDB persistence of the Webview origin across restarts.** If it does not persist, the consent dialog reappears with the size (honest, but costly at 3 GB).
 3. **Minimum VS Code/Chromium version** that runs the bundled transformers.js and ONNX Runtime. Not established; do not publish a number until it is tested.
 4. **Memory:** a ~3 GB model in a Webview process. The quota preflight does not measure RAM.

@@ -2,7 +2,7 @@ import { pipeline, env, InterruptableStoppingCriteria, TextStreamer, type TextGe
 import { IdbModelCache } from '../src/local/webview/idbCache';
 import { loadVerifiedRuntime, type LoadedRuntime } from '../src/local/webview/runtimeLoader';
 import {
-  checkStorageBudget, chooseDevice, deviceLabel, foldSystemMessages, friendlyStorageError, pickDtype,
+  checkStorageBudget, chooseDevice, deviceLabel, foldSystemMessages, friendlyInferenceError, friendlyStorageError, gpuRequired, noWebGpuReason, pickDtype,
   ProgressAggregator, SerialQueue, stripThinking, TokenMeter,
 } from '../src/local/enginePolicy';
 import { createVerifyingFetch, type RuntimePins } from '../src/local/integrity';
@@ -37,20 +37,30 @@ export class GemmaWasmEngine {
   private constructor() {}
 
   /**
-   * `reason` says WHY there is no WebGPU, shown in the engine tab: "API ausente" means the host (VS Code/Electron)
-   * does not expose navigator.gpu at all; "sin adaptador" means the API exists but no GPU was granted.
-   * A second request with powerPreference "high-performance" can find a discrete GPU the default request skipped.
+   * `reason` says WHY there is no WebGPU (see noWebGpuReason): most often VS Code itself fell back to software
+   * rendering, which only a full restart fixes. A second request with powerPreference "high-performance" can
+   * find a discrete GPU the default request skipped.
    */
   static async gpuInfo(): Promise<{ webgpu: boolean; shaderF16: boolean; reason?: string }> {
     type Adapter = { features: { has(f: string): boolean } };
     try {
       const gpu = (navigator as unknown as { gpu?: { requestAdapter(o?: { powerPreference?: string }): Promise<Adapter | null> } }).gpu;
-      if (!gpu) { return { webgpu: false, shaderF16: false, reason: 'API navigator.gpu ausente' }; }
-      const adapter = (await gpu.requestAdapter()) ?? (await gpu.requestAdapter({ powerPreference: 'high-performance' }));
-      return adapter
-        ? { webgpu: true, shaderF16: adapter.features.has('shader-f16') }
-        : { webgpu: false, shaderF16: false, reason: 'sin adaptador GPU' };
+      const adapter = gpu ? ((await gpu.requestAdapter()) ?? (await gpu.requestAdapter({ powerPreference: 'high-performance' }))) : null;
+      if (adapter) { return { webgpu: true, shaderF16: adapter.features.has('shader-f16') }; }
+      return { webgpu: false, shaderF16: false, reason: noWebGpuReason({ hasApi: !!gpu, webglRenderer: GemmaWasmEngine.webglRenderer() }) };
     } catch (e) { return { webgpu: false, shaderF16: false, reason: `error: ${e instanceof Error ? e.message : String(e)}` }; }
+  }
+
+  /** The WebGL renderer string tells hardware (ANGLE/D3D11 on a real GPU) from Chromium's software fallback. */
+  private static webglRenderer(): string | null {
+    try {
+      const gl = document.createElement('canvas').getContext('webgl2') ?? document.createElement('canvas').getContext('webgl');
+      if (!gl) { return null; }
+      const ext = gl.getExtension('WEBGL_debug_renderer_info');
+      const r = gl.getParameter(ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER) as unknown;
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      return typeof r === 'string' ? r : null;
+    } catch { return null; }
   }
 
   private prefix(t: EngineTarget): string { return `${t.cdnBase}/models/${t.modelId}/`; }
@@ -87,8 +97,8 @@ export class GemmaWasmEngine {
 
     const gpu = await GemmaWasmEngine.gpuInfo();
     this.device = chooseDevice(t.device, gpu.webgpu);
-    if (t.manifest.runtime.requiresWebGpu && this.device !== 'webgpu') {
-      throw new Error('Este modelo requiere WebGPU y no esta disponible aqui: en Wasm (CPU, un solo hilo) seria inutilizable de lento.');
+    if (this.device !== 'webgpu' && gpuRequired({ requiresWebGpu: t.manifest.runtime.requiresWebGpu, totalBytes: totalBytes(t.manifest) })) {
+      throw new Error(`Este modelo requiere WebGPU: en Wasm (CPU, un solo hilo) seria inutilizable de lento.${gpu.reason ? ` Motivo: ${gpu.reason}` : ''}`);
     }
     const dtype = pickDtype(t.manifest.runtime.dtypes, this.device, gpu.shaderF16, t.dtype);
 
@@ -123,18 +133,34 @@ export class GemmaWasmEngine {
     }
 
     const agg = new ProgressAggregator();
-    const generator = await pipeline('text-generation', t.modelId, {
-      device: this.device,
-      dtype,
-      progress_callback: (e: { status: string; file?: string; loaded?: number; total?: number }) => {
-        if (e.status === 'progress' && e.file && e.total) {
-          const pct = agg.update(e.file, e.loaded ?? 0, e.total);
-          onProgress?.(`Descargando ${e.file.split('/').pop()}`, Math.max(3, Math.min(95, pct)));
-        } else if (e.status === 'ready') {
-          onProgress?.(`Modelo listo (${this.device}, ${dtype})${gpu.reason ? ` — WebGPU: ${gpu.reason}` : ''}`, 96);
-        }
-      },
-    });
+    // Storing ~1 GB in IndexedDB happens after the download, with no transformers.js progress: report it from the
+    // cache itself so the host's inactivity timer sees the engine working.
+    let lastStore = 0;
+    this.cache.onStore = (key, loaded, total) => {
+      const now = Date.now();
+      if (now - lastStore < 1000 && loaded < total) { return; }
+      lastStore = now;
+      onProgress?.(`Guardando en la cache local ${key.split('/').pop()} (${Math.round((100 * loaded) / Math.max(1, total))}%)`, 95);
+    };
+    let generator: unknown;
+    try {
+      generator = await pipeline('text-generation', t.modelId, {
+        device: this.device,
+        dtype,
+        progress_callback: (e: { status: string; file?: string; loaded?: number; total?: number }) => {
+          if (e.status === 'progress' && e.file && e.total) {
+            const pct = agg.update(e.file, e.loaded ?? 0, e.total);
+            onProgress?.(`Descargando ${e.file.split('/').pop()}`, Math.max(3, Math.min(95, pct)));
+          } else if (e.status === 'done' && e.file?.includes('onnx')) {
+            onProgress?.(`Cargando el modelo en ${deviceLabel(this.device, self.crossOriginIsolated)} (${e.file.split('/').pop()})`, 95);
+          } else if (e.status === 'ready') {
+            onProgress?.(`Modelo listo (${this.device}, ${dtype})${gpu.reason ? ` — WebGPU: ${gpu.reason}` : ''}`, 96);
+          }
+        },
+      });
+    } finally {
+      this.cache.onStore = undefined;
+    }
     this.gen = generator as TextGenerationPipeline;
     await this.cache.put(this.marker(t), new Response(t.manifest.revision, { headers: { 'Content-Type': 'text/plain' } }));
   }
@@ -166,27 +192,43 @@ export class GemmaWasmEngine {
       const meter = new TokenMeter(opts.maxNewTokens);
       const streamer = new TextStreamer(this.gen!.tokenizer, {
         skip_prompt: true,
+        callback_function: () => { /* default prints every token to the console; the text is returned at the end */ },
         token_callback_function: () => {
           const tick = meter.tick(performance.now());
           if (tick) { onProgress?.(`Generando (${where}) · ${tick.tokens}/${opts.maxNewTokens} tokens · ${tick.rate} tok/s`, tick.pct); }
         },
       });
-      const out = await this.gen!(prompt, {
-        max_new_tokens: opts.maxNewTokens,
-        do_sample: sampling,
-        ...(sampling ? { temperature: opts.temperature, ...(s?.topP !== undefined ? { top_p: s.topP } : {}), ...(s?.topK !== undefined ? { top_k: s.topK } : {}) } : {}),
-        stopping_criteria: this.stopper,
-        streamer,
-      }) as Array<{ generated_text: Array<{ role: string; content: string }> }>;
+      let out: Array<{ generated_text: Array<{ role: string; content: string }> }>;
+      try {
+        out = await this.gen!(prompt, {
+          max_new_tokens: opts.maxNewTokens,
+          do_sample: sampling,
+          ...(sampling ? { temperature: opts.temperature, ...(s?.topP !== undefined ? { top_p: s.topP } : {}), ...(s?.topK !== undefined ? { top_k: s.topK } : {}) } : {}),
+          stopping_criteria: this.stopper,
+          streamer,
+        }) as typeof out;
+      } catch (err) {
+        // A failed OrtRun (GPU out of memory, device lost, Wasm trap) leaves the session unusable: the next run
+        // hit "unaligned accesses" / "memory access out of bounds". Drop it so the next request reloads from cache.
+        await this.discardModel();
+        throw friendlyInferenceError(err);
+      }
       const reply = stripThinking(out[0]?.generated_text?.at(-1)?.content ?? '');
       return { text: reply, newTokens: meter.tokens || Math.max(1, Math.round(reply.length / 4)) };
     });
   }
 
-  async clearCache(): Promise<{ files: number; bytes: number }> {
+  /** Releases the ONNX sessions (and their GPU buffers); the next request loads the model again from the cache. */
+  private async discardModel(): Promise<void> {
+    const gen = this.gen as unknown as { dispose?: () => Promise<void> } | undefined;
     this.gen = undefined;
     this.loadedKey = undefined;
     this.loading = undefined;
+    await gen?.dispose?.().catch(() => undefined);
+  }
+
+  async clearCache(): Promise<{ files: number; bytes: number }> {
+    await this.discardModel();
     this.runtime?.dispose();
     this.runtime = undefined;
     return this.cache.clear();

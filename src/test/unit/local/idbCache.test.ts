@@ -88,4 +88,36 @@ describe('IdbModelCache', () => {
     await cache.put('p', fileResponse(pattern(3 * 1024 * 1024)), (p) => seen.push(Math.round(p.progress)));
     expect(seen.at(-1)).toBe(100);
   });
+
+  // Chromium hands `new Response(uint8Array)` over as ONE piece, and that is how transformers.js stores a model
+  // after downloading it: a single 859 MB IndexedDB record hung the Webview in a real VS Code run.
+  it('splits a body delivered as one huge piece into records of at most CHUNK_BYTES', async () => {
+    const data = pattern(CHUNK_BYTES * 3 + 4321);
+    const onePiece = new Response(new ReadableStream<Uint8Array>({ start(c) { c.enqueue(data); c.close(); } }),
+      { headers: { 'Content-Length': String(data.length) } });
+    const factory = new IDBFactory();
+    const c2 = new IdbModelCache(factory);
+    await c2.put('big', onePiece);
+
+    const db = await new Promise<IDBDatabase>((res, rej) => { const o = factory.open('alpaquitay-models', 1); o.onsuccess = () => res(o.result); o.onerror = () => rej(o.error); });
+    const records = await new Promise<ArrayBuffer[]>((res, rej) => {
+      const r = db.transaction('chunks', 'readonly').objectStore('chunks').getAll();
+      r.onsuccess = () => res(r.result as ArrayBuffer[]); r.onerror = () => rej(r.error);
+    });
+    db.close();
+    expect(records).toHaveLength(4);
+    expect(Math.max(...records.map(b => b.byteLength))).toBe(CHUNK_BYTES);
+    const back = new Uint8Array(await (await c2.match('big'))!.arrayBuffer());
+    expect(Buffer.compare(Buffer.from(back), Buffer.from(data))).toBe(0);
+  });
+
+  it('reports storage progress through onStore even when put() gets no callback (transformers.js case)', async () => {
+    const seen: Array<[string, number, number]> = [];
+    cache.onStore = (key, loaded, total) => seen.push([key, loaded, total]);
+    const data = pattern(CHUNK_BYTES * 2 + 10);
+    await cache.put('k', new Response(new ReadableStream<Uint8Array>({ start(c) { c.enqueue(data); c.close(); } }), { headers: { 'Content-Length': String(data.length) } }));
+    expect(seen.length).toBeGreaterThanOrEqual(3);                     // one per full chunk, plus the tail
+    expect(seen[0]).toEqual(['k', CHUNK_BYTES, data.length]);
+    expect(seen.at(-1)).toEqual(['k', data.length, data.length]);
+  });
 });

@@ -12,6 +12,34 @@ export function chooseDevice(requested: 'auto' | 'webgpu' | 'wasm', hasWebGpuAda
 }
 
 /**
+ * Above this size a model is GPU-only, whatever its manifest says. Measured on an i7-10850H: gemma-3-1b-it q4
+ * (839 MB) runs at 0.15 tok/s on single-thread Wasm (hours per spec) versus 5.4 tok/s on the Intel iGPU.
+ */
+export const CPU_MAX_MODEL_BYTES = 512 * 1024 ** 2;
+
+/** True when running this model without WebGPU would be unusably slow: refuse up front instead of grinding for hours. */
+export function gpuRequired(m: { requiresWebGpu: boolean; totalBytes: number }): boolean {
+  return m.requiresWebGpu || m.totalBytes > CPU_MAX_MODEL_BYTES;
+}
+
+/** Renderer strings Chromium reports when it has fallen back to software rendering (no GPU process / GPU blocked). */
+const SOFTWARE_RENDERER = /swiftshader|basic render driver|llvmpipe|software/i;
+
+/**
+ * Why WebGPU is missing, phrased for the user. The common case in VS Code is not the extension: after its GPU
+ * process crashes a few times (e.g. D3D11 out-of-memory), Chromium drops the WHOLE app to software rendering
+ * until VS Code is fully restarted, and every Webview then gets `requestAdapter() === null`.
+ */
+export function noWebGpuReason(info: { hasApi: boolean; webglRenderer: string | null }): string {
+  if (!info.hasApi) { return 'este VS Code no expone la API navigator.gpu (actualiza VS Code).'; }
+  if (!info.webglRenderer || SOFTWARE_RENDERER.test(info.webglRenderer)) {
+    return 'VS Code esta en renderizado por software (su proceso GPU fallo o la aceleracion por hardware esta desactivada). '
+      + 'Cierra TODAS las ventanas de VS Code y vuelve a abrirlo; "code --status" muestra el estado en "GPU Status".';
+  }
+  return `la GPU (${info.webglRenderer}) no concede un adaptador WebGPU (controlador o lista de bloqueo de Chromium); actualiza el controlador de video.`;
+}
+
+/**
  * ONNX Runtime files the engine needs from the CDN. WebGPU needs the *asyncify* build (native WebGPU EP,
  * exports webgpuInit; the old JSEP build fails with "webgpuInit is not a function"); plain Wasm uses the base build. The folder is the exact onnxruntime-web version bundled in
  * the Webview, so runtime and glue code can never mismatch.
@@ -137,6 +165,22 @@ export function friendlyStorageError(err: unknown): Error {
     return new Error('Se agoto el espacio de la cache del Webview mientras se guardaba el modelo. Libera disco y reintenta; la descarga parcial se elimino.');
   }
   return err instanceof Error ? err : new Error(String(err));
+}
+
+const GPU_MEMORY_ERROR = /CreateCommittedResource|OutOfMemory|out of memory|\bOOM\b|device (was )?lost|Device removed/i;
+
+/**
+ * ONNX Runtime surfaces GPU exhaustion as a long C++ trace ("failed to call OrtRun() ... buffer_manager.cc").
+ * Say what happened and what to do; keep the first line of the original for support.
+ */
+export function friendlyInferenceError(err: unknown): Error {
+  const raw = err instanceof Error ? err.message : String(err);
+  if (GPU_MEMORY_ERROR.test(raw) || /OrtRun\(\)/.test(raw)) {
+    const detail = raw.split('\n')[0].slice(0, 160);
+    return new Error('La GPU se quedo sin memoria o fallo durante la generacion. Se libero el modelo: vuelve a intentarlo '
+      + `con un texto mas corto o cerrando aplicaciones que usen la GPU. (Detalle: ${detail})`);
+  }
+  return err instanceof Error ? err : new Error(raw);
 }
 
 /** Human label for where inference runs; shown in progress so a slow CPU run is not mistaken for a hang. */

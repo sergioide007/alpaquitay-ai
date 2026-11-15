@@ -114,6 +114,17 @@ describe('LocalEngineHost', () => {
     expect(srv.calls).toHaveLength(2);                                   // manifest cached for 5 minutes: no refetch
   });
 
+  it('probe passes on why WebGPU is missing, capped in length', async () => {
+    const fake = installPanel();
+    const { host } = makeHost();
+    const a = host.probe(S);
+    await flush(); fake.emit({ type: 'ready' }); await flush();
+    fake.emit({ type: 'probe-result', id: (fake.sent[0] as { id: string }).id, webgpu: false, shaderF16: false, cached: false, gpuReason: 'x'.repeat(1000) });
+    const r = await a;
+    expect(r.webgpu).toBe(false);
+    expect(r.gpuReason).toHaveLength(400);
+  });
+
   it('REFUSES an untrusted manifest and never opens the Webview', async () => {
     const { host } = makeHost({ trusted: false });
     await expect(host.generate(S, { messages: [{ role: 'user', content: 'x' }] })).rejects.toThrow(/no confiable/);

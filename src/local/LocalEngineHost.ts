@@ -23,7 +23,7 @@ export interface GenerateInput {
 export interface GenerateResult { text: string; device: 'webgpu' | 'wasm'; newTokens: number }
 
 /** What the rest of the extension depends on; lets tests replace the Webview. */
-export interface ProbeResult { webgpu: boolean; shaderF16: boolean; cached: boolean; manifest: ManifestSummary }
+export interface ProbeResult { webgpu: boolean; shaderF16: boolean; cached: boolean; manifest: ManifestSummary; gpuReason?: string }
 
 export interface LocalEngineApi {
   probe(s: LocalEngineSettings): Promise<ProbeResult>;
@@ -181,7 +181,9 @@ export class LocalEngineHost implements LocalEngineApi, vscode.Disposable {
     const { manifest, summary } = await this.manifestFor(s);
     const r = await this.request<Extract<EngineToHost, { type: 'probe-result' }>>(
       s.cdnBase, id => ({ type: 'probe', id, cdnBase: s.cdnBase, modelId: s.modelId, device: s.device, dtype: s.dtype, manifest }), 'probe-result', { timeoutMs: 30_000 });
-    return { webgpu: r.webgpu, shaderF16: r.shaderF16, cached: r.cached, manifest: summary };
+    // The reason is shown to the user verbatim: keep only a short string from the Webview.
+    const gpuReason = typeof r.gpuReason === 'string' && r.gpuReason ? r.gpuReason.slice(0, 400) : undefined;
+    return { webgpu: r.webgpu, shaderF16: r.shaderF16, cached: r.cached, manifest: summary, ...(gpuReason ? { gpuReason } : {}) };
   }
 
   async generate(settings: LocalEngineSettings, input: GenerateInput, onProgress?: ProgressCallback, token?: vscode.CancellationToken): Promise<GenerateResult> {

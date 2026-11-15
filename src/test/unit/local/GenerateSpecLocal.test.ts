@@ -49,10 +49,20 @@ describe('GenerateSpecLocal helpers', () => {
 });
 
 describe('capabilityProblem (refuse BEFORE the download)', () => {
+  const small = { totalBytes: 300 * 1024 ** 2 };
   it('blocks a WebGPU-only model on a machine without WebGPU', () => {
-    expect(capabilityProblem(summary({ requiresWebGpu: true }), { webgpu: false })).toMatch(/requiere WebGPU/);
-    expect(capabilityProblem(summary({ requiresWebGpu: true }), { webgpu: true })).toBeUndefined();
-    expect(capabilityProblem(summary({ requiresWebGpu: false }), { webgpu: false })).toBeUndefined();
+    expect(capabilityProblem(summary({ ...small, requiresWebGpu: true }), { webgpu: false })).toMatch(/necesita WebGPU/);
+    expect(capabilityProblem(summary({ ...small, requiresWebGpu: true }), { webgpu: true })).toBeUndefined();
+    expect(capabilityProblem(summary({ ...small, requiresWebGpu: false }), { webgpu: false })).toBeUndefined();
+  });
+  it('blocks a model too big for single-thread Wasm even when its manifest allows CPU (gemma-3-1b-it: 839 MB)', () => {
+    const big = summary({ requiresWebGpu: false, totalBytes: 879_436_000 });
+    expect(capabilityProblem(big, { webgpu: false })).toMatch(/necesita WebGPU/);
+    expect(capabilityProblem(big, { webgpu: true })).toBeUndefined();
+  });
+  it('tells the user why WebGPU is missing', () => {
+    const msg = capabilityProblem(summary(), { webgpu: false, gpuReason: 'VS Code esta en renderizado por software' });
+    expect(msg).toContain('Motivo: VS Code esta en renderizado por software');
   });
   it('blocks when RAM is below what the model declares', () => {
     expect(capabilityProblem(summary({ minRamBytes: 8 * 1024 ** 3 }), { webgpu: true }, 4 * 1024 ** 3)).toMatch(/al menos 8\.00 GB.*4\.00 GB/);
@@ -120,17 +130,27 @@ describe('alpaquitay-ai.generateSpecLocal command', () => {
     expect((vscode.window.showInformationMessage as jest.Mock).mock.calls[0][1].detail).toContain('ultima copia verificada');
   });
 
-  it('downloads after the user accepts', async () => {
-    engine.probe.mockResolvedValue({ webgpu: false, shaderF16: false, cached: false, manifest: summary() });
+  it('downloads after the user accepts (a model small enough for the CPU, with the CPU notice)', async () => {
+    engine.probe.mockResolvedValue({ webgpu: false, shaderF16: false, cached: false, manifest: summary({ totalBytes: 300 * 1024 ** 2 }) });
     (vscode.window.showInformationMessage as jest.Mock).mockResolvedValueOnce('Descargar y generar');
     await handlers[GENERATE_SPEC_LOCAL]();
+    expect((vscode.window.showInformationMessage as jest.Mock).mock.calls[0][1].detail).toContain('Sin WebGPU');
     expect(engine.generate).toHaveBeenCalledTimes(1);
+  });
+
+  it('refuses a model too big for the CPU when WebGPU is missing, and passes on the reason', async () => {
+    engine.probe.mockResolvedValue({ webgpu: false, shaderF16: false, cached: true, manifest: summary(), gpuReason: 'VS Code esta en renderizado por software' });
+    await handlers[GENERATE_SPEC_LOCAL]();
+    const msg = (vscode.window.showErrorMessage as jest.Mock).mock.calls[0][0] as string;
+    expect(msg).toContain('necesita WebGPU');
+    expect(msg).toContain('renderizado por software');
+    expect(engine.generate).not.toHaveBeenCalled();
   });
 
   it('refuses a WebGPU-only model on a machine without WebGPU BEFORE asking to download gigabytes', async () => {
     engine.probe.mockResolvedValue({ webgpu: false, shaderF16: false, cached: false, manifest: summary({ requiresWebGpu: true }) });
     await handlers[GENERATE_SPEC_LOCAL]();
-    expect((vscode.window.showErrorMessage as jest.Mock).mock.calls[0][0]).toContain('requiere WebGPU');
+    expect((vscode.window.showErrorMessage as jest.Mock).mock.calls[0][0]).toContain('necesita WebGPU');
     expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();   // no download dialog
     expect(engine.generate).not.toHaveBeenCalled();
   });

@@ -18,7 +18,7 @@ async function handle(msg: HostToEngine): Promise<void> {
     switch (msg.type) {
       case 'probe': {
         const [gpu, cached] = await Promise.all([GemmaWasmEngine.gpuInfo(), engine.isModelCached(msg)]);
-        vscode.postMessage({ type: 'probe-result', id: msg.id, webgpu: gpu.webgpu, shaderF16: gpu.shaderF16, cached });
+        vscode.postMessage({ type: 'probe-result', id: msg.id, webgpu: gpu.webgpu, shaderF16: gpu.shaderF16, cached, ...(gpu.reason ? { gpuReason: gpu.reason } : {}) });
         return;
       }
       case 'generate': {

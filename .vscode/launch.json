@@ -14,19 +14,6 @@
       "preLaunchTask": "npm: compile"
     },
     {
-      "name": "Run Extension (WebGPU flag)",
-      "type": "extensionHost",
-      "request": "launch",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}",
-        "--enable-unsafe-webgpu"
-      ],
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
-      "preLaunchTask": "npm: compile"
-    },
-    {
       "name": "Run Extension (No Compile)",
       "type": "extensionHost",
       "request": "launch",

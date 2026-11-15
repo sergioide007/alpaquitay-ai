@@ -1,6 +1,48 @@
-import { chooseDevice, foldSystemMessages, ProgressAggregator, runtimeFiles } from '../../../local/enginePolicy';
+import { chooseDevice, CPU_MAX_MODEL_BYTES, foldSystemMessages, friendlyInferenceError, gpuRequired, noWebGpuReason, ProgressAggregator, runtimeFiles } from '../../../local/enginePolicy';
 
 describe('enginePolicy', () => {
+  describe('gpuRequired (fail fast instead of hours on single-thread Wasm)', () => {
+    it('honours the manifest flag', () => {
+      expect(gpuRequired({ requiresWebGpu: true, totalBytes: 1 })).toBe(true);
+    });
+    it('treats any model above the CPU ceiling as GPU-only', () => {
+      expect(gpuRequired({ requiresWebGpu: false, totalBytes: CPU_MAX_MODEL_BYTES })).toBe(false);
+      expect(gpuRequired({ requiresWebGpu: false, totalBytes: CPU_MAX_MODEL_BYTES + 1 })).toBe(true);
+      expect(gpuRequired({ requiresWebGpu: false, totalBytes: 879_436_000 })).toBe(true);   // gemma-3-1b-it q4
+    });
+  });
+
+  describe('friendlyInferenceError', () => {
+    it('turns an ONNX Runtime GPU out-of-memory trace into advice, keeping the first line', () => {
+      const raw = 'failed to call OrtRun(). ERROR_CODE: 1, ERROR_MESSAGE: /onnxruntime/core/providers/webgpu/buffer_manager.cc:643 void Download\nID3D12Device::CreateCommittedResource';
+      const e = friendlyInferenceError(new Error(raw));
+      expect(e.message).toMatch(/sin memoria.*texto mas corto/);
+      expect(e.message).toContain('failed to call OrtRun()');
+      expect(e.message).not.toContain('CreateCommittedResource');            // only the first line is kept
+    });
+    it('leaves unrelated errors alone (no false positive on words like "room")', () => {
+      const original = new Error('No room for this booking');
+      expect(friendlyInferenceError(original)).toBe(original);
+      expect(friendlyInferenceError('plain string').message).toBe('plain string');
+    });
+  });
+
+  describe('noWebGpuReason', () => {
+    it('detects the API missing altogether', () => {
+      expect(noWebGpuReason({ hasApi: false, webglRenderer: null })).toMatch(/navigator\.gpu/);
+    });
+    it('detects VS Code running on software rendering and says to restart it', () => {
+      for (const r of [null, 'ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero)), SwiftShader driver)', 'ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11)']) {
+        expect(noWebGpuReason({ hasApi: true, webglRenderer: r })).toMatch(/renderizado por software.*Cierra TODAS las ventanas/);
+      }
+    });
+    it('names the hardware GPU when it renders WebGL but grants no WebGPU adapter', () => {
+      const r = noWebGpuReason({ hasApi: true, webglRenderer: 'ANGLE (Intel, Intel(R) UHD Graphics (0x00009BC4) Direct3D11 vs_5_0 ps_5_0, D3D11)' });
+      expect(r).toContain('Intel(R) UHD Graphics');
+      expect(r).toMatch(/controlador/);
+    });
+  });
+
   describe('chooseDevice', () => {
     it('auto prefers WebGPU only with a real adapter', () => {
       expect(chooseDevice('auto', true)).toBe('webgpu');

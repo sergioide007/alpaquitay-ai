@@ -32,6 +32,12 @@ const chunkKey = (key: string, i: number) => `${key}\u0000${String(i).padStart(6
 export class IdbModelCache {
   private dbPromise?: Promise<IDBDatabase>;
 
+  /**
+   * Called as each chunk is written, whoever called put(). transformers.js stores a downloaded model WITHOUT a
+   * progress callback, and writing ~1 GB takes a while: the engine uses this to keep reporting progress.
+   */
+  onStore?: (key: string, loaded: number, total: number) => void;
+
   constructor(private readonly factory: IDBFactory = indexedDB) {}
 
   private db(): Promise<IDBDatabase> {
@@ -95,19 +101,33 @@ export class IdbModelCache {
       await done(t);
     };
 
+    const report = () => {
+      const p = { progress: total ? (size / total) * 100 : 0, loaded: size, total: total || size };
+      progress?.(p);
+      this.onStore?.(key, p.loaded, p.total);
+    };
+    // A stream may hand over the whole file as ONE piece: Chromium does so for `new Response(uint8Array)`,
+    // which is exactly how transformers.js stores a model after downloading it. Never let a record grow past
+    // CHUNK_BYTES: one 859 MB IndexedDB value (plus its copy) hung the Webview for good.
+    const append = async (value: Uint8Array) => {
+      for (let off = 0; off < value.length;) {
+        const take = Math.min(CHUNK_BYTES - pendingBytes, value.length - off);
+        pending.push(value.subarray(off, off + take)); pendingBytes += take; size += take; off += take;
+        if (pendingBytes === CHUNK_BYTES) { await flush(); report(); }
+      }
+    };
+
     try {
       if (response.body) {
         const reader = response.body.getReader();
         for (;;) {
           const { done: end, value } = await reader.read();
           if (end) { break; }
-          pending.push(value); pendingBytes += value.length; size += value.length;
-          if (pendingBytes >= CHUNK_BYTES) { await flush(); }
-          progress?.({ progress: total ? (size / total) * 100 : 0, loaded: size, total: total || size });
+          await append(value);
+          report();
         }
       } else {
-        const whole = new Uint8Array(await response.arrayBuffer());
-        pending.push(whole); pendingBytes = size = whole.length;
+        await append(new Uint8Array(await response.arrayBuffer()));
       }
       await flush();
       if (strictLength && size !== total) { throw new Error(`Descarga incompleta de ${key}: ${size} de ${total} bytes`); }

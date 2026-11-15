@@ -3,7 +3,7 @@ import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
 import { formatBytes, type ManifestSummary } from './cdnPolicy';
-import { assertPromptSize, stripThinking } from './enginePolicy';
+import { assertPromptSize, gpuRequired, stripThinking } from './enginePolicy';
 import type { LocalEngineApi, ProbeResult } from './LocalEngineHost';
 import type { EngineMessage, LocalEngineSettings } from './protocol';
 import { friendlyFsError, isUsableRoot } from '../core/WorkspaceRoot';
@@ -54,12 +54,13 @@ export function titleOf(markdown: string, fallback: string): string {
 class UserCancelled extends Error {}
 
 /**
- * Refuse BEFORE downloading gigabytes when the model cannot run here (no WebGPU for a WebGPU-only model,
- * not enough RAM), instead of failing after the download.
+ * Refuse BEFORE downloading gigabytes when the model cannot run here (no WebGPU for a model that is WebGPU-only
+ * or too big for single-thread Wasm, not enough RAM), instead of failing after the download or grinding for hours.
  */
-export function capabilityProblem(m: ManifestSummary, probe: Pick<ProbeResult, 'webgpu'>, totalMem: number = os.totalmem()): string | undefined {
-  if (m.requiresWebGpu && !probe.webgpu) {
-    return `El modelo "${m.label}" requiere WebGPU y este equipo no lo expone en VS Code. En CPU seria inutilizable de lento; usa otro modelo o un proveedor como Ollama.`;
+export function capabilityProblem(m: ManifestSummary, probe: Pick<ProbeResult, 'webgpu' | 'gpuReason'>, totalMem: number = os.totalmem()): string | undefined {
+  if (!probe.webgpu && gpuRequired(m)) {
+    const why = probe.gpuReason ? ` Motivo: ${probe.gpuReason}` : '';
+    return `El modelo "${m.label}" (${formatBytes(m.totalBytes)}) necesita WebGPU y VS Code no lo expone ahora mismo.${why} En CPU seria inutilizable de lento; mientras tanto usa otro modelo o un proveedor como Ollama.`;
   }
   if (m.minRamBytes && totalMem < m.minRamBytes) {
     return `El modelo "${m.label}" necesita al menos ${formatBytes(m.minRamBytes)} de RAM y este equipo tiene ${formatBytes(totalMem)}.`;
