@@ -11,23 +11,70 @@ import { friendlyFsError, isUsableRoot } from '../core/WorkspaceRoot';
 export const GENERATE_SPEC_LOCAL = 'alpaquitay-ai.generateSpecLocal';
 export const CLEAR_LOCAL_CACHE = 'alpaquitay-ai.clearLocalModelCache';
 
-const SPEC_SYSTEM_PROMPT = [
-  'You are a senior business analyst. Turn the request into a specification in Markdown.',
-  'Use EXACTLY this format and nothing else:',
-  '# <Project or feature title>',
-  '<one short paragraph of context>',
-  '## Epic: <epic name>',
-  '- [ ] SPEC-001 <small, verifiable task>',
-  '- [ ] SPEC-002 <small, verifiable task>',
-  'Rules: 2 to 5 epics, 2 to 6 tasks per epic, task ids numbered continuously from SPEC-001,',
-  'every task starts with a verb, no code fences, no text before the title or after the last task.',
-  'Write in the same language as the request.',
-].join('\n');
+export type SpecLanguage = 'es' | 'en';
+
+const ES_WORDS = new Set(['de', 'la', 'el', 'los', 'las', 'del', 'para', 'con', 'que', 'una', 'un', 'por', 'y', 'en', 'se', 'su', 'al', 'como', 'gestion', 'usuarios']);
+const EN_WORDS = new Set(['the', 'and', 'for', 'with', 'of', 'to', 'a', 'an', 'in', 'on', 'that', 'by', 'from', 'users', 'management']);
+
+/**
+ * The model is told the language instead of guessing it: with an English example in the prompt, a 1.5B model wrote
+ * the tasks of a Spanish request in English (measured in VS Code). Spanish wins ties: it is the product's first language.
+ */
+export function requestLanguage(text: string): SpecLanguage {
+  if (/[ñ¿¡áéíóú]/i.test(text)) { return 'es'; }
+  let es = 0, en = 0;
+  for (const w of text.toLowerCase().split(/[^a-z]+/)) {
+    if (ES_WORDS.has(w)) { es++; }
+    if (EN_WORDS.has(w)) { en++; }
+  }
+  return en > es ? 'en' : 'es';
+}
+
+const EXAMPLES: Record<SpecLanguage, { name: string; request: string; lines: string[] }> = {
+  es: {
+    name: 'Spanish', request: 'tienda online de libros con pagos',
+    lines: ['# Tienda online de libros', 'Tienda web para vender libros en línea con pagos seguros.',
+      '## Epic: Catálogo', '- [ ] SPEC-001 Crear el modelo de datos de libros y autores', '- [ ] SPEC-002 Implementar la búsqueda por título y autor',
+      '## Epic: Compra', '- [ ] SPEC-003 Implementar el carrito de compra', '- [ ] SPEC-004 Integrar la pasarela de pago'],
+  },
+  en: {
+    name: 'English', request: 'online bookstore with payments',
+    lines: ['# Online bookstore', 'Web store to sell books online with secure payments.',
+      '## Epic: Catalog', '- [ ] SPEC-001 Create the book and author data model', '- [ ] SPEC-002 Implement search by title and author',
+      '## Epic: Checkout', '- [ ] SPEC-003 Implement the shopping cart', '- [ ] SPEC-004 Integrate the payment gateway'],
+  },
+};
+
+/**
+ * Small local models follow an example far better than a list of rules: measured in VS Code, rules alone gave one
+ * giant epic (34 tasks, cut off by the token limit). The example shows the grouping; the rules bound the size.
+ */
+export function specSystemPrompt(lang: SpecLanguage): string {
+  const ex = EXAMPLES[lang];
+  return [
+    'You are a senior business analyst. Turn the request into a short specification in Markdown.',
+    'Output ONLY the specification, in exactly this shape:',
+    '# <Project title>',
+    '<one short paragraph of context>',
+    '## Epic: <group of related features>',
+    '- [ ] SPEC-001 <verb + small, verifiable task>',
+    '',
+    'Rules:',
+    '- Group related features into 3 to 5 epics. Each epic has 2 to 5 tasks. Stop after the last epic.',
+    '- Number tasks continuously across epics: SPEC-001, SPEC-002, SPEC-003...',
+    '- Every task starts with a verb. No code, no notes, nothing after the last task.',
+    `- Write the title, the context and every task in ${ex.name}. Keep "## Epic:" and "SPEC-" as they are.`,
+    '',
+    `Example for the request "${ex.request}":`,
+    ...ex.lines,
+  ].join('\n');
+}
 
 export function buildSpecMessages(description: string): EngineMessage[] {
+  const request = description.trim();
   return [
-    { role: 'system', content: SPEC_SYSTEM_PROMPT },
-    { role: 'user', content: description.trim() },
+    { role: 'system', content: specSystemPrompt(requestLanguage(request)) },
+    { role: 'user', content: request },
   ];
 }
 
@@ -36,7 +83,11 @@ export function extractSpecMarkdown(raw: string): string {
   let text = stripThinking(raw).replace(/^```(?:markdown|md)?\s*\n/i, '').replace(/\n```\s*$/i, '').trim();
   const start = text.search(/^#\s+\S/m);
   if (start > 0) { text = text.slice(start); }
-  return text.trim() + '\n';
+  // A generation cut by the token limit can end in a task with no text ("- [ ] SPEC-0"): never write that line.
+  // Small models number or translate the epic headings ("## Epic 1:", "## Épica 2 -"): the spec.md format is "## Epic:".
+  const lines = text.split('\n').map(l => l.replace(/^##[ \t]*[EÉ]pica?(?=[ \t\d:.-]|$)[ \t]*\d*[ \t]*[:.-]?[ \t]*/i, '## Epic: '));
+  if (lines.length > 1 && /^- \[ \]( SPEC-\d*)?$/.test(lines[lines.length - 1].trim())) { lines.pop(); }
+  return lines.join('\n').trim() + '\n';
 }
 
 export function slugify(input: string): string {

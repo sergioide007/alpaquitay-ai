@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // End-to-end check of a deployed CDN (or a local mirror). Run after EVERY deployment, before releasing.
-//   npm run cdn:verify -- --base https://alpaquitay.specsolid.com --id gemma-4-e2b-it [--full] [--key <base64 public key>]
+//   npm run cdn:verify -- --base https://alpaquitay.specsolid.com --id qwen2.5-coder-1.5b-instruct [--full] [--key <base64 public key>]
 // Without --key it trusts the keys compiled into the extension (src/local/trustedKeys.ts). Exit code != 0 on any failure.
 const fs = require('fs');
 const path = require('path');

@@ -256,7 +256,7 @@
         },
         "alpaquitay-ai.localEngine.modelId": {
           "type": "string",
-          "default": "gemma-4-e2b-it",
+          "default": "qwen2.5-coder-1.5b-instruct",
           "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$",
           "description": "Carpeta del modelo bajo /models/ en la CDN (debe tener manifest.json y manifest.sig.json). Solo desde la configuracion de usuario.",
           "scope": "application"

@@ -4,7 +4,8 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import type { ManifestSummary } from '../../../local/cdnPolicy';
 import {
-  buildSpecMessages, capabilityProblem, CLEAR_LOCAL_CACHE, extractSpecMarkdown, GENERATE_SPEC_LOCAL, registerLocalEngineCommands, slugify, titleOf,
+  buildSpecMessages, capabilityProblem, CLEAR_LOCAL_CACHE, extractSpecMarkdown, GENERATE_SPEC_LOCAL, registerLocalEngineCommands, requestLanguage, slugify,
+  specSystemPrompt, titleOf,
 } from '../../../local/GenerateSpecLocal';
 import type { LocalEngineApi } from '../../../local/LocalEngineHost';
 import { settings } from './fixtures';
@@ -28,6 +29,33 @@ describe('GenerateSpecLocal helpers', () => {
     expect(extractSpecMarkdown('Claro, aqui esta:\n\n```markdown\n' + SPEC + '```\n')).toBe(SPEC);
     expect(extractSpecMarkdown('<|channel>thought\npiensa<channel|>' + SPEC)).toBe(SPEC);
     expect(extractSpecMarkdown(SPEC)).toBe(SPEC);
+  });
+  it('requestLanguage tells Spanish from English (Spanish wins ties)', () => {
+    expect(requestLanguage('Portal de reservas para un club de padel con pagos online')).toBe('es');
+    expect(requestLanguage('Gestión de pistas')).toBe('es');                     // accents are decisive
+    expect(requestLanguage('Booking portal for a padel club with online payments and reminders')).toBe('en');
+    expect(requestLanguage('CRM')).toBe('es');
+  });
+  it('the system prompt names the language and shows an example in it', () => {
+    const es = buildSpecMessages('Portal de reservas para un club de padel')[0].content;
+    expect(es).toContain('in Spanish');
+    expect(es).toContain('- [ ] SPEC-002 Implementar la búsqueda por título y autor');
+    const en = buildSpecMessages('Booking portal for a padel club with payments')[0].content;
+    expect(en).toContain('in English');
+    expect(en).toContain('- [ ] SPEC-004 Integrate the payment gateway');
+    expect(specSystemPrompt('es')).toMatch(/3 to 5 epics/);
+  });
+  it('extractSpecMarkdown normalises numbered or translated epic headings to "## Epic:"', () => {
+    const raw = '# T\nC\n## Epic 1: Reservas\n- [ ] SPEC-001 A\n## Épica 2 - Pagos\n- [ ] SPEC-002 B\n## epica: Socios\n- [ ] SPEC-003 C\n## Epic: Ya bien\n';
+    expect(extractSpecMarkdown(raw)).toBe('# T\nC\n## Epic: Reservas\n- [ ] SPEC-001 A\n## Epic: Pagos\n- [ ] SPEC-002 B\n## Epic: Socios\n- [ ] SPEC-003 C\n## Epic: Ya bien\n');
+    expect(extractSpecMarkdown('# T\n## Epics overview\n')).toBe('# T\n## Epics overview\n');   // a different word is left alone
+  });
+  it('extractSpecMarkdown drops a last task cut off by the token limit, and only that', () => {
+    expect(extractSpecMarkdown(SPEC + '- [ ] SPEC-0')).toBe(SPEC);
+    expect(extractSpecMarkdown(SPEC + '- [ ] SPEC-')).toBe(SPEC);
+    expect(extractSpecMarkdown(SPEC + '- [ ]')).toBe(SPEC);
+    const complete = SPEC + '- [ ] SPEC-003 Pagar online\n';
+    expect(extractSpecMarkdown(complete)).toBe(complete);
   });
   it('slugify is filesystem safe and accent free', () => {
     expect(slugify('Reservas de pádel & pagos!')).toBe('reservas-de-padel-pagos');

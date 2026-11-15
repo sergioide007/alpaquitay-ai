@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Signs cdn-staging/models/<id>/manifest.json -> manifest.sig.json (Ed25519, detached, over the exact bytes).
-//   npm run cdn:sign -- --key ~/.alpaquitay/manifest-signing.pem --id gemma-4-e2b-it
+//   npm run cdn:sign -- --key ~/.alpaquitay/manifest-signing.pem --id qwen2.5-coder-1.5b-instruct
 const fs = require('fs');
 const os = require('os');
 const path = require('path');

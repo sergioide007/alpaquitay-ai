@@ -86,27 +86,37 @@ Brotli, so the Node version string is not the right indicator. Keep VS Code curr
 2. **"Why not Ollama / LM Studio?"** Those remain first in `auto` and are better for big models. This engine is for people who cannot or will not install a server. It is opt-in.
 3. **"You execute remote code in a developer tool."** The runtime is pinned by hash inside the VSIX; the CDN can only deliver bytes that match. The weights are data and are signed.
 4. **"Is $0 real?"** Inference cost is $0 by construction. Hosting is $0 only inside free tiers. Per [Cloudflare R2 pricing](https://developers.cloudflare.com/r2/pricing/): Standard free tier is 10 GB-month storage, 1 M Class A and 10 M Class B operations per month, egress free; beyond it, $0.015/GB-month, $4.50/M Class A, $0.36/M Class B. The [Workers free plan](https://workers.cloudflare.com/pricing/.md) lists 100 k requests/day and 10 ms CPU per request. Two dtypes of Gemma 4 E2B (~6.7 GB) fit in 10 GB. Re-check those pages before you promise "free" in public.
-5. **"A 2B model is weak."** Yes. Hence: drafts, not decisions; a format check with a warning; Ollama stays available.
-6. **"3 GB in IndexedDB?"** The preflight checks the quota first, and the cache is chunked because very large single IndexedDB values are fragile. transformers.js still reads each file fully into memory to build the ONNX session, so peak memory is roughly the model size.
-7. **"Licensing?"** The `onnx-community/gemma-4-E2B-it-ONNX` card states Apache-2.0 at the time of writing; you are responsible for the notices when you redistribute. The manifest carries a `license` field shown in the consent dialog.
+5. **"A 1.5B model is weak."** Yes. Hence: drafts, not decisions; a format check with a warning; Ollama stays available. The default was chosen by measurement (§6), not by name.
+6. **"1.3 GB in IndexedDB?"** The preflight checks the quota first, and the cache writes records of at most 8 MiB because very large single IndexedDB values are fragile (one 859 MB record hung a real Webview). transformers.js still reads each file fully into memory to build the ONNX session, so peak memory is roughly the model size.
+7. **"Licensing?"** The default model, Qwen2.5-Coder 1.5B Instruct, is Apache-2.0 upstream; the CDN serves its `LICENSE.txt` and a `NOTICE.txt` that states the origin, the revisions and our two graph modifications. The manifest carries a `license` field shown in the consent dialog. Gemma 3 uses the Gemma Terms of Use, which carry use restrictions: that is one reason it is no longer the default.
 8. **"Old VS Code?"** `engines.vscode` is `^1.85` for the extension; the local engine needs a Chromium with WebGPU and modern JavaScript. Unsupported combinations should fail with a message, not silently. The minimum version is not established (§8).
 
-## 6. Configure it with a real model (Gemma 4 E2B, text only)
+## 6. Choosing the model (measured 2026-11-15)
 
-Facts from the [model page](https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX) on 2026-10-24: Apache-2.0; the whole repository is
-≈47.7 GB (every dtype and modality), so **download selectively**. For text-only generation transformers.js loads only
-`embed_tokens` + `decoder_model_merged` when a `*ForCausalLM` class is used on a `*ForConditionalGeneration` checkpoint
-(read from the transformers.js 4.3.1 source), so the vision (~99 MB) and audio (~171 MB) encoders are not needed.
+Goal: the best model **for software development**, fast enough to use (≥ 3 tok/s), with the safest terms. Every candidate
+ran through the real extension in an isolated VS Code 1.146.0, on the reference laptop (ThinkPad P1 Gen 3, Intel UHD gen-9
+iGPU with `shader-f16`): served from a local CDN with a throwaway signing key, same 760-character Spanish request, same engine.
+Licenses read from the upstream model repositories; sizes from the Hugging Face API.
 
-| Files | Approx. size |
-|---|---|
-| `onnx/decoder_model_merged_q4f16.onnx` + `.onnx_data` | 0.7 MB + 1.52 GB |
-| `onnx/embed_tokens_q4f16.onnx` + `.onnx_data` | 6 KB + 1.59 GB |
-| → **q4f16 total** | **≈ 3.1 GB** |
-| `q4` equivalents (fallback when the GPU lacks `shader-f16`) | ≈ 3.6 GB |
-| `tokenizer.json`, `tokenizer_config.json`, `chat_template.jinja`, `config.json`, `generation_config.json` | ≈ 20 MB |
+| Model (ONNX, onnx-community) | License | Download | Result in VS Code | Specification quality |
+|---|---|---|---|---|
+| **Qwen2.5-Coder 1.5B Instruct** `q4f16` (**default**) | **Apache-2.0** | 1.26 GB | **3.3–4.8 tok/s** | best: concrete engineering tasks, `SPEC-NNN` numbering, epics, request language |
+| Gemma 3 1B `q4` (previous test model) | Gemma Terms of Use (use restrictions) | 0.82 GB | 5.9 tok/s | weak: one epic, no `SPEC-NNN`, content errors |
+| Qwen3 1.7B `q4f16` | Apache-2.0 | 1.43 GB | does not load (Wasm heap: `bad_alloc` / "memory copy") | — |
+| Granite 4.0 1B `q4f16` / `q4` | Apache-2.0 | 1.19 / 1.70 GB | `q4f16` emits garbage; `q4` fails to create the session | — |
+| Gemma 4 E2B `q4f16` | Apache-2.0 | 3.2 GB (5.1 B params) | above the runtime's practical size limit; not staged | — |
 
-Confirm the sizes on the model page before you stage; repositories change.
+What decided it: Qwen2.5-Coder is the only code-specialised candidate that runs here, it writes the most useful specifications,
+and Apache-2.0 has no use restrictions and includes a patent grant. The practical model-size limit of onnxruntime-web in a
+Webview on this machine lies between 1.26 GB (loads) and 1.43 GB (does not). The `q4f16` file needs WebGPU with `shader-f16`;
+without it the extension refuses before downloading, with the reason.
+
+Two prompt findings, now in `GenerateSpecLocal.ts`. With rules alone, the model wrote one giant epic (34 tasks, cut off by the
+token limit); a short example fixes the grouping. And with an English example, a Spanish request got English tasks, so the
+extension now detects the request language and gives the example and the instruction in that language. Numbered epic headings
+("## Epic 1:") are normalised to "## Epic:", and a last task cut off by the token limit is dropped.
+
+### Set it up (default model)
 
 ```bash
 # 0. Tooling (Node must pass the security floor)
@@ -116,32 +126,41 @@ npm run check:node && npm ci && npm run compile && npm run build:engine
 npm run cdn:keygen -- --out ~/.alpaquitay/manifest-signing.pem
 #    paste the printed public key into src/local/trustedKeys.ts, then:  npm run compile && npm run build:engine
 
-# 2. Download only what text generation needs
-pip install -U "huggingface_hub[cli]"
-huggingface-cli download onnx-community/gemma-4-E2B-it-ONNX --local-dir ./gemma-4-e2b \
-  --include "config.json" "generation_config.json" "tokenizer.json" "tokenizer_config.json" "chat_template.jinja" \
-            "onnx/decoder_model_merged_q4f16.onnx*" "onnx/embed_tokens_q4f16.onnx*" \
-            "onnx/decoder_model_merged_q4.onnx*"    "onnx/embed_tokens_q4.onnx*"
+# 2. Download only what is needed, pinned to the revisions that were measured
+B=https://huggingface.co/onnx-community/Qwen2.5-Coder-1.5B-Instruct/resolve/774cc908b6c2be23bc4e8d4e401e4f8b8fba7daf
+D=./qwen2.5-coder-1.5b-instruct; mkdir -p $D/onnx
+for f in config.json generation_config.json tokenizer.json tokenizer_config.json special_tokens_map.json onnx/model_q4f16.onnx; do
+  curl -fL --retry 8 -C - -o "$D/$f" "$B/$f"; done
+curl -fL -o $D/LICENSE.txt https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct/resolve/2e1fd397ee46e1388853d2af2c993145b0f1098a/LICENSE
+#    and write $D/NOTICE.txt: origin, revisions and the two modifications below (Apache-2.0 section 4)
 
-# 3. Stage (hashes every 8 MiB block, copies the pinned ONNX Runtime) and sign
-npm run cdn:stage -- --model ./gemma-4-e2b --id gemma-4-e2b-it --label "Gemma 4 E2B (text)" \
-  --license apache-2.0 --dtypes q4f16,q4 --requires-webgpu --system-role native --min-ram-gb 8 --top-p 0.95 --top-k 64
-npm run cdn:sign -- --key ~/.alpaquitay/manifest-signing.pem --id gemma-4-e2b-it
+# 3. Prepare the graph (both idempotent): weights to external data, logits for the last position only
+pip install onnx onnxruntime numpy
+python scripts/onnx-external-data.py $D model_q4f16.onnx
+python scripts/onnx-last-token-logits.py $D/onnx/model_q4f16.onnx --verify
 
-# 4. Upload cdn-staging/models/** to the R2 bucket "alpaquitay-models" (keep the models/ prefix), deploy the Worker
+# 4. Stage (hashes every 8 MiB block, copies the pinned ONNX Runtime) and sign
+npm run cdn:stage -- --model $D --id qwen2.5-coder-1.5b-instruct --label "Qwen2.5-Coder 1.5B Instruct (q4f16)" \
+  --license apache-2.0 --dtypes q4f16 --requires-webgpu --system-role native --min-ram-gb 8 --top-p 0.8 --top-k 20
+npm run cdn:sign -- --key ~/.alpaquitay/manifest-signing.pem --id qwen2.5-coder-1.5b-instruct
+
+# 5. Upload cdn-staging/models/** to the R2 bucket "alpaquitay-models" (keep the models/ prefix; files above 300 MiB
+#    need the multipart uploader), deploy the Worker if it changed
 npx wrangler deploy --config worker/wrangler.toml
 
-# 5. Verify the LIVE CDN exactly as the extension will consume it (non-zero exit = do not release)
-npm run cdn:verify -- --base https://alpaquitay.specsolid.com --id gemma-4-e2b-it --full
+# 6. Verify the LIVE CDN exactly as the extension will consume it (non-zero exit = do not release)
+npm run cdn:verify -- --base https://alpaquitay.specsolid.com --id qwen2.5-coder-1.5b-instruct --full
 ```
 
-`--requires-webgpu` is deliberate: at this size, single-thread Wasm would be unusably slow, so the extension refuses before
-downloading. `--min-ram-gb 8` is a maintainer judgement, not a measurement: adjust it after real tests. `--system-role native`
-because the Gemma 4 model card describes native system-role support (earlier Gemma generations have none: use `fold`). `--top-p/--top-k` follow the model card's recommended sampling.
+`--requires-webgpu` is deliberate (any model above 512 MiB is GPU-only in the extension anyway). `--min-ram-gb 8` is a
+maintainer judgement. `--system-role native` because Qwen's chat template supports a system role. `--top-p 0.8 --top-k 20`
+follow the model's `generation_config.json`. Why the two graph steps: a single-file 1.26 GB model is parsed as one protobuf
+inside the Wasm heap and failed its first run; and full-sequence logits (151 936-entry vocabulary) exhaust an integrated GPU
+on long prompts.
 
 **First run in VS Code (F5), in this order:**
 1. (Optional) user settings: `"alpaquitay-ai.localEngine.enabled": true`. The command works either way.
-2. Run **Alpaquitay AI: Generate Specification (Local Gemma)**. Expect the tab "Alpaquitay · Motor local" to open and a modal showing ≈3.1 GB, Apache-2.0 and "manifiesto firmado".
+2. Run **Alpaquitay AI: Generate Specification (Local Gemma)** (the command keeps its name; the default model is Qwen2.5-Coder). Expect the tab "Alpaquitay · Motor local" to open and a modal showing ≈1.26 GB, apache-2.0 and "manifiesto firmado".
 3. Watch the progress notification. The second run must start with no download prompt (cache hit).
 4. If it reports that WebGPU is unavailable, read the reason in the message. "Renderizado por software" means VS Code's GPU
    process crashed earlier in the session and Chromium disabled the GPU for the **whole app**: close **every** VS Code window
@@ -150,18 +169,11 @@ because the Gemma 4 model card describes native system-role support (earlier Gem
    and `argv.json` only accepts a short allow-list of switches (none of them enable WebGPU).
 5. **Clear Local Model Cache** must free the space, and the next run must ask for confirmation again.
 
-Smaller models (for example Gemma 3 270M or 1B from `onnx-community`) go through the same pipeline with `--system-role fold`.
-Check their sizes first, and for 270M prefer `q4` over `q4f16` (the onnxruntime issue above). Anything above 512 MiB is GPU-only
-in the extension whatever the manifest says (`CPU_MAX_MODEL_BYTES`); pass `--requires-webgpu` so the manifest says so too.
-
-**Before staging a big-vocabulary model** (Gemma 3: 262 144 tokens), patch its graph so it computes logits for the last
-position only. The onnx-community exports compute them for every prompt position, 1 MiB per prompt token, and a few hundred
-tokens exhaust an integrated GPU. Only the small `.onnx` file changes; the weights keep their hashes:
-
-```bash
-pip install onnx onnxruntime numpy
-python scripts/onnx-last-token-logits.py ./gemma-3-1b/onnx/model_q4.onnx --verify   # idempotent; refuses to write on mismatch
-```
+Other models go through the same pipeline. Gemma generations without a native system role need `--system-role fold`; for
+Gemma prefer `q4` over `q4f16` (the onnxruntime issue above). Anything above 512 MiB is GPU-only in the extension whatever the
+manifest says (`CPU_MAX_MODEL_BYTES`); pass `--requires-webgpu` so the manifest says so too. Run both graph scripts on any
+decoder with a large vocabulary (the logits patch looks through a final `Cast` and checks itself with `--verify`), and keep a
+model below ≈1.3 GB until the Wasm heap limit is lifted. Measure a new model with a real VS Code run before making it the default.
 
 ## 7. Operations
 

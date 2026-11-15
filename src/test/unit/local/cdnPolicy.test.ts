@@ -2,8 +2,27 @@ import { makeManifest } from './fixtures';
 import {
   HASH_CHUNK_BYTES, manifestSigUrl, summarize, type ModelManifest,
   buildCdnHeaders, cacheControlFor, contentRangeHeader, formatBytes, isAllowedOrigin, isSafeModelPath,
-  isValidModelId, manifestUrl, mimeFor, normalizeCdnBase, parseManifest, totalBytes, DEFAULT_CDN_BASE,
+  isValidModelId, manifestUrl, mimeFor, normalizeCdnBase, parseManifest, totalBytes, DEFAULT_CDN_BASE, DEFAULT_LOCAL_MODEL_ID,
 } from '../../../local/cdnPolicy';
+import * as fs from 'fs';
+import * as path from 'path';
+
+describe('default local model', () => {
+  const root = path.resolve(__dirname, '../../../..');
+  it('package.json and the code agree on the default model, and it is a valid id', () => {
+    const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+    expect(pkg.contributes.configuration.properties['alpaquitay-ai.localEngine.modelId'].default).toBe(DEFAULT_LOCAL_MODEL_ID);
+    expect(isValidModelId(DEFAULT_LOCAL_MODEL_ID)).toBe(true);
+  });
+  // Staging is local (git-ignored): skipped in CI, checked on the maintainer's machine before signing.
+  const staged = path.join(root, 'cdn-staging', 'models', DEFAULT_LOCAL_MODEL_ID, 'manifest.json');
+  (fs.existsSync(staged) ? it : it.skip)('the staged default model is a valid, GPU-only manifest with its license files', () => {
+    const m = parseManifest(JSON.parse(fs.readFileSync(staged, 'utf8')), DEFAULT_LOCAL_MODEL_ID);
+    expect(m.id).toBe(DEFAULT_LOCAL_MODEL_ID);
+    expect(m.runtime.requiresWebGpu).toBe(true);
+    expect(m.files.map(f => f.path)).toEqual(expect.arrayContaining(['LICENSE.txt', 'NOTICE.txt']));
+  });
+});
 
 describe('cdnPolicy', () => {
   describe('mimeFor (strict MIME allow-list)', () => {

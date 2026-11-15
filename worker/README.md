@@ -3,7 +3,7 @@
 Static hosting for the Gemma ONNX model and the ONNX Runtime files used by the local engine (`src/local/`, `engine/`).
 The Worker adds the headers the Webview needs and runs no inference. **The CDN is untrusted by design**: what makes a file
 valid is the Ed25519 signature over `manifest.json`, not the server. Architecture, threat model and a worked example with
-Gemma 4 E2B: [`docs/LOCAL-ENGINE.md`](../docs/LOCAL-ENGINE.md).
+the default model (Qwen2.5-Coder 1.5B Instruct): [`docs/LOCAL-ENGINE.md`](../docs/LOCAL-ENGINE.md).
 
 ## Contract (what the extension expects)
 
@@ -29,9 +29,9 @@ The single source of truth for all of this is `src/local/cdnPolicy.ts` (shared b
    ```
 2. **Stage and sign** (copies the exact ONNX Runtime pinned in the bundle, hashes every block, writes `manifest.json`):
    ```bash
-   npm run cdn:stage -- --model ./path/to/model --id gemma-4-e2b-it --label "Gemma 4 E2B (text)" --license apache-2.0 \
-       --dtypes q4f16,q4 --requires-webgpu --system-role native --min-ram-gb 8
-   npm run cdn:sign -- --key ~/.alpaquitay/manifest-signing.pem --id gemma-4-e2b-it
+   npm run cdn:stage -- --model ./path/to/model --id qwen2.5-coder-1.5b-instruct --label "Qwen2.5-Coder 1.5B Instruct (q4f16)" --license apache-2.0 \
+       --dtypes q4f16 --requires-webgpu --system-role native --min-ram-gb 8 --top-p 0.8 --top-k 20
+   npm run cdn:sign -- --key ~/.alpaquitay/manifest-signing.pem --id qwen2.5-coder-1.5b-instruct
    ```
    The stager refuses files the Worker would not serve and dtypes for which no `onnx/*_<dtype>.onnx` exists.
 3. **Create the bucket, upload** `cdn-staging/models/**` (keep the `models/` prefix) and **deploy the Worker**:
@@ -42,7 +42,7 @@ The single source of truth for all of this is `src/local/cdnPolicy.ts` (shared b
    ```
 4. **Verify the live CDN exactly as the extension will consume it** (non-zero exit = do not release):
    ```bash
-   npm run cdn:verify -- --base https://alpaquitay.specsolid.com --id gemma-4-e2b-it --full
+   npm run cdn:verify -- --base https://alpaquitay.specsolid.com --id qwen2.5-coder-1.5b-instruct --full
    ```
    It checks the signature, headers (CORS for a Webview origin, COEP/CORP/COOP, no `Content-Encoding` on the manifest), MIME,
    `Range`/206, 415/404 behaviour, every block hash of every file, and the ONNX Runtime hashes against the pins in the bundle.

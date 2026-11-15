@@ -20,6 +20,9 @@ describe('enginePolicy', () => {
       expect(e.message).toContain('failed to call OrtRun()');
       expect(e.message).not.toContain('CreateCommittedResource');            // only the first line is kept
     });
+    it('recognises the cleanup error ONNX Runtime surfaces after a WebGPU device error', () => {
+      expect(friendlyInferenceError(new TypeError("Cannot read properties of undefined (reading 'destroy')")).message).toMatch(/sin memoria/);
+    });
     it('leaves unrelated errors alone (no false positive on words like "room")', () => {
       const original = new Error('No room for this booking');
       expect(friendlyInferenceError(original)).toBe(original);

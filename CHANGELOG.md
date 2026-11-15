@@ -25,12 +25,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - `npm run cdn:keygen`, `cdn:sign`, `cdn:verify` (post-deployment check of the live CDN: signature, headers, MIME, `Range`, every block hash, runtime pins). An end-to-end test runs the stager, signer, Worker handler and consumers against a real local HTTP server.
 - `docs/LOCAL-ENGINE.md`: architecture, threat model, failure register, objections and honest answers, setup with a real model (Gemma 4 E2B text-only), operations, and what is not verified yet.
-- Settings `localEngine.dtype` and `localEngine.extraTrustedKeys`; default model `gemma-4-e2b-it`.
+- Settings `localEngine.dtype` and `localEngine.extraTrustedKeys`; default model `qwen2.5-coder-1.5b-instruct` (see Changed).
 
 ### Changed
 
 - **Breaking for anyone who staged with 3.6.0:** manifests must be schema 2 and signed. Re-run `cdn:stage` and `cdn:sign`. Unsigned or old manifests are refused.
 - The model precision is no longer hard-coded: it comes from the manifest and the device (`q4f16` only with `shader-f16`). The system role is native or folded per model.
+- **Default local model: Qwen2.5-Coder 1.5B Instruct (`q4f16`, Apache-2.0)**, chosen by measurement in a real VS Code (Intel UHD gen-9, same Spanish request for every candidate). It is the only code-specialised candidate that runs in the WebGPU runtime (3.3–4.8 tok/s), and it wrote the best specifications. Gemma 3 1B was faster (5.9 tok/s) but weaker, and it is under the Gemma Terms of Use. Qwen3 1.7B and Gemma 4 E2B exceed the runtime's practical size limit (≈1.3 GB). Granite 4.0 1B produced garbage in `q4f16` and failed to load in `q4`. The previous default, `gemma-4-e2b-it`, was never published on the CDN. Table and method: `docs/LOCAL-ENGINE.md` §6.
+- **Spec prompt for small models:** a short example in the request's language (detected: Spanish or English) instead of rules alone. That fixed one giant epic and English tasks for Spanish requests. Numbered epic headings are normalised to `## Epic:`, and a last task cut off by the token limit is dropped.
+- `scripts/onnx-external-data.py` moves a single-file model's weights to `.onnx_data` (a 1.26 GB single-file model failed its first run in the Webview). `scripts/onnx-last-token-logits.py` now looks through a final `Cast` (fp16 exports).
+- A WebGPU device error that ONNX Runtime surfaces only as "reading 'destroy'" is reported as GPU exhaustion, in plain words.
 
 ### Fixed
 

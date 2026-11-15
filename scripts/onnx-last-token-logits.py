@@ -28,10 +28,16 @@ def patch(model: onnx.ModelProto, logits_name: str = "logits") -> bool:
     g = model.graph
     if any(n.name == MARKER for n in g.node):
         return False
-    producers = [n for n in g.node if logits_name in n.output]
-    if len(producers) != 1:
-        raise ValueError(f"expected exactly one node producing '{logits_name}', found {len(producers)}")
-    head = producers[0]
+    def producer(name):
+        found = [n for n in g.node if name in n.output]
+        if len(found) != 1:
+            raise ValueError(f"expected exactly one node producing '{name}', found {len(found)}")
+        return found[0]
+
+    head = producer(logits_name)
+    # fp16 exports end with lm_head -> logits_fp16 -> Cast -> logits; a Cast keeps positions, so look through it.
+    while head.op_type == "Cast":
+        head = producer(head.input[0])
     if head.op_type not in ("MatMulNBits", "MatMul", "Gemm"):
         raise ValueError(f"'{logits_name}' comes from {head.op_type}, expected the lm_head MatMul")
 

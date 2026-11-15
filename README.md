@@ -275,15 +275,15 @@ Run a Gemma ONNX model **inside VS Code, on your own GPU**. Nothing is sent to a
 
 **Be realistic about it:**
 
-- The reference model is **Gemma 4 E2B (text only)**: **≈3.1 GB** to download (≈3.6 GB in the `q4` fallback) and room for it in memory and in the Webview's storage. It needs **WebGPU**: if the machine has none, the extension refuses *before* downloading.
-- Output is a **first draft**. A 2B-class model will not match a cloud model; if it ignores the spec format the command warns you.
+- The default model is **Qwen2.5-Coder 1.5B Instruct** (`q4f16`, **≈1.26 GB** to download, Apache-2.0), chosen by measurement in a real VS Code: it was the only code-specialised candidate that loaded in the WebGPU runtime, and it wrote the best specifications (≈4 tok/s on an Intel UHD integrated GPU). It needs **WebGPU with `shader-f16`**: if the machine has neither, the extension refuses *before* downloading and says why. Comparison and method: [`docs/LOCAL-ENGINE.md` §6](./docs/LOCAL-ENGINE.md#6-choosing-the-model-measured-2026-11-15).
+- Output is a **first draft**. A 1.5B model will not match a cloud model; if it ignores the spec format the command warns you.
 - It is **opt-in** and has not yet been exercised in every VS Code/GPU combination: see the checklist in [`docs/LOCAL-ENGINE.md`](./docs/LOCAL-ENGINE.md#8-what-is-not-verified-yet).
 
 **Security model, in one paragraph:** the CDN is treated as untrusted. Each model manifest is **signed with Ed25519** and lists a **SHA-256 for every 8 MiB block** of every file; the Webview refuses any byte that does not match, any file that is not listed, and any older signed manifest (anti-rollback). The ONNX Runtime files are **pinned by hash inside the extension**, and the Webview's CSP allows no remote script origin. The manifest is fetched **without any decompression**, so no decoder parses network bytes before the signature check. CDN address, model and trusted keys can only be set in *user* settings, never by a workspace. Threat model, failure register and the answers to the objections architects raise: [`docs/LOCAL-ENGINE.md`](./docs/LOCAL-ENGINE.md).
 
 **Use it as a provider:** set `alpaquitay-ai.localEngine.enabled: true`. The engine then appears as a local provider (`local-wasm`): `auto` tries Ollama and LM Studio first and falls back to it, and you can pick it with `alpaquitay-ai.preferredProvider: "local-wasm"`.
 
-**Set it up with a real model** (selective download of Gemma 4 E2B, staging, signing, deploying the Worker and verifying the live CDN): [`docs/LOCAL-ENGINE.md` §6](./docs/LOCAL-ENGINE.md#6-configure-it-with-a-real-model-gemma-4-e2b-text-only) and [`worker/README.md`](./worker/README.md). The signing key is generated on your machine (`npm run cdn:keygen`); the repository ships with none.
+**Set it up with a real model** (selective download, graph preparation, staging, signing, deploying the Worker and verifying the live CDN): [`docs/LOCAL-ENGINE.md` §6–7](./docs/LOCAL-ENGINE.md#6-choosing-the-model-measured-2026-11-15) and [`worker/README.md`](./worker/README.md). The signing key is generated on your machine (`npm run cdn:keygen`); the repository ships with none.
 
 **How it works**
 
@@ -484,7 +484,7 @@ All settings are configurable in VS Code's settings UI or `settings.json`. Provi
 | `alpaquitay-ai.lmstudio.endpoint` | `http://localhost:1234` | LM Studio server address |
 | `alpaquitay-ai.localEngine.enabled` | `false` | Allow the local Gemma engine as an AI provider (the spec command works either way) |
 | `alpaquitay-ai.localEngine.cdnBaseUrl` | `https://alpaquitay.specsolid.com` | Origin that serves `/models/` (https; user settings only) |
-| `alpaquitay-ai.localEngine.modelId` | `gemma-4-e2b-it` | Folder under `/models/` with `manifest.json` + `manifest.sig.json` (user settings only) |
+| `alpaquitay-ai.localEngine.modelId` | `qwen2.5-coder-1.5b-instruct` | Folder under `/models/` with `manifest.json` + `manifest.sig.json` (user settings only) |
 | `alpaquitay-ai.localEngine.dtype` | `auto` | Weight precision: `auto`, `q4`, `q4f16`, `q8`, `fp16`, `fp32` |
 | `alpaquitay-ai.localEngine.extraTrustedKeys` | `[]` | Extra Ed25519 public keys for a self-hosted mirror (user settings only) |
 | `alpaquitay-ai.localEngine.device` | `auto` | `auto`, `webgpu` or `wasm` |

@@ -175,7 +175,9 @@ const GPU_MEMORY_ERROR = /CreateCommittedResource|OutOfMemory|out of memory|\bOO
  */
 export function friendlyInferenceError(err: unknown): Error {
   const raw = err instanceof Error ? err.message : String(err);
-  if (GPU_MEMORY_ERROR.test(raw) || /OrtRun\(\)/.test(raw)) {
+  // After a WebGPU device error ONNX Runtime may only surface its own cleanup failure ("reading 'destroy'"):
+  // seen in a real VS Code run whose prefill hit CreateCommittedResource OutOfMemory.
+  if (GPU_MEMORY_ERROR.test(raw) || /OrtRun\(\)|reading 'destroy'/.test(raw)) {
     const detail = raw.split('\n')[0].slice(0, 160);
     return new Error('La GPU se quedo sin memoria o fallo durante la generacion. Se libero el modelo: vuelve a intentarlo '
       + `con un texto mas corto o cerrando aplicaciones que usen la GPU. (Detalle: ${detail})`);

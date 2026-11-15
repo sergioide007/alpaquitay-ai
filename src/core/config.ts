@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { DEFAULT_CDN_BASE } from '../local/cdnPolicy';
+import { DEFAULT_CDN_BASE, DEFAULT_LOCAL_MODEL_ID } from '../local/cdnPolicy';
 import type { DtypeSetting, EngineDevice, LocalEngineSettings } from '../local/protocol';
 
 export class AlpaquitayConfig {
@@ -35,7 +35,7 @@ export class AlpaquitayConfig {
     return {
       enabled: this.cfg.get<boolean>('localEngine.enabled', false),
       cdnBase: this.cfg.get<string>('localEngine.cdnBaseUrl', DEFAULT_CDN_BASE),
-      modelId: this.cfg.get<string>('localEngine.modelId', 'gemma-4-e2b-it'),
+      modelId: this.cfg.get<string>('localEngine.modelId', DEFAULT_LOCAL_MODEL_ID),
       device: this.cfg.get<EngineDevice>('localEngine.device', 'auto'),
       dtype: this.cfg.get<DtypeSetting>('localEngine.dtype', 'auto'),
       maxNewTokens: this.cfg.get<number>('localEngine.maxNewTokens', 1024),

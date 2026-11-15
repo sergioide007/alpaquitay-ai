@@ -5,6 +5,11 @@
  */
 
 export const DEFAULT_CDN_BASE = 'https://alpaquitay.specsolid.com';
+/**
+ * Default local model, chosen by measurement in a real VS Code on an Intel UHD gen-9 iGPU (2026-11-15): the only
+ * code-specialised candidate that loads in the WebGPU runtime, ~3.3-4.1 tok/s, Apache-2.0. Keep package.json in sync.
+ */
+export const DEFAULT_LOCAL_MODEL_ID = 'qwen2.5-coder-1.5b-instruct';
 export const MODELS_PATH_PREFIX = '/models/';
 
 /** Strict allow-list: anything not listed here is rejected with 415 by the Worker. */
