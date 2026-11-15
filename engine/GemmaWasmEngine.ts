@@ -3,7 +3,7 @@ import { IdbModelCache } from '../src/local/webview/idbCache';
 import { loadVerifiedRuntime, type LoadedRuntime } from '../src/local/webview/runtimeLoader';
 import {
   checkStorageBudget, chooseDevice, deviceLabel, foldSystemMessages, friendlyInferenceError, friendlyStorageError, gpuRequired, noWebGpuReason, pickDtype,
-  ProgressAggregator, SerialQueue, stripThinking, TokenMeter,
+  ProgressAggregator, SerialQueue, stripThinking, TokenMeter, WeightFilesTracker,
 } from '../src/local/enginePolicy';
 import { createVerifyingFetch, type RuntimePins } from '../src/local/integrity';
 import { totalBytes } from '../src/local/cdnPolicy';
@@ -133,6 +133,7 @@ export class GemmaWasmEngine {
     }
 
     const agg = new ProgressAggregator();
+    const weights = new WeightFilesTracker(t.manifest.files.map(f => f.path), dtype);
     // Storing ~1 GB in IndexedDB happens after the download, with no transformers.js progress: report it from the
     // cache itself so the host's inactivity timer sees the engine working.
     let lastStore = 0;
@@ -151,7 +152,7 @@ export class GemmaWasmEngine {
           if (e.status === 'progress' && e.file && e.total) {
             const pct = agg.update(e.file, e.loaded ?? 0, e.total);
             onProgress?.(`Descargando ${e.file.split('/').pop()}`, Math.max(3, Math.min(95, pct)));
-          } else if (e.status === 'done' && e.file?.includes('onnx')) {
+          } else if (e.status === 'done' && e.file?.includes('onnx') && weights.done(e.file)) {
             onProgress?.(`Cargando el modelo en ${deviceLabel(this.device, self.crossOriginIsolated)} (${e.file.split('/').pop()})`, 95);
           } else if (e.status === 'ready') {
             onProgress?.(`Modelo listo (${this.device}, ${dtype})${gpu.reason ? ` — WebGPU: ${gpu.reason}` : ''}`, 96);

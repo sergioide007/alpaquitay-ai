@@ -185,6 +185,23 @@ export function friendlyInferenceError(err: unknown): Error {
   return err instanceof Error ? err : new Error(raw);
 }
 
+/**
+ * Tracks the ONNX files of the chosen dtype (graph plus external data) so "loading the model" is reported only once
+ * the last of them has arrived. transformers.js fires `done` for the small graph file before the multi-GB `.onnx_data`
+ * download even starts; reporting on that first `done` showed "Cargando el modelo" during the whole download.
+ */
+export class WeightFilesTracker {
+  private readonly pending: Set<string>;
+  constructor(manifestPaths: readonly string[], dtype: string) {
+    this.pending = new Set(manifestPaths.filter(p => p.startsWith('onnx/') && (p.endsWith(`_${dtype}.onnx`) || p.includes(`_${dtype}.onnx_data`))));
+  }
+  /** Marks a finished file; true when no weight file of this dtype is still outstanding. */
+  done(file: string): boolean {
+    for (const p of this.pending) { if (file === p || file.endsWith(`/${p}`)) { this.pending.delete(p); } }
+    return this.pending.size === 0;
+  }
+}
+
 /** Human label for where inference runs; shown in progress so a slow CPU run is not mistaken for a hang. */
 export function deviceLabel(device: 'webgpu' | 'wasm', crossOriginIsolated: boolean): string {
   if (device === 'webgpu') { return 'GPU'; }

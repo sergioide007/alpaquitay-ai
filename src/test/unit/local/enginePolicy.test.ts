@@ -1,6 +1,22 @@
-import { chooseDevice, CPU_MAX_MODEL_BYTES, foldSystemMessages, friendlyInferenceError, gpuRequired, noWebGpuReason, ProgressAggregator, runtimeFiles } from '../../../local/enginePolicy';
+import { chooseDevice, CPU_MAX_MODEL_BYTES, foldSystemMessages, friendlyInferenceError, gpuRequired, noWebGpuReason, ProgressAggregator, runtimeFiles, WeightFilesTracker } from '../../../local/enginePolicy';
 
 describe('enginePolicy', () => {
+  describe('WeightFilesTracker ("loading the model" only after the last weight file)', () => {
+    const paths = ['config.json', 'tokenizer.json', 'onnx/model_q4f16.onnx', 'onnx/model_q4f16.onnx_data', 'onnx/model_q4.onnx'];
+    it('waits for the external data after the graph file', () => {
+      const w = new WeightFilesTracker(paths, 'q4f16');
+      expect(w.done('onnx/model_q4f16.onnx')).toBe(false);
+      expect(w.done('onnx/model_q4f16.onnx_data')).toBe(true);
+    });
+    it('ignores files of other dtypes and accepts repo-prefixed names', () => {
+      const w = new WeightFilesTracker(paths, 'q4');
+      expect(w.done('qwen/onnx/model_q4.onnx')).toBe(true);
+    });
+    it('is satisfied immediately when the manifest lists no weights of that dtype', () => {
+      expect(new WeightFilesTracker(paths, 'fp16').done('onnx/whatever.onnx')).toBe(true);
+    });
+  });
+
   describe('gpuRequired (fail fast instead of hours on single-thread Wasm)', () => {
     it('honours the manifest flag', () => {
       expect(gpuRequired({ requiresWebGpu: true, totalBytes: 1 })).toBe(true);

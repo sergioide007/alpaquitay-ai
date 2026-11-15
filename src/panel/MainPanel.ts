@@ -31,6 +31,7 @@ import { buildPreview } from '../core/harness/DiffPreview';
 import { CheckpointManager } from '../core/harness/CheckpointManager';
 import { emptyEcon, recordLlm, recordLocal, econChip, ECON_FILE, EconState } from '../core/platform/Economy';
 import { isUsableRoot, friendlyFsError, workspaceRootHelp, assertWritableRoot } from '../core/WorkspaceRoot';
+import { toWorkspaceRelative } from '../core/WorkspacePath';
 import { specPathHints, sourceRule } from '../core/context/PathHints';
 import type { WorkspaceFingerprint } from '../core/context/WorkspaceFingerprinter';
 import {
@@ -1446,6 +1447,14 @@ export class MainPanel {
             planModel = retryResp.model;
           }
         }
+      }
+
+      // Models often answer "/api/x.js" for "api/x.js": read it as workspace-relative instead of resolving it
+      // against the filesystem root (the write was later refused as path traversal). Paths that escape are dropped.
+      const rejectedPaths = filePaths.filter(p => toWorkspaceRelative(p, this.workspaceRoot) === null);
+      filePaths = [...new Set(filePaths.map(p => toWorkspaceRelative(p, this.workspaceRoot)).filter((p): p is string => p !== null))];
+      if (rejectedPaths.length) {
+        this._post({ type: 'chat-chunk', content: `\n🛡️ Rutas fuera del proyecto descartadas: ${rejectedPaths.map(p => `\`${p}\``).join(', ')}` });
       }
 
       this._post({ type: 'chat-chunk', content: `${header}\n\n**Plan:**\n${filePaths.length > 0 ? filePaths.join('\n') : '_Sin rutas detectadas_'}` });
