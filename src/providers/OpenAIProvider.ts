@@ -1,4 +1,5 @@
 import { AIProvider, Message, AIResponse, ChatOptions } from '../core/interfaces';
+import { openaiIsReasoningModel, outputBudget } from './modelCapabilities';
 
 export class OpenAIProvider implements AIProvider {
   readonly name = 'OpenAI GPT';
@@ -17,12 +18,15 @@ export class OpenAIProvider implements AIProvider {
   }
 
   async chat(messages: Message[], options: ChatOptions = {}): Promise<AIResponse> {
+    const reasoning = openaiIsReasoningModel(this.model);
+    // `max_tokens` is deprecated and rejected by reasoning models; `max_completion_tokens` works for every model
+    // and also counts reasoning tokens, so reasoning models get room for both.
     const body: Record<string, unknown> = {
       model: this.model,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
-      max_tokens: options.maxTokens ?? 4096
+      max_completion_tokens: outputBudget(options.maxTokens ?? 4096, reasoning)
     };
-    if (options.temperature !== undefined) { body.temperature = options.temperature; }
+    if (options.temperature !== undefined && !reasoning) { body.temperature = options.temperature; }
 
     const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
@@ -40,12 +44,20 @@ export class OpenAIProvider implements AIProvider {
     }
 
     const data = await response.json() as {
-      choices: Array<{ message: { content: string } }>;
+      choices: Array<{ message: { content: string | null; refusal?: string | null }; finish_reason?: string }>;
       model: string;
       usage: { prompt_tokens: number; completion_tokens: number };
     };
+    const choice = data.choices?.[0];
+    if (choice?.message?.refusal) {
+      throw new Error(`OpenAI: the model declined this request: ${choice.message.refusal}`);
+    }
+    const content = choice?.message?.content ?? '';
+    if (!content && choice?.finish_reason === 'length') {
+      throw new Error('OpenAI: the output limit was reached before any answer was written. Raise "Max output tokens" in Settings.');
+    }
     return {
-      content: data.choices?.[0]?.message?.content ?? '',
+      content,
       model: data.model,
       usage: {
         promptTokens: data.usage?.prompt_tokens ?? 0,

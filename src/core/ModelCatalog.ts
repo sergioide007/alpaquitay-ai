@@ -5,21 +5,31 @@ export interface ModelInfo {
   maxOutput: number;
 }
 
+/**
+ * Cloud models offered in the Settings selector. Checked against the providers' own documentation on 2026-11-15:
+ * Anthropic's current models table and developers.openai.com/api/docs/models. The settings accept any other model
+ * id the account has access to; this list only drives the selector and the context/output hints.
+ * The first entry of each provider is its default (see the DEFAULT_* constants, which package.json must match).
+ */
 export const MODEL_CATALOG: Record<string, ModelInfo[]> = {
   anthropic: [
-    { id: 'claude-opus-4-7',          label: 'Claude Opus 4.7',   contextWindow: 200000, maxOutput: 32000 },
-    { id: 'claude-sonnet-4-6',         label: 'Claude Sonnet 4.6', contextWindow: 200000, maxOutput: 64000 },
-    { id: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5',  contextWindow: 200000, maxOutput: 8096  },
+    { id: 'claude-opus-5-5',   label: 'Claude Opus 5.5',   contextWindow: 1000000, maxOutput: 128000 },
+    { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5', contextWindow: 1000000, maxOutput: 128000 },
+    { id: 'claude-haiku-5-5',  label: 'Claude Haiku 5.5',  contextWindow: 1000000, maxOutput: 128000 },
+    { id: 'claude-fable-5-2',  label: 'Claude Fable 5.2',  contextWindow: 1000000, maxOutput: 128000 },
   ],
   openai: [
-    { id: 'gpt-4o',       label: 'GPT-4o',        contextWindow: 128000, maxOutput: 16384 },
-    { id: 'gpt-4o-mini',  label: 'GPT-4o Mini',   contextWindow: 128000, maxOutput: 16384 },
-    { id: 'gpt-4-turbo',  label: 'GPT-4 Turbo',   contextWindow: 128000, maxOutput: 4096  },
-    { id: 'gpt-3.5-turbo',label: 'GPT-3.5 Turbo', contextWindow: 16385,  maxOutput: 4096  },
-    { id: 'o1',           label: 'o1',             contextWindow: 200000, maxOutput: 32768 },
-    { id: 'o1-mini',      label: 'o1-mini',        contextWindow: 128000, maxOutput: 65536 },
+    { id: 'gpt-6.1-sol',   label: 'GPT-6.1 Sol',   contextWindow: 1050000, maxOutput: 128000 },
+    { id: 'gpt-6-astra',   label: 'GPT-6 Astra',   contextWindow: 1050000, maxOutput: 128000 },
+    { id: 'gpt-6.1-terra', label: 'GPT-6.1 Terra', contextWindow: 1050000, maxOutput: 128000 },
+    { id: 'gpt-6-luna',    label: 'GPT-6 Luna',    contextWindow: 1050000, maxOutput: 128000 },
   ],
 };
+
+/** Default Anthropic model (Claude Opus 5.5). Must equal the `alpaquitay-ai.anthropic.model` default in package.json. */
+export const DEFAULT_ANTHROPIC_MODEL = 'claude-opus-5-5';
+/** Default OpenAI model (GPT-6.1 Sol, OpenAI's balanced option). Must equal the `alpaquitay-ai.openai.model` default. */
+export const DEFAULT_OPENAI_MODEL = 'gpt-6.1-sol';
 
 export function getDefaultModel(provider: string): string {
   const first = MODEL_CATALOG[provider]?.[0];

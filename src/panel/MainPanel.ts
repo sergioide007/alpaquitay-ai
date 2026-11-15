@@ -45,7 +45,7 @@ import { generateCode, isSmallModel, deduplicateSpecTasks, normalizeSpecContent 
 import { HierarchicalMemory } from '../core/HierarchicalMemory';
 import { WebviewMessage, ModelOption, TaskStatus, SkillContext, SpecTask, ProviderType, ArchDiagram, ArchDiagramPatch, ArchNode, ArchEdge, ArchNodeType, AIProvider } from '../core/interfaces';
 import { AlpaquitayConfig } from '../core/config';
-import { MODEL_CATALOG, catalogJson } from '../core/ModelCatalog';
+import { MODEL_CATALOG, catalogJson, DEFAULT_ANTHROPIC_MODEL, DEFAULT_OPENAI_MODEL } from '../core/ModelCatalog';
 
 const PATH_SKILLS = new Set(['create-file', 'refactor', 'generate-tests']);
 const SPEC_SKILLS = new Set(['generate-from-spec', 'validate-against-spec']);
@@ -2446,10 +2446,10 @@ export class MainPanel {
         // Provider selection
         preferredProvider: cfg.get('preferredProvider', 'auto'),
         // Anthropic
-        anthropicModel: cfg.get('anthropic.model', 'claude-sonnet-4-6'),
+        anthropicModel: cfg.get('anthropic.model', DEFAULT_ANTHROPIC_MODEL),
         anthropicBaseUrl: cfg.get('anthropic.baseUrl', 'https://api.anthropic.com/v1'),
         // OpenAI
-        openaiModel: cfg.get('openai.model', 'gpt-4o'),
+        openaiModel: cfg.get('openai.model', DEFAULT_OPENAI_MODEL),
         openaiBaseUrl: cfg.get('openai.baseUrl', 'https://api.openai.com/v1'),
         // Ollama
         ollamaModel: cfg.get('ollama.model', 'codellama'),
@@ -3861,7 +3861,7 @@ document.getElementById('s-temperature').addEventListener('input', function(){ d
 function renderSettings(cfg){
   const setVal=(id,v)=>{ const el=document.getElementById(id); if(el&&v!==undefined&&v!==null) el.value=String(v); };
   const setChk=(id,v)=>{ const el=document.getElementById(id); if(el) el.checked=!!v; };
-  const setSel=(id,v)=>{ const el=document.getElementById(id); if(el&&v) el.value=String(v); };
+  const setSel=(id,v)=>{ const el=document.getElementById(id); if(!el||!v) return; const s=String(v); if(el.tagName==='SELECT'&&![...el.options].some(o=>o.value===s)){ const o=document.createElement('option'); o.value=s; o.textContent=s+' (custom)'; el.appendChild(o); } el.value=s; };
 
   // Global defaults
   setVal('s-maxTokens',     cfg.maxTokens??4096);
@@ -3875,17 +3875,17 @@ function renderSettings(cfg){
   document.getElementById('s-temperature-val').textContent=parseFloat(cfg.temperature??0.3).toFixed(2);
 
   // Anthropic
-  setSel('s-anthropic-model',  cfg.anthropicModel??'claude-sonnet-4-6');
+  setSel('s-anthropic-model',  cfg.anthropicModel??'${DEFAULT_ANTHROPIC_MODEL}');
   setVal('s-anthropic-maxTokens', cfg.maxTokens??4096);
   setVal('s-anthropic-baseUrl', cfg.anthropicBaseUrl??'https://api.anthropic.com/v1');
-  const am=MODEL_CATALOG?.anthropic?.find(m=>m.id===(cfg.anthropicModel??'claude-sonnet-4-6'));
+  const am=MODEL_CATALOG?.anthropic?.find(m=>m.id===(cfg.anthropicModel??'${DEFAULT_ANTHROPIC_MODEL}'));
   if(am){ const d=document.getElementById('anthropic-model-desc'); if(d) d.textContent=\`\${am.contextWindow.toLocaleString()} ctx window · max \${am.maxOutput.toLocaleString()} output tokens\`; }
 
   // OpenAI
-  setSel('s-openai-model',  cfg.openaiModel??'gpt-4o');
+  setSel('s-openai-model',  cfg.openaiModel??'${DEFAULT_OPENAI_MODEL}');
   setVal('s-openai-maxTokens', cfg.maxTokens??4096);
   setVal('s-openai-baseUrl', cfg.openaiBaseUrl??'https://api.openai.com/v1');
-  const om=MODEL_CATALOG?.openai?.find(m=>m.id===(cfg.openaiModel??'gpt-4o'));
+  const om=MODEL_CATALOG?.openai?.find(m=>m.id===(cfg.openaiModel??'${DEFAULT_OPENAI_MODEL}'));
   if(om){ const d=document.getElementById('openai-model-desc'); if(d) d.textContent=\`\${om.contextWindow.toLocaleString()} ctx window · max \${om.maxOutput.toLocaleString()} output tokens\`; }
 
   // Ollama
@@ -3930,8 +3930,8 @@ document.getElementById('s-reset').addEventListener('click',()=>{
   renderSettings({ maxTokens:4096, temperature:0.3, requestTimeout:120000,
     systemPrompt:'', orgContext:'', specFile:'spec.md',
     mcp_filesystem:true, mcp_git:true,
-    anthropicModel:'claude-sonnet-4-6', anthropicBaseUrl:'https://api.anthropic.com/v1',
-    openaiModel:'gpt-4o', openaiBaseUrl:'https://api.openai.com/v1',
+    anthropicModel:'${DEFAULT_ANTHROPIC_MODEL}', anthropicBaseUrl:'https://api.anthropic.com/v1',
+    openaiModel:'${DEFAULT_OPENAI_MODEL}', openaiBaseUrl:'https://api.openai.com/v1',
     ollamaModel:'codellama', ollamaEndpoint:'http://localhost:11434',
     lmstudioEndpoint:'http://localhost:1234',
   });

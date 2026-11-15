@@ -145,12 +145,12 @@
         },
         "alpaquitay-ai.anthropic.model": {
           "type": "string",
-          "default": "claude-sonnet-4-6",
+          "default": "claude-opus-5-5",
           "description": "Modelo de Anthropic a usar"
         },
         "alpaquitay-ai.openai.model": {
           "type": "string",
-          "default": "gpt-4o",
+          "default": "gpt-6.1-sol",
           "description": "Modelo de OpenAI a usar"
         },
         "alpaquitay-ai.ollama.endpoint": {

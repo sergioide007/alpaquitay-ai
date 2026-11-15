@@ -14,6 +14,7 @@
 
 import { BaseDomainShell, UseCaseHandler } from '../shared/BaseDomainShell';
 import type { DomainId, GuardrailResult }  from '../interfaces/DomainAgentShell';
+import { DEFAULT_ANTHROPIC_MODEL } from '../../core/ModelCatalog';
 
 export class AIExpertShell extends BaseDomainShell {
   readonly domainId: DomainId = 'ai-expert';
@@ -63,7 +64,7 @@ export class AIExpertShell extends BaseDomainShell {
     const budget    = String(params.budgetConstraint ?? 'no limit');
     const raw = await this.ask(`You are an AI systems expert (ISO/IEC 42001, EU AI Act).
 Compare LLMs for use case: "${useCase}". Budget constraint: ${budget}.
-Consider: Anthropic Claude (Opus/Sonnet/Haiku), OpenAI GPT-4o/o1, Google Gemini, Mistral, Llama 3.
+Consider: Anthropic Claude (Opus/Sonnet/Haiku/Fable), OpenAI GPT-6 family, Google Gemini, Mistral, open-weight models (Llama, Qwen).
 Return JSON: {recommendations:[{modelId,provider,contextWindow,benchmarks:[{name,score,category}],costPer1kTokens:{input,output},latencyP50Ms,strengths[],weaknesses[],recommendedUseCases[],notRecommendedFor[]}],topPick,rationale,costProjection}.`);
     return { success: true, data: this.parseJSON(raw, { recommendations: [] }) };
   }
@@ -80,7 +81,7 @@ Return JSON: {strategy,chunkingMethod,chunkSize,chunkOverlap,embeddingModel,vect
 
   private async engineerPrompt(params: Record<string, unknown>): ReturnType<UseCaseHandler> {
     const task      = String(params.task ?? '');
-    const model     = String(params.targetModel ?? 'claude-sonnet-4-6');
+    const model     = String(params.targetModel ?? DEFAULT_ANTHROPIC_MODEL);
     const technique = String(params.technique ?? 'auto');
     const raw = await this.ask(`Engineer a production-ready prompt for task: "${task}".
 Target model: ${model}. Preferred technique: ${technique}.

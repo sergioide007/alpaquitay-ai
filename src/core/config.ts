@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { DEFAULT_CDN_BASE, DEFAULT_LOCAL_MODEL_ID } from '../local/cdnPolicy';
+import { DEFAULT_ANTHROPIC_MODEL, DEFAULT_OPENAI_MODEL } from './ModelCatalog';
 import type { DtypeSetting, EngineDevice, LocalEngineSettings } from '../local/protocol';
 
 export class AlpaquitayConfig {
@@ -17,11 +18,11 @@ export class AlpaquitayConfig {
 
   // ── Anthropic ─────────────────────────────────────────────────────────────
   get anthropicBaseUrl(): string { return this.cfg.get<string>('anthropic.baseUrl', 'https://api.anthropic.com/v1'); }
-  get anthropicModel(): string   { return this.cfg.get<string>('anthropic.model', 'claude-sonnet-4-6'); }
+  get anthropicModel(): string   { return this.cfg.get<string>('anthropic.model', DEFAULT_ANTHROPIC_MODEL); }
 
   // ── OpenAI ────────────────────────────────────────────────────────────────
   get openaiBaseUrl(): string { return this.cfg.get<string>('openai.baseUrl', 'https://api.openai.com/v1'); }
-  get openaiModel(): string   { return this.cfg.get<string>('openai.model', 'gpt-4o'); }
+  get openaiModel(): string   { return this.cfg.get<string>('openai.model', DEFAULT_OPENAI_MODEL); }
 
   // ── Ollama ────────────────────────────────────────────────────────────────
   get ollamaEndpoint(): string { return this.cfg.get<string>('ollama.endpoint', 'http://localhost:11434'); }
