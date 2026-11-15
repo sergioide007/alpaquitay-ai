@@ -135,6 +135,8 @@ The engine's messages are in Spanish; here they are with their meaning.
 | *«este VS Code no expone la API navigator.gpu»* | VS Code is too old. | Update VS Code. |
 | *«Este modelo requiere WebGPU…»* (this model requires WebGPU) | Without WebGPU this model would be unusably slow on the CPU (single thread). | Fix WebGPU with the rows above. |
 | *«La GPU se quedó sin memoria o falló durante la generación»* (GPU out of memory) | The GPU had no memory for that request. The model is released. | Close other apps using the GPU, shorten the description and try again. |
+| *«Memoria agotada al cargar el modelo: reintentando en un panel nuevo»* (out of memory, retrying in a new panel) | On the first run the engine panel held the download, the cache and the model at once and ran out of memory. | Nothing: the extension retries once by itself in a new panel. |
+| *«No hubo memoria suficiente para cargar el modelo…»* (not enough memory) | The new panel ran out of memory too. | Close memory-hungry apps (virtual machines, browsers with many tabs) and try again; what is already cached is not downloaded again. |
 | Quota or storage error | No space for the cache. | Free disk space and try again. |
 
 More cases in [Troubleshooting](../troubleshooting/).

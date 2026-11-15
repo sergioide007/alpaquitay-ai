@@ -8,7 +8,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [3.6.1] — 2026-10-24
+## [3.6.1] — 2026-11-15
+
+First published release with the local engine. It includes everything in 3.6.0, which was never published to the Marketplace or Open VSX (the previous published version is 3.5.0).
 
 ### Security — local engine hardening
 
@@ -44,6 +46,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 
+- **First run of the default model could fail with "Failed to load external data file … memory copy"** (found by installing the packaged VSIX in a clean VS Code: 1 failure in about 5 first runs; 3 of 3 loads from the cache succeeded). On the first run the engine panel holds the download, the IndexedDB writes and the session at once. When the session fails for lack of memory, the host now closes the panel and retries once in a fresh one (a new process with a clean heap; files already cached are not downloaded again). If that fails too, the message says so in plain words.
+- **Release checks:** `verify-marketplace.js` certified whatever `.vsix` was lying in the folder (one from the day before passed). It now requires the package for this version, newer than `out/`, `dist/` and `package.json`, and checks that the website stays out of it. Two tests that run real `git stash` and ~25 MiB through fake IndexedDB got realistic timeouts: they failed intermittently on a loaded Windows machine.
 - **Anthropic: current models rejected the requests or returned empty answers.** Alpaquitay sent `temperature`, which Claude Opus 4.7+ and the 5.x family reject with a 400, and read only `content[0]`, which on models that think by default is a thinking block. It now sends sampling parameters only to models that accept them, reads every text block, leaves room for thinking in `max_tokens` (at least 16,000 on those models) and reports a refusal or an output limit reached before any answer in plain words.
 - **OpenAI: reasoning models rejected the requests.** `max_tokens` is deprecated and not compatible with reasoning models (the whole GPT-6 family): requests now use `max_completion_tokens`, send `temperature` only to classic models (GPT-4o, GPT-4.1) and report refusals and empty `length` stops.
 - **Board tasks could never finish when the model planned "/api/x.js"** (found while recording the manual with llama3.2 3B): a leading-slash path is absolute on every platform, so it was resolved against the filesystem root and the write was later refused as path traversal ("0 archivo(s) aplicados"). Planned paths now go through `toWorkspaceRelative`: a rooted path outside the workspace is read as workspace-relative, and anything that still escapes it is dropped before generation, with a note in the chat.

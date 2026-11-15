@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
 [![Version](https://img.shields.io/badge/version-3.6.1-green)](./CHANGELOG.md)
-[![Tests](https://img.shields.io/badge/tests-689%20passing-brightgreen)](./package.json)
+[![Tests](https://img.shields.io/badge/tests-693%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
 [![Stars](https://img.shields.io/github/stars/sergioide007/alpaquitay-ai?style=social)](https://github.com/sergioide007/alpaquitay-ai/stargazers)
@@ -17,7 +17,7 @@
 
 ## Contents
 
-[What is it](#what-is-alpaquitay-ai) · [Quick start](#quick-start) · [Harness](#the-harness-in-one-picture) · [Work tab (SDD)](#work-tab--spec-driven-development) · [Docs tab](#docs-tab--edit-word-markdown-epub-and-pdf-with-an-agent) · [Local engine](#local-ai-engine--webgpu--wasm-on-your-machine) · [Architecture](#architecture) · [Providers](#ai-providers) · [Skills](#skills) · [Memory](#hierarchical-memory) · [Domain agents](#domain-agent-architecture) · [Settings](#settings-reference) · [Contributing](#contributing) · [Contact](#author--contact) · [License](#license)
+[User manual](https://alpaquitay-ai.specsolid.com/manual/en/) · [What is it](#what-is-alpaquitay-ai) · [Quick start](#quick-start) · [Harness](#the-harness-in-one-picture) · [Work tab (SDD)](#core-sdd-workflow) · [Docs tab](#docs-tab--edit-word-markdown-epub-and-pdf-with-an-agent) · [Local engine](#local-ai-engine--webgpu--wasm-on-your-machine) · [Architecture](#architecture) · [Providers](#ai-providers) · [Skills](#skills) · [Memory](#hierarchical-memory) · [Domain agents](#domain-agent-architecture--the-architecture-to-win-a-vertical) · [Settings](#settings-reference) · [Contributing](#contributing) · [Contact](#author--contact) · [License](#license)
 
 ---
 
@@ -33,6 +33,8 @@ Alpaquitay AI turns VS Code into a complete **harness-driven development environ
 6. **Leaves evidence** in `.alpaquitay/` (decisions, economy, debt)
 
 **100% open source · MIT license · Privacy-first** — your code and prompts go directly to your chosen AI provider. No Alpaquitay server ever receives them; the optional local engine only downloads signed model files and runs them on your machine.
+
+**User manual:** [English](https://alpaquitay-ai.specsolid.com/manual/en/) · [Español](https://alpaquitay-ai.specsolid.com/manual/) — every feature, step-by-step use cases and short videos of the real extension.
 
 **Website:** [specsolid.com](https://www.specsolid.com) · **Book:** [Código Sintético](https://codigosintetico.specsolid.com) (Spanish) · [*Synthetic Code*](https://info-codigo-sintetico.specsolid.com/en/) (English) · **Videos:** [YouTube @codigosinteticolibro](https://www.youtube.com/@codigosinteticolibro) (Spanish)
 
@@ -174,7 +176,7 @@ Ctrl+Alt+A     →  Open Alpaquitay Hub directly
 
 #### Step 4 — Create your spec
 
-In the **Work** tab → **Spec** pane → click **Generate with AI**. The AI analyzes your workspace and creates an initial `spec.md` with epics and tasks. Refine it by hand or via the chat pane.
+In the **Work** tab → **Spec** pane → click **+ Create with AI** (or **Regen**, with an optional project description). The AI analyzes your workspace and creates an initial `spec.md` with epics and tasks. Refine it by hand. Prefer the board for new tasks: a code request confirmed in the chat regenerates `spec.md` from that request (a Git checkpoint is saved first).
 
 #### Step 5 — Work tasks
 
@@ -466,7 +468,7 @@ All Java projects follow **Clean Architecture** (Robert C. Martin) with strict d
 | `Alpaquitay AI: Open Hub` | `Ctrl+Alt+A` | Open the unified panel |
 | `Alpaquitay AI: Show Menu` | `Ctrl+Shift+A` | Quick menu with all commands |
 | `Alpaquitay AI: New Specification` | — | Create a spec from a template |
-| `Alpaquitay AI: Generate from Spec` | — | AI generates code from a selected spec |
+| `Alpaquitay AI: Generate from Spec` | — | AI generates code from a selected spec (writes the files directly, without a diff: use a clean Git tree) |
 | `Alpaquitay AI: Validate Against Spec` | — | Check implementation vs spec |
 | `Alpaquitay AI: Configure AI Provider` | — | Set API key or local endpoint |
 | `Alpaquitay AI: Generate Specification (Local Model)` | — | Write a spec with the on-device model |

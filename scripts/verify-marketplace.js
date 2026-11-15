@@ -137,11 +137,15 @@ try {
 
 // 7. Paquete .vsix
 console.log('\n📦 Paquete .vsix:');
-const vsixFiles = fs.readdirSync(root).filter(f => f.endsWith('.vsix'));
-check('.vsix exists', vsixFiles.length > 0, vsixFiles[0] || '');
-if (vsixFiles.length > 0) {
-  const vsixStats = fs.statSync(path.join(root, vsixFiles[0]));
+// The package for THIS version, built after the code it ships: an old .vsix left in the folder used to pass these checks.
+const vsixName = fs.readdirSync(root).find(f => f === `alpaquitay-ai-${VERSION}.vsix` || f === VSIX);
+check('.vsix for this version exists', !!vsixName, `(run: npx vsce package --no-dependencies)`);
+if (vsixName) {
+  const vsixStats = fs.statSync(path.join(root, vsixName));
   check('.vsix size > 500KB', vsixStats.size > 500000, `(${(vsixStats.size/1024).toFixed(0)}KB)`);
+  const newest = (dir) => { let t = 0; const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) { walk(p); } else { t = Math.max(t, fs.statSync(p).mtimeMs); } } }; if (fs.existsSync(dir)) { walk(dir); } return t; };
+  const built = Math.max(newest(path.join(root, 'out')), newest(path.join(root, 'dist')), fs.statSync(path.join(root, 'package.json')).mtimeMs);
+  check('.vsix is newer than out/, dist/ and package.json', vsixStats.mtimeMs >= built, '(stale package: rebuild it)');
 }
 
 
@@ -153,6 +157,7 @@ try {
   check('VSIX includes dist/engine-webview.js', listing.includes('dist/engine-webview.js'));
   check('VSIX excludes engine/ and worker/', !listing.some(l => l.startsWith('engine/') || l.startsWith('worker/')));
   check('VSIX excludes cdn-staging/ and .npmrc', !listing.some(l => l.startsWith('cdn-staging/') || l === '.npmrc'));
+  check('VSIX excludes the website (manual/, sitemap.xml, robots.txt, docs/)', !listing.some(l => l.startsWith('manual/') || l.startsWith('docs/') || l === 'sitemap.xml' || l === 'robots.txt'));
 } catch (e) {
   check('vsce ls', false, '(' + String(e.message).split('\n')[0] + ')');
 }
@@ -165,7 +170,7 @@ if (fail === 0) {
   console.log('\nPróximos pasos:');
   console.log('  1. F5 en VS Code → Extension Development Host');
   console.log(`  2. git tag v${VERSION} && git push origin v${VERSION}`);
-  console.log(`  3. O publicar manual: npx vsce publish --packagePath ${VSIX}`);
+  console.log(`  3. O publicar manual: npx vsce publish --packagePath ${vsixName || VSIX}`);
 } else {
   console.log('❌ HAY ERRORES — corregir antes de publicar');
 }

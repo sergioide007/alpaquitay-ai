@@ -109,7 +109,7 @@ describe('IdbModelCache', () => {
     expect(Math.max(...records.map(b => b.byteLength))).toBe(CHUNK_BYTES);
     const back = new Uint8Array(await (await c2.match('big'))!.arrayBuffer());
     expect(Buffer.compare(Buffer.from(back), Buffer.from(data))).toBe(0);
-  });
+  }, 30000);   // ~25 MiB through fake-indexeddb: over Jest's default 5 s on a loaded machine
 
   it('reports storage progress through onStore even when put() gets no callback (transformers.js case)', async () => {
     const seen: Array<[string, number, number]> = [];

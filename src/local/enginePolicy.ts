@@ -202,6 +202,22 @@ export class WeightFilesTracker {
   }
 }
 
+/**
+ * ONNX Runtime failures while creating the session that come from the engine panel's own memory, not from the model.
+ * Seen on the first run of the 1.26 GB default model ("Failed to load external data file … memory copy"): the panel
+ * held the download and the IndexedDB writes at the same time. A fresh panel loading from the cache succeeded 3/3.
+ */
+const SESSION_MEMORY_ERROR = /memory copy|Failed to load external data|array buffer allocation failed|Aborted\(\)|\bOOM\b|out of memory/i;
+export function isPanelMemoryError(message: string): boolean {
+  return SESSION_MEMORY_ERROR.test(message) || (/Can't create a session/i.test(message) && /external data|memory/i.test(message));
+}
+/** What the user reads when a fresh panel also ran out of memory. */
+export function panelMemoryErrorMessage(detail: string): string {
+  return 'No hubo memoria suficiente para cargar el modelo en el motor local, ni siquiera en un panel nuevo. '
+    + 'Cierra aplicaciones que usen mucha memoria (máquinas virtuales, navegadores con muchas pestañas) y vuelve a intentarlo: '
+    + 'lo que ya esté guardado en la caché no se descarga de nuevo. (Detalle: ' + detail.split('\n')[0].slice(0, 160) + ')';
+}
+
 /** Human label for where inference runs; shown in progress so a slow CPU run is not mistaken for a hang. */
 export function deviceLabel(device: 'webgpu' | 'wasm', crossOriginIsolated: boolean): string {
   if (device === 'webgpu') { return 'GPU'; }

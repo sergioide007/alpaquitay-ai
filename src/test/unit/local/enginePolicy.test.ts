@@ -1,6 +1,16 @@
-import { chooseDevice, CPU_MAX_MODEL_BYTES, foldSystemMessages, friendlyInferenceError, gpuRequired, noWebGpuReason, ProgressAggregator, runtimeFiles, WeightFilesTracker } from '../../../local/enginePolicy';
+import { chooseDevice, CPU_MAX_MODEL_BYTES, foldSystemMessages, friendlyInferenceError, gpuRequired, isPanelMemoryError, noWebGpuReason, ProgressAggregator, runtimeFiles, WeightFilesTracker } from '../../../local/enginePolicy';
 
 describe('enginePolicy', () => {
+  describe('isPanelMemoryError (retry in a fresh panel only for memory failures)', () => {
+    it('recognises the first-run ONNX Runtime memory failure', () => {
+      expect(isPanelMemoryError("Can't create a session. ERROR_CODE: 1 … Failed to load external data file \"model_q4f16.onnx_data\", error: Unknown error occurred in memory copy.")).toBe(true);
+      expect(isPanelMemoryError('RangeError: Array buffer allocation failed')).toBe(true);
+    });
+    it('does not match unrelated errors', () => {
+      for (const m of ['Este modelo requiere WebGPU', 'manifest: firma invalida', 'HTTP 404', 'Cancelado por el usuario.']) { expect(isPanelMemoryError(m)).toBe(false); }
+    });
+  });
+
   describe('WeightFilesTracker ("loading the model" only after the last weight file)', () => {
     const paths = ['config.json', 'tokenizer.json', 'onnx/model_q4f16.onnx', 'onnx/model_q4f16.onnx_data', 'onnx/model_q4.onnx'];
     it('waits for the external data after the graph file', () => {

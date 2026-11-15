@@ -147,6 +147,43 @@ describe('LocalEngineHost', () => {
     await expect(p).rejects.toThrow('WebGPU no disponible');
   });
 
+  const OOM = "Can't create a session. ERROR_CODE: 1, ERROR_MESSAGE: Deserialize tensor model.layers.0.mlp.down_proj.MatMul.weight_Q4 failed.Failed to load external data file \"model_q4f16.onnx_data\", error: Unknown error occurred in memory copy.";
+
+  it('retries ONCE in a fresh panel when the session runs out of memory (first-run case) and succeeds', async () => {
+    const first = installPanel(); const second = installPanel();
+    const { host } = makeHost();
+    const stages: string[] = [];
+    const p = host.generate(S, { messages: [{ role: 'user', content: 'x' }] }, (stage) => stages.push(stage));
+    await flush(); first.emit({ type: 'ready' }); await flush();
+    first.emit({ type: 'error', id: (first.sent[0] as { id: string }).id, message: OOM });
+    await flush(); await flush();
+    expect(first.disposed).toHaveBeenCalled();
+    second.emit({ type: 'ready' }); await flush();
+    expect(second.sent[0]).toMatchObject({ type: 'generate' });
+    second.emit({ type: 'done', id: (second.sent[0] as { id: string }).id, text: 'ok', device: 'webgpu', newTokens: 2 });
+    await expect(p).resolves.toMatchObject({ text: 'ok' });
+    expect(stages.some(s => /panel nuevo/.test(s))).toBe(true);
+  });
+
+  it('gives a clear message when the fresh panel runs out of memory too, and does not retry other errors', async () => {
+    const first = installPanel(); const second = installPanel();
+    const { host } = makeHost();
+    const p = host.generate(S, { messages: [{ role: 'user', content: 'x' }] });
+    await flush(); first.emit({ type: 'ready' }); await flush();
+    first.emit({ type: 'error', id: (first.sent[0] as { id: string }).id, message: OOM });
+    await flush(); await flush(); second.emit({ type: 'ready' }); await flush();
+    second.emit({ type: 'error', id: (second.sent[0] as { id: string }).id, message: OOM });
+    await expect(p).rejects.toThrow(/No hubo memoria suficiente.*no se descarga de nuevo/);
+
+    const third = installPanel();
+    const { host: h2 } = makeHost();
+    const q = h2.generate(S, { messages: [{ role: 'user', content: 'x' }] });
+    await flush(); third.emit({ type: 'ready' }); await flush();
+    third.emit({ type: 'error', id: (third.sent[0] as { id: string }).id, message: 'Este modelo requiere WebGPU' });
+    await expect(q).rejects.toThrow('Este modelo requiere WebGPU');
+    expect(third.disposed).not.toHaveBeenCalled();
+  });
+
   it('cancelling rejects, tells the engine to stop and ignores the late answer', async () => {
     const fake = installPanel();
     const { host } = makeHost();

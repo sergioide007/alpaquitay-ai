@@ -127,6 +127,8 @@ Puedes comprobar tú mismo qué modelos están publicados y si su firma es váli
 | *«este VS Code no expone la API navigator.gpu»* | VS Code demasiado antiguo. | Actualiza VS Code. |
 | *«Este modelo requiere WebGPU…»* | Sin WebGPU, este modelo sería inutilizable en la CPU (un solo hilo). | Resuelve WebGPU con las filas anteriores. |
 | *«La GPU se quedó sin memoria o falló durante la generación»* | La GPU no tuvo memoria para esa petición. El modelo se libera. | Cierra otras aplicaciones que usen la GPU, acorta la descripción y vuelve a intentarlo. |
+| *«Memoria agotada al cargar el modelo: reintentando en un panel nuevo»* | La primera vez, el panel del motor tuvo a la vez la descarga, la caché y el modelo, y se quedó sin memoria. | Nada: la extensión lo reintenta sola una vez en un panel nuevo. |
+| *«No hubo memoria suficiente para cargar el modelo…»* | Tampoco hubo memoria en el panel nuevo. | Cierra aplicaciones que usen mucha memoria (máquinas virtuales, navegadores con muchas pestañas) y vuelve a intentarlo; lo ya guardado no se descarga otra vez. |
 | Error de cuota o de espacio | No hay espacio para la caché. | Libera disco y vuelve a intentarlo. |
 
 Más casos en [Solución de problemas](../problemas/).

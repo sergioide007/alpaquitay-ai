@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { isValidModelId, normalizeCdnBase, type ManifestSummary, type ModelManifest } from './cdnPolicy';
-import { assertPromptSize } from './enginePolicy';
+import { assertPromptSize, isPanelMemoryError, panelMemoryErrorMessage } from './enginePolicy';
 import { resolveTrustedManifest, type TrustStore } from './manifestTrust';
 import { fetchBytesIdentity, type FetchBytes } from './safeHttp';
 import { PROJECT_PUBLIC_KEYS } from './trustedKeys';
@@ -190,7 +190,7 @@ export class LocalEngineHost implements LocalEngineApi, vscode.Disposable {
     const s = this.validate(settings);
     assertPromptSize(input.messages);
     const { manifest } = await this.manifestFor(s);
-    const r = await this.request<Extract<EngineToHost, { type: 'done' }>>(
+    const run = () => this.request<Extract<EngineToHost, { type: 'done' }>>(
       s.cdnBase,
       id => ({
         type: 'generate', id, cdnBase: s.cdnBase, modelId: s.modelId, device: s.device, dtype: s.dtype, manifest,
@@ -199,6 +199,21 @@ export class LocalEngineHost implements LocalEngineApi, vscode.Disposable {
         temperature: input.temperature ?? 0.3,
       }),
       'done', { onProgress, token, timeoutMs: input.timeoutMs });
+    let r: Extract<EngineToHost, { type: 'done' }>;
+    try {
+      r = await run();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (!isPanelMemoryError(msg) || token?.isCancellationRequested) { throw err; }
+      // The panel ran out of memory while creating the session (first run: download + cache writes + load in one
+      // process). A new panel is a new process with a clean heap; files already stored in the cache are not downloaded again. Retry once.
+      this.dispose();
+      onProgress?.('Memoria agotada al cargar el modelo: reintentando en un panel nuevo (lo ya guardado no se descarga otra vez)', 95);
+      try { r = await run(); } catch (err2) {
+        const msg2 = err2 instanceof Error ? err2.message : String(err2);
+        throw isPanelMemoryError(msg2) ? new Error(panelMemoryErrorMessage(msg2)) : err2;
+      }
+    }
     return { text: r.text, device: r.device, newTokens: r.newTokens };
   }
 
