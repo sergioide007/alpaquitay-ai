@@ -13,4 +13,16 @@ describe('Decider lanes', () => {
     const d = decide('tengo una idea desordenada de marketplace', fp);
     expect(d.route).toBe('ideate'); expect(d.lane).toBe('flash');
   });
+  it('expert vocabulary in Spanish or English goes to a specialist (Deep), with confirmation', () => {
+    for (const text of ['haz un modelo de amenazas STRIDE del flujo de pagos', 'genera un SBOM de este proyecto', 'evalua el pipeline frente a OWASP SAMM',
+      'prepara el despliegue en AWS', 'zero trust para la red interna', 'revision FinOps de la cuenta', 'threat model the payments API']) {
+      const d = decide(text, fp);
+      expect([text, d.route, d.lane, d.needsConfirm]).toEqual([text, 'specialist', 'deep', true]);
+    }
+  });
+  it('ordinary words that merely contain those letters do not trigger a specialist', () => {
+    for (const text of ['corrige el bug del login', 'que es un JWT?', 'add a cardiac monitor component', 'the laws page needs a fix']) {
+      expect([text, decide(text, fp).route === 'specialist']).toEqual([text, false]);
+    }
+  });
 });

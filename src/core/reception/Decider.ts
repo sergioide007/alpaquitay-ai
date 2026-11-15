@@ -15,7 +15,9 @@ const IDEATE_RE = /(idea|se me ocurre|ordena|brainstorm|no se por donde|empezar|
 const SPEC_RE = /(spec|epica|épica|kanban|tablero|tarea SPEC|promover a spec)/i;
 const CODE_RE = /(crea|genera|implementa|corrige|arregla|refactor|test|error|falla|traceback|archivo|endpoint|componente|fix|bug)/i;
 // Word boundaries: bare `aws`/`iac` used to match "laws" and "cardiac" and send them to a specialist.
-const OPS_RE = /\b(deploy\w*|pipeline\w*|docker\w*|terraform|aws|azure|gcp|iac|dora|pentest\w*|threat\w*)\b/i;
+// Spanish equivalents and unambiguous specialist vocabulary (STRIDE, SBOM, OWASP...): before this, "modelo de amenazas"
+// or "genera un SBOM" never reached the registered specialists.
+const OPS_RE = /\b(deploy\w*|despliegue\w*|desplegar|pipeline\w*|docker\w*|terraform|aws|azure|gcp|iac|dora|pentest\w*|threat\w*|amenazas?|stride|sbom|cbom|owasp|samm|finops|runbook\w*|mlops|zero[- ]?trust|well[- ]?architected)\b/i;
 export function decide(text: string, fp: WorkspaceFingerprint | null): Decision {
   const t = text.toLowerCase();
   const reasons: string[] = [];
