@@ -185,6 +185,11 @@ These are the facts the code cannot establish without a real VS Code and a real 
    inherits that state. Fix: restart VS Code completely. A real run in VS Code then found two more defects, both fixed (see the
    failure register): the IndexedDB single-record write and prefill OOM from full-sequence logits. **Measured in VS Code:
    3.8–4.2 tok/s** on WebGPU with a 760-character request (gemma-3-1b-it q4, patched graph); first run about two minutes.
+   *Re-checked after restarting VS Code (now 1.146.0, `code --status`: `webgpu: enabled`), against the production CDN
+   (unpatched graph), with 9.7 GB of free RAM:* 5.4 tok/s (44 chars), 6.0 tok/s (760 chars), 3.6 tok/s (6,080 chars). The
+   prefill OOM therefore depends on free memory: it appeared with 6.6 GB free and a degraded VS Code. The unpatched graph still
+   allocates n × 1 MiB of logits in prefill (≈ 1.7 GB for 6,080 characters, 9 s vs 6 s of prefill at 760 characters), so
+   publishing the patched graph remains the fix for machines under memory pressure.
 2. **IndexedDB persistence of the Webview origin across restarts.** If it does not persist, the consent dialog reappears with the size (honest, but costly at 3 GB).
 3. **Minimum VS Code/Chromium version** that runs the bundled transformers.js and ONNX Runtime. Not established; do not publish a number until it is tested.
 4. **Memory:** a ~3 GB model in a Webview process. The quota preflight does not measure RAM.
