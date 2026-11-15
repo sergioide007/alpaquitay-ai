@@ -1,9 +1,9 @@
-import { pipeline, env, InterruptableStoppingCriteria, type TextGenerationPipeline } from '@huggingface/transformers';
+import { pipeline, env, InterruptableStoppingCriteria, TextStreamer, type TextGenerationPipeline } from '@huggingface/transformers';
 import { IdbModelCache } from '../src/local/webview/idbCache';
 import { loadVerifiedRuntime, type LoadedRuntime } from '../src/local/webview/runtimeLoader';
 import {
-  checkStorageBudget, chooseDevice, foldSystemMessages, friendlyStorageError, pickDtype,
-  ProgressAggregator, SerialQueue, stripThinking,
+  checkStorageBudget, chooseDevice, deviceLabel, foldSystemMessages, friendlyStorageError, pickDtype,
+  ProgressAggregator, SerialQueue, stripThinking, TokenMeter,
 } from '../src/local/enginePolicy';
 import { createVerifyingFetch, type RuntimePins } from '../src/local/integrity';
 import { totalBytes } from '../src/local/cdnPolicy';
@@ -147,18 +147,30 @@ export class GemmaWasmEngine {
     return this.queue.run(id, async () => {
       await this.init(t, onProgress);
       this.stopper.reset();
-      onProgress?.('Generando', 97);
+      const where = deviceLabel(this.device, self.crossOriginIsolated);
+      onProgress?.(`Procesando la peticion (${where})`, 97);
       const prompt = t.manifest.runtime.systemRole === 'fold' ? foldSystemMessages(messages) : messages;
       const sampling = opts.temperature > 0;
       const s = t.manifest.runtime.sampling;
+      // At most one progress message per second: it shows that a slow CPU run is advancing and restarts the
+      // host's inactivity timer, so a long generation that keeps producing tokens is never cut off.
+      const meter = new TokenMeter(opts.maxNewTokens);
+      const streamer = new TextStreamer(this.gen!.tokenizer, {
+        skip_prompt: true,
+        token_callback_function: () => {
+          const tick = meter.tick(performance.now());
+          if (tick) { onProgress?.(`Generando (${where}) · ${tick.tokens}/${opts.maxNewTokens} tokens · ${tick.rate} tok/s`, tick.pct); }
+        },
+      });
       const out = await this.gen!(prompt, {
         max_new_tokens: opts.maxNewTokens,
         do_sample: sampling,
         ...(sampling ? { temperature: opts.temperature, ...(s?.topP !== undefined ? { top_p: s.topP } : {}), ...(s?.topK !== undefined ? { top_k: s.topK } : {}) } : {}),
         stopping_criteria: this.stopper,
+        streamer,
       }) as Array<{ generated_text: Array<{ role: string; content: string }> }>;
       const reply = stripThinking(out[0]?.generated_text?.at(-1)?.content ?? '');
-      return { text: reply, newTokens: Math.max(1, Math.round(reply.length / 4)) };
+      return { text: reply, newTokens: meter.tokens || Math.max(1, Math.round(reply.length / 4)) };
     });
   }
 

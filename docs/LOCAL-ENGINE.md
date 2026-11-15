@@ -160,6 +160,7 @@ Smaller models (for example Gemma 3 270M or 1B from `onnx-community`) go through
 These are the facts the code cannot establish without a real VS Code and a real GPU. Each has a runtime guard, but each needs one real check:
 
 1. **WebGPU in a VS Code Webview** (`navigator.gpu`, secure-context rules). Guarded: probe → clear error or Wasm fallback.
+   *First real run (2026-11-14, Windows 11, VS Code stable, Gemma 3 1B q4):* consent, signed download (839 MB), block verification and model load all worked; the Webview reported **no WebGPU adapter**, so the engine fell back to Wasm with one thread and the old 15-minute total timeout expired during generation. Fixed with the inactivity timeout and token-by-token progress (CHANGELOG 3.6.1). Still to establish: why no adapter is exposed, and real tokens/s on CPU.
 2. **IndexedDB persistence of the Webview origin across restarts.** If it does not persist, the consent dialog reappears with the size (honest, but costly at 3 GB).
 3. **Minimum VS Code/Chromium version** that runs the bundled transformers.js and ONNX Runtime. Not established; do not publish a number until it is tested.
 4. **Memory:** a ~3 GB model in a Webview process. The quota preflight does not measure RAM.

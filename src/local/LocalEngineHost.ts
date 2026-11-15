@@ -12,7 +12,11 @@ export interface GenerateInput {
   messages: EngineMessage[];
   maxNewTokens?: number;
   temperature?: number;
-  /** Covers download + load + generation. Default: 15 minutes. */
+  /**
+   * Inactivity window: the request fails only if the engine sends NO progress for this long (default 5 minutes).
+   * Every progress message (download bytes, load stages, each streamed token) restarts it, so a slow CPU or a slow
+   * connection that keeps advancing is never cut off. MAX_REQUEST_MS still bounds the whole request.
+   */
   timeoutMs?: number;
 }
 
@@ -34,7 +38,10 @@ interface Pending {
 }
 
 const READY_TIMEOUT_MS = 20_000;
-const DEFAULT_TIMEOUT_MS = 15 * 60_000;
+/** No progress at all for this long = the engine is stuck (download, load and each token all report progress). */
+export const DEFAULT_IDLE_TIMEOUT_MS = 5 * 60_000;
+/** Absolute ceiling for one request, progressing or not (an 800 MB download on a slow link plus CPU generation). */
+export const MAX_REQUEST_MS = 60 * 60_000;
 
 function nonce(): string {
   const bytes = new Uint8Array(16);
@@ -150,12 +157,15 @@ export class LocalEngineHost implements LocalEngineApi, vscode.Disposable {
     await this.ensurePanel(cdnBase);
     const id = `r${++this.seq}`;
     return new Promise<T>((resolve, reject) => {
-      const finish = () => { clearTimeout(timer); sub?.dispose(); };
+      const idleMs = opts.timeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS;
+      const finish = () => { clearTimeout(idle); clearTimeout(ceiling); sub?.dispose(); };
       const fail = (e: Error) => { finish(); this.pending.delete(id); void this.panel?.webview.postMessage({ type: 'cancel', id } satisfies HostToEngine); reject(e); };
-      const timer = setTimeout(() => fail(new Error('Tiempo de espera agotado en el motor local.')), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+      const onIdle = () => fail(new Error(`El motor local dejo de responder (${Math.round(idleMs / 60_000)} min sin avance).`));
+      let idle = setTimeout(onIdle, idleMs);
+      const ceiling = setTimeout(() => fail(new Error(`Tiempo maximo agotado en el motor local (${Math.round(MAX_REQUEST_MS / 60_000)} min).`)), Math.max(idleMs, MAX_REQUEST_MS));
       const sub = opts.token?.onCancellationRequested(() => fail(new Error('Cancelado por el usuario.')));
       this.pending.set(id, {
-        onProgress: opts.onProgress,
+        onProgress: (stage, pct) => { clearTimeout(idle); idle = setTimeout(onIdle, idleMs); opts.onProgress?.(stage, pct); },
         reject: (e) => { finish(); reject(e); },
         resolve: (m) => {
           finish();

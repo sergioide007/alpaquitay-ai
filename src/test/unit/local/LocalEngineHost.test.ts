@@ -28,6 +28,7 @@ function installPanel(): FakePanel {
 }
 
 const flush = () => new Promise(r => setImmediate(r));
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 const extUri = { fsPath: '/ext', toString: () => 'file:///ext' } as unknown as vscode.Uri;
 const S = settings();
 
@@ -147,6 +148,32 @@ describe('LocalEngineHost', () => {
     await expect(p).rejects.toThrow(/Cancelado/);
     expect(fake.sent.at(-1)).toEqual({ type: 'cancel', id });
     expect(() => fake.emit({ type: 'done', id, text: 'tarde', device: 'wasm', newTokens: 1 })).not.toThrow();
+  });
+
+  // Regression (real VS Code, 2026-11-14): a 15-minute TOTAL timer covered download + load + CPU generation and
+  // cut off a run that was still advancing. The window is now inactivity-based and every progress message resets it.
+  it('keeps a long request alive while progress keeps arriving (inactivity timeout, not total)', async () => {
+    const fake = installPanel();
+    const { host } = makeHost();
+    const p = host.generate(S, { messages: [{ role: 'user', content: 'x' }], timeoutMs: 120 });
+    await flush(); fake.emit({ type: 'ready' }); await flush();
+    const id = (fake.sent[0] as { id: string }).id;
+    for (let i = 1; i <= 6; i++) {                                       // ~480 ms in total, 4x the window
+      await sleep(80);
+      fake.emit({ type: 'progress', id, stage: `Generando (CPU, 1 hilo) · ${i} tokens`, pct: 97 });
+    }
+    fake.emit({ type: 'done', id, text: 'ok', device: 'wasm', newTokens: 6 });
+    await expect(p).resolves.toMatchObject({ text: 'ok', device: 'wasm' });
+  });
+
+  it('fails with a clear message when the engine sends no progress for the whole window', async () => {
+    const fake = installPanel();
+    const { host } = makeHost();
+    const p = host.generate(S, { messages: [{ role: 'user', content: 'x' }], timeoutMs: 60 });
+    await flush(); fake.emit({ type: 'ready' }); await flush();
+    const id = (fake.sent[0] as { id: string }).id;
+    await expect(p).rejects.toThrow(/dejo de responder/);
+    expect(fake.sent.at(-1)).toEqual({ type: 'cancel', id });            // the engine is told to stop
   });
 
   it('rejects in-flight work when the panel is closed', async () => {

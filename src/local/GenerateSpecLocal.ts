@@ -67,13 +67,17 @@ export function capabilityProblem(m: ManifestSummary, probe: Pick<ProbeResult, '
   return undefined;
 }
 
-async function confirmDownload(m: ManifestSummary): Promise<void> {
+/** Shown when VS Code exposes no WebGPU adapter: the engine then runs on the CPU (Wasm, one thread in a Webview). */
+export const CPU_NOTICE = 'Sin WebGPU en este VS Code: se ejecutara en la CPU (Wasm, 1 hilo). Funciona, pero puede tardar varios minutos; veras el avance token a token.';
+
+async function confirmDownload(m: ManifestSummary, webgpu: boolean): Promise<void> {
   const lines = [
     `Modelo: ${m.label}${m.license ? ` · licencia ${m.license}` : ''}`,
     `Descarga: ${formatBytes(m.totalBytes)} (una sola vez; queda en la cache local del Webview).`,
     'La integridad se verifica con un manifiesto firmado antes de usar cualquier archivo.',
     'Tu texto nunca se envia a la CDN: la inferencia ocurre en tu equipo.',
   ];
+  if (!webgpu) { lines.push(CPU_NOTICE); }
   if (m.source === 'offline-copy') { lines.push('Aviso: no se pudo contactar la CDN; se usa la ultima copia verificada del manifiesto.'); }
   const pick = await vscode.window.showInformationMessage(
     'Alpaquitay: el motor local necesita descargar el modelo.',
@@ -127,7 +131,7 @@ export function registerLocalEngineCommands(
             const probe = await engine.probe(settings);
             const problem = capabilityProblem(probe.manifest, probe);
             if (problem) { throw new Error(problem); }
-            if (!probe.cached) { await confirmDownload(probe.manifest); }
+            if (!probe.cached) { await confirmDownload(probe.manifest, probe.webgpu); }
             let last = 0;
             return engine.generate(
               settings,

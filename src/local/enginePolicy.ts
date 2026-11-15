@@ -138,3 +138,33 @@ export function friendlyStorageError(err: unknown): Error {
   }
   return err instanceof Error ? err : new Error(String(err));
 }
+
+/** Human label for where inference runs; shown in progress so a slow CPU run is not mistaken for a hang. */
+export function deviceLabel(device: 'webgpu' | 'wasm', crossOriginIsolated: boolean): string {
+  if (device === 'webgpu') { return 'GPU'; }
+  return crossOriginIsolated ? 'CPU' : 'CPU, 1 hilo';
+}
+
+/**
+ * Counts streamed tokens and decides when to report: the first token, then at most once per `everyMs`.
+ * Pure (time is passed in) so it is unit-tested without a model.
+ */
+export class TokenMeter {
+  tokens = 0;
+  private start?: number;
+  private lastReport = -Infinity;
+
+  constructor(private readonly maxNewTokens: number, private readonly everyMs = 1000) {}
+
+  tick(now: number): { tokens: number; rate: string; pct: number } | undefined {
+    this.tokens++;
+    this.start ??= now;
+    if (this.tokens > 1 && now - this.lastReport < this.everyMs) { return undefined; }
+    this.lastReport = now;
+    const secs = (now - this.start) / 1000;
+    const rate = secs > 0 ? ((this.tokens - 1) / secs).toFixed(1) : '…';
+    // Generation owns the 97..99 band of the overall progress bar (download and load use 0..96).
+    const pct = 97 + Math.min(2, (2 * this.tokens) / Math.max(1, this.maxNewTokens));
+    return { tokens: this.tokens, rate, pct };
+  }
+}

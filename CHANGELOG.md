@@ -34,6 +34,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 
+- **Local engine timeout on CPU** (found in the first real VS Code run, 2026-11-14): a 15-minute *total* timer covered download + load + generation and cut off a CPU run that was still advancing. It is now an inactivity window (5 min) reset by every progress message, under a 60-minute ceiling; the engine streams progress token by token ("Generando (CPU, 1 hilo) · N/1024 tokens · X tok/s"), and the consent dialog warns when VS Code exposes no WebGPU.
+
 - README listed a Twitter/X account, a Discord server and `hello@specsolid.com`, none of which exist; it now lists the real contact channels. The README also said "No Alpaquitay servers exist", which the optional model CDN would make inaccurate: it now says no server ever receives code or prompts.
 - Documentation claimed the first download was "hundreds of MB" and that large files "never sit in memory": the real Gemma 4 E2B text-only download is ≈3.1 GB and transformers.js reads each file fully into memory.
 - A healthy download served with `Content-Encoding` was rejected because `Content-Length` holds the encoded size.
