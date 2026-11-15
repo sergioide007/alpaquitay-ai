@@ -3,7 +3,7 @@ from dlib import *
 W, H = 1120, 914
 MGR_H = 552
 d = D(W, H, 'Runtime design · AI providers', 'Provider selection and the privacy boundary',
-      'Local models run untouched. Anything that leaves the machine is redacted first, restored on return, and audited without values.', '05-provider-privacy')
+      'Local models run untouched. Anything that leaves the machine is redacted first and audited without values.', '05-provider-privacy')
 
 # ── Column A: callers ────────────────────────────────────────────────────────
 ax, aw = 40, 160
@@ -60,7 +60,7 @@ d.text(cx0 + 16, ly0 + lh - 12, 'Undecorated · zero overhead · zero egress', 1
 STEPS = [
     ('1', 'Redact', 'PII: email, phone, card, SSN, IBAN. Secrets: API keys, bearer tokens, JWT, private keys, AWS keys.'),
     ('2', 'Send', 'Only the sanitized prompt is sent to the provider.'),
-    ('3', 'Restore', 'The response is detokenized back transparently.'),
+    ('3', 'Return', 'The reply comes back as sent; placeholders are not reversed.'),
     ('4', 'Disclose', 'Value-free record: counts and categories only, never content.'),
 ]
 cy0 = 320
@@ -74,7 +74,7 @@ steps = STEPS
 if 0: steps = [
     ('1', 'Redact', 'PII: email, phone, card, SSN, IBAN. Secrets: API keys, bearer tokens, JWT, private keys, AWS keys.'),
     ('2', 'Send', 'Only the sanitized prompt is sent to the provider.'),
-    ('3', 'Restore', 'The response is detokenized back transparently.'),
+    ('3', 'Return', 'The reply comes back as sent; placeholders are not reversed.'),
     ('4', 'Disclose', 'Value-free record: counts and categories only, never content.'),
 ]
 sy = pb + 36
@@ -106,7 +106,7 @@ ry = 792
 d.group(40, ry, 1040, 66, 'Return path', SIGNAL, 'same for every provider', fo=.03)
 d.text(60, ry + 32, 'response', 12, TEXT, True)
 xx = 60 + tw('response', 12, True) + 12
-for lab, col in [('detokenize (cloud only)', AMBER), ('SSE chunks → webview chat-chunk', SIGNAL), ('chat-done', SIGNAL), ('disclosure counts → Hub “Privacy boundary” card', BLUE)]:
+for lab, col in [('as sent, no detokenize', AMBER), ('SSE chunks → webview chat-chunk', SIGNAL), ('chat-done', SIGNAL), ('disclosure counts → Hub “Privacy boundary” card', BLUE)]:
     d.arrow([(xx, ry + 28), (xx + 22, ry + 28)], MUTED, sw=1.4)
     xx += 30
     b = d.pill(xx, ry + 17, lab, col, 11, False, 10, 24)

@@ -17,7 +17,7 @@ d.arrow([(it.cx, ld.b), (it.cx, it.y)], MUTED); d.arrow([it.right(), gate.left()
 ag = d.card(40, 466, 500, 'Edit run', 'Batches ≤ 5 000 chars (2 200 for small local models) → prompt with numbered [[id]] paragraphs → the model returns only the changed ones. Unknown ids are dropped.', SIGNAL, h=96)
 an = d.card(580, 466, 500, 'Analysis run', 'Map-reduce over chapters: summaries, fact sheets for cross-chapter consistency, developmental notes, outline, Q&A over the most relevant chapters → Markdown report.', PURPLE, h=96)
 d.arrow([(gate.cx - 150, gate.b), (gate.cx - 150, gate.b + 16), (ag.cx, gate.b + 16), (ag.cx, ag.y)], MUTED); d.arrow([(an.cx, gate.b), (an.cx, an.y)], MUTED)
-prov = d.card(40, 594, 1040, 'AIProviderManager', 'Local model (Ollama / LM Studio: private, free) or cloud behind PrivacyBoundaryProvider (PII and secrets redacted, restored on return).', BLUE, h=64)
+prov = d.card(40, 594, 1040, 'AIProviderManager', 'Local model (Ollama / LM Studio: private, free) or cloud behind PrivacyBoundaryProvider (PII and secrets redacted before sending).', BLUE, h=64)
 d.arrow([ag.bot(), (ag.cx, prov.y)], MUTED, dash='4 3'); d.arrow([an.bot(), (an.cx, prov.y)], MUTED, dash='4 3')
 # review
 rv = d.card(40, 690, 500, 'Proposed changes · risk gate', 'Word-level diff per paragraph. Unusually large rewrites, changed numbers or big length changes are flagged “review” and are NOT pre-selected.', AMBER, h=92, tag='B')

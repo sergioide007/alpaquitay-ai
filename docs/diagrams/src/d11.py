@@ -1,6 +1,6 @@
 from dlib import *
 W, H = 1120, 780
-d = D(W, H, 'Process design · Local engine', 'Local Gemma: WebGPU / Wasm on your machine, weights from a static CDN',
+d = D(W, H, 'Process design · Local engine', 'Local model: WebGPU / Wasm on your machine, weights from a static CDN',
       'Inference runs in a Webview (the only place VS Code exposes WebGPU). The CDN only serves files; prompts never leave the machine.', '11-local-gemma-engine')
 
 host = d.card(40, 122, 320, 'Extension host (Node)',

@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
 [![Version](https://img.shields.io/badge/version-3.6.1-green)](./CHANGELOG.md)
-[![Tests](https://img.shields.io/badge/tests-641%20passing-brightgreen)](./package.json)
+[![Tests](https://img.shields.io/badge/tests-676%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
 [![Stars](https://img.shields.io/github/stars/sergioide007/alpaquitay-ai?style=social)](https://github.com/sergioide007/alpaquitay-ai/stargazers)
@@ -273,6 +273,8 @@ Run a small ONNX language model (default: Qwen2.5-Coder 1.5B Instruct) **inside 
 
 **Try it:** run **`Alpaquitay AI: Generate Specification (Local Model)`** from the Command Palette (or the `Ctrl+Shift+A` menu). Select some text first, or describe the feature in the prompt box. The first run shows the **verified download size** and license and asks for confirmation; after that it works offline. The result is written to `specs/<name>.md` in the same `spec.md` format the Work tab reads (existing specs are never overwritten).
 
+**The download needs your click.** On the first run (and whenever the model revision changes) VS Code shows a modal dialog, *"Alpaquitay: el motor local necesita descargar el modelo."*, with the model, its license, the download size and the privacy note. Nothing is downloaded until you press **Descargar y generar**; **Cancel** (or `Esc`) stops the command and nothing leaves your machine. With VS Code's default `window.dialogStyle` (`native`) this is an **operating-system dialog**, a separate window that may not sit where you are looking; meanwhile the progress notification waits on *Preparando motor local…* until you answer it. Set `"window.dialogStyle": "custom"` if you prefer the dialog drawn inside the VS Code window.
+
 **Be realistic about it:**
 
 - The default model is **Qwen2.5-Coder 1.5B Instruct** (`q4f16`, **≈1.26 GB** to download, Apache-2.0), chosen by measurement in a real VS Code: it was the only code-specialised candidate that loaded in the WebGPU runtime, and it wrote the best specifications (≈4 tok/s on an Intel UHD integrated GPU). It needs **WebGPU with `shader-f16`**: if the machine has neither, the extension refuses *before* downloading and says why. Comparison and method: [`docs/LOCAL-ENGINE.md` §6](./docs/LOCAL-ENGINE.md#6-choosing-the-model-measured-2026-11-15).
@@ -305,7 +307,7 @@ Run a small ONNX language model (default: Qwen2.5-Coder 1.5B Instruct) **inside 
 
 ### AI provider chain and privacy boundary
 
-Local models run untouched. Anything that leaves the machine is redacted first, restored on return, and audited without values.
+Local models run untouched. Anything that leaves the machine is redacted first and audited without values. The reply comes back as the provider wrote it: placeholders are not reversed.
 
 
 <p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/05-provider-privacy.png" alt="Provider selection: register, select, classify; local path vs cloud path with PrivacyBoundaryProvider"></p>

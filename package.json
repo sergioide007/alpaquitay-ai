@@ -378,6 +378,8 @@
     "cdn:keygen": "node scripts/cdn-keygen.js",
     "cdn:sign": "node scripts/cdn-sign.js",
     "cdn:verify": "node scripts/cdn-verify.js",
+    "manual:build": "node scripts/build-manual.js",
+    "manual:check": "node scripts/build-manual.js --check",
     "check:node": "node scripts/check-node-security.js"
   },
   "jest": {
@@ -423,6 +425,7 @@
     "eslint": "^8.0.0",
     "fake-indexeddb": "^6.2.5",
     "jest": "^29.7.0",
+    "markdown-it": "14.1.0",
     "ts-jest": "^29.4.9",
     "typescript": "^5.3.0"
   }

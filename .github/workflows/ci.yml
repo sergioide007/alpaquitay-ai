@@ -42,5 +42,8 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: User manual builds, links resolve and the published copy is up to date
+        run: npm run manual:check
+
       - name: Package extension
         run: npx @vscode/vsce package --no-dependencies

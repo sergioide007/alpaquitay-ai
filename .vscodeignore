@@ -31,6 +31,9 @@ scripts/**
 
 # Website / repo assets (not part of the extension)
 index.html
+manual/**
+sitemap.xml
+robots.txt
 media/**
 images/**
 

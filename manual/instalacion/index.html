@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instalación y primeros pasos · Manual de Alpaquitay AI</title>
+<meta name="description" content="Cómo instalar Alpaquitay AI en VS Code desde el Marketplace u Open VSX, abrir el Hub con Ctrl+Alt+A y usar el menú rápido Ctrl+Shift+A.">
+<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/instalacion/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/instalacion/">
+<meta property="og:title" content="Instalación y primeros pasos">
+<meta property="og:description" content="Cómo instalar Alpaquitay AI en VS Code desde el Marketplace u Open VSX, abrir el Hub con Ctrl+Alt+A y usar el menú rápido Ctrl+Shift+A.">
+<meta property="og:locale" content="es_ES">
+<meta name="theme-color" content="#07100d">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+<link rel="stylesheet" href="../assets/manual.css?v=0c8d6ca692">
+<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Instalación y primeros pasos","description":"Cómo instalar Alpaquitay AI en VS Code desde el Marketplace u Open VSX, abrir el Hub con Ctrl+Alt+A y usar el menú rápido Ctrl+Shift+A.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/instalacion/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="top">
+  <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+  <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><span class="brand-mark">▲</span><span>Alpaquitay AI</span></a>
+  <a class="crumb" href="../">Manual</a>
+  <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
+  <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
+  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
+  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
+</header>
+<div class="layout">
+<aside class="sidebar" id="sidebar" aria-label="Índice del manual">
+  <p class="side-title">Manual de uso <span class="ver">v3.6.1</span></p>
+  <ol class="chapters">
+<li><a href="../"><span class="n">00</span>Inicio</a></li>
+<li><a href="../instalacion/" aria-current="page"><span class="n">01</span>Instalación y primeros pasos</a></li>
+<li><a href="../proveedores/"><span class="n">02</span>Proveedores y privacidad</a></li>
+<li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
+<li><a href="../work/"><span class="n">04</span>Work · spec, tablero y chat</a></li>
+<li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
+<li><a href="../docs/"><span class="n">06</span>Docs · documentos con un agente</a></li>
+<li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
+<li><a href="../arquitectura/"><span class="n">08</span>Architecture · ADR e IaC</a></li>
+<li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
+<li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
+<li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
+<li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
+<li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
+<li><a href="../referencia/"><span class="n">14</span>Referencia</a></li>
+<li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
+<li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
+  </ol>
+  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+</aside>
+<main class="content" id="contenido">
+<article class="doc">
+<p class="kicker">Capítulo 01</p>
+<h1 id="instalacion-y-primeros-pasos">Instalación y primeros pasos</h1>
+<p>En cinco minutos tendrás la extensión instalada, un proveedor de IA conectado y el Hub abierto sobre tu proyecto.</p>
+<h2 id="requisitos">Requisitos</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Necesitas</th>
+<th>Detalle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Visual Studio Code</td>
+<td>1.85 o posterior (Windows, macOS o Linux). También funciona en editores compatibles que instalan desde Open VSX, como VSCodium.</td>
+</tr>
+<tr>
+<td>Una carpeta abierta</td>
+<td>El arnés trabaja sobre la carpeta del workspace: la analiza, escribe allí <code>spec.md</code> y guarda sus evidencias en <code>.alpaquitay/</code>.</td>
+</tr>
+<tr>
+<td>Git (recomendado)</td>
+<td>Las métricas DORA, el historial trazable y los <em>checkpoints</em> antes de escribir usan Git. Sin Git la extensión funciona, pero sin esas tres cosas.</td>
+</tr>
+<tr>
+<td>Un proveedor de IA</td>
+<td>Local (Ollama, LM Studio, motor local) o en la nube (Anthropic, OpenAI). Lo eliges en el <a href="../proveedores/">capítulo 2</a>.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="instalar">Instalar</h2>
+<p><strong>Desde el Marketplace de VS Code (recomendado).</strong> Abre el panel de extensiones (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>), busca <strong>Alpaquitay AI</strong> y pulsa <em>Install</em>. O desde una terminal:</p>
+<div class="code" data-lang="Bash"><pre><code class="language-bash">code --install-extension alpaquitay-ai.alpaquitay-ai
+</code></pre></div>
+<p><strong>Desde Open VSX</strong> (VSCodium y otros editores):</p>
+<div class="code" data-lang="Bash"><pre><code class="language-bash">ovsx install alpaquitay-ai.alpaquitay-ai
+</code></pre></div>
+<p>La extensión se activa sola cuando VS Code termina de arrancar. No pide cuenta ni registro, y la telemetría viene <strong>desactivada</strong>.</p>
+<h2 id="los-dos-atajos-que-necesitas">Los dos atajos que necesitas</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Atajo (Windows/Linux)</th>
+<th>macOS</th>
+<th>Qué abre</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd></td>
+<td><kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd></td>
+<td>El <strong>Hub</strong>: el panel principal con todas las pestañas.</td>
+</tr>
+<tr>
+<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd></td>
+<td><kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd></td>
+<td>El <strong>menú rápido</strong>: abrir el Hub, nueva especificación, generar desde una especificación, validarla, generar una especificación con el modelo local, configurar el proveedor o abrir GitHub Copilot Chat.</td>
+</tr>
+</tbody>
+</table></div>
+<figure class="figure"><a class="zoom" href="../media/menu.png" aria-label="Ampliar: Menú rápido de Alpaquitay con Ctrl+Shift+A"><img src="../media/menu.png" alt="Menú rápido de Alpaquitay con Ctrl+Shift+A" width="1600" height="566" loading="lazy" decoding="async"></a><figcaption>El menú rápido (Ctrl+Shift+A). Incluye un acceso a Copilot Chat porque ese atajo es el que usa Copilot cuando Alpaquitay no está instalado.</figcaption></figure>
+
+<p>Todos los comandos están también en la paleta de comandos (<kbd>F1</kbd>) con el prefijo <strong>Alpaquitay AI:</strong>.</p>
+<h2 id="el-hub-de-un-vistazo">El Hub, de un vistazo</h2>
+<p>El Hub es una única pestaña del editor con seis secciones. Arriba a la derecha eliges el modelo activo y abres la configuración (⚙).</p>
+<figure class="figure"><a class="zoom" href="../media/hub-work.png" aria-label="Ampliar: El Hub con la pestaña Work: especificación, tablero y chat"><img src="../media/hub-work.png" alt="El Hub con la pestaña Work: especificación, tablero y chat" width="1600" height="1000" loading="lazy" decoding="async"></a><figcaption>La pestaña Work: a la izquierda la especificación, en el centro el tablero Kanban y a la derecha el chat.</figcaption></figure>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pestaña</th>
+<th>Para qué sirve</th>
+<th>Capítulo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Work</strong></td>
+<td>Especificación (<code>spec.md</code>), tablero Kanban y chat con el arnés.</td>
+<td><a href="../work/">Work</a></td>
+</tr>
+<tr>
+<td><strong>Docs</strong></td>
+<td>Editar y analizar documentos Word, Markdown, EPUB y PDF con un agente.</td>
+<td><a href="../docs/">Docs</a></td>
+</tr>
+<tr>
+<td><strong>Evidence</strong></td>
+<td>Señales del repositorio, deuda agéntica, cola de revisión, historial trazable, rutas y privacidad.</td>
+<td><a href="../evidence/">Evidence</a></td>
+</tr>
+<tr>
+<td><strong>Architecture</strong></td>
+<td>Lienzo de arquitectura inferido del proyecto, ADR, evaluación con IA y exportación a IaC.</td>
+<td><a href="../arquitectura/">Arquitectura</a></td>
+</tr>
+<tr>
+<td><strong>Agents</strong></td>
+<td>Skills incluidas y las tuyas propias.</td>
+<td><a href="../agentes/">Agentes</a></td>
+</tr>
+<tr>
+<td><strong>Settings</strong></td>
+<td>Proveedor, modelo, límites, <em>system prompt</em>, herramientas y archivo de especificación.</td>
+<td><a href="../proveedores/">Proveedores</a>, <a href="../referencia/">Referencia</a></td>
+</tr>
+</tbody>
+</table></div>
+<p>Bajo las pestañas, la <strong>franja del arnés</strong> resume el estado: carpeta de trabajo, <em>stack</em> detectado, deuda (<code>0/100</code>), diffs pendientes de revisión y modo de privacidad.</p>
+<h2 id="tu-primera-sesion-paso-a-paso">Tu primera sesión, paso a paso</h2>
+<ol>
+<li><strong>Abre una carpeta de proyecto</strong> en VS Code (<em>File → Open Folder</em>). Puede ser un proyecto nuevo o uno heredado.</li>
+<li><strong>Conecta un proveedor.</strong> Lo más rápido y privado es <a href="https://ollama.com" rel="noopener">Ollama</a>: instálalo y ejecuta <code>ollama pull qwen2.5-coder</code> (o cualquier modelo). Alpaquitay lo detecta solo en <code>http://localhost:11434</code>. Más opciones en el <a href="../proveedores/">capítulo 2</a>.</li>
+<li><strong>Abre el Hub</strong> con <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>.</li>
+<li><strong>Escribe <code>onboard</code> en el chat</strong> de la pestaña Work. Es gratis (no llama a ningún modelo): analiza el proyecto, detecta los comandos de build y test, escribe un primer ADR y calcula las señales DORA. Ver <a href="../comandos-chat/#onboard">Comandos del chat</a>.</li>
+<li><strong>Crea tu especificación</strong> con <em>+ Create with AI</em> en el panel <em>Spec</em>, o con el comando <em>Generate Specification (Local Model)</em> si quieres que no salga nada de tu equipo.</li>
+<li><strong>Arrastra una tarea a <em>In Progress</em></strong> y revisa el diff que propone. Escribe <code>si aplicar</code> para escribirlo o <code>no</code> para descartarlo.</li>
+</ol>
+<aside class="callout callout-tip"><p class="callout-title">Consejo</p>
+<p>Si no tienes ningún proveedor configurado, el chat te lo dice: <em>«No hay proveedor AI disponible. Configura uno en ⚙ o inicia Ollama/LM Studio.»</em> Los comandos del arnés que no usan modelo (<code>dora</code>, <code>deuda</code>, <code>economía</code>, <code>postmortem</code>) también necesitan un proveedor activo en esta versión, porque se escriben en el mismo chat.</p>
+</aside>
+<h2 id="que-se-crea-en-tu-proyecto">Qué se crea en tu proyecto</h2>
+<p>Alpaquitay escribe solo dentro de tu carpeta de trabajo, y casi todo dentro de <code>.alpaquitay/</code>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Archivo</th>
+<th>Contenido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>spec.md</code></td>
+<td>Tu especificación: épicas y tareas. Es la fuente de verdad del tablero.</td>
+</tr>
+<tr>
+<td><code>.alpaquitay/decisions.jsonl</code></td>
+<td>Una línea por decisión del arnés: ruta, carril, confianza y motivos.</td>
+</tr>
+<tr>
+<td><code>.alpaquitay/debt.json</code></td>
+<td>El medidor de deuda agéntica y sus últimos eventos.</td>
+</tr>
+<tr>
+<td><code>.alpaquitay/economy.json</code></td>
+<td>Llamadas a modelos frente a operaciones locales gratuitas.</td>
+</tr>
+<tr>
+<td><code>.alpaquitay/fingerprint.json</code>, <code>platform.json</code></td>
+<td>El <em>stack</em> detectado y los comandos de build y test.</td>
+</tr>
+<tr>
+<td><code>.alpaquitay/ADR-001-onboard.md</code>, <code>.alpaquitay/adrs/</code></td>
+<td>Registros de decisiones de arquitectura.</td>
+</tr>
+<tr>
+<td><code>.alpaquitay/memory.json</code></td>
+<td>Memoria jerárquica del proyecto (clases, funciones, tareas completadas).</td>
+</tr>
+<tr>
+<td><code>.alpaquitay/ideas.json</code></td>
+<td>La bandeja de ideas que aún no son tareas.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Decide tú si versionar <code>.alpaquitay/</code> en Git: compartirla da al equipo el mismo historial de decisiones; ignorarla la mantiene personal.</p>
+<h2 id="desinstalar">Desinstalar</h2>
+<p>Desinstala desde el panel de extensiones. La carpeta <code>.alpaquitay/</code> y <code>spec.md</code> se quedan en tu proyecto (son tuyos); bórralos a mano si no los quieres. Si usaste el motor local, ejecuta antes <strong>Alpaquitay AI: Clear Local Model Cache</strong> para liberar el espacio del modelo descargado.</p>
+
+<div class="doc-foot">
+  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/01-instalacion.md">Proponer una mejora a esta página</a>
+  <span>Manual para Alpaquitay AI 3.6.1 · MIT</span>
+</div>
+<nav class="pager" aria-label="Capítulos">
+<a class="prev" href="../"><span>Anterior</span>Inicio</a>
+<a class="next" href="../proveedores/"><span>Siguiente</span>Proveedores y privacidad</a>
+</nav>
+</article>
+<nav class="toc" aria-label="En esta página"><p class="toc-title">En esta página</p><ul><li class="l2"><a href="#requisitos">Requisitos</a></li><li class="l2"><a href="#instalar">Instalar</a></li><li class="l2"><a href="#los-dos-atajos-que-necesitas">Los dos atajos que necesitas</a></li><li class="l2"><a href="#el-hub-de-un-vistazo">El Hub, de un vistazo</a></li><li class="l2"><a href="#tu-primera-sesion-paso-a-paso">Tu primera sesión, paso a paso</a></li><li class="l2"><a href="#que-se-crea-en-tu-proyecto">Qué se crea en tu proyecto</a></li><li class="l2"><a href="#desinstalar">Desinstalar</a></li></ul></nav>
+</main>
+</div>
+<div class="search" id="search" hidden>
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
+    <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off" aria-label="Texto a buscar">
+    <ol id="searchResults" class="search-results"></ol>
+    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para cerrar</p>
+  </div>
+</div>
+<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
+<script src="../assets/manual.js?v=0c8d6ca692" data-root="../" defer></script>
+</body>
+</html>
