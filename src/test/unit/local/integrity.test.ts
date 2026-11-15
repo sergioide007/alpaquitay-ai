@@ -80,6 +80,15 @@ describe('createVerifyingFetch (the env.fetch the engine installs)', () => {
     await expect(f('https://huggingface.co/m/resolve/main/config.json')).rejects.toThrow(/fuera del modelo/);
     await expect(f('https://cdn.example/models/other/config.json')).rejects.toThrow(/fuera del modelo/);
   });
+  it('always bypasses the browser HTTP cache (files are immutable under fixed paths across revisions)', async () => {
+    const seen: Array<RequestInit | undefined> = [];
+    const spy = (async (_i: RequestInfo | URL, init?: RequestInit) => { seen.push(init); return new Response('hello', { status: 200 }); }) as typeof fetch;
+    const f = createVerifyingFetch(spy, opts);
+    await (await f(P + 'config.json')).text();
+    await f(P + 'config.json', { headers: { Range: 'bytes=0-0' }, cache: 'force-cache' });
+    expect(seen.map(i => i?.cache)).toEqual(['no-store', 'no-store']);
+    expect(new Headers(seen[1]?.headers).get('Range')).toBe('bytes=0-0');      // the caller's options are kept
+  });
   it('passes 404s through so optional files stay optional', async () => {
     const f = createVerifyingFetch((async () => new Response('', { status: 404 })) as typeof fetch, opts);
     expect((await f(P + 'special_tokens_map.json')).status).toBe(404);

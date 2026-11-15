@@ -108,7 +108,10 @@ export function createVerifyingFetch(baseFetch: typeof fetch, opts: VerifyingFet
     const method = (init?.method ?? 'GET').toUpperCase();
     const headers = new Headers(init?.headers);
     const partial = method !== 'GET' || headers.has('Range');
-    const res = await baseFetch(input, init);
+    // Bypass the browser HTTP cache: model files are served `immutable` under fixed paths, so after a new
+    // revision a Webview would get the OLD bytes from its HTTP cache, fail the hash check and stay stuck.
+    // The engine keeps its own verified copy in IndexedDB; the HTTP cache would only duplicate it.
+    const res = await baseFetch(input, { ...init, cache: 'no-store' });
     if (partial || res.status !== 200) { return res; }
 
     const rel = url.slice(prefix.length).split(/[?#]/)[0];
