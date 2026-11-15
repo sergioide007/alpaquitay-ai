@@ -6,7 +6,7 @@ const MJS = new TextEncoder().encode('export default function init(){}');
 const WASM = new Uint8Array([0, 0x61, 0x73, 0x6d, 1, 0, 0, 0]);
 const VER = '1.31.0-test';
 const pins = { version: VER, files: {
-  'ort-wasm-simd-threaded.jsep.mjs': sha(MJS), 'ort-wasm-simd-threaded.jsep.wasm': sha(WASM),
+  'ort-wasm-simd-threaded.asyncify.mjs': sha(MJS), 'ort-wasm-simd-threaded.asyncify.wasm': sha(WASM),
   'ort-wasm-simd-threaded.mjs': sha(MJS), 'ort-wasm-simd-threaded.wasm': sha(WASM),
 } };
 const BASE = 'https://cdn.example';
@@ -27,7 +27,7 @@ describe('loadVerifiedRuntime', () => {
     const cache = new FakeCache(); const f = cdn();
     const rt = await loadVerifiedRuntime(BASE, VER, 'webgpu', pins, cache as never, f);
     expect(rt.mjs).toMatch(/^blob:/); expect(rt.wasm).toMatch(/^blob:/);
-    expect(f.mock.calls.map(c => c[0])).toEqual([`${BASE}/models/runtime/${VER}/ort-wasm-simd-threaded.jsep.mjs`, `${BASE}/models/runtime/${VER}/ort-wasm-simd-threaded.jsep.wasm`]);
+    expect(f.mock.calls.map(c => c[0])).toEqual([`${BASE}/models/runtime/${VER}/ort-wasm-simd-threaded.asyncify.mjs`, `${BASE}/models/runtime/${VER}/ort-wasm-simd-threaded.asyncify.wasm`]);
     expect(cache.puts).toBe(2);
     rt.dispose();
   });

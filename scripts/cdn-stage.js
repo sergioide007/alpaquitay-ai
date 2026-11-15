@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Stages everything the CDN must serve under /models/ into ./cdn-staging:
-//   models/runtime/<onnxruntime-web version>/ort-wasm-simd-threaded[.jsep].{mjs,wasm}
+//   models/runtime/<onnxruntime-web version>/ort-wasm-simd-threaded[.asyncify].{mjs,wasm}
 //   models/<id>/...  (copied from --model <dir>) + manifest.json (schema 2: per-block SHA-256)
 // Then sign it:  npm run cdn:sign -- --key <pem> --id <id>      and upload cdn-staging/models/** to R2.
 //

@@ -16,8 +16,8 @@ describe('enginePolicy', () => {
   describe('runtimeFiles', () => {
     it('uses the JSEP build for WebGPU and the base build for Wasm, under the ORT version folder', () => {
       expect(runtimeFiles('https://c.example', '1.2.3', 'webgpu')).toEqual({
-        mjs: 'https://c.example/models/runtime/1.2.3/ort-wasm-simd-threaded.jsep.mjs',
-        wasm: 'https://c.example/models/runtime/1.2.3/ort-wasm-simd-threaded.jsep.wasm',
+        mjs: 'https://c.example/models/runtime/1.2.3/ort-wasm-simd-threaded.asyncify.mjs',
+        wasm: 'https://c.example/models/runtime/1.2.3/ort-wasm-simd-threaded.asyncify.wasm',
       });
       expect(runtimeFiles('https://c.example', '1.2.3', 'wasm').wasm)
         .toBe('https://c.example/models/runtime/1.2.3/ort-wasm-simd-threaded.wasm');

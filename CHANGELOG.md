@@ -34,6 +34,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 
+- **WebGPU runtime variant:** onnxruntime-web 1.31 runs WebGPU through the native EP in the *asyncify* build (`webgpuInit`); the build pinned the *jsep* files, so the GPU path failed with "webgpuInit is not a function". Pins, CDN layout and tests now use asyncify, `build:engine` refuses a variant that lacks `webgpuInit`, and the engine tab states why WebGPU is unavailable (API missing vs. no adapter). Measured in Chrome on the same laptop: WebGPU 5.4 tok/s vs. single-thread Wasm 0.15 tok/s.
 - **Local engine timeout on CPU** (found in the first real VS Code run, 2026-11-14): a 15-minute *total* timer covered download + load + generation and cut off a CPU run that was still advancing. It is now an inactivity window (5 min) reset by every progress message, under a 60-minute ceiling; the engine streams progress token by token ("Generando (CPU, 1 hilo) · N/1024 tokens · X tok/s"), and the consent dialog warns when VS Code exposes no WebGPU.
 
 - README listed a Twitter/X account, a Discord server and `hello@specsolid.com`, none of which exist; it now lists the real contact channels. The README also said "No Alpaquitay servers exist", which the optional model CDN would make inaccurate: it now says no server ever receives code or prompts.

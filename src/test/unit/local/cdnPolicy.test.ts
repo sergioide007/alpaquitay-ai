@@ -10,8 +10,8 @@ describe('cdnPolicy', () => {
     it.each([
       ['/models/g/onnx/model_q4.onnx', 'application/octet-stream'],
       ['/models/g/onnx/model_q4.onnx_data', 'application/octet-stream'],
-      ['/models/runtime/1.2.3/ort-wasm-simd-threaded.jsep.wasm', 'application/wasm'],
-      ['/models/runtime/1.2.3/ort-wasm-simd-threaded.jsep.mjs', 'text/javascript; charset=utf-8'],
+      ['/models/runtime/1.2.3/ort-wasm-simd-threaded.asyncify.wasm', 'application/wasm'],
+      ['/models/runtime/1.2.3/ort-wasm-simd-threaded.asyncify.mjs', 'text/javascript; charset=utf-8'],
       ['/models/g/config.json', 'application/json; charset=utf-8'],
     ])('%s -> %s', (p, mime) => expect(mimeFor(p)).toBe(mime));
 

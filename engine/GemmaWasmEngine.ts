@@ -36,12 +36,21 @@ export class GemmaWasmEngine {
 
   private constructor() {}
 
-  static async gpuInfo(): Promise<{ webgpu: boolean; shaderF16: boolean }> {
+  /**
+   * `reason` says WHY there is no WebGPU, shown in the engine tab: "API ausente" means the host (VS Code/Electron)
+   * does not expose navigator.gpu at all; "sin adaptador" means the API exists but no GPU was granted.
+   * A second request with powerPreference "high-performance" can find a discrete GPU the default request skipped.
+   */
+  static async gpuInfo(): Promise<{ webgpu: boolean; shaderF16: boolean; reason?: string }> {
+    type Adapter = { features: { has(f: string): boolean } };
     try {
-      const gpu = (navigator as unknown as { gpu?: { requestAdapter(): Promise<{ features: { has(f: string): boolean } } | null> } }).gpu;
-      const adapter = gpu ? await gpu.requestAdapter() : null;
-      return adapter ? { webgpu: true, shaderF16: adapter.features.has('shader-f16') } : { webgpu: false, shaderF16: false };
-    } catch { return { webgpu: false, shaderF16: false }; }
+      const gpu = (navigator as unknown as { gpu?: { requestAdapter(o?: { powerPreference?: string }): Promise<Adapter | null> } }).gpu;
+      if (!gpu) { return { webgpu: false, shaderF16: false, reason: 'API navigator.gpu ausente' }; }
+      const adapter = (await gpu.requestAdapter()) ?? (await gpu.requestAdapter({ powerPreference: 'high-performance' }));
+      return adapter
+        ? { webgpu: true, shaderF16: adapter.features.has('shader-f16') }
+        : { webgpu: false, shaderF16: false, reason: 'sin adaptador GPU' };
+    } catch (e) { return { webgpu: false, shaderF16: false, reason: `error: ${e instanceof Error ? e.message : String(e)}` }; }
   }
 
   private prefix(t: EngineTarget): string { return `${t.cdnBase}/models/${t.modelId}/`; }
@@ -122,7 +131,7 @@ export class GemmaWasmEngine {
           const pct = agg.update(e.file, e.loaded ?? 0, e.total);
           onProgress?.(`Descargando ${e.file.split('/').pop()}`, Math.max(3, Math.min(95, pct)));
         } else if (e.status === 'ready') {
-          onProgress?.(`Modelo listo (${this.device}, ${dtype})`, 96);
+          onProgress?.(`Modelo listo (${this.device}, ${dtype})${gpu.reason ? ` — WebGPU: ${gpu.reason}` : ''}`, 96);
         }
       },
     });

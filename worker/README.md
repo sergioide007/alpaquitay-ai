@@ -12,7 +12,7 @@ Gemma 4 E2B: [`docs/LOCAL-ENGINE.md`](../docs/LOCAL-ENGINE.md).
 | `/models/<id>/manifest.json` | schema 2: `{ id, label, revision, sequence, chunkBytes, license?, runtime, files: [{ path, size, sha256: [per 8 MiB block] }] }` | `application/json` | `max-age=300, must-revalidate, no-transform` |
 | `/models/<id>/manifest.sig.json` | `{ alg: "ed25519", keyId, sig }` over the exact bytes of `manifest.json` | `application/json` | same |
 | `/models/<id>/<files…>` | `config.json`, `tokenizer.json`, `onnx/*_q4f16.onnx`, `*.onnx_data`, … | by extension | `max-age=31536000, immutable, no-transform` |
-| `/models/runtime/<onnxruntime-web version>/ort-wasm-simd-threaded[.jsep].{mjs,wasm}` | ONNX Runtime, **hash-pinned inside the extension** | `text/javascript` / `application/wasm` | immutable |
+| `/models/runtime/<onnxruntime-web version>/ort-wasm-simd-threaded[.asyncify].{mjs,wasm}` | ONNX Runtime, **hash-pinned inside the extension** | `text/javascript` / `application/wasm` | immutable |
 
 Allowed extensions (anything else is **415**): `wasm`, `onnx`, `onnx_data`, `model`, `json`, `txt`, `jinja`, `mjs`.
 Allowed origins: `https://alpaquitay.specsolid.com`, `https://alpaquitay-ai.specsolid.com`, `https://specsolid.com`, and VS Code Webviews (`vscode-webview://<id>`).

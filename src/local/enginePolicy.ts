@@ -12,12 +12,12 @@ export function chooseDevice(requested: 'auto' | 'webgpu' | 'wasm', hasWebGpuAda
 }
 
 /**
- * ONNX Runtime files the engine needs from the CDN. WebGPU needs the JSEP build; plain
- * Wasm uses the base build. The folder is the exact onnxruntime-web version bundled in
+ * ONNX Runtime files the engine needs from the CDN. WebGPU needs the *asyncify* build (native WebGPU EP,
+ * exports webgpuInit; the old JSEP build fails with "webgpuInit is not a function"); plain Wasm uses the base build. The folder is the exact onnxruntime-web version bundled in
  * the Webview, so runtime and glue code can never mismatch.
  */
 export function runtimeFiles(cdnBase: string, ortVersion: string, device: 'webgpu' | 'wasm'): { mjs: string; wasm: string } {
-  const base = `${cdnBase}/models/runtime/${ortVersion}/ort-wasm-simd-threaded${device === 'webgpu' ? '.jsep' : ''}`;
+  const base = `${cdnBase}/models/runtime/${ortVersion}/ort-wasm-simd-threaded${device === 'webgpu' ? '.asyncify' : ''}`;
   return { mjs: `${base}.mjs`, wasm: `${base}.wasm` };
 }
 
