@@ -23,8 +23,8 @@ Un asistente de IA normal recibe tu texto y responde. Alpaquitay pone delante un
 | Carril | Cuándo | Qué hace | Coste |
 |---|---|---|---|
 | ⚡ **Flash** | Preguntas cortas, explicaciones, ideas sueltas. | Responde en el chat o guarda la idea en la bandeja. No escribe archivos. | Una llamada, o ninguna. |
-| 🔨 **Build** | Crear, implementar, corregir o refactorizar; hablar de la especificación o el tablero. | Planifica, genera y deja **diffs pendientes** que tú apruebas. | 2 a 4 llamadas por cambio confirmado. |
-| 🧠 **Deep** | Despliegue, pipelines, Docker, Terraform, nube, DORA, *pentest*, amenazas… | Envía la petición a **un único especialista** registrado (seguridad, DevOps, arquitectura, QA…). | Una llamada al especialista. |
+| 🔨 **Build** | Crear, implementar, corregir o refactorizar; hablar de la especificación o el tablero. | Desde el **tablero**: planifica, genera y deja **diffs pendientes** que tú apruebas. Desde el **chat**: al confirmar con `si`, convierte tu petición en un `spec.md` nuevo para trabajarla desde el tablero (ver el aviso de abajo). | 2 a 4 llamadas por cambio confirmado. |
+| 🧠 **Deep** | El mensaje habla de despliegue (*deploy*), pipelines, Docker, Terraform, AWS, Azure, GCP, IaC, DORA, *pentest*, amenazas (*threat*), STRIDE, SBOM, OWASP SAMM, FinOps, *zero trust*, *runbooks* o MLOps. | Envía la petición a **un único especialista** registrado (seguridad, DevOps, arquitectura, QA…). | Una llamada al especialista. |
 
 El arnés decide con reglas legibles, no con otro modelo. Algunos ejemplos de lo que dispara cada carril:
 
@@ -35,6 +35,9 @@ El arnés decide con reglas legibles, no con otro modelo. Algunos ejemplos de lo
 | «añade una épica de pagos a la spec» | Build · spec | menciona spec, épica o tablero |
 | «implementa el endpoint de reservas» | Build · code | verbo de código |
 | «prepara el pipeline de despliegue en AWS» | Deep · specialist | operaciones o infraestructura |
+
+> [!WARNING]
+> Confirmar con `si` una petición de código escrita en el chat (*«implementa el endpoint de reservas»*) **genera un `spec.md` nuevo a partir de esa petición y reemplaza el actual**. Antes guarda un *checkpoint* en Git, así que puedes recuperarlo, pero si ya tienes una especificación que quieres conservar, añade la tarea al tablero y arrástrala a *In Progress* en lugar de pedirla en el chat.
 
 Cuando la confianza es baja o la ruta es Deep, el arnés **propone la ruta y espera**: contesta `si` (o `sí`, `dale`, `ok`, `confirmo`) para seguir. Cada respuesta muestra una línea legible con el carril, el *stack*, la fase, la compuerta y la economía de la sesión.
 

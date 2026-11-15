@@ -48,7 +48,7 @@ La próxima vez que ejecutes el comando verás el diálogo de confirmación con 
 
 ## Cuándo cambia un modelo
 
-Cuando el proyecto publica una **revisión nueva** (mismos archivos corregidos o un grafo optimizado), el manifiesto lleva una revisión y una secuencia mayores. La extensión lo detecta, te pide confirmación para la nueva descarga y borra los pesos antiguos. Nunca acepta una secuencia menor que la que ya vio.
+Cuando el proyecto publica una **revisión nueva** (mismos archivos corregidos o un grafo optimizado), el manifiesto lleva una revisión nueva y una secuencia mayor. La extensión lo detecta, te pide confirmación para la nueva descarga y borra los pesos antiguos. Nunca acepta una secuencia menor que la que ya vio.
 
 ## Publicar un modelo en tu propio CDN
 

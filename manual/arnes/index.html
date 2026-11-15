@@ -6,6 +6,9 @@
 <title>Cómo piensa el arnés · Manual de Alpaquitay AI</title>
 <meta name="description" content="Los carriles Flash, Build y Deep, las seis fases del SDLC con sus compuertas, el marco FABLE-5, la deuda agéntica y las evidencias que Alpaquitay deja en .alpaquitay/.">
 <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/arnes/">
+<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/arnes/">
+<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/harness/">
+<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/harness/">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/arnes/">
 <meta property="og:title" content="Cómo piensa el arnés">
@@ -14,7 +17,7 @@
 <meta name="theme-color" content="#07100d">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../assets/manual.css?v=0c8d6ca692">
+<link rel="stylesheet" href="../assets/manual.css?v=3bc195267f">
 <script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Cómo piensa el arnés","description":"Los carriles Flash, Build y Deep, las seis fases del SDLC con sus compuertas, el marco FABLE-5, la deuda agéntica y las evidencias que Alpaquitay deja en .alpaquitay/.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/arnes/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
@@ -25,6 +28,7 @@
   <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><span class="brand-mark">▲</span><span>Alpaquitay AI</span></a>
   <a class="crumb" href="../">Manual</a>
   <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
+  <a class="lang" href="../en/harness/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
   <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
   <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
   <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
@@ -88,12 +92,12 @@
 <tr>
 <td>🔨 <strong>Build</strong></td>
 <td>Crear, implementar, corregir o refactorizar; hablar de la especificación o el tablero.</td>
-<td>Planifica, genera y deja <strong>diffs pendientes</strong> que tú apruebas.</td>
+<td>Desde el <strong>tablero</strong>: planifica, genera y deja <strong>diffs pendientes</strong> que tú apruebas. Desde el <strong>chat</strong>: al confirmar con <code>si</code>, convierte tu petición en un <code>spec.md</code> nuevo para trabajarla desde el tablero (ver el aviso de abajo).</td>
 <td>2 a 4 llamadas por cambio confirmado.</td>
 </tr>
 <tr>
 <td>🧠 <strong>Deep</strong></td>
-<td>Despliegue, pipelines, Docker, Terraform, nube, DORA, <em>pentest</em>, amenazas…</td>
+<td>El mensaje habla de despliegue (<em>deploy</em>), pipelines, Docker, Terraform, AWS, Azure, GCP, IaC, DORA, <em>pentest</em>, amenazas (<em>threat</em>), STRIDE, SBOM, OWASP SAMM, FinOps, <em>zero trust</em>, <em>runbooks</em> o MLOps.</td>
 <td>Envía la petición a <strong>un único especialista</strong> registrado (seguridad, DevOps, arquitectura, QA…).</td>
 <td>Una llamada al especialista.</td>
 </tr>
@@ -136,6 +140,9 @@
 </tr>
 </tbody>
 </table></div>
+<aside class="callout callout-warning"><p class="callout-title">Atención</p>
+<p>Confirmar con <code>si</code> una petición de código escrita en el chat (<em>«implementa el endpoint de reservas»</em>) <strong>genera un <code>spec.md</code> nuevo a partir de esa petición y reemplaza el actual</strong>. Antes guarda un <em>checkpoint</em> en Git, así que puedes recuperarlo, pero si ya tienes una especificación que quieres conservar, añade la tarea al tablero y arrástrala a <em>In Progress</em> en lugar de pedirla en el chat.</p>
+</aside>
 <p>Cuando la confianza es baja o la ruta es Deep, el arnés <strong>propone la ruta y espera</strong>: contesta <code>si</code> (o <code>sí</code>, <code>dale</code>, <code>ok</code>, <code>confirmo</code>) para seguir. Cada respuesta muestra una línea legible con el carril, el <em>stack</em>, la fase, la compuerta y la economía de la sesión.</p>
 <h2 id="las-seis-fases-del-sdlc-y-sus-compuertas">Las seis fases del SDLC y sus compuertas</h2>
 <p>El arnés también sitúa cada petición en una fase del ciclo de vida. Una fase solo avanza cuando pasa su <strong>compuerta de salida</strong>.</p>
@@ -305,6 +312,6 @@
   </div>
 </div>
 <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
-<script src="../assets/manual.js?v=0c8d6ca692" data-root="../" defer></script>
+<script src="../assets/manual.js?v=3bc195267f" data-root="../" defer></script>
 </body>
 </html>

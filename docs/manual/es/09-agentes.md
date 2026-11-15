@@ -36,7 +36,7 @@ Si programas en TypeScript, puedes añadir skills permanentes a la extensión (c
 
 ## Especialistas de dominio
 
-Cuando haces una pregunta experta en el chat, el arnés la envía al carril **Deep**: elige **un único especialista** registrado, te propone la ruta con su confianza y, cuando confirmas con `si`, hace **una sola llamada** a ese especialista. Antes, el texto pasa por el detector de datos personales; y el resultado pasa por las **reglas de control** (*guardrails*) de ese dominio.
+Cuando tu mensaje en el chat habla de despliegue, pipelines, Docker, Terraform, nube (AWS, Azure, GCP), IaC, DORA, *pentest*, amenazas, STRIDE, SBOM, OWASP SAMM, FinOps, *zero trust*, *runbooks* o MLOps, el arnés lo envía al carril **Deep**: elige **un único especialista** registrado, te propone la ruta con su confianza y, cuando confirmas con `si`, hace **una sola llamada** a ese especialista. Antes, el texto pasa por el detector de datos personales; y el resultado pasa por las **reglas de control** (*guardrails*) de ese dominio.
 
 ![Orquestación de especialistas de dominio](diagrams/06-domain-orchestration.svg "El agente central, el orquestador y el registro de especialistas.")
 
@@ -78,7 +78,7 @@ En total hay **17 especialistas** registrados, cada uno anclado a sus normas de 
 | Zero Trust | modelo de madurez *zero trust* |
 
 > [!TIP]
-> Sé concreto: «haz un modelo de amenazas STRIDE del endpoint de pagos de este proyecto» llega al especialista correcto y con contexto útil. Una pregunta vaga se queda en Flash o te pide aclaración.
+> Sé concreto y usa el vocabulario del dominio: «haz un modelo de amenazas STRIDE del endpoint de pagos de este proyecto» llega al especialista DevSecOps con contexto útil. Una pregunta sin esas palabras («¿es seguro mi login?») se queda en Flash y la responde el modelo general.
 
 Cada especialista sigue una arquitectura hexagonal (puertos y adaptadores), con un modelo de dominio puro y sus reglas de control:
 

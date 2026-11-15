@@ -6,6 +6,9 @@
 <title>Modelos disponibles · Manual de Alpaquitay AI</title>
 <meta name="description" content="Estado en vivo de los modelos firmados que sirve el CDN del motor local de Alpaquitay AI, con verificación de la firma en el navegador, y la comparación medida que llevó a elegir el modelo por defecto.">
 <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/modelos/">
+<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/modelos/">
+<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/models/">
+<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/models/">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/modelos/">
 <meta property="og:title" content="Modelos disponibles">
@@ -14,7 +17,7 @@
 <meta name="theme-color" content="#07100d">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../assets/manual.css?v=0c8d6ca692">
+<link rel="stylesheet" href="../assets/manual.css?v=3bc195267f">
 <script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Modelos disponibles","description":"Estado en vivo de los modelos firmados que sirve el CDN del motor local de Alpaquitay AI, con verificación de la firma en el navegador, y la comparación medida que llevó a elegir el modelo por defecto.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/modelos/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
@@ -25,6 +28,7 @@
   <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><span class="brand-mark">▲</span><span>Alpaquitay AI</span></a>
   <a class="crumb" href="../">Manual</a>
   <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
+  <a class="lang" href="../en/models/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
   <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
   <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
   <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
@@ -130,7 +134,7 @@
 </code></pre></div>
 <p>La próxima vez que ejecutes el comando verás el diálogo de confirmación con el tamaño del modelo nuevo. Para volver al de por defecto, borra el ajuste.</p>
 <h2 id="cuando-cambia-un-modelo">Cuándo cambia un modelo</h2>
-<p>Cuando el proyecto publica una <strong>revisión nueva</strong> (mismos archivos corregidos o un grafo optimizado), el manifiesto lleva una revisión y una secuencia mayores. La extensión lo detecta, te pide confirmación para la nueva descarga y borra los pesos antiguos. Nunca acepta una secuencia menor que la que ya vio.</p>
+<p>Cuando el proyecto publica una <strong>revisión nueva</strong> (mismos archivos corregidos o un grafo optimizado), el manifiesto lleva una revisión nueva y una secuencia mayor. La extensión lo detecta, te pide confirmación para la nueva descarga y borra los pesos antiguos. Nunca acepta una secuencia menor que la que ya vio.</p>
 <h2 id="publicar-un-modelo-en-tu-propio-cdn">Publicar un modelo en tu propio CDN</h2>
 <p>Si quieres servir modelos desde tu propia infraestructura (por ejemplo, en una red sin acceso a Internet), el proceso es: preparar el grafo, <em>stage</em>, firmar con tu clave, subir y verificar. Añade tu clave pública en <code>alpaquitay-ai.localEngine.extraTrustedKeys</code> y apunta <code>cdnBaseUrl</code> a tu CDN. Guía completa: <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/worker/README.md" rel="noopener"><code>worker/README.md</code></a> y <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/docs/LOCAL-ENGINE.md#7-operations" rel="noopener"><code>docs/LOCAL-ENGINE.md</code> §6–7</a>.</p>
 
@@ -154,6 +158,6 @@
   </div>
 </div>
 <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
-<script src="../assets/manual.js?v=0c8d6ca692" data-root="../" defer></script>
+<script src="../assets/manual.js?v=3bc195267f" data-root="../" defer></script>
 </body>
 </html>

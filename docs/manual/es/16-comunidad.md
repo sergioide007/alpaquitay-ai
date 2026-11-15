@@ -12,7 +12,7 @@ Alpaquitay AI es software libre (MIT) hecho para la comunidad. Toda ayuda cuenta
 
 Cada página tiene al final el enlace **Proponer una mejora a esta página**, que abre el archivo Markdown en GitHub para editarlo.
 
-- Los capítulos están en [`docs/manual/es/`](https://github.com/sergioide007/alpaquitay-ai/tree/main/docs/manual/es), uno por archivo.
+- Los capítulos están en [`docs/manual/es/`](https://github.com/sergioide007/alpaquitay-ai/tree/main/docs/manual/es) y su traducción al inglés en [`docs/manual/en/`](https://github.com/sergioide007/alpaquitay-ai/tree/main/docs/manual/en), uno por archivo con el mismo número. Si cambias un capítulo, cambia también su traducción: la generación falla si los dos idiomas no tienen los mismos capítulos.
 - Las capturas y vídeos están en `manual/media/`.
 - La web se genera con `npm run manual:build`, que **falla si hay un enlace roto, un ancla que no existe o una imagen que falta**. `npm run manual:check` comprueba que lo publicado está al día.
 

@@ -15,7 +15,7 @@ Este manual explica cómo usar cada parte, para qué casos sirve y qué garantí
 title: Recorrido por el Hub
 src: media/tour.mp4
 poster: media/tour.jpg
-duration: 0:46
+duration: 0:44
 caption: Se abre el Hub con `Ctrl+Alt+A` y se recorren sus seis pestañas: Work, Docs, Evidence, Architecture, Agents y Settings.
 ```
 
@@ -48,7 +48,7 @@ caption: Se abre el Hub con `Ctrl+Alt+A` y se recorren sus seis pestañas: Work,
 - **Capítulos 4 a 10:** una pestaña o función por capítulo. Puedes saltar al que necesites.
 - **Capítulos 11 a 16:** modelos, recetas de uso, diagramas, referencia, solución de problemas y cómo contribuir.
 
-Busca cualquier tema con <kbd>Ctrl</kbd>+<kbd>K</kbd> (o <kbd>/</kbd>). Cada página tiene al final un enlace para proponer mejoras en GitHub: este manual es de la comunidad.
+Busca cualquier tema con <kbd>Ctrl</kbd>+<kbd>K</kbd> (o <kbd>/</kbd>). Cada página tiene al final un enlace para proponer mejoras en GitHub: este manual es de la comunidad. También está [en inglés](en/) (botón **EN** arriba).
 
 > [!NOTE]
 > El manual describe la versión **3.6.1**. El motor local (WebGPU), el comando *Generate Specification (Local Model)* y la página de modelos llegan con esa versión. Si el Marketplace todavía muestra una versión anterior, esas funciones aún no están publicadas; el resto del manual vale igual.

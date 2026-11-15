@@ -6,6 +6,9 @@
 <title>Proveedores de IA y privacidad · Manual de Alpaquitay AI</title>
 <meta name="description" content="Cómo conectar Ollama, LM Studio, el motor local con WebGPU, Anthropic u OpenAI en Alpaquitay AI, cómo elige el modo auto y qué protege el límite de privacidad.">
 <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/proveedores/">
+<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/proveedores/">
+<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/providers/">
+<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/providers/">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/proveedores/">
 <meta property="og:title" content="Proveedores de IA y privacidad">
@@ -14,7 +17,7 @@
 <meta name="theme-color" content="#07100d">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../assets/manual.css?v=0c8d6ca692">
+<link rel="stylesheet" href="../assets/manual.css?v=3bc195267f">
 <script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Proveedores de IA y privacidad","description":"Cómo conectar Ollama, LM Studio, el motor local con WebGPU, Anthropic u OpenAI en Alpaquitay AI, cómo elige el modo auto y qué protege el límite de privacidad.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/proveedores/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
@@ -25,6 +28,7 @@
   <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><span class="brand-mark">▲</span><span>Alpaquitay AI</span></a>
   <a class="crumb" href="../">Manual</a>
   <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
+  <a class="lang" href="../en/providers/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
   <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
   <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
   <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
@@ -109,7 +113,7 @@
 </table></div>
 <figure class="video">
 <video controls preload="none" playsinline poster="../media/providers.jpg" width="1440" height="900" aria-label="Configurar un proveedor"><source src="../media/providers.mp4" type="video/mp4">Tu navegador no reproduce vídeo MP4. <a href="../media/providers.mp4">Descarga el vídeo</a>.</video>
-<figcaption><strong>Configurar un proveedor</strong> <span class="video-len">0:22</span> — Pestaña Settings: se elige el proveedor, el modelo, el límite de tokens y la temperatura. Las claves de API nunca se escriben en los ajustes.</figcaption>
+<figcaption><strong>Configurar un proveedor</strong> <span class="video-len">0:21</span> — Pestaña Settings: se elige el proveedor, el modelo, el límite de tokens y la temperatura. Las claves de API nunca se escriben en los ajustes.</figcaption>
 </figure>
 <h2 id="como-elige-el-modo-auto">Cómo elige el modo <code>auto</code></h2>
 <p>Con <code>alpaquitay-ai.preferredProvider</code> en <code>auto</code> (el valor por defecto), Alpaquitay usa <strong>el primero disponible</strong> en este orden:</p>
@@ -141,6 +145,68 @@ ollama pull qwen2.5-coder
 <li>Elige el proveedor y pega tu clave.</li>
 <li>Elige el modelo en <strong>Settings</strong>. El selector trae una lista de modelos conocidos, pero los ajustes <code>alpaquitay-ai.anthropic.model</code> y <code>alpaquitay-ai.openai.model</code> aceptan <strong>cualquier identificador</strong> que tu cuenta tenga disponible.</li>
 </ol>
+<p>Modelos del selector (revisados el 15 de noviembre de 2026 en la documentación de cada proveedor; precio por millón de tokens de entrada y salida):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Proveedor</th>
+<th>Modelo</th>
+<th>Precio</th>
+<th>Para qué</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Anthropic</td>
+<td><strong>Claude Opus 5.5</strong> (<code>claude-opus-5-5</code>, por defecto)</td>
+<td>$4 / $20</td>
+<td>Arquitectura, tareas de varios archivos, revisiones</td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td>Claude Sonnet 5.5 (<code>claude-sonnet-5-5</code>)</td>
+<td>$2 / $10</td>
+<td>Código del día a día, a la mitad de precio</td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td>Claude Haiku 5.5 (<code>claude-haiku-5-5</code>)</td>
+<td>$0.10 / $0.50</td>
+<td>Tareas rápidas y de mucho volumen</td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td>Claude Fable 5.2 (<code>claude-fable-5-2</code>)</td>
+<td>$8 / $40</td>
+<td>El razonamiento más exigente (requiere retención de datos de 30 días en tu cuenta)</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td><strong>GPT-6.1 Sol</strong> (<code>gpt-6.1-sol</code>, por defecto)</td>
+<td>$2 / $10</td>
+<td>Equilibrio entre capacidad y coste</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>GPT-6 Astra (<code>gpt-6-astra</code>)</td>
+<td>$10 / $50</td>
+<td>El más capaz de OpenAI</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>GPT-6.1 Terra (<code>gpt-6.1-terra</code>)</td>
+<td>$1 / $5</td>
+<td>Rápido; redactar y revisar texto</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>GPT-6 Luna (<code>gpt-6-luna</code>)</td>
+<td>$0.10 / $0.50</td>
+<td>Mucho volumen al menor coste</td>
+</tr>
+</tbody>
+</table></div>
+<p>Todos tienen alrededor de un millón de tokens de contexto y hasta 128 000 de salida, y todos razonan antes de responder. Por eso Alpaquitay no les envía la temperatura (la rechazan) y les deja margen de salida para ese razonamiento: si tu límite de tokens es menor de 16 000, con estos modelos se usa 16 000.</p>
 <p>La clave se guarda en el <strong>llavero del sistema operativo</strong> mediante el <em>SecretStorage</em> de VS Code: nunca en <code>settings.json</code>, nunca en texto plano y nunca en el repositorio. Para Azure OpenAI o un proxy compatible, cambia <code>alpaquitay-ai.openai.baseUrl</code> (o <code>anthropic.baseUrl</code>).</p>
 <h2 id="el-limite-de-privacidad">El límite de privacidad</h2>
 <p>Cuando la petición va a un proveedor en la nube, pasa antes por el <strong>límite de privacidad</strong> (<code>PrivacyBoundaryProvider</code>):</p>
@@ -179,7 +245,7 @@ ollama pull qwen2.5-coder
 <tr>
 <td>Temperature</td>
 <td>0.3</td>
-<td>0 = determinista, 2 = creativo. Para código, quédate entre 0 y 0.4.</td>
+<td>0 = determinista, 2 = creativo. Para código, quédate entre 0 y 0.4. Se envía a los modelos locales y a los de la nube que la aceptan; Alpaquitay no se la envía a los modelos de razonamiento actuales.</td>
 </tr>
 <tr>
 <td>Request timeout</td>
@@ -219,6 +285,6 @@ ollama pull qwen2.5-coder
   </div>
 </div>
 <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
-<script src="../assets/manual.js?v=0c8d6ca692" data-root="../" defer></script>
+<script src="../assets/manual.js?v=3bc195267f" data-root="../" defer></script>
 </body>
 </html>

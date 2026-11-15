@@ -41,7 +41,7 @@ Cada receta indica para quién es, qué necesitas y los pasos, con enlaces al ca
 1. Instala **Ollama** y descarga un modelo de código de 7B o más si tu equipo lo soporta. [Proveedores](../proveedores/#ollama)
 2. Pon `alpaquitay-ai.preferredProvider: "ollama"` para que nunca se elija un proveedor en la nube por accidente, y **no guardes** claves de Anthropic ni OpenAI.
 3. Usa el **motor local** para especificaciones: la única red que usa es la descarga firmada del modelo, una vez.
-4. Comprueba en **Evidence → Privacy boundary** que la franja dice `privacy local-first`.
+4. Comprueba en **Evidence → Privacy boundary** que la franja dice `privacy on-device`.
 5. Para una red sin Internet, sirve los modelos desde tu propio CDN con tu clave (`cdnBaseUrl` + `extraTrustedKeys`). [Modelos](../modelos/#publicar-un-modelo-en-tu-propio-cdn)
 
 > [!TIP]

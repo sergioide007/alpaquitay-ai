@@ -46,6 +46,10 @@ La política o la revisión automática pararon un archivo:
 
 Antes de escribir se guardó un *checkpoint*: `git stash list` muestra uno llamado `alpaquitay/apply-diffs-<fecha>`. Descarta los cambios no deseados con Git (por ejemplo `git restore <archivo>`) o recupera el estado del *checkpoint* con `git stash apply stash@{N}`.
 
+### Mi `spec.md` cambió entero después de un `si` en el chat
+
+Confirmaste una petición de código escrita en el chat: eso genera un `spec.md` nuevo a partir de la petición. Antes se guardó un *checkpoint*; recupera la versión anterior con `git stash list` (busca el `alpaquitay/code-<fecha>` o `alpaquitay/spec-<fecha>`) y `git checkout stash@{N} -- spec.md`, o con `git checkout -- spec.md` si estaba confirmada en Git. Para no perderla, añade las tareas nuevas al tablero en vez de pedirlas en el chat. [Detalle](../arnes/#los-tres-carriles)
+
 ### El tablero no muestra mis tareas
 
 - ¿Tu especificación se llama `spec.md` y está en la raíz? Si no, cambia `alpaquitay-ai.specFile`.
@@ -64,6 +68,10 @@ code --status
 ```
 
 En *GPU Status* debe aparecer `webgpu: enabled`.
+
+### Un modelo en la nube responde con un error 400
+
+Los modelos actuales de Claude y GPT razonan antes de responder y rechazan algunos parámetros antiguos de las peticiones. Desde la versión 3.6.1, Alpaquitay solo envía `temperature` a los modelos que la aceptan y usa `max_completion_tokens` con OpenAI. Si usas una versión anterior, elige un modelo del selector o actualiza la extensión.
 
 ### Ctrl+Shift+A abre otra cosa
 

@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
 [![Version](https://img.shields.io/badge/version-3.6.1-green)](./CHANGELOG.md)
-[![Tests](https://img.shields.io/badge/tests-676%20passing-brightgreen)](./package.json)
+[![Tests](https://img.shields.io/badge/tests-689%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
 [![Stars](https://img.shields.io/github/stars/sergioide007/alpaquitay-ai?style=social)](https://github.com/sergioide007/alpaquitay-ai/stargazers)
@@ -341,21 +341,27 @@ The canvas infers the real system from manifests, Docker Compose and `spec.md`, 
 
 ### Anthropic Models
 
-| Model | Context | Max Output | Best for |
-|---|---|---|---|
-| Claude Opus 4.7 | 200k | 32k | Complex architecture, reasoning |
-| Claude Sonnet 4.6 | 200k | 64k | Balanced — default recommendation |
-| Claude Haiku 4.5 | 200k | 8k | Fast iteration, simple tasks |
+Checked against Anthropic's model documentation on 2026-11-15. Prices are per million input / output tokens.
+
+| Model | ID | Context | Max output | Price | Best for |
+|---|---|---|---|---|---|
+| Claude Opus 5.5 | `claude-opus-5-5` | 1M | 128k | $4 / $20 | **Default.** Complex architecture, multi-file tasks, reviews |
+| Claude Sonnet 5.5 | `claude-sonnet-5-5` | 1M | 128k | $2 / $10 | Everyday coding at half the price of Opus |
+| Claude Haiku 5.5 | `claude-haiku-5-5` | 1M | 128k | $0.10 / $0.50 | Fast, high-volume, simple tasks |
+| Claude Fable 5.2 | `claude-fable-5-2` | 1M | 128k | $8 / $40 | The most demanding reasoning (needs 30-day data retention on your account) |
 
 ### OpenAI Models
 
-| Model | Context | Max Output | Best for |
-|---|---|---|---|
-| GPT-4o | 128k | 16k | General coding, balanced |
-| GPT-4o Mini | 128k | 16k | Fast, cost-effective |
-| GPT-4 Turbo | 128k | 4k | Legacy compatibility |
-| o1 | 200k | 32k | Multi-step reasoning |
-| o1-mini | 128k | 65k | Reasoning at lower cost |
+Checked against developers.openai.com on 2026-11-15. All four are reasoning models.
+
+| Model | ID | Context | Max output | Price | Best for |
+|---|---|---|---|---|---|
+| GPT-6.1 Sol | `gpt-6.1-sol` | 1.05M | 128k | $2 / $10 | **Default.** OpenAI's balance of intelligence and cost |
+| GPT-6 Astra | `gpt-6-astra` | 1.05M | 128k | $10 / $50 | OpenAI's most capable model |
+| GPT-6.1 Terra | `gpt-6.1-terra` | 1.05M | 128k | $1 / $5 | Fast and efficient; writing and revising text |
+| GPT-6 Luna | `gpt-6-luna` | 1.05M | 128k | $0.10 / $0.50 | Cost-sensitive, high-volume work |
+
+Any other model ID your account can use works too: type it in `alpaquitay-ai.anthropic.model` or `alpaquitay-ai.openai.model`. Alpaquitay sends sampling parameters (`temperature`) only to models that accept them, and leaves room for reasoning tokens on models that think before answering.
 
 ---
 
@@ -477,9 +483,9 @@ All settings are configurable in VS Code's settings UI or `settings.json`. Provi
 | Setting | Default | Description |
 |---|---|---|
 | `alpaquitay-ai.preferredProvider` | `auto` | `auto` tries local first, then cloud |
-| `alpaquitay-ai.anthropic.model` | `claude-sonnet-4-6` | Anthropic model ID |
+| `alpaquitay-ai.anthropic.model` | `claude-opus-5-5` | Anthropic model ID |
 | `alpaquitay-ai.anthropic.baseUrl` | Anthropic API | Override for proxies or compatible APIs |
-| `alpaquitay-ai.openai.model` | `gpt-4o` | OpenAI model ID |
+| `alpaquitay-ai.openai.model` | `gpt-6.1-sol` | OpenAI model ID |
 | `alpaquitay-ai.openai.baseUrl` | OpenAI API | Override for Azure OpenAI |
 | `alpaquitay-ai.ollama.endpoint` | `http://localhost:11434` | Ollama server address |
 | `alpaquitay-ai.ollama.model` | `codellama` | Ollama model name |

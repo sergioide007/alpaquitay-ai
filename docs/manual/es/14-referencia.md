@@ -36,9 +36,9 @@ Se cambian en la interfaz de ajustes de VS Code, en `settings.json` o, los del p
 | Ajuste | Por defecto | Descripción |
 |---|---|---|
 | `alpaquitay-ai.preferredProvider` | `auto` | `auto`, `ollama`, `lmstudio`, `local-wasm`, `anthropic` u `openai`. `auto` prueba primero los locales. |
-| `alpaquitay-ai.anthropic.model` | `claude-sonnet-4-6` | Identificador del modelo de Anthropic. |
+| `alpaquitay-ai.anthropic.model` | `claude-opus-5-5` | Identificador del modelo de Anthropic. |
 | `alpaquitay-ai.anthropic.baseUrl` | `https://api.anthropic.com/v1` | Para proxies o APIs compatibles. |
-| `alpaquitay-ai.openai.model` | `gpt-4o` | Identificador del modelo de OpenAI. |
+| `alpaquitay-ai.openai.model` | `gpt-6.1-sol` | Identificador del modelo de OpenAI. |
 | `alpaquitay-ai.openai.baseUrl` | `https://api.openai.com/v1` | Para Azure OpenAI o proxies. |
 | `alpaquitay-ai.ollama.endpoint` | `http://localhost:11434` | Dirección del servidor Ollama. |
 | `alpaquitay-ai.ollama.model` | `codellama` | Modelo de Ollama. |
@@ -84,7 +84,7 @@ Se cambian en la interfaz de ajustes de VS Code, en `settings.json` o, los del p
 
 | Ruta | Quién la escribe |
 |---|---|
-| `spec.md` | Tú, *Create with AI*, *Regen*, `promover` y el tablero al cerrar tareas. |
+| `spec.md` | Tú, *Create with AI*, *Regen*, `promover`, una petición de código confirmada en el chat (reemplaza el archivo) y el tablero al cerrar tareas. |
 | `specs/*.md` | *New Specification* y *Generate Specification (Local Model)*. |
 | `infra/main.*` | *Export as IaC* en Architecture. |
 | `*.edited.*` | El agente de Docs al aplicar cambios (salvo que elijas sobrescribir). |

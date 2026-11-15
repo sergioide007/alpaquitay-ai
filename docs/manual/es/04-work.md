@@ -70,7 +70,7 @@ caption: Se arrastra SPEC-003 a In Progress; el agente planifica y genera el arc
 
 **Arrastrar una tarjeta a *In Progress* arranca la IA**, y no escribe nada a ciegas:
 
-1. **Plan.** El agente revisa el workspace y decide qué archivos crear o cambiar (como mucho 6).
+1. **Plan.** El agente revisa el workspace y decide qué archivos crear o cambiar (como mucho 6). Las rutas que saldrían del proyecto se descartan; una ruta que el modelo escriba como `/api/x.js` se lee como `api/x.js` dentro del proyecto.
 2. **Generación.** Genera cada archivo y lo guarda como **diff pendiente**. El chat muestra cada diff (`+añadidas/−quitadas`).
 3. **Tu revisión.** Lee los diffs. Usa `diff <ruta>` para ver uno completo.
 4. **Aplicar o descartar.** `si aplicar` escribe todos los pendientes con la política, la revisión automática y el *checkpoint* descritos en [Cómo piensa el arnés](../arnes/#que-protege-una-escritura). `no` los descarta todos.

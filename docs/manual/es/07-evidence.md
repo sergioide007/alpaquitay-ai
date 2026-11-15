@@ -63,4 +63,4 @@ Estado de la privacidad de la sesión:
 | Keys | VS Code SecretStorage |
 | Intermediary servers | *None* |
 
-La franja del arnés (bajo las pestañas) muestra el mismo estado en corto: `privacy local-first` cuando el proveedor activo es local.
+La franja del arnés (bajo las pestañas) muestra el mismo estado en corto: `privacy on-device` con un proveedor local y `privacy cloud boundary` con uno en la nube.

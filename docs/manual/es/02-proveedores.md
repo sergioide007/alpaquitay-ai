@@ -22,7 +22,7 @@ Alpaquitay no trae un modelo propio en la nube ni pasa tus datos por un servidor
 title: Configurar un proveedor
 src: media/providers.mp4
 poster: media/providers.jpg
-duration: 0:22
+duration: 0:21
 caption: Pestaña Settings: se elige el proveedor, el modelo, el límite de tokens y la temperatura. Las claves de API nunca se escriben en los ajustes.
 ```
 
@@ -67,6 +67,21 @@ Los modelos de menos de unos 4 000 millones de parámetros (nombres con `1.3b`, 
 2. Elige el proveedor y pega tu clave.
 3. Elige el modelo en **Settings**. El selector trae una lista de modelos conocidos, pero los ajustes `alpaquitay-ai.anthropic.model` y `alpaquitay-ai.openai.model` aceptan **cualquier identificador** que tu cuenta tenga disponible.
 
+Modelos del selector (revisados el 15 de noviembre de 2026 en la documentación de cada proveedor; precio por millón de tokens de entrada y salida):
+
+| Proveedor | Modelo | Precio | Para qué |
+|---|---|---|---|
+| Anthropic | **Claude Opus 5.5** (`claude-opus-5-5`, por defecto) | $4 / $20 | Arquitectura, tareas de varios archivos, revisiones |
+| Anthropic | Claude Sonnet 5.5 (`claude-sonnet-5-5`) | $2 / $10 | Código del día a día, a la mitad de precio |
+| Anthropic | Claude Haiku 5.5 (`claude-haiku-5-5`) | $0.10 / $0.50 | Tareas rápidas y de mucho volumen |
+| Anthropic | Claude Fable 5.2 (`claude-fable-5-2`) | $8 / $40 | El razonamiento más exigente (requiere retención de datos de 30 días en tu cuenta) |
+| OpenAI | **GPT-6.1 Sol** (`gpt-6.1-sol`, por defecto) | $2 / $10 | Equilibrio entre capacidad y coste |
+| OpenAI | GPT-6 Astra (`gpt-6-astra`) | $10 / $50 | El más capaz de OpenAI |
+| OpenAI | GPT-6.1 Terra (`gpt-6.1-terra`) | $1 / $5 | Rápido; redactar y revisar texto |
+| OpenAI | GPT-6 Luna (`gpt-6-luna`) | $0.10 / $0.50 | Mucho volumen al menor coste |
+
+Todos tienen alrededor de un millón de tokens de contexto y hasta 128 000 de salida, y todos razonan antes de responder. Por eso Alpaquitay no les envía la temperatura (la rechazan) y les deja margen de salida para ese razonamiento: si tu límite de tokens es menor de 16 000, con estos modelos se usa 16 000.
+
 La clave se guarda en el **llavero del sistema operativo** mediante el *SecretStorage* de VS Code: nunca en `settings.json`, nunca en texto plano y nunca en el repositorio. Para Azure OpenAI o un proxy compatible, cambia `alpaquitay-ai.openai.baseUrl` (o `anthropic.baseUrl`).
 
 ## El límite de privacidad
@@ -98,7 +113,7 @@ En **Settings → Global Defaults**:
 | Ajuste | Por defecto | Efecto |
 |---|---|---|
 | Max output tokens | 4096 | Límite de respuesta cuando el proveedor no tiene uno propio. |
-| Temperature | 0.3 | 0 = determinista, 2 = creativo. Para código, quédate entre 0 y 0.4. |
+| Temperature | 0.3 | 0 = determinista, 2 = creativo. Para código, quédate entre 0 y 0.4. Se envía a los modelos locales y a los de la nube que la aceptan; Alpaquitay no se la envía a los modelos de razonamiento actuales. |
 | Request timeout | 120 000 ms | Tiempo máximo por petición. Súbelo con modelos locales lentos. |
 | System Prompt | vacío | Instrucciones que se añaden a todas las peticiones (por ejemplo, convenciones de tu equipo). |
 | Organization context | vacío | Nombre o contexto de tu equipo, para personalizar respuestas. |

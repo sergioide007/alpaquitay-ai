@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agents: skills and specialists · Alpaquitay AI manual</title>
+<meta name="description" content="The skills built into Alpaquitay AI, how to create your own, and how the harness routes expert questions to 17 domain specialists (security, DevOps, architecture, QA, cloud, AI and more).">
+<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/agents/">
+<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/agents/">
+<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/agentes/">
+<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/agents/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/agents/">
+<meta property="og:title" content="Agents: skills and specialists">
+<meta property="og:description" content="The skills built into Alpaquitay AI, how to create your own, and how the harness routes expert questions to 17 domain specialists (security, DevOps, architecture, QA, cloud, AI and more).">
+<meta property="og:locale" content="en_US">
+<meta name="theme-color" content="#07100d">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+<link rel="stylesheet" href="../../assets/manual.css?v=3bc195267f">
+<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Agents: skills and specialists","description":"The skills built into Alpaquitay AI, how to create your own, and how the harness routes expert questions to 17 domain specialists (security, DevOps, architecture, QA, cloud, AI and more).","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/agents/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+</head>
+<body>
+<a class="skip" href="#contenido">Skip to content</a>
+<header class="top">
+  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><span class="brand-mark">▲</span><span>Alpaquitay AI</span></a>
+  <a class="crumb" href="../">Manual</a>
+  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
+  <a class="lang" href="../../agentes/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
+  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
+  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+</header>
+<div class="layout">
+<aside class="sidebar" id="sidebar" aria-label="Manual contents">
+  <p class="side-title">User manual <span class="ver">v3.6.1</span></p>
+  <ol class="chapters">
+<li><a href="../"><span class="n">00</span>Home</a></li>
+<li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
+<li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
+<li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
+<li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
+<li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
+<li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
+<li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
+<li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+<li><a href="../agents/" aria-current="page"><span class="n">09</span>Agents · skills and specialists</a></li>
+<li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
+<li><a href="../models/"><span class="n">11</span>Available models</a></li>
+<li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
+<li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
+<li><a href="../reference/"><span class="n">14</span>Reference</a></li>
+<li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+<li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
+  </ol>
+  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+</aside>
+<main class="content" id="contenido">
+<article class="doc">
+<p class="kicker">Chapter 09</p>
+<h1 id="agents-skills-and-specialists">Agents: skills and specialists</h1>
+<p>Alpaquitay has two kinds of agents: <strong>skills</strong>, concrete jobs you launch yourself, and <strong>domain specialists</strong>, to which the harness sends expert questions.</p>
+<figure class="figure"><a class="zoom" href="../../media/hub-agents.png" aria-label="Enlarge: The Agents tab with the list of skills"><img src="../../media/hub-agents.png" alt="The Agents tab with the list of skills" width="1600" height="1000" loading="lazy" decoding="async"></a><figcaption>The Agents tab: available skills and the button to create a new one.</figcaption></figure>
+
+<h2 id="built-in-skills">Built-in skills</h2>
+<p>Launch them from the <strong>Work</strong> chat with the <strong>/skill</strong> button, or from the <strong>Agents</strong> tab.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Create File</strong></td>
+<td>Generates a new file from a description.</td>
+</tr>
+<tr>
+<td><strong>Refactor Code</strong></td>
+<td>Applies SOLID principles and clean code to the active file.</td>
+</tr>
+<tr>
+<td><strong>Generate Tests</strong></td>
+<td>Writes unit tests for the active file.</td>
+</tr>
+<tr>
+<td><strong>Generate from Spec</strong></td>
+<td>Reads a spec, plans the files and generates them all.</td>
+</tr>
+<tr>
+<td><strong>Validate vs Spec</strong></td>
+<td>Checks that the implementation complies with the spec.</td>
+</tr>
+<tr>
+<td><strong>New Specification</strong></td>
+<td>Creates a new <code>spec.md</code> from a template.</td>
+</tr>
+<tr>
+<td><strong>Project Builder</strong></td>
+<td>Builds a complete project from a goal description, with the architecture of the chosen stack.</td>
+</tr>
+<tr>
+<td><strong>Daily Standup</strong></td>
+<td>Summarises recent work from the commits.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="creating-your-own-skills">Creating your own skills</h2>
+<p>In <strong>Agents → + New Skill</strong>, type a name, a description and the prompt. The skill appears in the list and in <strong>/skill</strong>.</p>
+<aside class="callout callout-warning"><p class="callout-title">Warning</p>
+<p>In this version, skills created from the Agents tab <strong>only live while VS Code is open</strong>: they are not saved to disk and disappear when the window reloads. They also send their prompt as is, without the text you type in the chat. Keep your prompts in a project file if you want to reuse them.</p>
+</aside>
+<p>If you code in TypeScript, you can add permanent skills to the extension (with access to the model and to the file and Git tools) and multi-step skills. The README explains how: <a href="https://github.com/sergioide007/alpaquitay-ai#custom-skills-typescript" rel="noopener">Custom Skills</a>.</p>
+<h2 id="domain-specialists">Domain specialists</h2>
+<p>When your chat message mentions deployment, pipelines, Docker, Terraform, cloud (AWS, Azure, GCP), IaC, DORA, pentests, threats, STRIDE, SBOM, OWASP SAMM, FinOps, zero trust, runbooks or MLOps, the harness sends it to the <strong>Deep</strong> lane: it picks <strong>one registered specialist</strong>, proposes the route with its confidence and, once you confirm with <code>si</code>, makes <strong>a single call</strong> to that specialist. Before that, the text goes through the personal-data detector; afterwards, the result goes through that domain's <strong>guardrails</strong>.</p>
+<figure class="figure"><a class="zoom" href="../../diagrams/06-domain-orchestration.svg" aria-label="Enlarge: Domain specialist orchestration"><img src="../../diagrams/06-domain-orchestration.svg" alt="Domain specialist orchestration" width="1120" height="962" loading="lazy" decoding="async"></a><figcaption>The central agent, the orchestrator and the specialist registry.</figcaption></figure>
+
+<p>Some requests and the specialist that handles them:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>You ask for…</th>
+<th>Specialist</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A STRIDE threat model, a secure CI/CD pipeline, an SBOM, an OWASP SAMM assessment</td>
+<td>DevSecOps</td>
+</tr>
+<tr>
+<td>Pentest planning, incident response, a risk register, a NIST CSF assessment</td>
+<td>Security</td>
+</tr>
+<tr>
+<td>DORA metrics, infrastructure as code, a runbook, a deployment plan, a CI/CD pipeline</td>
+<td>DevOps</td>
+</tr>
+<tr>
+<td>An ADR, a C4 diagram, a technology radar</td>
+<td>Software architecture</td>
+</tr>
+<tr>
+<td>Technical-debt, SOLID or complexity analysis</td>
+<td>Software engineering</td>
+</tr>
+<tr>
+<td>A test plan, coverage, a quality gate</td>
+<td>QA</td>
+</tr>
+<tr>
+<td>RAG architecture, prompt engineering, MLOps</td>
+<td>AI expert</td>
+</tr>
+<tr>
+<td>A FinOps review, operational excellence, AWS, Azure or GCP Well-Architected</td>
+<td>Well-Architected</td>
+</tr>
+<tr>
+<td>Microsegmentation, CISA zero-trust maturity, privileged access, identity</td>
+<td>Zero Trust</td>
+</tr>
+<tr>
+<td>A cryptographic inventory (CBOM), post-quantum migration, crypto agility, the harvest-now-decrypt-later threat</td>
+<td>Quantum readiness</td>
+</tr>
+</tbody>
+</table></div>
+<p>There are <strong>17 registered specialists</strong> in all, each anchored to its reference standards:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Specialist</th>
+<th>Standards and frameworks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>English (learning)</td>
+<td>CEFR · ISO 17024 · ISO 21001</td>
+</tr>
+<tr>
+<td>Software engineering</td>
+<td>ISO/IEC 25010 · 12207 · SOLID</td>
+</tr>
+<tr>
+<td>Software architecture</td>
+<td>ISO/IEC 42010 · TOGAF · C4</td>
+</tr>
+<tr>
+<td>Development</td>
+<td>ISO/IEC 12207 · Clean Code</td>
+</tr>
+<tr>
+<td>QA</td>
+<td>ISO/IEC 29119 · IEEE 829</td>
+</tr>
+<tr>
+<td>DevOps</td>
+<td>DORA · ISO/IEC 27001</td>
+</tr>
+<tr>
+<td>DevSecOps</td>
+<td>OWASP SAMM · ISO/IEC 27001</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>NIST CSF · ISO/IEC 27001/27005</td>
+</tr>
+<tr>
+<td>Infrastructure</td>
+<td>ISO/IEC 27001 · ITIL v4</td>
+</tr>
+<tr>
+<td>Cloud (AWS/Azure/GCP)</td>
+<td>AWS WAF · ISO/IEC 27017</td>
+</tr>
+<tr>
+<td>Marketing</td>
+<td>ISO 9001 · IAB</td>
+</tr>
+<tr>
+<td>Process</td>
+<td>ISO 9001 · BPM CBOK · Six Sigma</td>
+</tr>
+<tr>
+<td>AI expert</td>
+<td>ISO/IEC 42001 · EU AI Act · NIST AI RMF</td>
+</tr>
+<tr>
+<td>Business</td>
+<td>ISO 56002 · OKR · Business Model Canvas</td>
+</tr>
+<tr>
+<td>Quantum readiness</td>
+<td>cryptographic inventory, PQC</td>
+</tr>
+<tr>
+<td>Well-Architected</td>
+<td>Well-Architected pillars</td>
+</tr>
+<tr>
+<td>Zero Trust</td>
+<td>zero-trust maturity model</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="callout callout-tip"><p class="callout-title">Tip</p>
+<p>Be specific and use the domain vocabulary: &quot;build a STRIDE threat model of this project's payments endpoint&quot; reaches the DevSecOps specialist with useful context. A question without those words (&quot;is my login secure?&quot;) stays in Flash and the general model answers it.</p>
+</aside>
+<p>Every specialist follows a hexagonal architecture (ports and adapters), with a pure domain model and its guardrails:</p>
+<figure class="figure"><a class="zoom" href="../../diagrams/07-hexagonal-domain-shell.svg" aria-label="Enlarge: A specialist with hexagonal architecture"><img src="../../diagrams/07-hexagonal-domain-shell.svg" alt="A specialist with hexagonal architecture" width="1120" height="890" loading="lazy" decoding="async"></a><figcaption>Primary ports, use cases, domain, guardrails, secondary ports and adapters.</figcaption></figure>
+
+<div class="doc-foot">
+  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/09-agents.md">Suggest an improvement to this page</a>
+  <span>Manual for Alpaquitay AI 3.6.1 · MIT</span>
+</div>
+<nav class="pager" aria-label="Chapters">
+<a class="prev" href="../architecture/"><span>Previous</span>Architecture · ADRs and IaC</a>
+<a class="next" href="../local-engine/"><span>Next</span>Local engine (WebGPU)</a>
+</nav>
+</article>
+<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#built-in-skills">Built-in skills</a></li><li class="l2"><a href="#creating-your-own-skills">Creating your own skills</a></li><li class="l2"><a href="#domain-specialists">Domain specialists</a></li></ul></nav>
+</main>
+</div>
+<div class="search" id="search" hidden>
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
+    <ol id="searchResults" class="search-results"></ol>
+    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+  </div>
+</div>
+<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+<script src="../../assets/manual.js?v=3bc195267f" data-root="../" defer></script>
+</body>
+</html>
