@@ -9,25 +9,41 @@ export interface WorkspaceFingerprint {
 }
 const FILE = '.alpaquitay/fingerprint.json';
 const IGNORED = new Set(['node_modules','.venv','venv','__pycache__','target','dist','build','.git','.alpaquitay','vendor','bin','obj','.next']);
-const EXT: Record<string,string> = { ts:'TypeScript',tsx:'TypeScript',js:'JavaScript',jsx:'JavaScript',py:'Python',java:'Java',kt:'Kotlin',go:'Go',rs:'Rust',php:'PHP',rb:'Ruby',cs:'C#',dart:'Dart' };
+const EXT: Record<string,string> = {
+  ts: 'TypeScript', tsx: 'TypeScript', js: 'JavaScript', jsx: 'JavaScript', mjs: 'JavaScript', cjs: 'JavaScript',
+  py: 'Python', java: 'Java', kt: 'Kotlin', kts: 'Kotlin', go: 'Go', rs: 'Rust', php: 'PHP', rb: 'Ruby',
+  cs: 'C#', dart: 'Dart', c: 'C', h: 'C/C++', cc: 'C++', cpp: 'C++', cxx: 'C++', hpp: 'C++', hxx: 'C++',
+  vue: 'Vue', svelte: 'Svelte', scala: 'Scala', sc: 'Scala', clj: 'Clojure', cljs: 'Clojure', cljc: 'Clojure',
+  ex: 'Elixir', exs: 'Elixir', erl: 'Erlang', hrl: 'Erlang', hs: 'Haskell', lhs: 'Haskell', lua: 'Lua',
+  pl: 'Perl/Prolog', pm: 'Perl', r: 'R', m: 'Objective-C/MATLAB', mm: 'Objective-C++', sql: 'SQL',
+  sh: 'Shell', bash: 'Shell', zsh: 'Shell', ps1: 'PowerShell', psm1: 'PowerShell', fs: 'F#', fsx: 'F#',
+  vb: 'Visual Basic', swift: 'Swift', ml: 'OCaml', mli: 'OCaml', f: 'Fortran', f90: 'Fortran', f95: 'Fortran',
+  s: 'Assembly', asm: 'Assembly', sol: 'Solidity', ipynb: 'Jupyter Notebook',
+};
+export const SOURCE_CODE_EXTENSIONS = [...Object.keys(EXT), 'C', 'H', 'R', 'S'];
 // Invariante Cap.09 Codigo Sintetico: NUNCA asumir src/. Todo sourceDir evidenciado.
 // Uncle Bob: el framework es un detalle. Fowler: pasos pequenos y reversibles.
 export class WorkspaceFingerprinter {
   private cached: WorkspaceFingerprint | null = null;
+  private forceScan = false;
   constructor(private readonly mcp: MCPExecutor) {}
   async fingerprint(): Promise<WorkspaceFingerprint> {
     if (this.cached) { return this.cached; }
-    try {
-      const f = await this.mcp.executeTool('filesystem','read_file',{ path: FILE }) as { content: string };
-      const p = JSON.parse(f.content) as WorkspaceFingerprint;
-      if (p?.version === 1 && Array.isArray(p.sourceDirs)) { this.cached = p; return p; }
-    } catch { /* cold start */ }
+    if (!this.forceScan) {
+      try {
+        const f = await this.mcp.executeTool('filesystem','read_file',{ path: FILE }) as { content: string };
+        const p = JSON.parse(f.content) as WorkspaceFingerprint;
+        if (p?.version === 1 && Array.isArray(p.sourceDirs)) { this.cached = p; return p; }
+      } catch { /* cold start */ }
+    }
     const fp = await this.scan();
     this.cached = fp;
+    this.forceScan = false;
     try { await this.mcp.executeTool('filesystem','write_file',{ path: FILE, content: JSON.stringify(fp,null,2) }); } catch { /* best-effort */ }
     return fp;
   }
-  invalidate(): void { this.cached = null; }
+  invalidate(): void { this.cached = null; this.forceScan = true; }
+  async refresh(): Promise<WorkspaceFingerprint> { this.invalidate(); return this.fingerprint(); }
   private async scan(): Promise<WorkspaceFingerprint> {
     const fp: WorkspaceFingerprint = { version: 1, roots: ['.'], sourceDirs: [], languages: [], frameworks: [], entryPoints: [], pkgManager: 'unknown', hasSpec: false, monorepo: false, scannedAt: new Date().toISOString() };
     let top: Array<{ name: string; isDirectory: boolean }> = [];
@@ -36,8 +52,10 @@ export class WorkspaceFingerprinter {
     const fw = (s: string) => { if (!fp.frameworks.includes(s)) { fp.frameworks.push(s); } };
     const ent = (s: string) => { if (!fp.entryPoints.includes(s)) { fp.entryPoints.push(s); } };
     if (names.has('angular.json')) { fw('Angular'); fp.pkgManager = 'npm'; }
-    if (names.has('pnpm-workspace.yaml')) { fp.monorepo = true; fp.pkgManager = 'pnpm'; }
-    if (names.has('package.json')) { fp.pkgManager = 'npm'; fw(await this.refineNode()); ent('package.json'); }
+    if (names.has('pnpm-workspace.yaml')) { fp.monorepo = true; }
+    if (names.has('package.json')) { fw(await this.refineNode()); ent('package.json'); }
+    if (names.has('pnpm-workspace.yaml') || names.has('pnpm-lock.yaml')) { fp.pkgManager = 'pnpm'; }
+    else if (names.has('package.json')) { fp.pkgManager = 'npm'; }
     if (names.has('manage.py')) { fw('Django + DRF'); fp.pkgManager = 'pip'; ent('manage.py'); }
     else if (names.has('pyproject.toml') || names.has('requirements.txt')) { fw(await this.refinePy(names)); fp.pkgManager = 'pip'; }
     if (names.has('pom.xml')) { fw('Java + Maven'); fp.pkgManager = 'maven'; ent('pom.xml'); }

@@ -36,6 +36,8 @@ caption: The harness's local commands on a real project: first analysis, DORA si
 
 ## onboard
 
+Running `onboard` saves the contract verification; detecting a stack alone does not open the gate. For an unknown stack, confirm the commands with `onboard {"build":"build command","test":"test command"}`.
+
 The best first step in any project, especially a legacy one. Locally, it produces:
 
 - **Project fingerprint:** frameworks, real source folders and entry points. It never assumes `src/`.

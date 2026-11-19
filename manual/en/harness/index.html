@@ -35,7 +35,7 @@
 </header>
 <div class="layout">
 <aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.6.1</span></p>
+  <p class="side-title">User manual <span class="ver">v3.6.2</span></p>
   <ol class="chapters">
 <li><a href="../"><span class="n">00</span>Home</a></li>
 <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
@@ -235,12 +235,13 @@
 </ol>
 <p>To go back after a <code>si aplicar</code>, find the stash with <code>git stash list</code> (Alpaquitay's start with <code>alpaquitay/</code>) and restore it with <code>git stash apply stash@{N}</code>.</p>
 <h2 id="the-definition-of-done-dod">The Definition of Done (DoD)</h2>
-<p>A card only moves to <strong>Done</strong> when the DoD gate has evidence:</p>
+<p>A card moves to <strong>Done</strong> only when it passes the DoD gate:</p>
 <ul>
 <li>no diffs are left unapplied (<code>si aplicar</code> or <code>no</code> first);</li>
-<li>the <strong>platform contract</strong> is verified: the build and test commands are known (run <code>onboard</code> once);</li>
-<li>build and tests <strong>really ran</strong> and came back green. Knowing which command to run does not count as having run it.</li>
+<li>for code projects, the <strong>platform contract</strong> is verified by an explicit <code>onboard</code> run and saved for the current stack;</li>
+<li>for code projects, build and tests <strong>really ran</strong> and came back green. Knowing which command to run does not count as having run it.</li>
 </ul>
+<p>Projects with no source code (for example, only PDFs, Markdown and HTML) skip the contract and quality evidence checks; pending diffs still block Done. The gate reads the saved contract without creating one and runs the exact build and test commands stored in <code>.alpaquitay/platform.json</code>. If the stack is not detected, confirm both commands with <code>onboard {&quot;build&quot;:&quot;...&quot;,&quot;test&quot;:&quot;...&quot;}</code>.</p>
 <p>If something fails, the card stays <em>In Progress</em> and the chat shows what blocks it, with an automatic, blameless postmortem.</p>
 <h2 id="agentic-debt">Agentic debt</h2>
 <p>Every risky decision adds debt and every gate passed pays some back. The meter runs from 0 to 100; <strong>at 100 the Build lane is blocked</strong> until you pay it down.</p>
@@ -294,7 +295,7 @@
 
 <div class="doc-foot">
   <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/03-harness.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.6.1 · MIT</span>
+  <span>Manual for Alpaquitay AI 3.6.2 · MIT</span>
 </div>
 <nav class="pager" aria-label="Chapters">
 <a class="prev" href="../providers/"><span>Previous</span>Providers and privacy</a>

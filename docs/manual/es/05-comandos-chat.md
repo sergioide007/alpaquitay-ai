@@ -36,6 +36,8 @@ caption: Los comandos locales del arnés en un proyecto real: análisis inicial,
 
 ## onboard
 
+Ejecutar `onboard` guarda la verificación del contrato; detectar un stack por sí solo no habilita el gate. Para un stack desconocido, confirma los comandos así: `onboard {"build":"comando de build","test":"comando de tests"}`.
+
 El mejor primer paso en cualquier proyecto, sobre todo si es heredado. Hace, en local:
 
 - **Huella del proyecto:** *frameworks*, carpetas de código reales y puntos de entrada. Nunca da por hecho `src/`.

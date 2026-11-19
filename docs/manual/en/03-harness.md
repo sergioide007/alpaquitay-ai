@@ -79,11 +79,13 @@ To go back after a `si aplicar`, find the stash with `git stash list` (Alpaquita
 
 ## The Definition of Done (DoD)
 
-A card only moves to **Done** when the DoD gate has evidence:
+A card moves to **Done** only when it passes the DoD gate:
 
 - no diffs are left unapplied (`si aplicar` or `no` first);
-- the **platform contract** is verified: the build and test commands are known (run `onboard` once);
-- build and tests **really ran** and came back green. Knowing which command to run does not count as having run it.
+- for code projects, the **platform contract** is verified by an explicit `onboard` run and saved for the current stack;
+- for code projects, build and tests **really ran** and came back green. Knowing which command to run does not count as having run it.
+
+Projects with no source code (for example, only PDFs, Markdown and HTML) skip the contract and quality evidence checks; pending diffs still block Done. The gate reads the saved contract without creating one and runs the exact build and test commands stored in `.alpaquitay/platform.json`. If the stack is not detected, confirm both commands with `onboard {"build":"...","test":"..."}`.
 
 If something fails, the card stays *In Progress* and the chat shows what blocks it, with an automatic, blameless postmortem.
 
