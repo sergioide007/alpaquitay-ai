@@ -56,6 +56,6 @@ Busca cualquier tema con <kbd>Ctrl</kbd>+<kbd>K</kbd> (o <kbd>/</kbd>). Cada pá
 ## Principios que vas a ver en todas partes
 
 1. **Nada se escribe sin que lo veas.** En el Hub, todo cambio de código llega primero como un *diff* acotado y escribir requiere tu `si aplicar`. (La excepción es el comando clásico *Generate from Spec*, que escribe directamente; ver [Work](work/#generate-from-spec-y-validate-against-spec).)
-2. **Evidencia antes que autonomía.** Una tarea solo pasa a *Done* cuando hay pruebas: sin diffs pendientes, contrato de plataforma verificado y build y tests ejecutados de verdad.
+2. **Evidencia antes que autonomía.** Las tareas con código pasan a *Done* solo sin diffs pendientes, con contrato verificado por onboard y build/tests en verde. Los proyectos solo de documentos no necesitan contrato ni esas pruebas, pero sus diffs pendientes también bloquean *Done*.
 3. **Privacidad por arquitectura.** No hay servidor intermedio de Alpaquitay. Los modelos locales no salen de tu equipo; las llamadas a la nube van directas a tu proveedor y pasan antes por un límite de privacidad que oculta datos personales y secretos.
 4. **Todo queda registrado en tu repositorio**, en la carpeta `.alpaquitay/`: decisiones, deuda, economía de la sesión, memoria del proyecto y ADR.

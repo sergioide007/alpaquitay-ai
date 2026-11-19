@@ -26,9 +26,17 @@ describe('quality evidence', () => {
     expect(result.blockers.join(' ')).toMatch(/sin evidencia/);
   });
 
+  it('requires the executed command on every passing check', () => {
+    const incomplete = evidence('passed', 'passed');
+    incomplete.tests.command = undefined;
+    expect(evaluateQualityEvidence(incomplete).pass).toBe(false);
+  });
+
   it('parses only versioned evidence records', () => {
     expect(parseQualityEvidence(JSON.stringify(evidence('passed', 'passed')))?.taskId).toBe('SPEC-001');
     expect(parseQualityEvidence('{"version":2}')).toBeNull();
+    expect(parseQualityEvidence(JSON.stringify({ ...evidence('passed', 'passed'), tests: { status: 'maybe' } }))).toBeNull();
+    expect(parseQualityEvidence(JSON.stringify({ ...evidence('passed', 'passed'), files: [1] }))).toBeNull();
     expect(parseQualityEvidence('not-json')).toBeNull();
   });
 });

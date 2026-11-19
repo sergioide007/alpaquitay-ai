@@ -79,13 +79,13 @@ Para volver atrás tras un `si aplicar`, busca el stash con `git stash list` (lo
 
 ## La Definición de Hecho (DoD)
 
-Una tarjeta solo pasa a **Done** si la compuerta DoD tiene evidencia:
+Una tarjeta pasa a **Done** solo si supera la compuerta DoD:
 
-- no quedan diffs sin aplicar (`si aplicar` o `no` primero);
-- el **contrato de plataforma** está verificado: se conocen los comandos de build y test (ejecuta `onboard` una vez);
-- el build y los tests **se ejecutaron de verdad** y salieron en verde. Saber qué comando correr no cuenta como haberlo corrido.
+- no quedan diffs pendientes (primero si aplicar o no);
+- en proyectos con código, el contrato de plataforma está verificado por una ejecución explícita de onboard y guardado para el stack actual;
+- en proyectos con código, build y tests se ejecutaron de verdad y terminaron en verde. Saber qué comando ejecutar no cuenta como haberlo ejecutado.
 
-Si algo falla, la tarjeta se queda en *In Progress* y el chat muestra qué bloquea, con un *postmortem* automático y sin culpables.
+Los proyectos sin archivos de código (por ejemplo, solo PDF, Markdown y HTML) omiten las comprobaciones de contrato y calidad; los diffs pendientes siguen bloqueando Done. La compuerta lee el contrato guardado sin crearlo y ejecuta exactamente los comandos build y test de .alpaquitay/platform.json. Si no detecta el stack, confirma ambos comandos con el formato JSON de onboard descrito en Comandos del chat.
 
 ## La deuda agéntica
 

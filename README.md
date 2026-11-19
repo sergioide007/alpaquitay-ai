@@ -119,7 +119,7 @@ The harness detects the SDLC phase from the request and only lets it advance whe
 
 ### How a task runs
 
-Dragging a card to **In Progress** never writes silently. The agent plans up to 6 files, generates them, and stores the result as a **bounded diff**. Nothing touches disk until you answer `si aplicar` (or `no` to discard). On apply, PolicyGuard and AgentReview check each file, a git checkpoint is taken, files are written, and **real build and test commands** run. A card only reaches **Done** when the Definition-of-Done gate has evidence.
+Dragging a card to **In Progress** never writes silently. The agent plans up to 6 files, generates them, and stores the result as a **bounded diff**. Nothing touches disk until you answer `si aplicar` (or `no` to discard). On apply, PolicyGuard and AgentReview check each file, a git checkpoint is taken, files are written, and **real build and test commands** run. Code tasks reach **Done** only with a contract verified by `onboard` and green build/test evidence; docs-only projects can pass without those checks, but pending diffs always block Done.
 
 
 <p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/03-sdd-task-sequence.png" alt="Sequence diagram of task execution: plan, generate, diff preview, approve, apply, prove, outcome"></p>

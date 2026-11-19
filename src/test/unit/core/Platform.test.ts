@@ -1,5 +1,5 @@
 import { WorkspaceFingerprinter } from '../../../core/context/WorkspaceFingerprinter';
-import { contractFor, dodFor } from '../../../core/platform/PlatformContract';
+import { contractFor, dodFor, isPlatformContractVerified } from '../../../core/platform/PlatformContract';
 
 describe('Platform senior', () => {
   it('Django/pip tiene golden path verificable', async () => {
@@ -11,7 +11,16 @@ describe('Platform senior', () => {
     expect(fp === null || fp.pkgManager !== undefined).toBe(true);
     const c = contractFor({ version: 1, roots: ['.'], sourceDirs: ['apps'], languages: [], frameworks: ['Django + DRF'], entryPoints: ['manage.py'], pkgManager: 'pip', hasSpec: false, monorepo: false, scannedAt: '' });
     expect(c.commands.test).toBe('pytest');
-    expect(c.verified).toBe(true);
+    expect(c.verified).toBe(false);
+    expect(isPlatformContractVerified(c)).toBe(false);
+    const onboarded = {
+      ...c,
+      verified: true,
+      onboardedAt: '2026-11-19T00:00:00.000Z',
+      verifiedCommands: { stack: c.stack, pkgManager: c.pkgManager, build: c.commands.build, test: c.commands.test },
+    };
+    expect(isPlatformContractVerified(onboarded)).toBe(true);
+    expect(isPlatformContractVerified({ ...onboarded, commands: { ...onboarded.commands, test: 'npm test --watch' } })).toBe(false);
     expect(dodFor('despliegue', c)).toMatch(/rollback/);
   });
   it('unknown no inventa comandos', () => {
