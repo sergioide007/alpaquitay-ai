@@ -6,7 +6,8 @@
  * el LLM copiaba `src/` y generaba tareas que apuntaban a carpetas inexistentes.
  *
  * Este modulo es puro y deterministico: deriva los ejemplos del fingerprint evidenciado
- * (nunca del cwd ni de un `src/` hardcodeado) y degrada a un placeholder neutro si no hay datos.
+ * (nunca del cwd ni de un `src/` hardcodeado). Sin evidencia, usa rutas relativas a la raiz
+ * real del workspace: un placeholder de documentacion nunca debe convertirse en ruta de escritura.
  */
 import type { WorkspaceFingerprint } from './WorkspaceFingerprinter';
 
@@ -40,12 +41,13 @@ export function specPathHints(
   const ext = dominantExt(fp);
   const prefix = dir ? `${dir}/` : '';
   if (!dir) {
-    // Sin evidencia: no inventamos `src/`. Se marcan placeholders explicitos.
+    // La raiz del workspace es un destino real y seguro cuando no hay una fuente detectada.
+    // No usar placeholders como `<carpeta-fuente>`: el modelo puede copiarlos literalmente.
     return {
-      component: `<carpeta-fuente>/Feature.${ext}`,
-      endpoint: `<carpeta-fuente>/routes/resource.${ext}`,
-      validator: `<carpeta-fuente>/services/validator.${ext}`,
-      sourceLabel: '<carpeta-fuente>'
+      component: `Feature.${ext}`,
+      endpoint: `routes/resource.${ext}`,
+      validator: `services/validator.${ext}`,
+      sourceLabel: '.'
     };
   }
   return {
@@ -60,7 +62,7 @@ export function specPathHints(
 export function sourceRule(fp: WorkspaceFingerprint | null | undefined): string {
   const dirs = (fp?.sourceDirs ?? []).filter(d => d && d !== '.' && d !== './');
   if (dirs.length === 0) {
-    return 'Si no conoces la carpeta fuente, usa un placeholder `<carpeta-fuente>/...` (prohibido inventar `src/`).';
+    return 'Sin carpeta fuente evidenciada: usa rutas relativas a la raiz real del workspace (por ejemplo `services/validator.ts`). No inventes `src/` ni uses placeholders entre < >.';
   }
-  return `Escribe rutas SOLO dentro de las carpetas reales de este proyecto: ${dirs.join(', ')} (prohibido inventar \`src/\`).`;
+  return `Escribe rutas SOLO dentro de las carpetas reales de este proyecto: ${dirs.join(', ')}. No uses placeholders entre < > ni inventes \`src/\`.`;
 }

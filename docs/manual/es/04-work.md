@@ -98,6 +98,8 @@ caption: Se arrastra SPEC-003 a In Progress; el agente planifica y genera el arc
 5. **Verificación.** Tras aplicar se ejecutan los comandos reales de build y test.
 6. **Done.** La tarjeta pasa a *Done* y `spec.md` se actualiza a `- [x]` **solo si** la compuerta DoD tiene evidencia. Si no, se queda en *In Progress* y el chat explica qué falta.
 
+Si una tarea antigua contiene una ruta de ejemplo como `<carpeta-fuente>/services/validator.ts`, el arnés la resuelve usando la carpeta fuente detectada (o la raíz del workspace), actualiza la vista previa en la ruta real y pide confirmación otra vez. Si el archivo cambió desde que se generó el diff, no lo sobrescribe: conserva esa propuesta para regenerarla. Un diff que falla queda pendiente, pero los demás se siguen procesando. Si no hay repositorio Git, la aplicación continúa con un aviso de que no se pudo crear el *checkpoint*.
+
 ![Secuencia de una tarea: planificar, generar, diff, aprobar, aplicar, probar](diagrams/03-sdd-task-sequence.svg "Lo que ocurre entre arrastrar la tarjeta y que llegue a Done.")
 
 La pestaña **Evidence** muestra la misma cola de revisión con botones (*Discard all* y *Apply & run gates*), por si prefieres hacer clic en vez de escribir.

@@ -35,7 +35,7 @@
 </header>
 <div class="layout">
 <aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.8.0</span></p>
+  <p class="side-title">User manual <span class="ver">v3.8.1</span></p>
   <ol class="chapters">
 <li><a href="../"><span class="n">00</span>Home</a></li>
 <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
@@ -202,6 +202,7 @@ Court bookings with online payment and email reminders.
 <li><strong>Verify.</strong> After applying, the real build and test commands run.</li>
 <li><strong>Done.</strong> The card moves to <em>Done</em> and <code>spec.md</code> becomes <code>- [x]</code> <strong>only if</strong> the DoD gate has evidence. Otherwise it stays <em>In Progress</em> and the chat explains what is missing.</li>
 </ol>
+<p>If an older task contains an example path such as <code>&lt;carpeta-fuente&gt;/services/validator.ts</code>, the harness resolves it using the detected source folder (or the workspace root), refreshes the preview at the real path, and asks for confirmation again. If the file changed since the diff was generated, it will not overwrite it; the proposal stays pending so you can regenerate it. A failed diff remains pending while other diffs continue processing. If the workspace is not a Git repository, applying continues with a warning that no checkpoint could be created.</p>
 <figure class="figure"><a class="zoom" href="../../diagrams/03-sdd-task-sequence.svg" aria-label="Enlarge: Task sequence: plan, generate, diff, approve, apply, prove"><img src="../../diagrams/03-sdd-task-sequence.svg" alt="Task sequence: plan, generate, diff, approve, apply, prove" width="1120" height="1358" loading="lazy" decoding="async"></a><figcaption>What happens between dragging the card and it reaching Done.</figcaption></figure>
 
 <p>The <strong>Evidence</strong> tab shows the same review queue with buttons (<em>Discard all</em> and <em>Apply &amp; run gates</em>), if you prefer clicking to typing.</p>
@@ -238,7 +239,7 @@ Shows the free slots for the next 7 days.
 
 <div class="doc-foot">
   <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/04-work.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.8.0 · MIT</span>
+  <span>Manual for Alpaquitay AI 3.8.1 · MIT</span>
 </div>
 <nav class="pager" aria-label="Chapters">
 <a class="prev" href="../harness/"><span>Previous</span>How the harness thinks</a>

@@ -54,7 +54,7 @@ caption: The Hub opens with `Ctrl+Alt+A`; the video walks through its six tabs: 
 Search any topic with <kbd>Ctrl</kbd>+<kbd>K</kbd> (or <kbd>/</kbd>). Every page ends with a link to suggest improvements on GitHub: this manual belongs to the community. There is also a [Spanish version](../).
 
 > [!NOTE]
-> The manual describes version **3.7.0**. It includes the **Changes** tab for following agent progress and reviewing file diffs, with buttons to apply or discard all pending changes. It also covers the WebGPU local engine, *Generate Specification (Local Model)* and the models page.
+> The manual describes version **3.8.1**. It includes the **Changes** tab for following agent progress and reviewing file diffs, with buttons to apply or discard all pending changes. It also covers the WebGPU local engine, *Generate Specification (Local Model)* and the models page.
 
 ## Principles you will see everywhere
 

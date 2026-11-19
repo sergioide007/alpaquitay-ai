@@ -98,6 +98,8 @@ caption: SPEC-003 is dragged to In Progress; the agent plans and generates the f
 5. **Verify.** After applying, the real build and test commands run.
 6. **Done.** The card moves to *Done* and `spec.md` becomes `- [x]` **only if** the DoD gate has evidence. Otherwise it stays *In Progress* and the chat explains what is missing.
 
+If an older task contains an example path such as `<carpeta-fuente>/services/validator.ts`, the harness resolves it using the detected source folder (or the workspace root), refreshes the preview at the real path, and asks for confirmation again. If the file changed since the diff was generated, it will not overwrite it; the proposal stays pending so you can regenerate it. A failed diff remains pending while other diffs continue processing. If the workspace is not a Git repository, applying continues with a warning that no checkpoint could be created.
+
 ![Task sequence: plan, generate, diff, approve, apply, prove](diagrams/03-sdd-task-sequence.svg "What happens between dragging the card and it reaching Done.")
 
 The **Evidence** tab shows the same review queue with buttons (*Discard all* and *Apply & run gates*), if you prefer clicking to typing.
