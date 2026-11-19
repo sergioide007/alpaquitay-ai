@@ -84,6 +84,8 @@ Lo clasifica (build, test, lint, diagnósticos, escritura o desconocido), propon
 
 ## diff, si aplicar y no
 
+También puedes pulsar **Apply & run gates** o **Discard all** en la pestaña **Changes**. Ambos botones actúan sobre todos los diffs pendientes; **Apply & run gates** ejecuta las mismas revisiones, el *checkpoint* y las compuertas que `si aplicar`.
+
 Después de que el agente genere cambios, el chat lista los **diffs pendientes**. Nada está escrito todavía.
 
 - `diff src/reservas/calendario.ts` muestra el diff completo de ese archivo.

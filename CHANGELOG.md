@@ -8,6 +8,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.7.0] — 2026-11-19
+
+### Added
+
+- Live Changes panel shows agent progress and file diffs, with direct **Apply & run gates** and **Discard all** actions for pending changes.
+- Applying from the panel reuses the existing policy review, Git checkpoint and build/test gates.
+- Updated the Spanish and English manuals for the live Changes panel and its review actions.
+
+---
+
 ## [3.6.2] — 2026-11-19
 
 ### Fixed

@@ -35,7 +35,7 @@
 </header>
 <div class="layout">
 <aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.6.2</span></p>
+  <p class="side-title">User manual <span class="ver">v3.7.0</span></p>
   <ol class="chapters">
 <li><a href="../"><span class="n">00</span>Home</a></li>
 <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
@@ -226,7 +226,8 @@
 </tbody>
 </table></div>
 <h2 id="what-guards-a-write">What guards a write</h2>
-<p>When you reply <code>si aplicar</code>, for <strong>each pending file</strong>:</p>
+<p>Review agent activity and diffs in <strong>Changes</strong>. Its <strong>Apply &amp; run gates</strong> and <strong>Discard all</strong> buttons act on every pending diff; applying starts the same guarded flow as <code>si aplicar</code>, and discarding is equivalent to <code>no</code>.</p>
+<p>When you reply <code>si aplicar</code> (or click <strong>Apply &amp; run gates</strong>), for <strong>each pending file</strong>:</p>
 <ol>
 <li><strong>Write policy.</strong> Files that <em>are</em> secrets are always denied: <code>.env</code>, <code>*.pem</code>, <code>*.key</code>, <code>id_rsa</code>, <code>id_ed25519</code>, <code>secrets/</code> folders, credential or token files. Writing <code>spec.md</code> needs confirmation and a backup.</li>
 <li><strong>Automatic review</strong> (no model). It <strong>blocks</strong> when the file is outside the detected source folders or the content looks like a literal secret (API keys, private keys, AWS keys, <code>sk-…</code>, <code>ghp_…</code>, JWTs). It <strong>warns</strong> when the file passes 400 lines, when <code>console.log</code>, <code>print(</code>, <code>TODO</code> or <code>FIXME</code> remain, or when the change changes nothing.</li>
@@ -295,7 +296,7 @@
 
 <div class="doc-foot">
   <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/03-harness.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.6.2 · MIT</span>
+  <span>Manual for Alpaquitay AI 3.7.0 · MIT</span>
 </div>
 <nav class="pager" aria-label="Chapters">
 <a class="prev" href="../providers/"><span>Previous</span>Providers and privacy</a>

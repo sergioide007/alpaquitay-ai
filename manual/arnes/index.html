@@ -35,7 +35,7 @@
 </header>
 <div class="layout">
 <aside class="sidebar" id="sidebar" aria-label="Índice del manual">
-  <p class="side-title">Manual de uso <span class="ver">v3.6.2</span></p>
+  <p class="side-title">Manual de uso <span class="ver">v3.7.0</span></p>
   <ol class="chapters">
 <li><a href="../"><span class="n">00</span>Inicio</a></li>
 <li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
@@ -226,7 +226,8 @@
 </tbody>
 </table></div>
 <h2 id="que-protege-una-escritura">Qué protege una escritura</h2>
-<p>Cuando respondes <code>si aplicar</code>, para <strong>cada archivo</strong> pendiente:</p>
+<p>Puedes revisar la actividad y los diffs en <strong>Changes</strong>. Sus botones <strong>Apply &amp; run gates</strong> y <strong>Discard all</strong> actúan sobre todos los diffs pendientes; aplicar inicia el mismo flujo protegido que el comando <code>si aplicar</code>, y descartar equivale a <code>no</code>.</p>
+<p>Cuando respondes <code>si aplicar</code> (o pulsas <strong>Apply &amp; run gates</strong>), para <strong>cada archivo</strong> pendiente:</p>
 <ol>
 <li><strong>Política de escritura.</strong> Se deniegan siempre los archivos que <em>son</em> secretos: <code>.env</code>, <code>*.pem</code>, <code>*.key</code>, <code>id_rsa</code>, <code>id_ed25519</code>, carpetas <code>secrets/</code>, archivos de credenciales o de <em>tokens</em>. Escribir <code>spec.md</code> exige confirmación y copia de seguridad.</li>
 <li><strong>Revisión automática</strong> (sin modelo). <strong>Bloquea</strong> si el archivo está fuera de las carpetas de código detectadas o si el contenido parece contener un secreto literal (claves de API, claves privadas, claves de AWS, <code>sk-…</code>, <code>ghp_…</code>, JWT). <strong>Avisa</strong> si el archivo supera 400 líneas, si quedan <code>console.log</code>, <code>print(</code>, <code>TODO</code> o <code>FIXME</code>, o si el cambio no cambia nada.</li>
@@ -294,7 +295,7 @@
 
 <div class="doc-foot">
   <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/03-arnes.md">Proponer una mejora a esta página</a>
-  <span>Manual para Alpaquitay AI 3.6.2 · MIT</span>
+  <span>Manual para Alpaquitay AI 3.7.0 · MIT</span>
 </div>
 <nav class="pager" aria-label="Capítulos">
 <a class="prev" href="../proveedores/"><span>Anterior</span>Proveedores y privacidad</a>

@@ -46,8 +46,8 @@ import {
 
 import { generateCode, isSmallModel, deduplicateSpecTasks, normalizeSpecContent } from '../prompts/codeUtils';
 import { HierarchicalMemory } from '../core/HierarchicalMemory';
-import { WebviewMessage, ModelOption, TaskStatus, SkillContext, SpecTask, ProviderType, ArchDiagram, ArchDiagramPatch, ArchNode, ArchEdge, ArchNodeType, AIProvider, ExtensionMessage } from '../core/interfaces';
-import { thoughtStream } from '../domains/orchestration/AgentThoughtStream';
+import { WebviewMessage, ModelOption, TaskStatus, SkillContext, SpecTask, ProviderType, ArchDiagram, ArchDiagramPatch, ArchNode, ArchEdge, ArchNodeType, AIProvider } from '../core/interfaces';
+import { thoughtStream } from '../core/harness/AgentThoughtStream';
 import { AlpaquitayConfig } from '../core/config';
 import { MODEL_CATALOG, catalogJson, DEFAULT_ANTHROPIC_MODEL, DEFAULT_OPENAI_MODEL } from '../core/ModelCatalog';
 
@@ -104,6 +104,7 @@ export class MainPanel {
   private _contextBuilder!: ProjectContextBuilder;
   private _specialists!: SpecialistRouter;
   private _memory!: HierarchicalMemory;
+  private _memoryReady: Promise<void> = Promise.resolve();
   private _docs!: DocsController;
   private _econ: EconState = emptyEcon(`s-${Date.now().toString(36)}`);
   private readonly config = new AlpaquitayConfig();
@@ -126,7 +127,7 @@ export class MainPanel {
     this._contextBuilder = new ProjectContextBuilder(workspaceRoot, mcpManager);
     this._specialists = new SpecialistRouter(mcpManager, workspaceRoot);
     this._memory = new HierarchicalMemory(mcpManager);
-    this._memory.load().catch(() => {/* non-fatal */ });
+    this._memoryReady = this._memory.load().catch(() => {/* non-fatal */ });
     this._docs = new DocsController({
       post: m => this._post(m),
       getProvider: () => this.aiManager.getActive(),
@@ -153,17 +154,20 @@ export class MainPanel {
     // initial load-spec message is delayed or missed on first render.
     setImmediate(() => this._sendSpec().catch(() => { }));
 
-    // ── Subscribe to live agent thoughts / progress (Cline-style panel) ─────
+    // ── Subscribe to live progress and actual workspace writes ─────────────
     const unsubscribeThought = thoughtStream.subscribe(event => {
       switch (event.type) {
-        case 'thought':
-          this._post({ type: 'agent-thought', sessionId: event.sessionId, step: event.step, thought: event.thought, timestamp: Date.now() });
+        case 'progress':
+          this._post({ type: 'agent-progress', sessionId: event.sessionId, step: event.step, message: event.message, timestamp: Date.now() });
           break;
         case 'step-start':
           this._post({ type: 'agent-step-start', sessionId: event.sessionId, step: event.step, domainId: event.domainId, useCaseId: event.useCaseId, timestamp: Date.now() });
           break;
         case 'step-done':
           this._post({ type: 'agent-step-done', sessionId: event.sessionId, step: event.step, success: event.success, timestamp: Date.now() });
+          break;
+        case 'file-change':
+          this._post({ type: 'agent-file-change', sessionId: event.sessionId, path: event.path, status: event.status, diff: event.diff, added: event.added, removed: event.removed, timestamp: Date.now() });
           break;
       }
     });
@@ -386,6 +390,7 @@ export class MainPanel {
   }
 
   private async _sendHarnessStatus(): Promise<void> {
+    await this._memoryReady;
     const [gitLog, spec] = await Promise.all([
       this.git.getLog(40).catch(() => ({ available: false, commits: [] })),
       this.specManager.load().catch(() => ({ exists: false, markdown: '', tasks: [] })),
@@ -406,6 +411,18 @@ export class MainPanel {
       try {
         const change = JSON.parse(entry.value) as PendingChange;
         const diff = unifiedDiff(path, change.before, change.after);
+        if (path !== '.alpaquitay' && !path.startsWith('.alpaquitay/')) {
+          this._post({
+            type: 'agent-file-change',
+            sessionId: change.taskId ?? 'pending',
+            path,
+            status: 'proposed',
+            diff: diff.diff,
+            added: diff.added,
+            removed: diff.removed,
+            timestamp: Date.now(),
+          });
+        }
         return { path, added: diff.added, removed: diff.removed, taskId: change.taskId ?? null };
       } catch {
         return { path, added: 0, removed: 0, taskId: null };
@@ -668,7 +685,15 @@ export class MainPanel {
     }
     if (/^\s*no\s*$/i.test(text)) {
       const pendings = this._memory.search('pending-diff:');
-      for (const p of pendings) { this._memory.delete('config', p.key); }
+      for (const p of pendings) {
+        try {
+          const pending = JSON.parse(p.value) as PendingChange;
+          const rel = p.key.replace('pending-diff:', '');
+          const diff = unifiedDiff(rel, pending.before, pending.after);
+          thoughtStream.fileChange(pending.taskId ?? `discard:${Date.now()}`, rel, 'discarded', diff.diff, diff.added, diff.removed);
+        } catch { /* ignore malformed stale preview */ }
+        this._memory.delete('config', p.key);
+      }
       await this._memory.save().catch(() => { });
       this._post({ type: 'chat-chunk', content: `Diffs descartados (${pendings.length}). Nada se escribio.` });
       this._post({ type: 'chat-done', model: provider.modelName });
@@ -1568,6 +1593,7 @@ export class MainPanel {
           written.push(filePath);
           this._memory.extractFromCode(filePath, content, language);
           const fd = unifiedDiff(rel, before, content);
+          thoughtStream.fileChange(task.id, rel, 'proposed', fd.diff, fd.added, fd.removed);
           const preview = fd.diff.split('\n').slice(0, 25).join('\n');
           this._post({ type: 'chat-chunk', content: `\n**Diff \`${rel}\` (+${fd.added}/-${fd.removed}) — pendiente**\n\`\`\`diff\n${preview}\n\`\`\`\n_si aplicar_ para escribir · _no_ para descartar · _diff ${rel}_ para ver completo` });
         } catch (e) {
@@ -2560,9 +2586,9 @@ export class MainPanel {
     this._panel.webview.postMessage(msg);
   }
 
-  /** Activate the "Thoughts" tab in the panel (Cline-style live agent progress). */
-  activateThoughtsTab(): void {
-    this._post({ type: 'switch-tab', tab: 'thoughts' });
+  /** Activate the Changes tab in the panel. */
+  activateChangesTab(): void {
+    this._post({ type: 'switch-tab', tab: 'changes' });
   }
 
   public refreshProviders(): void {
@@ -2797,6 +2823,7 @@ main{flex:1;overflow:hidden;position:relative}
 .btn{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:var(--radius);font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--sans);transition:opacity .15s;white-space:nowrap}
 .btn-p{background:var(--signal);color:var(--bg0)}
 .btn-p:hover{opacity:.88}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 .btn-o{background:transparent;color:var(--text);border:1px solid var(--border)}
 .btn-o:hover{border-color:var(--signal);color:var(--signal)}
 .btn-ai{background:rgba(0,229,160,.08);color:var(--signal);border:1px solid rgba(0,229,160,.2)}
@@ -2930,13 +2957,14 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
 @media(max-width:900px){.metric-grid{grid-template-columns:repeat(2,1fr)}.evidence-grid{grid-template-columns:1fr}.phase-rail{grid-template-columns:repeat(3,1fr)}.studio{grid-template-columns:220px minmax(360px,1fr)}.studio-pane:last-child{display:none}}
 @media(max-width:620px){.ev-hero{align-items:flex-start;flex-direction:column}.metric-grid{grid-template-columns:1fr 1fr}.phase-rail{grid-template-columns:repeat(2,1fr)}.evidence-scroll{padding:12px}.header-right{display:none}.tab{padding:0 9px}}
 
-/* ── Live agent thoughts panel (Cline-style) ─────────────────────────────── */
-.thoughts-panel{display:flex;flex-direction:column;height:100%;background:var(--bg1);border-right:1px solid var(--border)}
-.thoughts-hd{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
-.thoughts-hd h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--signal);margin:0}
-.thoughts-hd .clear{background:none;border:1px solid var(--border);color:var(--muted-lt);font-size:10px;padding:2px 8px;border-radius:var(--radius);cursor:pointer}
-.thoughts-hd .clear:hover{color:var(--text);border-color:var(--muted-lt)}
-.thoughts-list{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+/* ── Live agent changes panel ─────────────────────────────── */
+.changes-panel{display:flex;flex-direction:column;height:100%;background:var(--bg1);border-right:1px solid var(--border)}
+.changes-hd{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
+.changes-actions{display:flex;align-items:center;gap:6px}
+.changes-hd h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--signal);margin:0}
+.changes-hd .clear{background:none;border:1px solid var(--border);color:var(--muted-lt);font-size:10px;padding:2px 8px;border-radius:var(--radius);cursor:pointer}
+.changes-hd .clear:hover{color:var(--text);border-color:var(--muted-lt)}
+.changes-list{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
 .thought-item{display:flex;gap:9px;padding:7px 9px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);font-size:11px;line-height:1.5;animation:fadeIn .15s ease-out}
 .thought-item.step-start{border-left:3px solid var(--blue)}
 .thought-item.step-done{border-left:3px solid var(--signal)}
@@ -2949,8 +2977,13 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
 .thought-item .text{color:var(--text);font-family:var(--mono);white-space:pre-wrap;word-break:break-word}
 .thought-item .text b{color:var(--signal)}
 .thought-item .domain{color:#60a5fa;font-weight:600;font-size:10px;margin-right:4px}
+.thought-item.file-change{display:block;border-left:3px solid var(--signal)}
+.thought-item.file-change.proposed{border-left-color:var(--warn)}
+.thought-item.file-change.discarded{border-left-color:var(--muted)}
+.thought-item.file-change summary{cursor:pointer;color:var(--text);font-family:var(--mono);font-size:10px}
+.thought-item.file-change pre{max-height:360px;overflow:auto;margin:8px 0 0;padding:8px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius);font:10px/1.5 var(--mono);white-space:pre}
 @keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
-.empty-thoughts{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;font-style:italic}
+.empty-changes{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;font-style:italic}
 `;
   }
 
@@ -2964,7 +2997,7 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
     <button class="tab" data-tab="git">Evidence</button>
     <button class="tab" data-tab="arch">Architecture</button>
     <button class="tab" data-tab="skills">Agents</button>
-    <button class="tab" data-tab="thoughts">Thoughts</button>
+    <button class="tab" data-tab="changes">Changes</button>
     <button class="tab" data-tab="settings">Settings</button>
   </nav>
   <div class="header-right">
@@ -3050,14 +3083,18 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
       </div>
     </div>
   </div>
-<div class="panel active" id="panel-thoughts">
-  <div class="thoughts-panel">
-    <div class="thoughts-hd">
-      <h3>Thoughts</h3>
-      <button class="clear" id="thoughtsClear" title="Clear">Clear</button>
+<div class="panel" id="panel-changes">
+  <div class="changes-panel">
+    <div class="changes-hd">
+      <h3>Live changes</h3>
+      <div class="changes-actions">
+        <button class="btn btn-danger btn-sm" data-harness-command="no" title="Discard every pending change">Discard all</button>
+        <button class="btn btn-p btn-sm" data-harness-command="si aplicar" title="Apply every pending change and run the quality gates">Apply &amp; run gates</button>
+        <button class="clear" id="changesClear" title="Clear">Clear</button>
+      </div>
     </div>
-    <div class="thoughts-list" id="thoughtsList">
-      <div class="empty-thoughts">No agent thoughts yet</div>
+    <div class="changes-list" id="changesList">
+      <div class="empty-changes">Code changes and progress will appear here</div>
     </div>
   </div>
 </div>
@@ -3445,9 +3482,10 @@ window.addEventListener('message', e => {
     case 'arch-chat-chunk':        appendArchAiChunk(msg.content); break;
     case 'arch-chat-done':         finishArchAiChat(msg.patch, msg.model); break;
     case 'arch-chat-error':        archAiChatError(msg.error); break;
-    case 'agent-thought':          appendThought(msg.sessionId, msg.step, msg.thought, msg.timestamp); break;
+    case 'agent-progress':         appendProgress(msg.sessionId, msg.step, msg.message, msg.timestamp); break;
     case 'agent-step-start':       appendStepStart(msg.sessionId, msg.step, msg.domainId, msg.useCaseId, msg.timestamp); break;
     case 'agent-step-done':        appendStepDone(msg.sessionId, msg.step, msg.success, msg.timestamp); break;
+    case 'agent-file-change':       appendFileChange(msg.sessionId, msg.path, msg.status, msg.diff, msg.added, msg.removed, msg.timestamp); break;
     case 'switch-tab':             switchTab(msg.tab); break;
   }
 });
@@ -3462,6 +3500,9 @@ function renderHarness(data) {
   if (!data) return;
   const setText = (id, value) => { const el=document.getElementById(id); if(el) el.textContent=String(value); };
   const pending = Array.isArray(data.pending) ? data.pending : [];
+  document.querySelectorAll('.changes-actions [data-harness-command]').forEach(button => {
+    button.disabled = pending.length === 0 || S.thinking;
+  });
   const debt = data.debt || { score:0, ceiling:100, events:[] };
   const dora = data.dora || {};
   const economy = data.economy || { localOps:0, llmCalls:0 };
@@ -3539,6 +3580,7 @@ function sendMessage() {
   hideEmpty(); addMessage('user', text);
   chatInput.value = ''; chatInput.style.height = 'auto';
   S.thinking = true; sendBtn.disabled = true;
+  document.querySelectorAll('.changes-actions [data-harness-command]').forEach(button => { button.disabled = true; });
   window._thinkBubble = addThinking();
   vscode.postMessage({ type:'chat', text, modelId: document.getElementById('modelSel').value });
 }
@@ -3579,23 +3621,27 @@ function finishChat(model) {
   if (_streamDiv && model) { const m=document.createElement('div'); m.className='msg-meta'; m.textContent=model; _streamDiv.querySelector('div > div').appendChild(m); }
   _streamDiv=null; _streamContent=''; S.thinking=false; sendBtn.disabled=false;
   vscode.postMessage({ type:'load-harness' });
-function appendThought(sessionId, step, thought, timestamp) {
-  const list = document.getElementById('thoughtsList');
+}
+function appendProgress(sessionId, step, message, timestamp) {
+  const list = document.getElementById('changesList');
   if (!list) return;
+  list.querySelector('.empty-changes')?.remove();
   const item = document.createElement('div');
   item.className = 'thought-item';
   item.dataset.sessionId = sessionId;
   item.dataset.step = step;
   item.innerHTML =
-    '<span class="badge">Thought</span>' +
-    '<div class="text">' + esc(thought) + '</div>' +
+    '<span class="badge">Progress</span>' +
+    '<div class="text">' + esc(message) + '</div>' +
     '<span class="ts">' + new Date(timestamp || Date.now()).toLocaleTimeString() + '</span>';
   list.appendChild(item);
+  trimChangeFeed(list);
   list.scrollTop = list.scrollHeight;
 }
 function appendStepStart(sessionId, step, domainId, useCaseId, timestamp) {
-  const list = document.getElementById('thoughtsList');
+  const list = document.getElementById('changesList');
   if (!list) return;
+  list.querySelector('.empty-changes')?.remove();
   const item = document.createElement('div');
   item.className = 'thought-item step-start';
   item.dataset.sessionId = sessionId;
@@ -3606,11 +3652,13 @@ function appendStepStart(sessionId, step, domainId, useCaseId, timestamp) {
     '<div class="text">' + esc(step) + '</div>' +
     '<span class="ts">' + new Date(timestamp || Date.now()).toLocaleTimeString() + '</span>';
   list.appendChild(item);
+  trimChangeFeed(list);
   list.scrollTop = list.scrollHeight;
 }
 function appendStepDone(sessionId, step, success, timestamp) {
-  const list = document.getElementById('thoughtsList');
+  const list = document.getElementById('changesList');
   if (!list) return;
+  list.querySelector('.empty-changes')?.remove();
   const item = document.createElement('div');
   item.className = 'thought-item step-done' + (success ? '' : ' fail');
   item.dataset.sessionId = sessionId;
@@ -3620,17 +3668,50 @@ function appendStepDone(sessionId, step, success, timestamp) {
     '<div class="text">' + esc((success ? 'Completed' : 'Failed') + ': ' + step) + '</div>' +
     '<span class="ts">' + new Date(timestamp || Date.now()).toLocaleTimeString() + '</span>';
   list.appendChild(item);
+  trimChangeFeed(list);
   list.scrollTop = list.scrollHeight;
 }
-function clearThoughts() {
-  const list = document.getElementById('thoughtsList');
-  if (list) { list.innerHTML = '<div class="empty-thoughts">No agent thoughts yet</div>'; }
+function clearChanges() {
+  const list = document.getElementById('changesList');
+  if (list) { list.innerHTML = '<div class="empty-changes">Code changes and progress will appear here</div>'; }
 }
-document.getElementById('thoughtsClear')?.addEventListener('click', clearThoughts);
+document.getElementById('changesClear')?.addEventListener('click', clearChanges);
+function trimChangeFeed(list) {
+  while (list.children.length > 150) { list.firstElementChild.remove(); }
+}
+function appendFileChange(sessionId, path, status, diff, added, removed, timestamp) {
+  const list = document.getElementById('changesList');
+  if (!list) return;
+  const empty = list.querySelector('.empty-changes');
+  if (empty) empty.remove();
+  const existing = Array.from(list.querySelectorAll('.thought-item.file-change')).reverse()
+    .find(candidate => candidate.dataset.path === path && (candidate.classList.contains('proposed') || status === 'proposed'));
+  const item = existing || document.createElement('div');
+  item.replaceChildren();
+  item.className = 'thought-item file-change ' + status;
+  item.dataset.sessionId = sessionId;
+  item.dataset.path = path;
+  const details = document.createElement('details');
+  details.open = status === 'proposed';
+  const summary = document.createElement('summary');
+  const labels = { proposed: 'Proposed', applied: 'Applied', discarded: 'Discarded' };
+  summary.textContent = (labels[status] || status) + ': ' + path + ' (+' + added + '/-' + removed + ')';
+  const pre = document.createElement('pre');
+  const maxDiffLength = 16000;
+  pre.textContent = diff.length > maxDiffLength ? diff.slice(0, maxDiffLength) + String.fromCharCode(10) + '… diff truncated in feed; use the full diff in Work.' : diff;
+  details.append(summary, pre);
+  const time = document.createElement('span');
+  time.className = 'ts';
+  time.textContent = new Date(timestamp || Date.now()).toLocaleTimeString();
+  item.append(details, time);
+  if (!existing) list.appendChild(item);
+  trimChangeFeed(list);
+  list.scrollTop = list.scrollHeight;
 }
 function chatError(err) {
   if (window._thinkBubble) { window._thinkBubble.remove(); window._thinkBubble=null; }
   toast('Error: ' + err, 'err'); S.thinking=false; sendBtn.disabled=false;
+  vscode.postMessage({ type:'load-harness' });
 }
 function onTaskWorkStarted(taskId, title) { reviewTasks.delete(taskId); workingTasks.add(taskId); renderBoard(); hideEmpty(); addSystemMessage('Starting: ' + title); }
 function onTaskWorkReview(taskId, title, files) { workingTasks.delete(taskId); reviewTasks.add(taskId); renderBoard(); vscode.postMessage({type:'load-harness'}); toast('Review required: ' + title + ' (' + files + ' file' + (files===1?'':'s') + ')','info'); }

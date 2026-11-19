@@ -4,8 +4,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
-[![Version](https://img.shields.io/badge/version-3.6.2-green)](./CHANGELOG.md)
-[![Tests](https://img.shields.io/badge/tests-701%20passing-brightgreen)](./package.json)
+[![Version](https://img.shields.io/badge/version-3.7.0-green)](./CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-711%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
 [![Stars](https://img.shields.io/github/stars/sergioide007/alpaquitay-ai?style=social)](https://github.com/sergioide007/alpaquitay-ai/stargazers)
@@ -40,33 +40,34 @@ Alpaquitay AI turns VS Code into a complete **harness-driven development environ
 
 ---
 
-## Live agent thoughts (Cline-style progress)
+## Live agent changes
 
-The Alpaquitay Hub now includes a **Thoughts** panel that mirrors what an agent like Cline shows: every step the AI takes while executing your request is published in real time, so you can watch it **think, plan, delegate, and verify** step by step.
+The Hub's **Changes** panel shows exact diffs as the agent proposes them and reports when each change is applied or discarded. It also shows concise operational progress without exposing prompt text or private chain-of-thought.
 
 ### How it works
 
-When you send an objective to the Central Brain, every internal phase emits a typed event on the local `AgentThoughtStream`:
+Generated task diffs and workspace filesystem writes emit local typed events:
 
 | Event | What you see in the panel |
 |-------|---------------------------|
 | `step-start` | A step has begun — e.g. `receive-objective`, `sanitize-objective`, `rag-augment`, `multi-agent-orchestration`, `refine-output`, etc. |
-| `thought` | A free-form reasoning snippet — why the agent chose a certain agent, or what it decided during planning. |
-| `step-done` | A step finished, with `success: true` (green) or `success: false` (red). |
+| `progress` | A short operational status with no prompt text. |
+| `step-done` | A step finished with success or failure status. |
+| `file-change` | Exact unified diff, path, and state: proposed, applied, or discarded. |
 
-These events flow from the extension host → the Hub webview → the **Thoughts** panel, which renders them as a chronological feed of step badges, colored banners, timestamps, and thoughts. No data ever leaves your machine.
+These events flow from the extension host → the Hub webview → the **Changes** panel. Proposed diffs expand automatically; applied and discarded diffs remain in a bounded feed. The panel keeps these events local.
 
 ### How to use it
 
-- **Open the panel:** from the hub, click the tab **Thoughts** (or press `Ctrl+Shift+P` → *Alpaquitay AI: Toggle Agent Thoughts*).
-- **Watch the agent work:** as you route a task, the panel shows each specialist agent being called, each guardrail check passing, and each refinement iteration.
+- **Open the panel:** from the hub, click **Changes** (or press `Ctrl+Shift+P` → *Alpaquitay AI: Show Agent Changes*).
+- **Review a proposal:** expand a file entry to inspect additions and removals. A proposal stays pending until you apply it through **Apply & run gates** or the Work flow.
 - **Clear the feed:** click the **Clear** button on the panel to start a fresh session view.
 
 ### VS Code commands
 
 | Command | Shortcut | What it does |
 |---------|----------|--------------|
-| `alpaquitay-ai.toggle-thoughts` | — | Open/switch to the Thoughts tab in the hub and show the agent's live progress. |
+| `alpaquitay-ai.show-agent-changes` | — | Open/switch to the Changes tab in the hub. |
 
 ---
 
@@ -76,7 +77,7 @@ These events flow from the extension host → the Hub webview → the **Thoughts
 2. Press `Ctrl+Alt+A` to open the Hub, then add a provider in **Settings** — a local model ([Ollama](https://ollama.com) / LM Studio) keeps everything on your machine.
 3. **Code:** open the **Work** tab, generate a `spec.md`, and drag a task to *In Progress*.
 4. **Writing:** open the **Docs** tab, pick a `.docx`, `.md`, `.epub` or `.pdf`, and tell the agent what to do.
-5. **Live thoughts:** click the **Thoughts** tab to watch the agent think and execute in real time.
+5. **Live changes:** click **Changes** to inspect proposed file diffs and see them move to applied or discarded. Use **Apply all** to review, write all pending diffs and run the quality gates, or **Discard all** to reject them.
 
 The detailed, step-by-step version is [below](#step-by-step-setup).
 

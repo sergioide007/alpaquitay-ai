@@ -84,6 +84,8 @@ It classifies it (build, test, lint, diagnostics, write or unknown), suggests th
 
 ## diff, si aplicar and no
 
+You can also click **Apply & run gates** or **Discard all** in the **Changes** tab. Both buttons act on every pending diff; **Apply & run gates** runs the same reviews, checkpoint and gates as `si aplicar`.
+
 After the agent generates changes, the chat lists the **pending diffs**. Nothing is written yet.
 
 - `diff src/bookings/calendar.ts` shows that file's full diff.

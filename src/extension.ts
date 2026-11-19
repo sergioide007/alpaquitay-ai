@@ -268,14 +268,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     })
   );
 
-  vscode.commands.registerCommand('alpaquitay-ai.toggle-thoughts', () => {
+  vscode.commands.registerCommand('alpaquitay-ai.show-agent-changes', () => {
     const panel = MainPanel.current;
     if (!panel) {
-      vscode.window.showInformationMessage('Alpaquitay AI: Open the hub (Ctrl+Alt+A) to see the agent thoughts panel.');
+      vscode.window.showInformationMessage('Alpaquitay AI: Open the hub (Ctrl+Alt+A) to see live agent changes.');
       return;
     }
-    panel.activateThoughtsTab();
-    vscode.window.showInformationMessage('Alpaquitay AI: Thoughts panel activated — watch the agent progress in real time.');
+    panel.activateChangesTab();
+    vscode.window.showInformationMessage('Alpaquitay AI: Live Changes panel activated.');
   });
 
   registerLocalEngineCommands(context, localEngine, () => config.localEngine, workspaceRoot);

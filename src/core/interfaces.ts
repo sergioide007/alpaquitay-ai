@@ -240,7 +240,9 @@ export type ExtensionMessage =
   | { type: 'arch-chat-chunk'; content: string }
   | { type: 'arch-chat-done'; patch: ArchDiagramPatch | null; model: string }
   | { type: 'arch-chat-error'; error: string }
-  // ── Live agent thoughts / progress (Cline-style) ─────────────────────────
-  | { type: 'agent-thought'; sessionId: string; step: string; thought: string; timestamp: number }
+  // ── Live agent progress and workspace changes ────────────────────────────
+  | { type: 'agent-progress'; sessionId: string; step: string; message: string; timestamp: number }
   | { type: 'agent-step-start'; sessionId: string; step: string; domainId?: string; useCaseId?: string; timestamp: number }
-  | { type: 'agent-step-done'; sessionId: string; step: string; success: boolean; timestamp: number };
+  | { type: 'agent-step-done'; sessionId: string; step: string; success: boolean; timestamp: number }
+  | { type: 'agent-file-change'; sessionId: string; path: string; status: 'proposed' | 'applied' | 'discarded'; diff: string; added: number; removed: number; timestamp: number }
+  | { type: 'switch-tab'; tab: string };

@@ -33,7 +33,7 @@ import { PrivacyGuard }            from './privacy/PrivacyGuard';
 import { MetaheuristicEngine }     from './metaheuristic/MetaheuristicEngine';
 import { RefinementRubric }        from './metaheuristic/RecursiveRefinement';
 import { AgentRegistry }           from './AgentRegistry';
-import { thoughtStream }           from './AgentThoughtStream';
+import { thoughtStream }           from '../../core/harness/AgentThoughtStream';
 import { randomUUID }              from 'crypto';
 
 export interface BrainSessionContext {
@@ -93,7 +93,7 @@ export class CentralBrainAgent {
     const start = Date.now();
 
     // ── Live thought: receiving the objective ─────────────────────────────────
-    thoughtStream.thought(this.session.sessionId, 'receive', `Received objective: "${objective.slice(0, 120)}"`);
+    thoughtStream.progress(this.session.sessionId, 'receive', 'Objective received. Sanitizing before processing.');
     thoughtStream.stepStart(this.session.sessionId, 'receive-objective');
 
     // ── Step 1: Privacy sanitization ──────────────────────────────────────────
@@ -103,15 +103,15 @@ export class CentralBrainAgent {
     }
     const safeObjective = privacyReport.sanitizedText;
     thoughtStream.stepDone(this.session.sessionId, 'receive-objective', true);
-    thoughtStream.thought(this.session.sessionId, 'privacy', privacyReport.piiFound
-      ? `PII detected — redacted ${privacyReport.riskLevel.toLowerCase()} risk content before forwarding.`
-      : 'No PII found — objective is clean.');
+    thoughtStream.progress(this.session.sessionId, 'privacy', privacyReport.piiFound
+      ? 'Sensitive content was detected and redacted before forwarding.'
+      : 'Input sanitization completed.');
 
     // ── Step 2: RAG context augmentation ─────────────────────────────────────
     thoughtStream.stepStart(this.session.sessionId, 'rag-augment');
     const augmented = this.rag.augment(safeObjective, { topK: 4 });
     thoughtStream.stepDone(this.session.sessionId, 'rag-augment', true);
-    thoughtStream.thought(this.session.sessionId, 'rag', `Retrieved ${augmented?.retrievedChunks?.length ?? 0} relevant context chunks from knowledge base.`);
+    thoughtStream.progress(this.session.sessionId, 'rag', `Retrieved ${augmented?.retrievedChunks?.length ?? 0} relevant context chunks from knowledge base.`);
 
     // ── Step 3: Session history injection ────────────────────────────────────
     thoughtStream.stepStart(this.session.sessionId, 'session-history');
@@ -120,9 +120,9 @@ export class CentralBrainAgent {
 
     // ── Step 4: Multi-agent orchestration ────────────────────────────────────
     thoughtStream.stepStart(this.session.sessionId, 'multi-agent-orchestration');
-    const orchestration = await this.orchestrator.execute(enrichedObjective, contextParams);
+    const orchestration = await this.orchestrator.execute(enrichedObjective, contextParams, this.session.sessionId);
     thoughtStream.stepDone(this.session.sessionId, 'multi-agent-orchestration', true);
-    thoughtStream.thought(this.session.sessionId, 'orchestrate', `Planned ${orchestration.plan.tasks.length} tasks across ${new Set(orchestration.plan.tasks.map(t => t.domainId)).size} specialist agents. Algorithm: ${orchestration.plan.algorithm}.`);
+    thoughtStream.progress(this.session.sessionId, 'orchestrate', `Planned ${orchestration.plan.tasks.length} tasks across ${new Set(orchestration.plan.tasks.map(t => t.domainId)).size} specialist agents. Algorithm: ${orchestration.plan.algorithm}.`);
 
     // ── Step 5: Recursive refinement of synthesized output ───────────────────
     thoughtStream.stepStart(this.session.sessionId, 'refine-output');
@@ -132,7 +132,7 @@ export class CentralBrainAgent {
       DEFAULT_RUBRIC,
     );
     thoughtStream.stepDone(this.session.sessionId, 'refine-output', true);
-    thoughtStream.thought(this.session.sessionId, 'refine', `Refinement score ${refinementResult.finalScore} (threshold 75) after ${refinementResult.iterations.length} iteration(s).`);
+    thoughtStream.progress(this.session.sessionId, 'refine', `Refinement score ${refinementResult.finalScore} (threshold 75) after ${refinementResult.iterations.length} iteration(s).`);
 
     // ── Step 6: Learn from high-quality output ───────────────────────────────
     thoughtStream.stepStart(this.session.sessionId, 'learn-from-output');
@@ -149,7 +149,7 @@ export class CentralBrainAgent {
       knowledgeAdded = true;
     }
     thoughtStream.stepDone(this.session.sessionId, 'learn-from-output', knowledgeAdded);
-    thoughtStream.thought(this.session.sessionId, 'learn', knowledgeAdded
+    thoughtStream.progress(this.session.sessionId, 'learn', knowledgeAdded
       ? 'High-quality output stored to knowledge base for future sessions.'
       : 'Output below knowledge threshold — not stored to memory.');
 
@@ -162,7 +162,7 @@ export class CentralBrainAgent {
     });
     thoughtStream.stepDone(this.session.sessionId, 'update-history', true);
 
-    thoughtStream.thought(this.session.sessionId, 'respond', `Final response ready (quality ${refinementResult.finalScore}/100, ${Date.now() - start}ms elapsed).`);
+    thoughtStream.progress(this.session.sessionId, 'respond', `Final response ready (quality ${refinementResult.finalScore}/100, ${Date.now() - start}ms elapsed).`);
 
     return {
       sessionId:     this.session.sessionId,

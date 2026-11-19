@@ -68,7 +68,9 @@ El arnés también sitúa cada petición en una fase del ciclo de vida. Una fase
 
 ## Qué protege una escritura
 
-Cuando respondes `si aplicar`, para **cada archivo** pendiente:
+Puedes revisar la actividad y los diffs en **Changes**. Sus botones **Apply & run gates** y **Discard all** actúan sobre todos los diffs pendientes; aplicar inicia el mismo flujo protegido que el comando `si aplicar`, y descartar equivale a `no`.
+
+Cuando respondes `si aplicar` (o pulsas **Apply & run gates**), para **cada archivo** pendiente:
 
 1. **Política de escritura.** Se deniegan siempre los archivos que *son* secretos: `.env`, `*.pem`, `*.key`, `id_rsa`, `id_ed25519`, carpetas `secrets/`, archivos de credenciales o de *tokens*. Escribir `spec.md` exige confirmación y copia de seguridad.
 2. **Revisión automática** (sin modelo). **Bloquea** si el archivo está fuera de las carpetas de código detectadas o si el contenido parece contener un secreto literal (claves de API, claves privadas, claves de AWS, `sk-…`, `ghp_…`, JWT). **Avisa** si el archivo supera 400 líneas, si quedan `console.log`, `print(`, `TODO` o `FIXME`, o si el cambio no cambia nada.

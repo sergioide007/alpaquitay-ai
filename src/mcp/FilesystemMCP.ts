@@ -2,6 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MCPServer, MCPTool } from '../core/interfaces';
 import { assertWritableRoot, friendlyFsError, isUsableRoot } from '../core/WorkspaceRoot';
+import { unifiedDiff } from '../core/harness/FileDiff';
+import { thoughtStream } from '../core/harness/AgentThoughtStream';
 
 /**
  * Filesystem MCP server — safe read/write operations scoped to the workspace.
@@ -37,12 +39,20 @@ export class FilesystemMCP implements MCPServer {
         parameters: { path: 'string', content: 'string' },
         execute: async (params) => {
           const filePath = this.safePath(params.path as string);
+          let before = '';
+          try { before = await fs.promises.readFile(filePath, 'utf-8'); } catch { /* new file */ }
           await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
           try {
             await fs.promises.writeFile(filePath, params.content as string, 'utf-8');
           } catch (err) {
             // Fix EROFS/EACCES: mensaje accionable en vez de un stack crudo en el chat.
             throw new Error(friendlyFsError(err, filePath));
+          }
+          const relativePath = path.relative(this.root, filePath).split(path.sep).join('/');
+          // Harness state can contain cached prompts and pending source content; never surface it in the Changes feed.
+          if (relativePath !== '.alpaquitay' && !relativePath.startsWith('.alpaquitay/')) {
+            const diff = unifiedDiff(relativePath, before, params.content as string);
+            thoughtStream.fileChange('workspace', relativePath, 'applied', diff.diff, diff.added, diff.removed);
           }
           return { success: true, path: filePath };
         }
