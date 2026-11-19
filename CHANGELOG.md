@@ -8,6 +8,28 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.8.0] — 2026-11-19
+
+### Added
+
+- Hub **next-step bar**: always shows where you are in *Spec → Build → Review → Verify* and offers one primary button for what to do now (create spec, start the next task, review changes, apply & run gates, validate against spec).
+- **Start / Resume** button on every board card (dragging to *In Progress* still works), and **Review changes** on cards waiting for approval.
+- **Quick actions** above the chat input (*Build next task*, *Validate*, *Tests*, *Refactor*, and *Apply changes* when diffs are pending) and starter prompts in the empty chat.
+- **Command palette** (`Ctrl+K` / `Cmd+K`) with every tab, action and agent, plus `Alt+1…7` (`Option+1…7` on macOS) to switch tabs and `/` to focus the chat.
+- Tab icons with tooltips, a pending-changes badge on **Changes** and a warning badge on **Evidence** when debt is high.
+
+### Changed
+
+- Modernized Hub styles: native editor fonts, sentence-case labels instead of 9–10 px uppercase text, larger buttons and hit areas, visible keyboard focus and reduced-motion support.
+- Task rows in the Spec pane no longer lose width to their hidden action buttons, so titles stay readable.
+
+### Fixed
+
+- The **Chat** pane was hidden when the Hub was narrower than 900 px; it now stays visible and the Work tab reflows to fit.
+- Pending diffs remain the next action even when the workspace has no spec tasks yet.
+
+---
+
 ## [3.7.0] — 2026-11-19
 
 ### Added

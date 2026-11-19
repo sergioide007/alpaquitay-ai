@@ -35,7 +35,7 @@
 </header>
 <div class="layout">
 <aside class="sidebar" id="sidebar" aria-label="Índice del manual">
-  <p class="side-title">Manual de uso <span class="ver">v3.7.0</span></p>
+  <p class="side-title">Manual de uso <span class="ver">v3.8.0</span></p>
   <ol class="chapters">
 <li><a href="../"><span class="n">00</span>Inicio</a></li>
 <li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
@@ -67,6 +67,72 @@
      ▲                                                                                              │
      └──────────────────────────────────── ciclo de retroalimentación ─────────────────────────────┘
 </code></pre></div>
+<h2 id="tu-siguiente-paso-siempre-a-la-vista">Tu siguiente paso, siempre a la vista</h2>
+<p>Debajo de las pestañas, la <strong>barra de siguiente paso</strong> sigue el flujo SDD, <em>Spec → Build → Review → Verify</em>, y muestra un botón principal con lo que toca hacer ahora:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Dónde estás</th>
+<th>Qué dice la barra</th>
+<th>El botón</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Aún no hay <code>spec.md</code></td>
+<td>Start with a spec</td>
+<td><strong>Create spec with AI</strong></td>
+</tr>
+<tr>
+<td>Hay tareas pendientes</td>
+<td>Next task: …</td>
+<td><strong>Start SPEC-00x</strong> (equivale a arrastrar la tarjeta a <em>In Progress</em>)</td>
+</tr>
+<tr>
+<td>La IA está trabajando</td>
+<td>AI is building …</td>
+<td><strong>Watch progress</strong></td>
+</tr>
+<tr>
+<td>Hay diffs pendientes</td>
+<td>Review N pending changes</td>
+<td><strong>Review changes</strong> y <strong>Apply &amp; run gates</strong></td>
+</tr>
+<tr>
+<td>La deuda llegó al tope</td>
+<td>Build is blocked by technical debt</td>
+<td><strong>See debt</strong></td>
+</tr>
+<tr>
+<td>Todas las tareas hechas</td>
+<td>All N tasks are done</td>
+<td><strong>Validate against spec</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Cada tarjeta de <em>Backlog</em>, <em>Todo</em> e <em>In Progress</em> tiene además un botón <strong>Start</strong> (o <strong>Resume</strong>), así que arrastrar es opcional. Sobre el campo del chat, botones rápidos ejecutan lo habitual: <em>Build next task</em>, <em>Validate</em>, <em>Tests</em>, <em>Refactor</em> y, mientras haya diffs pendientes, <em>Apply changes</em>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Atajo</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>Cmd</kbd>+<kbd>K</kbd> en macOS)</td>
+<td>Abre la paleta de comandos: cada pestaña, acción y agente, con búsqueda</td>
+</tr>
+<tr>
+<td><kbd>Alt</kbd>+<kbd>1</kbd> a <kbd>7</kbd> (<kbd>Option</kbd> en macOS)</td>
+<td>Cambia de pestaña</td>
+</tr>
+<tr>
+<td><kbd>/</kbd></td>
+<td>Enfoca el chat</td>
+</tr>
+</tbody>
+</table></div>
 <h2 id="1-la-especificacion-spec-md">1. La especificación (<code>spec.md</code>)</h2>
 <p><code>spec.md</code> es Markdown normal en la raíz de tu proyecto, y es <strong>la base de datos del tablero</strong>: el estado de las tarjetas se lee de este archivo, no se guarda aparte. Así que lo puedes editar a mano, revisarlo en un <em>pull request</em> y versionarlo como cualquier otro archivo.</p>
 <div class="code" data-lang="Markdown"><pre><code class="language-markdown"># Portal de reservas del club
@@ -172,14 +238,14 @@ Muestra las franjas libres de los próximos 7 días.
 
 <div class="doc-foot">
   <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/04-work.md">Proponer una mejora a esta página</a>
-  <span>Manual para Alpaquitay AI 3.7.0 · MIT</span>
+  <span>Manual para Alpaquitay AI 3.8.0 · MIT</span>
 </div>
 <nav class="pager" aria-label="Capítulos">
 <a class="prev" href="../arnes/"><span>Anterior</span>Cómo piensa el arnés</a>
 <a class="next" href="../comandos-chat/"><span>Siguiente</span>Comandos del chat</a>
 </nav>
 </article>
-<nav class="toc" aria-label="En esta página"><p class="toc-title">En esta página</p><ul><li class="l2"><a href="#1-la-especificacion-spec-md">1. La especificación (spec.md)</a></li><li class="l3"><a href="#tres-formas-de-crearla">Tres formas de crearla</a></li><li class="l2"><a href="#2-el-tablero">2. El tablero</a></li><li class="l2"><a href="#3-el-chat">3. El chat</a></li><li class="l2"><a href="#ideas-que-todavia-no-son-tareas">Ideas que todavía no son tareas</a></li><li class="l2"><a href="#enlazar-commits-con-tareas">Enlazar commits con tareas</a></li><li class="l2"><a href="#generate-from-spec-y-validate-against-spec">Generate from Spec y Validate Against Spec</a></li></ul></nav>
+<nav class="toc" aria-label="En esta página"><p class="toc-title">En esta página</p><ul><li class="l2"><a href="#tu-siguiente-paso-siempre-a-la-vista">Tu siguiente paso, siempre a la vista</a></li><li class="l2"><a href="#1-la-especificacion-spec-md">1. La especificación (spec.md)</a></li><li class="l3"><a href="#tres-formas-de-crearla">Tres formas de crearla</a></li><li class="l2"><a href="#2-el-tablero">2. El tablero</a></li><li class="l2"><a href="#3-el-chat">3. El chat</a></li><li class="l2"><a href="#ideas-que-todavia-no-son-tareas">Ideas que todavía no son tareas</a></li><li class="l2"><a href="#enlazar-commits-con-tareas">Enlazar commits con tareas</a></li><li class="l2"><a href="#generate-from-spec-y-validate-against-spec">Generate from Spec y Validate Against Spec</a></li></ul></nav>
 </main>
 </div>
 <div class="search" id="search" hidden>

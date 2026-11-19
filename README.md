@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
-[![Version](https://img.shields.io/badge/version-3.7.0-green)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.8.0-green)](./CHANGELOG.md)
 [![Tests](https://img.shields.io/badge/tests-711%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
@@ -37,6 +37,23 @@ Alpaquitay AI turns VS Code into a complete **harness-driven development environ
 **User manual:** [English](https://alpaquitay-ai.specsolid.com/manual/en/) · [Español](https://alpaquitay-ai.specsolid.com/manual/) — every feature, step-by-step use cases and short videos of the real extension.
 
 **Website:** [specsolid.com](https://www.specsolid.com) · **Book:** [Código Sintético](https://codigosintetico.specsolid.com) (Spanish) · [*Synthetic Code*](https://info-codigo-sintetico.specsolid.com/en/) (English) · **Videos:** [YouTube @codigosinteticolibro](https://www.youtube.com/@codigosinteticolibro) (Spanish)
+
+---
+
+## Guided flow in the Hub
+
+The Hub tells you what to do next instead of making you remember the commands.
+
+- **Next-step bar.** Under the tabs it follows *Spec → Build → Review → Verify* and shows one primary button: **Create spec with AI**, **Start SPEC-00x**, **Review changes**, **Apply & run gates** or **Validate against spec**, depending on where the project is.
+- **Start buttons.** Every card in *Backlog*, *Todo* and *In Progress* has **Start** / **Resume**; dragging still works.
+- **Quick actions.** Above the chat input: *Build next task*, *Validate*, *Tests*, *Refactor* and, when diffs are pending, *Apply changes*.
+- **Command palette.** `Ctrl+K` (`Cmd+K` on macOS) searches every tab, action and agent.
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+K` / `Cmd+K` | Command palette |
+| `Alt+1`…`Alt+7` (`Option` on macOS) | Switch tab |
+| `/` | Focus the chat |
 
 ---
 

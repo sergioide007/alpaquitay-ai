@@ -16,6 +16,27 @@ The **Work** tab is where the coding happens. It has three panes: the **spec** (
      └──────────────────────────────────────── feedback loop ──────────────────────────────────┘
 ```
 
+## Your next step, always visible
+
+Under the tabs, the **next-step bar** follows the SDD flow, *Spec → Build → Review → Verify*, and shows one primary button for what to do now:
+
+| Where you are | The bar says | The button |
+|---|---|---|
+| No `spec.md` yet | Start with a spec | **Create spec with AI** |
+| Tasks waiting | Next task: … | **Start SPEC-00x** (the same as dragging the card to *In Progress*) |
+| The AI is working | AI is building … | **Watch progress** |
+| Diffs pending | Review N pending changes | **Review changes** and **Apply & run gates** |
+| Debt at its ceiling | Build is blocked by technical debt | **See debt** |
+| Every task done | All N tasks are done | **Validate against spec** |
+
+Every card in *Backlog*, *Todo* and *In Progress* also has a **Start** (or **Resume**) button, so dragging is optional. Above the chat input, quick buttons run the common actions: *Build next task*, *Validate*, *Tests*, *Refactor* and, while diffs are pending, *Apply changes*.
+
+| Shortcut | Action |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>Cmd</kbd>+<kbd>K</kbd> on macOS) | Open the command palette: every tab, action and agent, searchable |
+| <kbd>Alt</kbd>+<kbd>1</kbd> to <kbd>7</kbd> (<kbd>Option</kbd> on macOS) | Switch tab |
+| <kbd>/</kbd> | Focus the chat |
+
 ## 1. The spec (`spec.md`)
 
 `spec.md` is plain Markdown at the root of your project, and it is **the board's database**: card state is read from this file, not stored elsewhere. So you can edit it by hand, review it in a pull request and version it like any other file.

@@ -16,6 +16,27 @@ La pestaña **Work** es donde se hace el trabajo de código. Tiene tres paneles:
      └──────────────────────────────────── ciclo de retroalimentación ─────────────────────────────┘
 ```
 
+## Tu siguiente paso, siempre a la vista
+
+Debajo de las pestañas, la **barra de siguiente paso** sigue el flujo SDD, *Spec → Build → Review → Verify*, y muestra un botón principal con lo que toca hacer ahora:
+
+| Dónde estás | Qué dice la barra | El botón |
+|---|---|---|
+| Aún no hay `spec.md` | Start with a spec | **Create spec with AI** |
+| Hay tareas pendientes | Next task: … | **Start SPEC-00x** (equivale a arrastrar la tarjeta a *In Progress*) |
+| La IA está trabajando | AI is building … | **Watch progress** |
+| Hay diffs pendientes | Review N pending changes | **Review changes** y **Apply & run gates** |
+| La deuda llegó al tope | Build is blocked by technical debt | **See debt** |
+| Todas las tareas hechas | All N tasks are done | **Validate against spec** |
+
+Cada tarjeta de *Backlog*, *Todo* e *In Progress* tiene además un botón **Start** (o **Resume**), así que arrastrar es opcional. Sobre el campo del chat, botones rápidos ejecutan lo habitual: *Build next task*, *Validate*, *Tests*, *Refactor* y, mientras haya diffs pendientes, *Apply changes*.
+
+| Atajo | Acción |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>Cmd</kbd>+<kbd>K</kbd> en macOS) | Abre la paleta de comandos: cada pestaña, acción y agente, con búsqueda |
+| <kbd>Alt</kbd>+<kbd>1</kbd> a <kbd>7</kbd> (<kbd>Option</kbd> en macOS) | Cambia de pestaña |
+| <kbd>/</kbd> | Enfoca el chat |
+
 ## 1. La especificación (`spec.md`)
 
 `spec.md` es Markdown normal en la raíz de tu proyecto, y es **la base de datos del tablero**: el estado de las tarjetas se lee de este archivo, no se guarda aparte. Así que lo puedes editar a mano, revisarlo en un *pull request* y versionarlo como cualquier otro archivo.
