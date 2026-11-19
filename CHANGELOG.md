@@ -8,6 +8,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.6.2] — 2026-11-19
+
+### Fixed
+
+- Definition of Done now blocks code projects until onboarding has saved a verified platform contract and the contract's build and test commands pass. Projects without source code can complete without that quality gate; pending diffs block completion in either case.
+- Manual, automatic, and skill-driven task completion now use the same gate and current workspace evidence.
+- Regenerated the published Spanish and English manual for the updated onboarding and completion rules.
+
+---
+
 ## [3.6.1] — 2026-11-15
 
 First published release with the local engine. It includes everything in 3.6.0, which was never published to the Marketplace or Open VSX (the previous published version is 3.5.0).

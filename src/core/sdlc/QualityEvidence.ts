@@ -43,11 +43,18 @@ export function evaluateQualityEvidence(evidence: QualityEvidence | null): Quali
   ];
 
   for (const [name, check] of checks) {
-    const command = check.command ? ` \`${check.command}\`` : '';
-    if (check.status === 'passed') {
+    if (!check || typeof check !== 'object') {
+      blockers.push(`${name} evidencia invalida`);
+      continue;
+    }
+    const commandText = typeof check.command === 'string' ? check.command.trim() : '';
+    const command = commandText ? ` \`${commandText}\`` : '';
+    if (check.status === 'passed' && commandText) {
       checklist.push(`${name}${command} ejecutado en verde`);
     } else if (check.status === 'failed') {
       blockers.push(`${name}${command} fallo${check.detail ? `: ${check.detail}` : ''}`);
+    } else if (check.status === 'passed') {
+      blockers.push(`${name} evidencia invalida: falta el comando ejecutado`);
     } else {
       blockers.push(`${name}${command} no ejecutado${check.detail ? `: ${check.detail}` : ''}`);
     }
@@ -60,10 +67,19 @@ export function parseQualityEvidence(value: string | undefined): QualityEvidence
   if (!value) { return null; }
   try {
     const parsed = JSON.parse(value) as Partial<QualityEvidence>;
-    if (parsed.version !== 1 || typeof parsed.taskId !== 'string' || !Array.isArray(parsed.files)) {
+    const isCheck = (check: unknown): check is QualityCheck => {
+      if (!check || typeof check !== 'object') { return false; }
+      const candidate = check as Partial<QualityCheck>;
+      return (candidate.status === 'passed' || candidate.status === 'failed' || candidate.status === 'not-run') &&
+        (candidate.command === undefined || typeof candidate.command === 'string') &&
+        (candidate.detail === undefined || typeof candidate.detail === 'string');
+    };
+    if (parsed.version !== 1 || typeof parsed.taskId !== 'string' || !parsed.taskId.trim() ||
+      !Array.isArray(parsed.files) || !parsed.files.every(file => typeof file === 'string')) {
       return null;
     }
-    if (!parsed.build || !parsed.tests || typeof parsed.recordedAt !== 'string') { return null; }
+    if (!isCheck(parsed.build) || !isCheck(parsed.tests) || typeof parsed.recordedAt !== 'string' ||
+      !Number.isFinite(Date.parse(parsed.recordedAt))) { return null; }
     return parsed as QualityEvidence;
   } catch {
     return null;

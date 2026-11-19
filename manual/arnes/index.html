@@ -35,7 +35,7 @@
 </header>
 <div class="layout">
 <aside class="sidebar" id="sidebar" aria-label="Índice del manual">
-  <p class="side-title">Manual de uso <span class="ver">v3.6.1</span></p>
+  <p class="side-title">Manual de uso <span class="ver">v3.6.2</span></p>
   <ol class="chapters">
 <li><a href="../"><span class="n">00</span>Inicio</a></li>
 <li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
@@ -235,13 +235,13 @@
 </ol>
 <p>Para volver atrás tras un <code>si aplicar</code>, busca el stash con <code>git stash list</code> (los de Alpaquitay empiezan por <code>alpaquitay/</code>) y recupéralo con <code>git stash apply stash@{N}</code>.</p>
 <h2 id="la-definicion-de-hecho-dod">La Definición de Hecho (DoD)</h2>
-<p>Una tarjeta solo pasa a <strong>Done</strong> si la compuerta DoD tiene evidencia:</p>
+<p>Una tarjeta pasa a <strong>Done</strong> solo si supera la compuerta DoD:</p>
 <ul>
-<li>no quedan diffs sin aplicar (<code>si aplicar</code> o <code>no</code> primero);</li>
-<li>el <strong>contrato de plataforma</strong> está verificado: se conocen los comandos de build y test (ejecuta <code>onboard</code> una vez);</li>
-<li>el build y los tests <strong>se ejecutaron de verdad</strong> y salieron en verde. Saber qué comando correr no cuenta como haberlo corrido.</li>
+<li>no quedan diffs pendientes (primero si aplicar o no);</li>
+<li>en proyectos con código, el contrato de plataforma está verificado por una ejecución explícita de onboard y guardado para el stack actual;</li>
+<li>en proyectos con código, build y tests se ejecutaron de verdad y terminaron en verde. Saber qué comando ejecutar no cuenta como haberlo ejecutado.</li>
 </ul>
-<p>Si algo falla, la tarjeta se queda en <em>In Progress</em> y el chat muestra qué bloquea, con un <em>postmortem</em> automático y sin culpables.</p>
+<p>Los proyectos sin archivos de código (por ejemplo, solo PDF, Markdown y HTML) omiten las comprobaciones de contrato y calidad; los diffs pendientes siguen bloqueando Done. La compuerta lee el contrato guardado sin crearlo y ejecuta exactamente los comandos build y test de .alpaquitay/platform.json. Si no detecta el stack, confirma ambos comandos con el formato JSON de onboard descrito en Comandos del chat.</p>
 <h2 id="la-deuda-agentica">La deuda agéntica</h2>
 <p>Cada decisión arriesgada suma deuda y cada compuerta superada la resta. El medidor va de 0 a 100; <strong>al llegar a 100 se bloquea el carril Build</strong> hasta que la pagues.</p>
 <div class="table-wrap"><table>
@@ -294,7 +294,7 @@
 
 <div class="doc-foot">
   <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/03-arnes.md">Proponer una mejora a esta página</a>
-  <span>Manual para Alpaquitay AI 3.6.1 · MIT</span>
+  <span>Manual para Alpaquitay AI 3.6.2 · MIT</span>
 </div>
 <nav class="pager" aria-label="Capítulos">
 <a class="prev" href="../proveedores/"><span>Anterior</span>Proveedores y privacidad</a>

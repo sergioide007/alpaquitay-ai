@@ -7,16 +7,19 @@ import { SpecManager } from '../core/SpecManager';
 import { GitIntegration } from '../core/GitIntegration';
 import { MCPManager } from '../mcp/MCPManager';
 import { SecretManager } from '../core/SecretManager';
-import { WorkspaceFingerprinter } from '../core/context/WorkspaceFingerprinter';
+import { SOURCE_CODE_EXTENSIONS, WorkspaceFingerprinter } from '../core/context/WorkspaceFingerprinter';
 import { ProjectContextBuilder } from '../core/ProjectContextBuilder';
 import { decide } from '../core/reception/Decider';
 import { SpecialistRouter } from '../core/reception/SpecialistRouter';
 import { sdlcPhase } from '../core/sdlc/SdlcRouter';
-import { loadOrBuild, dodFor } from '../core/platform/PlatformContract';
+import {
+  isPlatformContractVerified, loadOrBuild, readPlatformContract, dodFor,
+  PlatformContract,
+} from '../core/platform/PlatformContract';
 import { doraFrom, doraMarkdown } from '../core/platform/Dora';
 import { classifyFailure, postmortemMarkdown } from '../core/platform/Postmortem';
 import { dodGateForDone, dodGateMarkdown } from '../core/sdlc/DefinitionOfDone';
-import { parseQualityEvidence, QualityEvidence, QualityCheck } from '../core/sdlc/QualityEvidence';
+import { QualityEvidence, QualityCheck } from '../core/sdlc/QualityEvidence';
 import { emptyDebt, applyDelta, debtMarkdown, DEBT_FILE } from '../core/platform/DebtTracker';
 import { onboard } from '../core/platform/Onboard';
 import { IdeaInbox } from '../core/reception/IdeaInbox';
@@ -525,10 +528,24 @@ export class MainPanel {
     // Experto ambos aspectos:
     // 1) `onboard` — reporte legado en un comando (fingerprint + platform + ADR + DORA).
     // Experto: `diff <ruta>` muestra el diff pendiente o actual vs disco (legible-first).
-    if (/^\s*onboard\s*$/i.test(text)) {
+    const onboardMatch = text.match(/^\s*onboard(?:\s+([\s\S]+?))?\s*$/i);
+    if (onboardMatch) {
       this._post({ type: 'chat-chunk', content: '_Generando onboard del proyecto…_' });
       try {
-        const r = await onboard(this.mcpManager, this.git);
+        let commandOverrides: { build: string; test: string } | undefined;
+        if (onboardMatch[1]) {
+          const parsed: unknown = JSON.parse(onboardMatch[1]);
+          if (!parsed || typeof parsed !== 'object' ||
+            typeof (parsed as { build?: unknown }).build !== 'string' ||
+            typeof (parsed as { test?: unknown }).test !== 'string') {
+            throw new Error('Uso para stack sin detectar: `onboard {"build":"...","test":"..."}`.');
+          }
+          commandOverrides = {
+            build: (parsed as { build: string }).build,
+            test: (parsed as { test: string }).test,
+          };
+        }
+        const r = await onboard(this.mcpManager, this.git, commandOverrides);
         this._fingerprinter.invalidate();
         this._post({ type: 'chat-chunk', content: r.markdown });
       } catch (e) { this._post({ type: 'chat-error', error: e instanceof Error ? e.message : String(e) }); }
@@ -600,22 +617,21 @@ export class MainPanel {
         } catch (e) { this._post({ type: 'chat-chunk', content: `(!) No se pudo escribir \`${rel}\`: ${friendlyFsError(e, rel)}` }); }
       }
       await this._memory.save().catch(() => { });
+      if (ok > 0) { this._fingerprinter.invalidate(); }
       this._post({ type: 'chat-chunk', content: `> 🛡️ checkpoint \`${cp}\`\n\n**${ok} archivo(s) aplicados${blocked ? `, ${blocked} bloqueado(s) por review` : ''}.**` });
 
       for (const [taskId, taskChanges] of appliedByTask) {
-        const remainingForTask = this._memory.search('pending-diff:').filter(entry => {
-          try { return (JSON.parse(entry.value) as PendingChange).taskId === taskId; } catch { return false; }
-        }).length;
-
+        const remainingForTask = this._pendingDiffCountForTask(taskId);
+        const fingerprint = await this._fingerprinter.fingerprint();
+        let contract: PlatformContract | null = null;
+        try { contract = await readPlatformContract(this.mcpManager, fingerprint); } catch { /* gate explica */ }
+        const hasCode = await this._isCodeProject(fingerprint);
         let evidence: QualityEvidence | null = null;
-        if (remainingForTask === 0) {
-          evidence = await this._runBuildAndTests(taskId, taskChanges.files);
+        if (hasCode && remainingForTask === 0 && contract && isPlatformContractVerified(contract)) {
+          evidence = await this._runBuildAndTests(taskId, taskChanges.files, contract.commands);
           this._memory.set('config', `quality:${taskId}`, JSON.stringify(evidence), { tags: ['quality', 'evidence', taskId] });
         }
-
-        let contract = null;
-        try { contract = await loadOrBuild(this.mcpManager, await this._fingerprinter.fingerprint()); } catch { /* gate explica */ }
-        const gate = dodGateForDone(remainingForTask, contract, evidence);
+        const gate = dodGateForDone(remainingForTask, contract, evidence, hasCode);
         this._post({ type: 'chat-chunk', content: `\n\n${dodGateMarkdown(gate)}` });
 
         if (gate.pass) {
@@ -683,7 +699,7 @@ export class MainPanel {
         const c = await loadOrBuild(this.mcpManager, fp);
         const sdlc0 = sdlcPhase(text, fp);
         dod = dodFor(sdlc0.phase, c);
-        platformChip = ` · 🏭 ${c.stack} · \`${c.commands.test}\`${c.verified ? '' : ' (sin verificar)'}`;
+        platformChip = ` · 🏭 ${c.stack} · \`${c.commands.test}\`${isPlatformContractVerified(c) ? '' : ' (sin verificar — onboard)'}`;
       } catch { /* chat sigue sin plataforma */ }
     }
     // SDLC experto: cada pedido entra a una fase con gate visible (FABLE-5 L/E).
@@ -877,18 +893,24 @@ export class MainPanel {
     if (!task) { return; }
 
     const wasAlreadyWorked = this._workedTasks.has(taskId);
-    this.specManager.setBoardStatus(taskId, status);
 
     if (status === 'done') {
-      // Experto: DoD gate ejecutable. Done manual sin gate pasado se bloquea y se explica.
-      const pendings = this._memory.search('pending-diff:');
-      let contract = null;
-      try { contract = await loadOrBuild(this.mcpManager, await this._fingerprinter.fingerprint()); } catch { /* sin contrato */ }
-      const evidenceEntry = this._memory.get('config', `quality:${task.id}`);
-      const evidence = parseQualityEvidence(evidenceEntry?.value);
-      const gate = dodGateForDone(pendings.length, contract, evidence);
+      const pendingDiffs = this._pendingDiffCountForTask(taskId);
+      const fingerprint = await this._fingerprinter.refresh();
+      let contract: PlatformContract | null = null;
+      try { contract = await readPlatformContract(this.mcpManager, fingerprint); } catch { /* gate explica */ }
+      const hasCode = await this._isCodeProject(fingerprint);
+      let evidence: QualityEvidence | null = null;
+      if (hasCode && pendingDiffs === 0 && contract && isPlatformContractVerified(contract)) {
+        evidence = await this._runBuildAndTests(taskId, [], contract.commands);
+        this._memory.set('config', `quality:${taskId}`, JSON.stringify(evidence), { tags: ['quality', 'evidence', taskId] });
+        await this._memory.save().catch(() => { });
+      }
+      const gate = dodGateForDone(pendingDiffs, contract, evidence, hasCode);
       if (!gate.pass) {
-        this._post({ type: 'chat-chunk', content: `${dodGateMarkdown(gate)}\n\n_La tarea **${task.id}** no se marca done. Aplica o descarta diffs primero._` });
+        if (task.done) { await this.specManager.updateTaskDone(task, false); }
+        this.specManager.setBoardStatus(taskId, 'in-progress');
+        this._post({ type: 'chat-chunk', content: `${dodGateMarkdown(gate)}\n\n_La tarea **${task.id}** no se marca done. Resuelve los diffs pendientes, ejecuta \`onboard\` o corrige build/tests según corresponda._` });
         await this._sendSpec();
         logDecision(this.mcpManager, `dod-blocked:${task.id}`, { route: 'spec', lane: 'build', confidence: 1, reasons: gate.blockers, needsConfirm: false, chip: '⛔ DoD gate' }, { checkpoint: 'sdlc:pruebas' }).catch(() => { });
         this._trackDebt(`dod-blocked:${task.id}`).catch(() => { });
@@ -897,11 +919,14 @@ export class MainPanel {
       // Fast path: update cached data and send immediately, write disk in background
       const doneTask = data.tasks.find(t => t.id === taskId);
       if (doneTask) { doneTask.done = true; doneTask.status = 'done'; }
+      this.specManager.setBoardStatus(taskId, 'done');
       this._post({ type: 'spec-data', data });
       this.specManager.updateTaskDone(task, true).catch(() => { });
       this._trackDebt('done-verificado').catch(() => { });
       return;
     }
+
+    this.specManager.setBoardStatus(taskId, status);
 
     // Moving a done or worked task back to in-progress -> uncheck in spec.md
     if (task.done) {
@@ -1087,16 +1112,38 @@ export class MainPanel {
       this._post({ type: 'chat-chunk', content: `\n**(!) Errores:** ${result.errors.join(', ')}` });
     }
 
-    this._post({ type: 'chat-done', model: provider.modelName });
-
     if (result.success) {
+      const pendingDiffs = this._pendingDiffCountForTask(task.id);
+      this._fingerprinter.invalidate();
+      const fingerprint = await this._fingerprinter.fingerprint();
+      let contract: PlatformContract | null = null;
+      let evidence: QualityEvidence | null = null;
+      try { contract = await readPlatformContract(this.mcpManager, fingerprint); } catch { /* gate explica */ }
+      const hasCode = await this._isCodeProject(fingerprint);
+      if (hasCode && pendingDiffs === 0 && contract && isPlatformContractVerified(contract)) {
+        evidence = await this._runBuildAndTests(task.id, [], contract.commands);
+        this._memory.set('config', `quality:${task.id}`, JSON.stringify(evidence), { tags: ['quality', 'evidence', task.id] });
+        await this._memory.save().catch(() => { });
+      }
+      const gate = dodGateForDone(pendingDiffs, contract, evidence, hasCode);
+      this._post({ type: 'chat-chunk', content: `\n\n${dodGateMarkdown(gate)}` });
+      if (!gate.pass) {
+        this.specManager.setBoardStatus(task.id, 'in-progress');
+        await this._sendSpec();
+        this._post({ type: 'chat-done', model: provider.modelName });
+        this._post({ type: 'task-work-review', taskId: task.id, title: task.title, files: pendingDiffs });
+        return;
+      }
       this._memory.set('feature', task.id, `${task.title} — skill: ${skillId}`, { parentKey: task.epicTitle, tags: ['task', 'completed'] });
       await this._memory.save();
       await this.specManager.updateTaskDone(task, true);
       this.specManager.setBoardStatus(task.id, 'done');
       await this._sendSpec();
+      this._post({ type: 'chat-done', model: provider.modelName });
       this._post({ type: 'task-work-done', taskId: task.id, title: task.title });
+      return;
     }
+    this._post({ type: 'chat-done', model: provider.modelName });
   }
 
   private _stripAnsi(s: string): string {
@@ -1114,54 +1161,27 @@ export class MainPanel {
     });
   }
 
-  private async _detectBuildCommands(): Promise<{ build?: string; test?: string }> {
-    const { existsSync } = await import('fs');
-    const { readFile } = await import('fs/promises');
-    // Fix EROFS: sin raiz real, `'package.json'` relativo resolveria al cwd del
-    // extension host y reportaria comandos de OTRO proyecto (peligroso: build/test falsos).
-    if (!isUsableRoot(this.workspaceRoot)) { return {}; }
-    const p = (f: string) => nodePath.join(this.workspaceRoot, f);
-
-    if (existsSync(p('package.json'))) {
+  private _pendingDiffCountForTask(taskId: string): number {
+    return this._memory.search('pending-diff:').filter(entry => {
       try {
-        const pkg = JSON.parse(await readFile(p('package.json'), 'utf-8'));
-        const s: Record<string, string> = pkg.scripts ?? {};
-        const buildKey = ['build', 'compile', 'tsc', 'typecheck'].find(k => s[k]);
-        const testKey = ['test', 'test:unit', 'test:run', 'vitest'].find(k => s[k]);
-        return {
-          build: buildKey ? `npm run ${buildKey}` : undefined,
-          test: testKey ? `npm run ${testKey}` : undefined,
-        };
-      } catch { return {}; }
-    }
-    if (existsSync(p('pom.xml'))) {
-      return { build: 'mvn compile -q', test: 'mvn test -q' };
-    }
-    if (existsSync(p('build.gradle')) || existsSync(p('build.gradle.kts'))) {
-      return { build: 'gradle compileJava -q', test: 'gradle test -q' };
-    }
-    if (existsSync(p('go.mod'))) {
-      return { build: 'go build ./...', test: 'go test ./... -timeout 60s' };
-    }
-    if (existsSync(p('Cargo.toml'))) {
-      return { build: 'cargo check -q', test: 'cargo test -q' };
-    }
-    if (existsSync(p('pyproject.toml')) || existsSync(p('requirements.txt'))) {
-      return { test: 'python -m pytest --tb=short -q' };
-    }
-    return {};
+        const pending = JSON.parse(entry.value) as Partial<PendingChange> | null;
+        return !pending || typeof pending.taskId !== 'string' || !pending.taskId || pending.taskId === taskId;
+      } catch { return true; }
+    }).length;
   }
 
-  private async _hasTestFiles(): Promise<boolean> {
-    const patterns = [
-      '**/*.test.ts', '**/*.spec.ts', '**/*.test.js', '**/*.spec.js',
-      '**/test_*.py', '**/*_test.py', '**/*Test.java', '**/*Spec.java', '**/*_test.go',
-    ];
-    for (const g of patterns) {
-      const found = await vscode.workspace.findFiles(g, '**/node_modules/**', 1);
-      if (found.length > 0) { return true; }
-    }
-    return false;
+  private async _hasCodeFiles(): Promise<boolean> {
+    const sourceFiles = `**/*.{${SOURCE_CODE_EXTENSIONS.join(',')}}`;
+    const matches = await vscode.workspace.findFiles(
+      sourceFiles,
+      '**/{node_modules,vendor,dist,build,.git,.venv,venv,__pycache__,target,coverage,out,.next,bin,obj}/**',
+      1
+    );
+    return matches.length > 0;
+  }
+
+  private async _isCodeProject(fingerprint: WorkspaceFingerprint): Promise<boolean> {
+    return fingerprint.languages.length > 0 || fingerprint.pkgManager !== 'unknown' || (await this._hasCodeFiles());
   }
 
   private async _fixBuildErrors(
@@ -1214,16 +1234,20 @@ export class MainPanel {
     return fixed;
   }
 
-  private async _runBuildAndTests(taskId: string, writtenFiles: string[]): Promise<QualityEvidence> {
-    const cmds = await this._detectBuildCommands();
+  private async _runBuildAndTests(
+    taskId: string,
+    writtenFiles: string[],
+    commands: PlatformContract['commands']
+  ): Promise<QualityEvidence> {
+    const cmds = { build: commands.build.trim(), test: commands.test.trim() };
     let build: QualityCheck = {
       status: 'not-run',
-      detail: cmds.build ? 'pendiente' : 'no se detecto un comando de build',
+      detail: cmds.build ? 'pendiente' : 'el contrato no define build',
       ...(cmds.build ? { command: cmds.build } : {}),
     };
     let tests: QualityCheck = {
       status: 'not-run',
-      detail: cmds.test ? 'pendiente' : 'no se detecto un comando de tests',
+      detail: cmds.test ? 'pendiente' : 'el contrato no define tests',
       ...(cmds.test ? { command: cmds.test } : {}),
     };
 
@@ -1247,24 +1271,19 @@ export class MainPanel {
 
     // ── Tests ──────────────────────────────────────────────────────────────────
     if (cmds.test) {
-      if (await this._hasTestFiles()) {
-        this._post({ type: 'chat-chunk', content: `\n\n*Tests: \`${cmds.test}\`...*` });
-        const res = await this._runCommand(cmds.test, 120_000);
-        tests = {
-          command: cmds.test,
-          status: res.success ? 'passed' : 'failed',
-          ...(!res.success ? { detail: res.output.slice(-500) || 'exit code no-cero' } : {}),
-        };
-        this._post({
-          type: 'chat-chunk',
-          content: res.success
-            ? `\n  all tests pass`
-            : `\n  tests fallaron; se requiere un nuevo diff revisable:\n\`\`\`\n${res.output.slice(-1500)}\n\`\`\``,
-        });
-      } else {
-        tests = { command: cmds.test, status: 'not-run', detail: 'no se encontraron archivos de test' };
-        this._post({ type: 'chat-chunk', content: `\n\n⛔ Tests no ejecutados: no se encontraron archivos de test.` });
-      }
+      this._post({ type: 'chat-chunk', content: `\n\n*Tests: \`${cmds.test}\`...*` });
+      const res = await this._runCommand(cmds.test, 120_000);
+      tests = {
+        command: cmds.test,
+        status: res.success ? 'passed' : 'failed',
+        ...(!res.success ? { detail: res.output.slice(-500) || 'exit code no-cero' } : {}),
+      };
+      this._post({
+        type: 'chat-chunk',
+        content: res.success
+          ? `\n  all tests pass`
+          : `\n  tests fallaron; se requiere un nuevo diff revisable:\n\`\`\`\n${res.output.slice(-1500)}\n\`\`\``,
+      });
     }
 
     return {
