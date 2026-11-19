@@ -11,6 +11,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { randomUUID } from 'crypto';
 import { isUsableRoot } from '../../core/WorkspaceRoot';
 import type { AIProvider } from '../../core/interfaces';
 import type {
@@ -19,6 +20,7 @@ import type {
   DomainResult,
   GuardrailResult,
 } from '../interfaces/DomainAgentShell';
+import { thoughtStream } from '../orchestration/AgentThoughtStream';
 
 export type UseCaseHandler = (
   params: Record<string, unknown>,
@@ -44,15 +46,23 @@ export abstract class BaseDomainShell implements IDomainAgentShell {
   }
 
   async run(useCaseId: string, params: Record<string, unknown>): Promise<DomainResult> {
+    const sessionId = randomUUID();
     const handlers = this.useCaseHandlers();
     const handler  = handlers[useCaseId];
     if (!handler) {
+      thoughtStream.thought(sessionId, `${this.domainId}:${useCaseId}`, `Unknown use case '${useCaseId}' — no handler registered.`);
       return { success: false, errors: [`Unknown use case '${useCaseId}' for domain '${this.domainId}'`] };
     }
+    thoughtStream.stepStart(sessionId, `${this.domainId}:${useCaseId}`, this.domainId, useCaseId);
+    thoughtStream.thought(sessionId, `${this.domainId}:${useCaseId}`, `Running use case "${useCaseId}" on domain "${this.domainId}".`);
     const result = await handler(params, this.provider, this.workspacePath);
     if (result.success && result.data !== undefined) {
       result.guardrailResults = await this.checkGuardrails(result.data);
     }
+    thoughtStream.stepDone(sessionId, `${this.domainId}:${useCaseId}`, result.success);
+    thoughtStream.thought(sessionId, `${this.domainId}:${useCaseId}`, result.success
+      ? `Use case "${useCaseId}" completed successfully.`
+      : `Use case "${useCaseId}" failed: ${result.errors?.join(', ')}`);
     return result;
   }
 

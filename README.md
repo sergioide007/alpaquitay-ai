@@ -40,12 +40,43 @@ Alpaquitay AI turns VS Code into a complete **harness-driven development environ
 
 ---
 
+## Live agent thoughts (Cline-style progress)
+
+The Alpaquitay Hub now includes a **Thoughts** panel that mirrors what an agent like Cline shows: every step the AI takes while executing your request is published in real time, so you can watch it **think, plan, delegate, and verify** step by step.
+
+### How it works
+
+When you send an objective to the Central Brain, every internal phase emits a typed event on the local `AgentThoughtStream`:
+
+| Event | What you see in the panel |
+|-------|---------------------------|
+| `step-start` | A step has begun — e.g. `receive-objective`, `sanitize-objective`, `rag-augment`, `multi-agent-orchestration`, `refine-output`, etc. |
+| `thought` | A free-form reasoning snippet — why the agent chose a certain agent, or what it decided during planning. |
+| `step-done` | A step finished, with `success: true` (green) or `success: false` (red). |
+
+These events flow from the extension host → the Hub webview → the **Thoughts** panel, which renders them as a chronological feed of step badges, colored banners, timestamps, and thoughts. No data ever leaves your machine.
+
+### How to use it
+
+- **Open the panel:** from the hub, click the tab **Thoughts** (or press `Ctrl+Shift+P` → *Alpaquitay AI: Toggle Agent Thoughts*).
+- **Watch the agent work:** as you route a task, the panel shows each specialist agent being called, each guardrail check passing, and each refinement iteration.
+- **Clear the feed:** click the **Clear** button on the panel to start a fresh session view.
+
+### VS Code commands
+
+| Command | Shortcut | What it does |
+|---------|----------|--------------|
+| `alpaquitay-ai.toggle-thoughts` | — | Open/switch to the Thoughts tab in the hub and show the agent's live progress. |
+
+---
+
 ## Quick Start
 
 1. Install **Alpaquitay AI** from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai) or [Open VSX](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai).
 2. Press `Ctrl+Alt+A` to open the Hub, then add a provider in **Settings** — a local model ([Ollama](https://ollama.com) / LM Studio) keeps everything on your machine.
 3. **Code:** open the **Work** tab, generate a `spec.md`, and drag a task to *In Progress*.
 4. **Writing:** open the **Docs** tab, pick a `.docx`, `.md`, `.epub` or `.pdf`, and tell the agent what to do.
+5. **Live thoughts:** click the **Thoughts** tab to watch the agent think and execute in real time.
 
 The detailed, step-by-step version is [below](#step-by-step-setup).
 

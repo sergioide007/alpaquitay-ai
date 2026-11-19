@@ -268,6 +268,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     })
   );
 
+  vscode.commands.registerCommand('alpaquitay-ai.toggle-thoughts', () => {
+    const panel = MainPanel.current;
+    if (!panel) {
+      vscode.window.showInformationMessage('Alpaquitay AI: Open the hub (Ctrl+Alt+A) to see the agent thoughts panel.');
+      return;
+    }
+    panel.activateThoughtsTab();
+    vscode.window.showInformationMessage('Alpaquitay AI: Thoughts panel activated — watch the agent progress in real time.');
+  });
+
   registerLocalEngineCommands(context, localEngine, () => config.localEngine, workspaceRoot);
 
   // Register MCP servers eagerly — connect() is a no-op for both, so this is fast and

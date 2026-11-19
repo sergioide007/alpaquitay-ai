@@ -43,7 +43,8 @@ import {
 
 import { generateCode, isSmallModel, deduplicateSpecTasks, normalizeSpecContent } from '../prompts/codeUtils';
 import { HierarchicalMemory } from '../core/HierarchicalMemory';
-import { WebviewMessage, ModelOption, TaskStatus, SkillContext, SpecTask, ProviderType, ArchDiagram, ArchDiagramPatch, ArchNode, ArchEdge, ArchNodeType, AIProvider } from '../core/interfaces';
+import { WebviewMessage, ModelOption, TaskStatus, SkillContext, SpecTask, ProviderType, ArchDiagram, ArchDiagramPatch, ArchNode, ArchEdge, ArchNodeType, AIProvider, ExtensionMessage } from '../core/interfaces';
+import { thoughtStream } from '../domains/orchestration/AgentThoughtStream';
 import { AlpaquitayConfig } from '../core/config';
 import { MODEL_CATALOG, catalogJson, DEFAULT_ANTHROPIC_MODEL, DEFAULT_OPENAI_MODEL } from '../core/ModelCatalog';
 
@@ -148,6 +149,22 @@ export class MainPanel {
     // Proactive spec push: ensures spec is sent even if the webview's
     // initial load-spec message is delayed or missed on first render.
     setImmediate(() => this._sendSpec().catch(() => { }));
+
+    // ── Subscribe to live agent thoughts / progress (Cline-style panel) ─────
+    const unsubscribeThought = thoughtStream.subscribe(event => {
+      switch (event.type) {
+        case 'thought':
+          this._post({ type: 'agent-thought', sessionId: event.sessionId, step: event.step, thought: event.thought, timestamp: Date.now() });
+          break;
+        case 'step-start':
+          this._post({ type: 'agent-step-start', sessionId: event.sessionId, step: event.step, domainId: event.domainId, useCaseId: event.useCaseId, timestamp: Date.now() });
+          break;
+        case 'step-done':
+          this._post({ type: 'agent-step-done', sessionId: event.sessionId, step: event.step, success: event.success, timestamp: Date.now() });
+          break;
+      }
+    });
+    this._disposables.push(new vscode.Disposable(unsubscribeThought));
   }
 
   static show(
@@ -2524,6 +2541,11 @@ export class MainPanel {
     this._panel.webview.postMessage(msg);
   }
 
+  /** Activate the "Thoughts" tab in the panel (Cline-style live agent progress). */
+  activateThoughtsTab(): void {
+    this._post({ type: 'switch-tab', tab: 'thoughts' });
+  }
+
   public refreshProviders(): void {
     this._sendModels().catch(() => { /* panel disposed */ });
   }
@@ -2888,6 +2910,28 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
 .proxy-note{font-size:9px;color:var(--muted);line-height:1.5;padding:0 12px 10px}
 @media(max-width:900px){.metric-grid{grid-template-columns:repeat(2,1fr)}.evidence-grid{grid-template-columns:1fr}.phase-rail{grid-template-columns:repeat(3,1fr)}.studio{grid-template-columns:220px minmax(360px,1fr)}.studio-pane:last-child{display:none}}
 @media(max-width:620px){.ev-hero{align-items:flex-start;flex-direction:column}.metric-grid{grid-template-columns:1fr 1fr}.phase-rail{grid-template-columns:repeat(2,1fr)}.evidence-scroll{padding:12px}.header-right{display:none}.tab{padding:0 9px}}
+
+/* ── Live agent thoughts panel (Cline-style) ─────────────────────────────── */
+.thoughts-panel{display:flex;flex-direction:column;height:100%;background:var(--bg1);border-right:1px solid var(--border)}
+.thoughts-hd{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
+.thoughts-hd h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--signal);margin:0}
+.thoughts-hd .clear{background:none;border:1px solid var(--border);color:var(--muted-lt);font-size:10px;padding:2px 8px;border-radius:var(--radius);cursor:pointer}
+.thoughts-hd .clear:hover{color:var(--text);border-color:var(--muted-lt)}
+.thoughts-list{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+.thought-item{display:flex;gap:9px;padding:7px 9px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);font-size:11px;line-height:1.5;animation:fadeIn .15s ease-out}
+.thought-item.step-start{border-left:3px solid var(--blue)}
+.thought-item.step-done{border-left:3px solid var(--signal)}
+.thought-item.step-done.fail{border-left-color:var(--accent)}
+.thought-item .badge{flex-shrink:0;font-size:9px;font-weight:700;text-transform:uppercase;padding:1px 6px;border-radius:3px;background:var(--bg3);color:var(--muted-lt);white-space:nowrap}
+.thought-item.step-start .badge{color:#60a5fa}
+.thought-item.step-done .badge{color:var(--signal)}
+.thought-item.step-done.fail .badge{color:var(--accent)}
+.thought-item .ts{font-size:9px;color:var(--muted);white-space:nowrap;margin-left:auto}
+.thought-item .text{color:var(--text);font-family:var(--mono);white-space:pre-wrap;word-break:break-word}
+.thought-item .text b{color:var(--signal)}
+.thought-item .domain{color:#60a5fa;font-weight:600;font-size:10px;margin-right:4px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.empty-thoughts{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;font-style:italic}
 `;
   }
 
@@ -2901,6 +2945,7 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
     <button class="tab" data-tab="git">Evidence</button>
     <button class="tab" data-tab="arch">Architecture</button>
     <button class="tab" data-tab="skills">Agents</button>
+    <button class="tab" data-tab="thoughts">Thoughts</button>
     <button class="tab" data-tab="settings">Settings</button>
   </nav>
   <div class="header-right">
@@ -2986,6 +3031,17 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
       </div>
     </div>
   </div>
+<div class="panel active" id="panel-thoughts">
+  <div class="thoughts-panel">
+    <div class="thoughts-hd">
+      <h3>Thoughts</h3>
+      <button class="clear" id="thoughtsClear" title="Clear">Clear</button>
+    </div>
+    <div class="thoughts-list" id="thoughtsList">
+      <div class="empty-thoughts">No agent thoughts yet</div>
+    </div>
+  </div>
+</div>
 ${DOCS_HTML}
   <div class="panel" id="panel-arch">
     <div class="arch-toolbar-row">
@@ -3370,6 +3426,10 @@ window.addEventListener('message', e => {
     case 'arch-chat-chunk':        appendArchAiChunk(msg.content); break;
     case 'arch-chat-done':         finishArchAiChat(msg.patch, msg.model); break;
     case 'arch-chat-error':        archAiChatError(msg.error); break;
+    case 'agent-thought':          appendThought(msg.sessionId, msg.step, msg.thought, msg.timestamp); break;
+    case 'agent-step-start':       appendStepStart(msg.sessionId, msg.step, msg.domainId, msg.useCaseId, msg.timestamp); break;
+    case 'agent-step-done':        appendStepDone(msg.sessionId, msg.step, msg.success, msg.timestamp); break;
+    case 'switch-tab':             switchTab(msg.tab); break;
   }
 });
 function renderModels(models) {
@@ -3500,6 +3560,54 @@ function finishChat(model) {
   if (_streamDiv && model) { const m=document.createElement('div'); m.className='msg-meta'; m.textContent=model; _streamDiv.querySelector('div > div').appendChild(m); }
   _streamDiv=null; _streamContent=''; S.thinking=false; sendBtn.disabled=false;
   vscode.postMessage({ type:'load-harness' });
+function appendThought(sessionId, step, thought, timestamp) {
+  const list = document.getElementById('thoughtsList');
+  if (!list) return;
+  const item = document.createElement('div');
+  item.className = 'thought-item';
+  item.dataset.sessionId = sessionId;
+  item.dataset.step = step;
+  item.innerHTML =
+    '<span class="badge">Thought</span>' +
+    '<div class="text">' + esc(thought) + '</div>' +
+    '<span class="ts">' + new Date(timestamp || Date.now()).toLocaleTimeString() + '</span>';
+  list.appendChild(item);
+  list.scrollTop = list.scrollHeight;
+}
+function appendStepStart(sessionId, step, domainId, useCaseId, timestamp) {
+  const list = document.getElementById('thoughtsList');
+  if (!list) return;
+  const item = document.createElement('div');
+  item.className = 'thought-item step-start';
+  item.dataset.sessionId = sessionId;
+  item.dataset.step = step;
+  item.innerHTML =
+    '<span class="badge">Start</span>' +
+    '<span class="domain">' + esc(domainId || 'agent') + '</span>' +
+    '<div class="text">' + esc(step) + '</div>' +
+    '<span class="ts">' + new Date(timestamp || Date.now()).toLocaleTimeString() + '</span>';
+  list.appendChild(item);
+  list.scrollTop = list.scrollHeight;
+}
+function appendStepDone(sessionId, step, success, timestamp) {
+  const list = document.getElementById('thoughtsList');
+  if (!list) return;
+  const item = document.createElement('div');
+  item.className = 'thought-item step-done' + (success ? '' : ' fail');
+  item.dataset.sessionId = sessionId;
+  item.dataset.step = step;
+  item.innerHTML =
+    '<span class="badge">' + (success ? 'Done' : 'Failed') + '</span>' +
+    '<div class="text">' + esc((success ? 'Completed' : 'Failed') + ': ' + step) + '</div>' +
+    '<span class="ts">' + new Date(timestamp || Date.now()).toLocaleTimeString() + '</span>';
+  list.appendChild(item);
+  list.scrollTop = list.scrollHeight;
+}
+function clearThoughts() {
+  const list = document.getElementById('thoughtsList');
+  if (list) { list.innerHTML = '<div class="empty-thoughts">No agent thoughts yet</div>'; }
+}
+document.getElementById('thoughtsClear')?.addEventListener('click', clearThoughts);
 }
 function chatError(err) {
   if (window._thinkBubble) { window._thinkBubble.remove(); window._thinkBubble=null; }

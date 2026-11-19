@@ -117,6 +117,12 @@
         "title": "Clear Local Model Cache",
         "category": "Alpaquitay AI",
         "icon": "$(trash)"
+      },
+      {
+        "command": "alpaquitay-ai.toggle-thoughts",
+        "title": "Toggle Agent Thoughts",
+        "category": "Alpaquitay AI",
+        "icon": "$(comment-discussion)"
       }
     ],
     "configuration": {
