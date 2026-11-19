@@ -30,6 +30,7 @@ import { logDecision } from '../core/harness/DecisionLog';
 import { DocsController } from '../documents/DocsController';
 import { SUPPORTED_EXTS, detectFormat } from '../documents/Documents';
 import { DOCS_CSS, DOCS_HTML, DOCS_JS, DOCS_TAB_BUTTON } from './DocsTab';
+import { HUX_CSS, HUX_FLOW_HTML, HUX_QUICK_HTML, HUX_OVERLAY_HTML, HUX_JS } from './HubUx';
 import { buildPreview } from '../core/harness/DiffPreview';
 import { CheckpointManager } from '../core/harness/CheckpointManager';
 import { emptyEcon, recordLlm, recordLocal, econChip, ECON_FILE, EconState } from '../core/platform/Economy';
@@ -2632,7 +2633,7 @@ export class MainPanel {
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Alpaquitay</title>
-<style>${this._htmlStyles()}${DOCS_CSS}</style>
+<style>${this._htmlStyles()}${DOCS_CSS}${HUX_CSS}</style>
 </head>
 <body>
 ${this._htmlBody()}
@@ -3005,6 +3006,7 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
     <button class="cfg-btn" id="cfgBtn" title="Configure provider">&#9881;</button>
   </div>
 </header>
+${HUX_FLOW_HTML}
 <div class="harness-strip" id="harnessStrip">
   <span class="hs-pulse"></span><span class="hs-label">Harness active</span>
   <span class="hs-sep"></span><span class="hs-chip">workspace <strong id="hsWorkspace">detecting</strong></span>
@@ -3043,7 +3045,7 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
       <div class="studio-pane">
         <div class="pane-hd">
           <span>Board</span>
-          <small style="color:var(--muted);font-size:9px">Drag to In Progress to start AI</small>
+          <small style="color:var(--muted);font-size:9px">Press Start on a card, or drag it to In Progress</small>
         </div>
         <div class="board-cols">
           <div class="col">
@@ -3074,6 +3076,7 @@ input:disabled+.sl-tog{opacity:.4;cursor:not-allowed}
         </div>
         <div class="chat-bar">
           <div class="skill-picker" id="skillPicker" style="display:none"></div>
+          ${HUX_QUICK_HTML}
           <div class="input-row">
             <button class="pill" id="skillToggle">/skill</button>
             <textarea id="chatInput" placeholder="Ask something..." rows="1"></textarea>
@@ -3430,6 +3433,7 @@ ${DOCS_HTML}
   </div>
 </main>
 <div class="toasts" id="toasts"></div>
+${HUX_OVERLAY_HTML}
 `;
   }
 
@@ -3970,7 +3974,8 @@ function renderBoard() {
         <div class="card-title">\${esc(t.title)}</div>
         <div class="card-epic">\${esc(t.epicTitle)}</div>
         \${w ? '<div class="card-working"><div class="thinking"><span></span><span></span><span></span></div> working...</div>' : ''}
-        \${r ? '<div class="card-review">Review required · apply diff</div>' : ''}
+        \${r ? '<div class="card-review">Review required · apply diff</div><div class="card-actions"><button class="hux-card-btn" type="button" data-review-task="1">Review changes</button></div>' : ''}
+        \${(!w && !r && st!=='done') ? '<div class="card-actions"><button class="hux-card-btn primary" type="button" data-start-task="'+esc(t.id)+'">'+(st==='in-progress'?'Resume':'Start')+'</button></div>' : ''}
       </div>\`;
     }).join('') : '<div class="board-empty">No tasks</div>';
   });
@@ -4316,6 +4321,7 @@ function applyArchPatch(patch){
   toast('Diagram updated by AI','ok');
 }
 ${DOCS_JS}
+${HUX_JS}
 })();
 `;
   }

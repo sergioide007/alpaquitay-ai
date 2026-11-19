@@ -35,7 +35,7 @@
 </header>
 <div class="layout">
 <aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.7.0</span></p>
+  <p class="side-title">User manual <span class="ver">v3.8.0</span></p>
   <ol class="chapters">
 <li><a href="../"><span class="n">00</span>Home</a></li>
 <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
@@ -67,6 +67,72 @@
      ▲                                                                                          │
      └──────────────────────────────────────── feedback loop ──────────────────────────────────┘
 </code></pre></div>
+<h2 id="your-next-step-always-visible">Your next step, always visible</h2>
+<p>Under the tabs, the <strong>next-step bar</strong> follows the SDD flow, <em>Spec → Build → Review → Verify</em>, and shows one primary button for what to do now:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Where you are</th>
+<th>The bar says</th>
+<th>The button</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No <code>spec.md</code> yet</td>
+<td>Start with a spec</td>
+<td><strong>Create spec with AI</strong></td>
+</tr>
+<tr>
+<td>Tasks waiting</td>
+<td>Next task: …</td>
+<td><strong>Start SPEC-00x</strong> (the same as dragging the card to <em>In Progress</em>)</td>
+</tr>
+<tr>
+<td>The AI is working</td>
+<td>AI is building …</td>
+<td><strong>Watch progress</strong></td>
+</tr>
+<tr>
+<td>Diffs pending</td>
+<td>Review N pending changes</td>
+<td><strong>Review changes</strong> and <strong>Apply &amp; run gates</strong></td>
+</tr>
+<tr>
+<td>Debt at its ceiling</td>
+<td>Build is blocked by technical debt</td>
+<td><strong>See debt</strong></td>
+</tr>
+<tr>
+<td>Every task done</td>
+<td>All N tasks are done</td>
+<td><strong>Validate against spec</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Every card in <em>Backlog</em>, <em>Todo</em> and <em>In Progress</em> also has a <strong>Start</strong> (or <strong>Resume</strong>) button, so dragging is optional. Above the chat input, quick buttons run the common actions: <em>Build next task</em>, <em>Validate</em>, <em>Tests</em>, <em>Refactor</em> and, while diffs are pending, <em>Apply changes</em>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>Cmd</kbd>+<kbd>K</kbd> on macOS)</td>
+<td>Open the command palette: every tab, action and agent, searchable</td>
+</tr>
+<tr>
+<td><kbd>Alt</kbd>+<kbd>1</kbd> to <kbd>7</kbd> (<kbd>Option</kbd> on macOS)</td>
+<td>Switch tab</td>
+</tr>
+<tr>
+<td><kbd>/</kbd></td>
+<td>Focus the chat</td>
+</tr>
+</tbody>
+</table></div>
 <h2 id="1-the-spec-spec-md">1. The spec (<code>spec.md</code>)</h2>
 <p><code>spec.md</code> is plain Markdown at the root of your project, and it is <strong>the board's database</strong>: card state is read from this file, not stored elsewhere. So you can edit it by hand, review it in a pull request and version it like any other file.</p>
 <div class="code" data-lang="Markdown"><pre><code class="language-markdown"># Club booking portal
@@ -172,14 +238,14 @@ Shows the free slots for the next 7 days.
 
 <div class="doc-foot">
   <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/04-work.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.7.0 · MIT</span>
+  <span>Manual for Alpaquitay AI 3.8.0 · MIT</span>
 </div>
 <nav class="pager" aria-label="Chapters">
 <a class="prev" href="../harness/"><span>Previous</span>How the harness thinks</a>
 <a class="next" href="../chat-commands/"><span>Next</span>Chat commands</a>
 </nav>
 </article>
-<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#1-the-spec-spec-md">1. The spec (spec.md)</a></li><li class="l3"><a href="#three-ways-to-create-it">Three ways to create it</a></li><li class="l2"><a href="#2-the-board">2. The board</a></li><li class="l2"><a href="#3-the-chat">3. The chat</a></li><li class="l2"><a href="#ideas-that-are-not-tasks-yet">Ideas that are not tasks yet</a></li><li class="l2"><a href="#linking-commits-to-tasks">Linking commits to tasks</a></li><li class="l2"><a href="#generate-from-spec-and-validate-against-spec">Generate from Spec and Validate Against Spec</a></li></ul></nav>
+<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#your-next-step-always-visible">Your next step, always visible</a></li><li class="l2"><a href="#1-the-spec-spec-md">1. The spec (spec.md)</a></li><li class="l3"><a href="#three-ways-to-create-it">Three ways to create it</a></li><li class="l2"><a href="#2-the-board">2. The board</a></li><li class="l2"><a href="#3-the-chat">3. The chat</a></li><li class="l2"><a href="#ideas-that-are-not-tasks-yet">Ideas that are not tasks yet</a></li><li class="l2"><a href="#linking-commits-to-tasks">Linking commits to tasks</a></li><li class="l2"><a href="#generate-from-spec-and-validate-against-spec">Generate from Spec and Validate Against Spec</a></li></ul></nav>
 </main>
 </div>
 <div class="search" id="search" hidden>
