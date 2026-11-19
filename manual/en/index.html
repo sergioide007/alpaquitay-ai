@@ -139,7 +139,7 @@
 <h2 id="principles-you-will-see-everywhere">Principles you will see everywhere</h2>
 <ol>
 <li><strong>Nothing is written without you seeing it.</strong> In the Hub, every code change first arrives as a bounded <em>diff</em>, and writing needs your <code>si aplicar</code>. (The exception is the classic <em>Generate from Spec</em> command, which writes directly; see <a href="work/#generate-from-spec-and-validate-against-spec">Work</a>.)</li>
-<li><strong>Evidence before autonomy.</strong> A task only moves to <em>Done</em> with proof: no pending diffs, a verified platform contract, and build and tests that really ran.</li>
+<li><strong>Evidence before autonomy.</strong> Code tasks move to <em>Done</em> only with no pending diffs, an <code>onboard</code>-verified platform contract and green build/test evidence. Docs-only projects need no contract or build/test evidence, but pending diffs still block <em>Done</em>.</li>
 <li><strong>Privacy by architecture.</strong> There is no Alpaquitay intermediary server. Local models never leave your machine; cloud calls go straight to your provider after passing a privacy boundary that hides personal data and secrets.</li>
 <li><strong>Everything is recorded in your repository</strong>, in the <code>.alpaquitay/</code> folder: decisions, debt, session economy, project memory and ADRs.</li>
 </ol>
