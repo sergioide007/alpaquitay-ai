@@ -9,7 +9,7 @@
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
 [![Stars](https://img.shields.io/github/stars/sergioide007/alpaquitay-ai?style=social)](https://github.com/sergioide007/alpaquitay-ai/stargazers)
-[![Website](https://img.shields.io/badge/Website-specsolid.com-blueviolet)](https://www.specsolid.com)
+[![Website](https://img.shields.io/badge/Website-specsolid.com-blueviolet)](https://www.specsolid.com/tools/alpaquitay-ai/)
 
 ![Alpaquitay AI — Hub with Work, Docs, Evidence, Architecture, Agents and Settings tabs](https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/media/demo-hub.gif)
 
