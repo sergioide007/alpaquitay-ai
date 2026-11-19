@@ -4,8 +4,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
-[![Version](https://img.shields.io/badge/version-3.6.1-green)](./CHANGELOG.md)
-[![Tests](https://img.shields.io/badge/tests-693%20passing-brightgreen)](./package.json)
+[![Version](https://img.shields.io/badge/version-3.6.2-green)](./CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-701%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
 [![Stars](https://img.shields.io/github/stars/sergioide007/alpaquitay-ai?style=social)](https://github.com/sergioide007/alpaquitay-ai/stargazers)
