@@ -26,3 +26,21 @@ export function toWorkspaceRelative(filePath: string, workspaceRoot: string): st
   if (!rel || rel.startsWith('..') || nodePath.isAbsolute(rel)) { return null; }
   return rel.split(nodePath.sep).join('/');
 }
+
+/**
+ * Recovers the documentation placeholder emitted by older specs/prompts.
+ * The placeholder is never a filesystem path. It is replaced with the first
+ * evidenced source directory, or with the workspace root when no source dir is known.
+ */
+export function resolveSourceDirPlaceholder(filePath: string, sourceDirs: string[]): string {
+  const normalized = filePath.replace(/\\/g, '/');
+  const match = normalized.match(/^<(?:carpeta[-_ ]?fuente|source[-_ ]?dir(?:ectory)?|source)>\/?/i);
+  if (!match) { return normalized; }
+  const suffix = normalized.slice(match[0].length).replace(/^\/+/, '');
+  const sourceDir = sourceDirs.find(dir => typeof dir === 'string' && dir.trim() && dir.trim() !== '.' && dir.trim() !== './' && !/[<>]/.test(dir));
+  const cleanSource = sourceDir?.trim().replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+  // Some fingerprints already identify the first path segment (e.g. `services`).
+  if (cleanSource && (suffix === cleanSource || suffix.startsWith(`${cleanSource}/`))) { return suffix; }
+  const prefix = cleanSource ?? '';
+  return [prefix, suffix].filter(Boolean).join('/');
+}

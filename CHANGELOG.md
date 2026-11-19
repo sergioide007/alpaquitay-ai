@@ -8,6 +8,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.8.1] — 2026-11-19
+
+### Fixed
+
+- Build prompts no longer emit `<carpeta-fuente>` as a filesystem path. When a legacy pending diff contains that placeholder, the harness resolves it against the detected source directory (or workspace root), refreshes the preview at the real path, and asks for confirmation again.
+- Applying pending diffs now detects when the destination changed since preview and refuses to overwrite stale content. Failed or stale diffs remain pending with a clear recovery message, while other pending diffs continue to apply.
+- The apply summary distinguishes a missing Git checkpoint from a failed write; lack of a Git repository remains a warning and does not stop file application.
+
+---
+
 ## [3.8.0] — 2026-11-19
 
 ### Added

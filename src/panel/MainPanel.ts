@@ -35,7 +35,7 @@ import { buildPreview } from '../core/harness/DiffPreview';
 import { CheckpointManager } from '../core/harness/CheckpointManager';
 import { emptyEcon, recordLlm, recordLocal, econChip, ECON_FILE, EconState } from '../core/platform/Economy';
 import { isUsableRoot, friendlyFsError, workspaceRootHelp, assertWritableRoot } from '../core/WorkspaceRoot';
-import { toWorkspaceRelative } from '../core/WorkspacePath';
+import { resolveSourceDirPlaceholder, toWorkspaceRelative } from '../core/WorkspacePath';
 import { specPathHints, sourceRule } from '../core/context/PathHints';
 import type { WorkspaceFingerprint } from '../core/context/WorkspaceFingerprinter';
 import {
@@ -604,22 +604,64 @@ export class MainPanel {
       const applyGuard = this._preflightWrite();
       if (applyGuard) { this._post({ type: 'chat-chunk', content: applyGuard }); this._post({ type: 'chat-done', model: provider.modelName }); return; }
       const cp = await this._checkpoints.save('apply-diffs');
+      let fpSources: string[] = [];
+      try { fpSources = (await this._fingerprinter.fingerprint()).sourceDirs; } catch { /* review sigue */ }
       let ok = 0;
       let blocked = 0;
       const appliedByTask = new Map<string, { files: string[]; title: string; epicTitle: string }>();
-      let fpSources: string[] = [];
-      try { fpSources = (await this._fingerprinter.fingerprint()).sourceDirs; } catch { /* review sigue */ }
       for (const p of pendings) {
-        const rel = p.key.replace('pending-diff:', '');
-        const v = guardWrite(rel);
-        if (v.verdict === 'deny') { this._post({ type: 'chat-chunk', content: `🛡️ Bloqueado: ${v.reason}` }); blocked++; continue; }
         try {
+          const storedRel = p.key.replace('pending-diff:', '');
           const pending = JSON.parse(p.value) as PendingChange;
           const { before, after } = pending;
+          const resolvedPath = resolveSourceDirPlaceholder(storedRel, fpSources);
+          const rel = toWorkspaceRelative(resolvedPath, this.workspaceRoot);
+          if (!rel) {
+            this._post({ type: 'chat-chunk', content: `🛡️ Ruta de diff invalida: \`${storedRel}\`. El diff sigue pendiente; corrige la ruta en la tarea y vuelve a generarlo.` });
+            blocked++;
+            continue;
+          }
+          if (resolvedPath !== storedRel) {
+            const exists = await this.mcpManager.executeTool('filesystem', 'file_exists', { path: rel }) as { exists: boolean };
+            const current = exists.exists
+              ? (await this.mcpManager.executeTool('filesystem', 'read_file', { path: rel }) as { content: string }).content
+              : '';
+            const rebasedReview = reviewDiff(rel, current, after, fpSources);
+            this._post({ type: 'chat-chunk', content: reviewMarkdown(rel, rebasedReview) });
+            if (!rebasedReview.pass) { blocked++; continue; }
+            const newKey = `pending-diff:${rel}`;
+            if (newKey !== p.key && this._memory.get('config', newKey)) {
+              this._post({ type: 'chat-chunk', content: `⚠️ No pude recuperar \`${storedRel}\` porque ya hay otro diff pendiente para \`${rel}\`. Revisa y aplica cada propuesta por separado.` });
+              blocked++;
+              continue;
+            }
+            const rebased: PendingChange = { ...pending, before: current };
+            this._memory.delete('config', p.key);
+            this._memory.set('config', newKey, JSON.stringify(rebased), { tags: ['diff', 'pending', ...(pending.taskId ? [pending.taskId] : [])] });
+            const diff = unifiedDiff(rel, current, after);
+            this._post({ type: 'chat-chunk', content: `ℹ️ Recuperé la ruta de ejemplo \`${storedRel}\` como \`${rel}\`. Como la ruta cambió, revisa esta vista previa actualizada y vuelve a confirmar con \`si aplicar\`:\n\n${diffMarkdown(diff)}` });
+            blocked++;
+            continue;
+          }
+          const v = guardWrite(rel);
+          if (v.verdict === 'deny') { this._post({ type: 'chat-chunk', content: `🛡️ Bloqueado: ${v.reason}` }); blocked++; continue; }
           // Cap.12: review con agente antes de escribir (local, sin LLM).
           const rev = reviewDiff(rel, before, after, fpSources);
           this._post({ type: 'chat-chunk', content: reviewMarkdown(rel, rev) });
           if (!rev.pass) { blocked++; logDecision(this.mcpManager, `review-blocked:${rel}`, { route: 'code', lane: 'build', confidence: 1, reasons: rev.findings.map(f => f.detail), needsConfirm: false, chip: '⛔ review' }, {}).catch(() => { }); continue; }
+          const exists = await this.mcpManager.executeTool('filesystem', 'file_exists', { path: rel }) as { exists: boolean };
+          if (exists.exists) {
+            const current = await this.mcpManager.executeTool('filesystem', 'read_file', { path: rel }) as { content: string };
+            if (current.content !== before) {
+              this._post({ type: 'chat-chunk', content: `⚠️ Diff obsoleto en \`${rel}\`: el archivo cambio desde que se genero la vista previa. No lo sobrescribi; vuelve a ejecutar Build para revisar el contenido actual.` });
+              blocked++;
+              continue;
+            }
+          } else if (before !== '') {
+            this._post({ type: 'chat-chunk', content: `⚠️ Diff obsoleto en \`${rel}\`: el archivo original ya no existe. No lo sobrescribi; vuelve a ejecutar Build para revisar el destino actual.` });
+            blocked++;
+            continue;
+          }
           await this.mcpManager.executeTool('filesystem', 'write_file', { path: rel, content: after });
           this._memory.delete('config', p.key);
           if (pending.taskId) {
@@ -632,11 +674,18 @@ export class MainPanel {
             appliedByTask.set(pending.taskId, taskChanges);
           }
           ok++;
-        } catch (e) { this._post({ type: 'chat-chunk', content: `(!) No se pudo escribir \`${rel}\`: ${friendlyFsError(e, rel)}` }); }
+        } catch (e) {
+          blocked++;
+          const storedRel = p.key.replace('pending-diff:', '');
+          this._post({ type: 'chat-chunk', content: `(!) No se pudo aplicar \`${storedRel}\`: ${friendlyFsError(e, storedRel)}. El diff se conserva para poder reintentarlo.` });
+        }
       }
       await this._memory.save().catch(() => { });
       if (ok > 0) { this._fingerprinter.invalidate(); }
-      this._post({ type: 'chat-chunk', content: `> 🛡️ checkpoint \`${cp}\`\n\n**${ok} archivo(s) aplicados${blocked ? `, ${blocked} bloqueado(s) por review` : ''}.**` });
+      const checkpointNote = cp.startsWith('no-git:') || cp.startsWith('no-checkpoint:')
+        ? `⚠️ No se pudo crear checkpoint de Git (\`${cp}\`); la aplicacion continua sin el.`
+        : `🛡️ checkpoint \`${cp}\``;
+      this._post({ type: 'chat-chunk', content: `> ${checkpointNote}\n\n**${ok} archivo(s) aplicados${blocked ? `; ${blocked} diff(s) siguen pendientes por resolver` : ''}.**` });
 
       for (const [taskId, taskChanges] of appliedByTask) {
         const remainingForTask = this._pendingDiffCountForTask(taskId);
@@ -1452,6 +1501,9 @@ export class MainPanel {
     const specData = await this.specManager.load();
     const epicContext = this._epicExcerpt(specData.markdown, task.epicTitle);
     const tree = await this._workspaceTree();
+    let pathFingerprint: WorkspaceFingerprint | null = null;
+    try { pathFingerprint = await this._fingerprinter.fingerprint(); } catch { /* root-relative paths remain valid */ }
+    const pathRule = sourceRule(pathFingerprint);
     const treeSection = tree ? `Project structure:\n${tree}\n\n` : '';
     const header = correction ? `**🔄 Correction:** ${task.title}` : `**> Implementando:** ${task.title}`;
 
@@ -1480,14 +1532,15 @@ export class MainPanel {
         const planPrompt = smallModel
           ? `Task: "${task.title}"\n` +
           (tree ? `Existing files:\n${tree}\n` : '') +
-          `Give ONE relative file path to create or modify. Output only the path, nothing else.`
+          `Source path rule: ${pathRule}\n` +
+          `Give ONE workspace-relative file path to create or modify. No placeholders. Output only the path, nothing else.`
           : `${correction ? 'Fix' : 'Implement'}: ${task.title}\n\n` +
           treeSection +
           `Task context:\n${epicContext}\n\n` +
           specStateSection +
           (correction ? `Problem to fix: ${correction}\n\n` : '') +
           `List the relative file paths to create or modify (one per line).\n` +
-          `If no path is specified, infer a reasonable one from the task (e.g. index.html, src/main.ts).\n` +
+          `If no path is specified, infer a reasonable workspace-relative path from the existing structure and source folders above. If none are evidenced, use the workspace root. Never use placeholders or invent src/.\n` +
           `Output ONLY the paths, no explanations, no markdown.`;
 
         const plan = await provider.chat(
@@ -1500,8 +1553,8 @@ export class MainPanel {
         // Retry: if Phase 1 returned prose, ask once more with a minimal prompt.
         if (filePaths.length === 0) {
           const retryResp = await provider.chat(
-            [{ role: 'user', content: `Task: "${task.title}"\nGive ONE relative file path to create or modify. Only the path, nothing else.` }],
-            { systemPrompt: 'Output only a single relative file path like: src/index.html', maxTokens: 50 }
+            [{ role: 'user', content: `Task: "${task.title}"\nSource path rule: ${pathRule}\nGive ONE workspace-relative file path to create or modify. No placeholders. Only the path, nothing else.` }],
+          { systemPrompt: 'Output only a single workspace-relative file path like: index.ts', maxTokens: 50 }
           );
           const retryPath = retryResp.content.trim().split('\n')[0].replace(/`/g, '').trim();
           if (/\.\w{1,6}$/.test(retryPath) && !/\s/.test(retryPath)) {
@@ -1513,6 +1566,7 @@ export class MainPanel {
 
       // Models often answer "/api/x.js" for "api/x.js": read it as workspace-relative instead of resolving it
       // against the filesystem root (the write was later refused as path traversal). Paths that escape are dropped.
+      filePaths = filePaths.map(p => resolveSourceDirPlaceholder(p, pathFingerprint?.sourceDirs ?? []));
       const rejectedPaths = filePaths.filter(p => toWorkspaceRelative(p, this.workspaceRoot) === null);
       filePaths = [...new Set(filePaths.map(p => toWorkspaceRelative(p, this.workspaceRoot)).filter((p): p is string => p !== null))];
       if (rejectedPaths.length) {
