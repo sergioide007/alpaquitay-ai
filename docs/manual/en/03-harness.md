@@ -68,7 +68,9 @@ The harness also places each request in a lifecycle phase. A phase only moves on
 
 ## What guards a write
 
-When you reply `si aplicar`, for **each pending file**:
+Review agent activity and diffs in **Changes**. Its **Apply & run gates** and **Discard all** buttons act on every pending diff; applying starts the same guarded flow as `si aplicar`, and discarding is equivalent to `no`.
+
+When you reply `si aplicar` (or click **Apply & run gates**), for **each pending file**:
 
 1. **Write policy.** Files that *are* secrets are always denied: `.env`, `*.pem`, `*.key`, `id_rsa`, `id_ed25519`, `secrets/` folders, credential or token files. Writing `spec.md` needs confirmation and a backup.
 2. **Automatic review** (no model). It **blocks** when the file is outside the detected source folders or the content looks like a literal secret (API keys, private keys, AWS keys, `sk-…`, `ghp_…`, JWTs). It **warns** when the file passes 400 lines, when `console.log`, `print(`, `TODO` or `FIXME` remain, or when the change changes nothing.

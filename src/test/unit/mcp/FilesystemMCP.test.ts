@@ -2,17 +2,20 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { FilesystemMCP } from '../../../mcp/FilesystemMCP';
+import { thoughtStream } from '../../../core/harness/AgentThoughtStream';
 
 describe('FilesystemMCP', () => {
   let tmpDir: string;
   let mcp: FilesystemMCP;
 
   beforeEach(() => {
+    thoughtStream.removeAllListeners();
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'alpaquitay-test-'));
     mcp = new FilesystemMCP(tmpDir);
   });
 
   afterEach(() => {
+    thoughtStream.removeAllListeners();
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
@@ -53,6 +56,36 @@ describe('FilesystemMCP', () => {
       await tool.execute({ path: 'output.ts', content: 'export {}' });
       const written = fs.readFileSync(path.join(tmpDir, 'output.ts'), 'utf-8');
       expect(written).toBe('export {}');
+    });
+
+    it('publishes the exact applied diff for a workspace write', async () => {
+      fs.writeFileSync(path.join(tmpDir, 'existing.ts'), 'const before = true;');
+      const handler = jest.fn();
+      thoughtStream.subscribe(handler);
+      const tool = mcp.tools.find(t => t.name === 'write_file')!;
+
+      await tool.execute({ path: 'existing.ts', content: 'const after = true;' });
+
+      expect(handler).toHaveBeenCalledWith(expect.objectContaining({
+        type: 'file-change',
+        sessionId: 'workspace',
+        path: 'existing.ts',
+        status: 'applied',
+        added: 1,
+        removed: 1,
+      }));
+      expect(handler.mock.calls[0][0].diff).toContain('- const before = true;');
+      expect(handler.mock.calls[0][0].diff).toContain('+ const after = true;');
+    });
+
+    it('does not expose internal harness state in the Changes feed', async () => {
+      const handler = jest.fn();
+      thoughtStream.subscribe(handler);
+      const tool = mcp.tools.find(t => t.name === 'write_file')!;
+
+      await tool.execute({ path: '.alpaquitay/memory.json', content: '{"private":"cached context"}' });
+
+      expect(handler).not.toHaveBeenCalled();
     });
 
     it('When writing to a nested path, Then creates parent directories', async () => {

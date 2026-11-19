@@ -24,7 +24,7 @@ import { AgentRegistry } from './AgentRegistry';
 import { MetaheuristicEngine }  from './metaheuristic/MetaheuristicEngine';
 import { PrivacyGuard }         from './privacy/PrivacyGuard';
 import { TaskGene }             from './metaheuristic/GeneticOptimizer';
-import { thoughtStream }        from './AgentThoughtStream';
+import { thoughtStream }        from '../../core/harness/AgentThoughtStream';
 import { randomUUID }           from 'crypto';
 
 export interface OrchestratedTask {
@@ -71,12 +71,11 @@ export class OrchestratorAgent {
   /**
    * Main entry point: receive a natural-language objective, plan and execute it.
    */
-  async execute(objective: string, contextParams: Record<string, unknown> = {}): Promise<OrchestratorResult> {
+  async execute(objective: string, contextParams: Record<string, unknown> = {}, sessionId: string = randomUUID()): Promise<OrchestratorResult> {
     const start = Date.now();
-    const sessionId = randomUUID();
 
-    // Live thought: orchestrator received the objective
-    thoughtStream.thought(sessionId, 'receive', `Orchestrator received objective: "${objective.slice(0, 120)}"`);
+    // Progress events deliberately contain operational status only, never prompt text.
+    thoughtStream.progress(sessionId, 'receive', 'Orchestrator received the sanitized objective.');
     thoughtStream.stepStart(sessionId, 'sanitize-objective');
 
     // 1. Privacy sanitization of the objective
@@ -89,7 +88,7 @@ export class OrchestratorAgent {
     thoughtStream.stepStart(sessionId, 'decompose-tasks');
     const tasks = await this.decomposeObjective(safeObjective, safeParams);
     thoughtStream.stepDone(sessionId, 'decompose-tasks', true);
-    thoughtStream.thought(sessionId, 'decompose', `Decomposed into ${tasks.length} sub-task(s): ${tasks.map(t => t.description).slice(0, 3).join('; ')}`);
+    thoughtStream.progress(sessionId, 'decompose', `Decomposed objective into ${tasks.length} sub-task(s).`);
 
     // 3. Optimize execution plan
     thoughtStream.stepStart(sessionId, 'optimize-plan');
@@ -108,7 +107,7 @@ export class OrchestratorAgent {
     const optResult = this.metaheuristic.optimizePlan(genes, allAgents);
 
     thoughtStream.stepDone(sessionId, 'optimize-plan', true);
-    thoughtStream.thought(sessionId, 'plan', `Execution plan: ${genes.length} gene(s), algorithm will assign agents based on relevance and dependencies.`);
+    thoughtStream.progress(sessionId, 'plan', `Execution plan: ${genes.length} gene(s), algorithm will assign agents based on relevance and dependencies.`);
 
     const plan: ExecutionPlan = {
       objective: safeObjective,
@@ -121,7 +120,7 @@ export class OrchestratorAgent {
     thoughtStream.stepStart(sessionId, 'execute-tasks');
     const taskResults = await this.executePlan(plan, sessionId);
     thoughtStream.stepDone(sessionId, 'execute-tasks', true);
-    thoughtStream.thought(sessionId, 'execute', `Executed ${taskResults.length} task(s): ${taskResults.filter(r => r.result.success).length} succeeded, ${taskResults.filter(r => !r.result.success).length} failed.`);
+    thoughtStream.progress(sessionId, 'execute', `Executed ${taskResults.length} task(s): ${taskResults.filter(r => r.result.success).length} succeeded, ${taskResults.filter(r => !r.result.success).length} failed.`);
 
     // 5. Aggregate and synthesize
     thoughtStream.stepStart(sessionId, 'aggregate-results');
@@ -218,14 +217,16 @@ Only return the JSON array.`;
       const batchResults = await Promise.all(
         batch.map(async task => {
           thoughtStream.stepStart(sessionId, `task:${task.taskId}`, task.domainId, task.useCaseId);
-          thoughtStream.thought(sessionId, `task:${task.taskId}`, `Assigning to ${task.domainId} · use case "${task.useCaseId}" — ${task.description.slice(0, 100)}`);
-          const shell = await this.registry.getInstance(task.domainId, this.provider, this.workspacePath);
-          const result = await shell.run(task.useCaseId, task.params);
-          thoughtStream.stepDone(sessionId, `task:${task.taskId}`, result.success);
-          thoughtStream.thought(sessionId, `task:${task.taskId}`, result.success
-            ? `Completed: ${task.description.slice(0, 100)}`
-            : `Failed: ${task.description.slice(0, 100)} — ${result.errors?.join(', ')}`);
-          return { task, result };
+          thoughtStream.progress(sessionId, `task:${task.taskId}`, `Running ${task.useCaseId} with ${task.domainId}.`);
+          try {
+            const shell = await this.registry.getInstance(task.domainId, this.provider, this.workspacePath);
+            const result = await shell.run(task.useCaseId, task.params);
+            thoughtStream.stepDone(sessionId, `task:${task.taskId}`, result.success);
+            return { task, result };
+          } catch (error) {
+            thoughtStream.stepDone(sessionId, `task:${task.taskId}`, false);
+            throw error;
+          }
         }),
       );
 
