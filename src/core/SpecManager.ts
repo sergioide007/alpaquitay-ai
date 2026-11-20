@@ -131,13 +131,29 @@ export class SpecManager {
         currentEpic = headingMatch[1];
         continue;
       }
-      const taskMatch = line.match(/^\s*[-*]\s+\[([ x])\]\s*(.+)/i);
+      // Only top-level checkboxes are board tasks; indented checkboxes belong
+      // to the parent task as acceptance criteria.
+      const taskMatch = line.match(/^[-*]\s+\[([ x])\]\s*(.+)/i);
       if (!taskMatch) { continue; }
 
       const done = taskMatch[1].toLowerCase() === 'x';
       const title = taskMatch[2].trim();
       const id = `SPEC-${String(counter++).padStart(3, '0')}`;
       const saved = this.boardState.get(id);
+      const taskContext: string[] = [title];
+      const acceptanceCriteria: string[] = [];
+      for (let j = i + 1; j < lines.length; j++) {
+        const next = lines[j];
+        if (/^#{1,6}\s+/.test(next) || /^[-*]\s+\[[ x]\]/i.test(next)) { break; }
+        if (!next.trim()) { continue; }
+        taskContext.push(next.trim());
+        const criterion = next.match(/^\s{2,}[-*]\s+(?:\[[ x]\]\s*)?(.+?)\s*$/i);
+        if (criterion && !/\bADR-\d{3,}\b/i.test(criterion[1])) {
+          acceptanceCriteria.push(criterion[1].trim());
+        }
+      }
+      const adrs = [...new Set(taskContext.join('\n').match(/\bADR-\d{3,}\b/gi) ?? [])]
+        .map(adr => adr.toUpperCase());
 
       let status: TaskStatus;
       if (done) {
@@ -151,7 +167,7 @@ export class SpecManager {
         status = 'backlog';
       }
 
-      tasks.push({ id, epicTitle: currentEpic, title, done, status, lineIndex: i });
+      tasks.push({ id, epicTitle: currentEpic, title, done, status, lineIndex: i, acceptanceCriteria, adrs });
     }
     return tasks;
   }

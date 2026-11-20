@@ -107,7 +107,8 @@ export const HUX_QUICK_HTML = `
   <button class="hux-chip" type="button" data-hux-skill="validate-against-spec" title="Check the code against your spec">Validate</button>
   <button class="hux-chip" type="button" data-hux-skill="generate-tests" title="Write tests for the open file">Tests</button>
   <button class="hux-chip" type="button" data-hux-skill="refactor" title="Refactor the open file">Refactor</button>
-  <button class="hux-chip warn" type="button" data-hux-act="apply" id="huxApplyChip" title="Approve pending changes and run quality gates" hidden>Apply changes</button>
+  <button class="hux-chip warn" type="button" data-hux-act="apply" id="huxApplyChip" title="Revisa los cambios y ejecuta las comprobaciones de calidad" aria-label="Revisar y aplicar cambios pendientes" hidden>Revisar y aplicar</button>
+  <button class="hux-chip" type="button" data-hux-act="discard" id="huxDiscardChip" title="Descarta todos los cambios pendientes" aria-label="Descartar cambios pendientes" hidden>Descartar cambios</button>
   <button class="hux-chip ghost" type="button" data-hux-act="palette" title="Every command and agent">More&hellip;</button>
 </div>`;
 
@@ -200,6 +201,8 @@ kbd{font:11px var(--mono);padding:1px 6px;border:1px solid var(--border-strong);
 
 /* Board cards: visible primary action instead of drag-only */
 .card-actions{margin-top:8px;display:flex;gap:6px}
+.card-move-select{width:100%;min-width:0;height:26px;margin-top:6px;padding:0 7px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg2);color:var(--text);font:500 10.5px var(--sans);cursor:pointer}
+.card-move-select:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
 .hux-card-btn{height:26px;padding:0 12px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg3);color:var(--text);font:600 11.5px var(--sans);cursor:pointer;transition:border-color .12s,background .12s}
 .hux-card-btn:hover{border-color:var(--signal)}
 .hux-card-btn.primary{background:var(--signal);border-color:var(--signal);color:var(--bg0)}
@@ -347,6 +350,8 @@ function huxRefresh() {
   }
   var apply = document.getElementById('huxApplyChip');
   if (apply) { apply.hidden = !pending; apply.disabled = !!S.thinking; }
+  var discard = document.getElementById('huxDiscardChip');
+  if (discard) { discard.hidden = !pending; discard.disabled = !!S.thinking; }
   huxTabs().forEach(function (b) { b.setAttribute('aria-selected', b.classList.contains('active') ? 'true' : 'false'); });
 }
 
@@ -361,6 +366,7 @@ function huxRun(act) {
     return;
   }
   if (act === 'apply') { runHarnessCommand('si aplicar'); return; }
+  if (act === 'discard') { runHarnessCommand('no'); return; }
   if (act === 'palette') { huxOpenPal(); return; }
   if (act === 'chat') { switchTab('studio'); chatInput.focus(); return; }
   if (act === 'refresh') {
@@ -406,7 +412,10 @@ function huxCommands() {
   var next = huxNextStep(S, workingTasks);
   if (next.taskId) { cmds.unshift({ group: 'Action', label: 'Start next task', hint: next.title, act: 'start:' + next.taskId }); }
   var pending = (S.harness && Array.isArray(S.harness.pending)) ? S.harness.pending.length : 0;
-  if (pending) { cmds.unshift({ group: 'Action', label: 'Apply changes & run gates', hint: pending + ' pending', act: 'apply' }); }
+  if (pending) {
+    cmds.unshift({ group: 'Action', label: 'Descartar cambios pendientes', hint: pending + ' pendientes', act: 'discard' });
+    cmds.unshift({ group: 'Action', label: 'Revisar y aplicar cambios', hint: pending + ' pendientes · ejecuta las comprobaciones', act: 'apply' });
+  }
   cmds.push({ group: 'Action', label: 'Create or regenerate spec', hint: 'Describe the project and let the AI write tasks', act: 'regen' });
   cmds.push({ group: 'Action', label: 'Validate against spec', hint: 'Check the code against spec.md', act: 'skill:validate-against-spec' });
   cmds.push({ group: 'Action', label: 'Generate tests', hint: 'For the file open in the editor', act: 'skill:generate-tests' });

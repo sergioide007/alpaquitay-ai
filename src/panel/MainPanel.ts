@@ -1,4 +1,4 @@
-﻿import * as vscode from 'vscode';
+import * as vscode from 'vscode';
 import * as crypto from 'crypto';
 import * as nodePath from 'path';
 import { AIProviderManager } from '../providers/AIProviderManager';
@@ -19,7 +19,7 @@ import {
 import { doraFrom, doraMarkdown } from '../core/platform/Dora';
 import { classifyFailure, postmortemMarkdown } from '../core/platform/Postmortem';
 import { dodGateForDone, dodGateMarkdown } from '../core/sdlc/DefinitionOfDone';
-import { QualityEvidence, QualityCheck } from '../core/sdlc/QualityEvidence';
+import { QualityEvidence, QualityCheck, parseQualityEvidence } from '../core/sdlc/QualityEvidence';
 import { emptyDebt, applyDelta, debtMarkdown, DEBT_FILE } from '../core/platform/DebtTracker';
 import { onboard } from '../core/platform/Onboard';
 import { IdeaInbox } from '../core/reception/IdeaInbox';
@@ -236,6 +236,7 @@ export class MainPanel {
       case 'docs-reveal': return this._docsReveal(msg.path);
       case 'get-models': return this._sendModels();
       case 'load-spec': return this._sendSpec();
+      case 'open-adr': return this._openAdr(msg.path);
       case 'load-git': return this._sendGit();
       case 'load-harness': return this._sendHarnessStatus();
       case 'load-skills': return this._sendSkills();
@@ -306,6 +307,7 @@ export class MainPanel {
   private async _sendModels(): Promise<void> {
     const infos = await this.aiManager.getProviderInfo();
     const models: ModelOption[] = [];
+    const activeType = this.aiManager.getActive()?.type;
 
     for (const info of infos) {
       if (!info.available) { continue; }
@@ -318,18 +320,18 @@ export class MainPanel {
             ? this.config.openaiModel
             : catalog[0].id;
         for (const m of catalog) {
-          models.push({ id: `${info.type}:${m.id}`, label: `${m.label} (${info.name})`, provider: info.type, isLocal: false });
+          models.push({ id: `${info.type}:${m.id}`, label: `${m.label} (${info.name})`, provider: info.type, isLocal: false, active: info.type === activeType });
         }
         // Ensure the currently configured model appears even if not in catalog
         if (!catalog.find(m => m.id === activeModelId)) {
-          models.push({ id: `${info.type}:${activeModelId}`, label: `${activeModelId} (${info.name})`, provider: info.type, isLocal: false });
+          models.push({ id: `${info.type}:${activeModelId}`, label: `${activeModelId} (${info.name})`, provider: info.type, isLocal: false, active: info.type === activeType });
         }
       } else {
         // Local providers: current configured model
         const modelName = info.type === 'ollama'
           ? this.config.ollamaModel
           : info.type === 'local-wasm' ? this.config.localEngine.modelId : 'local-model';
-        models.push({ id: `${info.type}:${modelName}`, label: `${modelName} (${info.name})`, provider: info.type, isLocal: true });
+        models.push({ id: `${info.type}:${modelName}`, label: `${modelName} (${info.name})`, provider: info.type, isLocal: true, active: info.type === activeType });
       }
     }
     this._post({ type: 'models-list', models });
@@ -337,10 +339,91 @@ export class MainPanel {
 
   private async _sendSpec(): Promise<void> {
     const data = await this.specManager.load();
+    for (const task of data.tasks) {
+      const evidence = parseQualityEvidence(this._memory.get('config', `quality:${task.id}`)?.value);
+      const pendingForTask = this._memory.search('pending-diff:').some(entry => {
+        try {
+          const pending = JSON.parse(entry.value) as Partial<PendingChange> | null;
+          return pending?.taskId === task.id && Date.parse(entry.updatedAt) > Date.parse(evidence?.recordedAt ?? '');
+        } catch { return false; }
+      });
+      const blocked = this._memory.get('config', `dod-blockers:${task.id}`);
+      if (blocked) {
+        try {
+          const parsed = JSON.parse(blocked.value);
+          if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) { task.gateBlockers = parsed; }
+        } catch { /* malformed old gate detail is ignored */ }
+      }
+      if (evidence && evidence.taskId === task.id) {
+        const freshness = pendingForTask ? 'stale' : await this._qualityEvidenceFreshness(task.id);
+        task.qualityEvidence = {
+          build: evidence.build.status,
+          tests: evidence.tests.status,
+          recordedAt: evidence.recordedAt,
+          freshness,
+        };
+      }
+    }
+    const adrUris = await Promise.all([
+      vscode.workspace.findFiles('**/*ADR*.md', '**/{node_modules,vendor,dist,build,.git}/**', 300),
+      vscode.workspace.findFiles('.alpaquitay/adrs/**/*.md', '**/{node_modules,vendor,dist,build,.git}/**', 300),
+    ]).then(groups => [...new Map(groups.flat().map(uri => [uri.fsPath, uri])).values()]).catch(() => []);
+    for (const task of data.tasks) {
+      task.adrLinks = [];
+      for (const id of task.adrs ?? []) {
+        const match = adrUris.find(uri => nodePath.basename(uri.fsPath).toUpperCase().includes(id));
+        const rel = match ? toWorkspaceRelative(match.fsPath, this.workspaceRoot) : null;
+        if (rel) { task.adrLinks.push({ id, path: rel }); }
+      }
+    }
     if (!data.exists) {
       data.candidates = await this.specManager.discover();
     }
     this._post({ type: 'spec-data', data });
+  }
+
+  private async _qualityFileHashes(files: string[]): Promise<Record<string, string>> {
+    const entries = await Promise.all([...new Set(files)].map(async rawPath => {
+      const rel = toWorkspaceRelative(rawPath, this.workspaceRoot);
+      if (!rel) { return null; }
+      try {
+        const bytes = await vscode.workspace.fs.readFile(vscode.Uri.file(nodePath.join(this.workspaceRoot, rel)));
+        return [rel, crypto.createHash('sha256').update(bytes).digest('hex')] as const;
+      } catch { return null; }
+    }));
+    return Object.fromEntries(entries.filter((entry): entry is readonly [string, string] => entry !== null));
+  }
+
+  private async _saveQualityEvidence(evidence: QualityEvidence): Promise<void> {
+    const hashes = await this._qualityFileHashes(evidence.files);
+    this._memory.set('config', `quality:${evidence.taskId}`, JSON.stringify(evidence), { tags: ['quality', 'evidence', evidence.taskId] });
+    this._memory.set('config', `quality-files:${evidence.taskId}`, JSON.stringify(hashes), { tags: ['quality', 'fingerprint', evidence.taskId] });
+    await this._memory.save().catch(() => { });
+  }
+
+  private async _qualityEvidenceFreshness(taskId: string): Promise<'current' | 'stale' | 'unknown'> {
+    const saved = this._memory.get('config', `quality-files:${taskId}`);
+    if (!saved) { return 'unknown'; }
+    let expected: Record<string, string>;
+    try {
+      const parsed: unknown = JSON.parse(saved.value);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) { return 'unknown'; }
+      expected = parsed as Record<string, string>;
+      if (!Object.entries(expected).every(([rel, hash]) => typeof rel === 'string' && typeof hash === 'string')) { return 'unknown'; }
+    } catch { return 'unknown'; }
+    const paths = Object.keys(expected);
+    if (!paths.length) { return 'unknown'; }
+    const actual = await this._qualityFileHashes(paths);
+    return paths.every(rel => actual[rel] === expected[rel]) ? 'current' : 'stale';
+  }
+
+  private async _openAdr(relPath: string): Promise<void> {
+    const rel = toWorkspaceRelative(relPath, this.workspaceRoot);
+    if (!rel || !/\.md$/i.test(rel) || !/(^|\/)ADR[^/]*\.md$/i.test(rel)) {
+      throw new Error('La ruta ADR no es válida dentro del workspace.');
+    }
+    const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(nodePath.join(this.workspaceRoot, rel)));
+    await vscode.window.showTextDocument(doc, { preview: true });
   }
 
   private async _handleUseSpecFile(filename: string): Promise<void> {
@@ -522,14 +605,14 @@ export class MainPanel {
       try {
         const f = await this.mcpManager.executeTool('filesystem', 'read_file', { path: DEBT_FILE }) as { content: string };
         this._post({ type: 'chat-chunk', content: debtMarkdown({ ...emptyDebt(), ...JSON.parse(f.content) }) });
-      } catch { this._post({ type: 'chat-chunk', content: '> 🧾 Deuda agentica: **0/100** ✅ sana\n> `(sin eventos aun — el harness la mide desde ahora)`' }); }
+      } catch { this._post({ type: 'chat-chunk', content: '> Deuda agentica: **0/100** sana\n> `(sin eventos aun — el harness la mide desde ahora)`' }); }
       this._post({ type: 'chat-done', model: provider.modelName });
       this._econLocal();
       return;
     }
     // Cap.01/18: `economia` muestra el costo de sesion (local gratis vs LLM).
     if (/^\s*econom[ií]a\s*$/i.test(text)) {
-      this._post({ type: 'chat-chunk', content: `> 💰 Economia de sesion — ${this._econLine()}\n> _Local gratis (dora/deuda/postmortem/diff/review/economia): ${this._econ.localOps}. Cada Build confirmado = 2-4 llamadas LLM._\n> _Ahorra con: preguntas cortas en Flash, \`onboard\` una vez, diffs en lote._` });
+      this._post({ type: 'chat-chunk', content: `> Economia de sesion — ${this._econLine()}\n> _Operaciones locales (DORA/deuda/postmortem/diff/review/economía): ${this._econ.localOps}. Cada Build confirmado = 2-4 llamadas LLM._\n> _Ahorra con: preguntas cortas en Flash, \`onboard\` una vez, diffs en lote._` });
       this._post({ type: 'chat-done', model: provider.modelName });
       this._econLocal();
       return;
@@ -617,7 +700,7 @@ export class MainPanel {
           const resolvedPath = resolveSourceDirPlaceholder(storedRel, fpSources);
           const rel = toWorkspaceRelative(resolvedPath, this.workspaceRoot);
           if (!rel) {
-            this._post({ type: 'chat-chunk', content: `🛡️ Ruta de diff invalida: \`${storedRel}\`. El diff sigue pendiente; corrige la ruta en la tarea y vuelve a generarlo.` });
+            this._post({ type: 'chat-chunk', content: `Ruta de diff invalida: \`${storedRel}\`. El diff sigue pendiente; corrige la ruta en la tarea y vuelve a generarlo.` });
             blocked++;
             continue;
           }
@@ -631,7 +714,7 @@ export class MainPanel {
             if (!rebasedReview.pass) { blocked++; continue; }
             const newKey = `pending-diff:${rel}`;
             if (newKey !== p.key && this._memory.get('config', newKey)) {
-              this._post({ type: 'chat-chunk', content: `⚠️ No pude recuperar \`${storedRel}\` porque ya hay otro diff pendiente para \`${rel}\`. Revisa y aplica cada propuesta por separado.` });
+              this._post({ type: 'chat-chunk', content: `No pude recuperar \`${storedRel}\` porque ya hay otro diff pendiente para \`${rel}\`. Revisa y aplica cada propuesta por separado.` });
               blocked++;
               continue;
             }
@@ -639,12 +722,12 @@ export class MainPanel {
             this._memory.delete('config', p.key);
             this._memory.set('config', newKey, JSON.stringify(rebased), { tags: ['diff', 'pending', ...(pending.taskId ? [pending.taskId] : [])] });
             const diff = unifiedDiff(rel, current, after);
-            this._post({ type: 'chat-chunk', content: `ℹ️ Recuperé la ruta de ejemplo \`${storedRel}\` como \`${rel}\`. Como la ruta cambió, revisa esta vista previa actualizada y vuelve a confirmar con \`si aplicar\`:\n\n${diffMarkdown(diff)}` });
+            this._post({ type: 'chat-chunk', content: `La ruta del cambio se ajustó. Revisa la vista previa actualizada y confirma desde las acciones del Hub:\n\n${diffMarkdown(diff)}` });
             blocked++;
             continue;
           }
           const v = guardWrite(rel);
-          if (v.verdict === 'deny') { this._post({ type: 'chat-chunk', content: `🛡️ Bloqueado: ${v.reason}` }); blocked++; continue; }
+          if (v.verdict === 'deny') { this._post({ type: 'chat-chunk', content: `Bloqueado: ${v.reason}` }); blocked++; continue; }
           // Cap.12: review con agente antes de escribir (local, sin LLM).
           const rev = reviewDiff(rel, before, after, fpSources);
           this._post({ type: 'chat-chunk', content: reviewMarkdown(rel, rev) });
@@ -653,12 +736,12 @@ export class MainPanel {
           if (exists.exists) {
             const current = await this.mcpManager.executeTool('filesystem', 'read_file', { path: rel }) as { content: string };
             if (current.content !== before) {
-              this._post({ type: 'chat-chunk', content: `⚠️ Diff obsoleto en \`${rel}\`: el archivo cambio desde que se genero la vista previa. No lo sobrescribi; vuelve a ejecutar Build para revisar el contenido actual.` });
+              this._post({ type: 'chat-chunk', content: `Diff obsoleto en \`${rel}\`: el archivo cambio desde que se genero la vista previa. No lo sobrescribi; vuelve a ejecutar Build para revisar el contenido actual.` });
               blocked++;
               continue;
             }
           } else if (before !== '') {
-            this._post({ type: 'chat-chunk', content: `⚠️ Diff obsoleto en \`${rel}\`: el archivo original ya no existe. No lo sobrescribi; vuelve a ejecutar Build para revisar el destino actual.` });
+            this._post({ type: 'chat-chunk', content: `Diff obsoleto en \`${rel}\`: el archivo original ya no existe. No lo sobrescribi; vuelve a ejecutar Build para revisar el destino actual.` });
             blocked++;
             continue;
           }
@@ -683,8 +766,8 @@ export class MainPanel {
       await this._memory.save().catch(() => { });
       if (ok > 0) { this._fingerprinter.invalidate(); }
       const checkpointNote = cp.startsWith('no-git:') || cp.startsWith('no-checkpoint:')
-        ? `⚠️ No se pudo crear checkpoint de Git (\`${cp}\`); la aplicacion continua sin el.`
-        : `🛡️ checkpoint \`${cp}\``;
+        ? `Checkpoint de Git no disponible (\`${cp}\`); continué sin él.`
+        : `Checkpoint creado: \`${cp}\``;
       this._post({ type: 'chat-chunk', content: `> ${checkpointNote}\n\n**${ok} archivo(s) aplicados${blocked ? `; ${blocked} diff(s) siguen pendientes por resolver` : ''}.**` });
 
       for (const [taskId, taskChanges] of appliedByTask) {
@@ -696,12 +779,13 @@ export class MainPanel {
         let evidence: QualityEvidence | null = null;
         if (hasCode && remainingForTask === 0 && contract && isPlatformContractVerified(contract)) {
           evidence = await this._runBuildAndTests(taskId, taskChanges.files, contract.commands);
-          this._memory.set('config', `quality:${taskId}`, JSON.stringify(evidence), { tags: ['quality', 'evidence', taskId] });
+          await this._saveQualityEvidence(evidence);
         }
         const gate = dodGateForDone(remainingForTask, contract, evidence, hasCode);
         this._post({ type: 'chat-chunk', content: `\n\n${dodGateMarkdown(gate)}` });
 
         if (gate.pass) {
+          await this._storeGateBlockers(taskId, []);
           const latest = await this.specManager.load();
           const task = latest.tasks.find(t => t.id === taskId);
           if (task) {
@@ -717,8 +801,13 @@ export class MainPanel {
           this._post({ type: 'task-work-done', taskId, title: taskChanges.title });
           this._trackDebt('done-verificado').catch(() => { });
         } else {
+          await this._storeGateBlockers(taskId, gate.blockers);
           this.specManager.setBoardStatus(taskId, 'in-progress');
-          this._post({ type: 'task-work-review', taskId, title: taskChanges.title, files: remainingForTask });
+          if (remainingForTask > 0) {
+            this._post({ type: 'task-work-review', taskId, title: taskChanges.title, files: remainingForTask });
+          } else {
+            this._post({ type: 'task-work-blocked', taskId, title: taskChanges.title, blockers: gate.blockers });
+          }
           logDecision(this.mcpManager, `dod-blocked:${taskId}`, {
             route: 'code', lane: 'build', confidence: 1, reasons: gate.blockers,
             needsConfirm: false, chip: '⛔ DoD gate',
@@ -760,7 +849,7 @@ export class MainPanel {
       await this.specManager.addEpic(`${last.id} ${last.structured?.objetivo ?? last.raw.slice(0, 80)}`);
       last.promoted = true;
       try { await this.mcpManager.executeTool('filesystem', 'write_file', { path: '.alpaquitay/ideas.json', content: JSON.stringify(ideas, null, 2) }); } catch { /* best-effort */ }
-      this._post({ type: 'chat-chunk', content: `> 🛡️ checkpoint \`${cp}\`\n\n**${last.id} promovida a spec.md.** Revisa el tablero.` });
+      this._post({ type: 'chat-chunk', content: `> checkpoint \`${cp}\`\n\n**${last.id} promovida a spec.md.** Revisa el tablero.` });
       await this._sendSpec();
       this._post({ type: 'chat-done', model: provider.modelName });
       return;
@@ -780,9 +869,9 @@ export class MainPanel {
     // SDLC experto: cada pedido entra a una fase con gate visible (FABLE-5 L/E).
     // Platform: + contrato verificado + DoD ejecutable (senior: pavimentar, no improvisar).
     const sdlc = sdlcPhase(text, fp);
-    const sdlcChip = sdlc.phase !== 'ninguna' ? ` · 📐 ${sdlc.phase} (gate: ${sdlc.gate})` : '';
+    const sdlcChip = sdlc.phase !== 'ninguna' ? ` · ${sdlc.phase} (comprobación: ${sdlc.gate})` : '';
     const stackChip = (fp ? ` · ${fp.frameworks[0] ?? 'stack?'} · \`${fp.sourceDirs.join(', ') || '.'}\`` : '') + platformChip;
-    const dodLine = dod ? `\n> ✅ ${dod}` : '';
+    const dodLine = dod ? `\n> DoD: ${dod}` : '';
     // FABLE-5 (E): toda decision queda en decisions.jsonl (best-effort).
     logDecision(this.mcpManager, text, d, { stack: fp?.frameworks[0], sources: fp?.sourceDirs.join(','), policy: d.needsConfirm ? 'confirm' : 'allow', checkpoint: `sdlc:${sdlc.phase}` }).catch(() => { });
     // Rutas que tocan disco o delegan: piden confirmacion, no ejecutan directo.
@@ -826,7 +915,7 @@ export class MainPanel {
       const rawPath = deleteMatch[1].replace(/[`'"]/g, '').trim();
       const v = guardWrite(rawPath);
       if (v.verdict === 'deny') {
-        this._post({ type: 'chat-chunk', content: `🛡️ Bloqueado por PolicyGuard: ${v.reason}` });
+        this._post({ type: 'chat-chunk', content: `Bloqueado por PolicyGuard: ${v.reason}` });
         this._post({ type: 'chat-done', model: provider.modelName });
         return;
       }
@@ -837,7 +926,7 @@ export class MainPanel {
       try {
         const abs = nodePath.isAbsolute(rawPath) ? rawPath : nodePath.join(this.workspaceRoot, rawPath);
         await this.mcpManager.executeTool('filesystem', 'delete_file', { path: abs });
-        this._post({ type: 'chat-chunk', content: `🛡️ checkpoint \`${cp}\`\n\nArchivo \`${rawPath}\` eliminado correctamente.` });
+        this._post({ type: 'chat-chunk', content: `checkpoint \`${cp}\`\n\nArchivo \`${rawPath}\` eliminado correctamente.` });
       } catch (e) {
         this._post({ type: 'chat-chunk', content: `No se pudo eliminar \`${rawPath}\`: ${friendlyFsError(e, rawPath)}` });
       }
@@ -849,12 +938,26 @@ export class MainPanel {
       const systemPrompt = await this._contextBuilder.getChatSystemPrompt();
       const fpLine = fp ? `\n\nContexto detectado: ${fp.frameworks.join(', ') || 'stack por detectar'} · fuentes: ${fp.sourceDirs.join(', ') || '.'}.` : '';
       const promptChars = (text + fpLine + systemPrompt).length;
-      const response = await provider.chat(
-        [{ role: 'user', content: text + fpLine }],
-        { systemPrompt }
-      );
+      const messages = [{ role: 'user' as const, content: text + fpLine }];
+      const response = provider.type === 'local-wasm'
+        ? await vscode.window.withProgress({
+          location: vscode.ProgressLocation.Notification,
+          title: `Alpaquitay AI · ${provider.modelName}`,
+          cancellable: false,
+        }, progress => {
+          let lastPercentage = 0;
+          return provider.chat(messages, {
+            systemPrompt,
+            onProgress: (stage, percentage) => {
+              const current = Math.max(lastPercentage, Math.min(100, percentage));
+              progress.report({ message: `${stage.slice(0, 80)} · ${current}%`, increment: current - lastPercentage });
+              lastPercentage = current;
+            },
+          });
+        })
+        : await provider.chat(messages, { systemPrompt });
       this._econLlm(promptChars, response.content.length);
-      this._post({ type: 'chat-chunk', content: `> ${d.chip}${stackChip}${sdlcChip}${dodLine} · ${this._econLine()}\n\n${response.content}` });
+      this._post({ type: 'chat-chunk', content: response.content });
       this._post({ type: 'chat-done', model: response.model });
     } catch (err) {
       this._post({ type: 'chat-error', error: err instanceof Error ? err.message : String(err) });
@@ -910,7 +1013,7 @@ export class MainPanel {
   private async _handleChatConfirmed(text: string, route: string): Promise<void> {
     if (route === 'code' || route === 'spec') {
       const cp = await this._checkpoints.save(route);
-      this._post({ type: 'chat-chunk', content: `> 🛡️ checkpoint \`${cp}\`\n\n_Generando spec y plan desde tu pedido…_` });
+      this._post({ type: 'chat-chunk', content: `> checkpoint \`${cp}\`\n\n_Generando spec y plan desde tu pedido…_` });
       await this._handleRegenSpec(text);
       return;
     }
@@ -923,17 +1026,17 @@ export class MainPanel {
       if (!result.handled) {
         this._post({
           type: 'chat-chunk',
-          content: '> 🧠 Deep · routing stopped safely\n\nNo registered specialist met the confidence threshold. Add the target domain (for example: security, QA, architecture, DORA, or FinOps) and try again.',
+          content: '> Especialista · derivación detenida de forma segura\n\nNo registered specialist met the confidence threshold. Add the target domain (for example: security, QA, architecture, DORA, or FinOps) and try again.',
         });
         this._post({ type: 'chat-done', model: provider.modelName });
         return;
       }
 
       const guards = result.guardrailResults
-        .map(g => `- ${g.severity === 'pass' ? '✅' : g.severity === 'warn' ? '⚠️' : '⛔'} ${g.rule}: ${g.message}`)
+        .map(g => `- ${g.severity === 'pass' ? 'Pass' : g.severity === 'warn' ? 'Aviso' : 'Bloqueo'} ${g.rule}: ${g.message}`)
         .join('\n');
       const receipt = [
-        `> 🧠 Deep · **${result.specialistName ?? result.specialistId}** · \`${result.useCaseId}\` · ${Math.round(result.confidence * 100)}% confidence`,
+        `> Especialista · **${result.specialistName ?? result.specialistId}** · \`${result.useCaseId}\` · ${Math.round(result.confidence * 100)}% confidence`,
         `> ${result.privacyRedacted ? 'PII redacted before routing' : 'privacy boundary checked'}`,
       ].join('\n');
       this._post({
@@ -978,19 +1081,25 @@ export class MainPanel {
       let evidence: QualityEvidence | null = null;
       if (hasCode && pendingDiffs === 0 && contract && isPlatformContractVerified(contract)) {
         evidence = await this._runBuildAndTests(taskId, [], contract.commands);
-        this._memory.set('config', `quality:${taskId}`, JSON.stringify(evidence), { tags: ['quality', 'evidence', taskId] });
-        await this._memory.save().catch(() => { });
+        await this._saveQualityEvidence(evidence);
       }
       const gate = dodGateForDone(pendingDiffs, contract, evidence, hasCode);
       if (!gate.pass) {
+        await this._storeGateBlockers(task.id, gate.blockers);
         if (task.done) { await this.specManager.updateTaskDone(task, false); }
         this.specManager.setBoardStatus(taskId, 'in-progress');
         this._post({ type: 'chat-chunk', content: `${dodGateMarkdown(gate)}\n\n_La tarea **${task.id}** no se marca done. Resuelve los diffs pendientes, ejecuta \`onboard\` o corrige build/tests según corresponda._` });
+        if (pendingDiffs > 0) {
+          this._post({ type: 'task-work-review', taskId: task.id, title: task.title, files: pendingDiffs });
+        } else {
+          this._post({ type: 'task-work-blocked', taskId: task.id, title: task.title, blockers: gate.blockers });
+        }
         await this._sendSpec();
         logDecision(this.mcpManager, `dod-blocked:${task.id}`, { route: 'spec', lane: 'build', confidence: 1, reasons: gate.blockers, needsConfirm: false, chip: '⛔ DoD gate' }, { checkpoint: 'sdlc:pruebas' }).catch(() => { });
         this._trackDebt(`dod-blocked:${task.id}`).catch(() => { });
         return;
       }
+      await this._storeGateBlockers(taskId, []);
       // Fast path: update cached data and send immediately, write disk in background
       const doneTask = data.tasks.find(t => t.id === taskId);
       if (doneTask) { doneTask.done = true; doneTask.status = 'done'; }
@@ -1001,6 +1110,7 @@ export class MainPanel {
       return;
     }
 
+    if (status === 'in-progress') { await this._storeGateBlockers(taskId, []); }
     this.specManager.setBoardStatus(taskId, status);
 
     // Moving a done or worked task back to in-progress -> uncheck in spec.md
@@ -1197,18 +1307,23 @@ export class MainPanel {
       const hasCode = await this._isCodeProject(fingerprint);
       if (hasCode && pendingDiffs === 0 && contract && isPlatformContractVerified(contract)) {
         evidence = await this._runBuildAndTests(task.id, [], contract.commands);
-        this._memory.set('config', `quality:${task.id}`, JSON.stringify(evidence), { tags: ['quality', 'evidence', task.id] });
-        await this._memory.save().catch(() => { });
+        await this._saveQualityEvidence(evidence);
       }
       const gate = dodGateForDone(pendingDiffs, contract, evidence, hasCode);
       this._post({ type: 'chat-chunk', content: `\n\n${dodGateMarkdown(gate)}` });
       if (!gate.pass) {
+        await this._storeGateBlockers(task.id, gate.blockers);
         this.specManager.setBoardStatus(task.id, 'in-progress');
         await this._sendSpec();
         this._post({ type: 'chat-done', model: provider.modelName });
-        this._post({ type: 'task-work-review', taskId: task.id, title: task.title, files: pendingDiffs });
+        if (pendingDiffs > 0) {
+          this._post({ type: 'task-work-review', taskId: task.id, title: task.title, files: pendingDiffs });
+        } else {
+          this._post({ type: 'task-work-blocked', taskId: task.id, title: task.title, blockers: gate.blockers });
+        }
         return;
       }
+      await this._storeGateBlockers(task.id, []);
       this._memory.set('feature', task.id, `${task.title} — skill: ${skillId}`, { parentKey: task.epicTitle, tags: ['task', 'completed'] });
       await this._memory.save();
       await this.specManager.updateTaskDone(task, true);
@@ -1240,9 +1355,21 @@ export class MainPanel {
     return this._memory.search('pending-diff:').filter(entry => {
       try {
         const pending = JSON.parse(entry.value) as Partial<PendingChange> | null;
-        return !pending || typeof pending.taskId !== 'string' || !pending.taskId || pending.taskId === taskId;
-      } catch { return true; }
+        // Legacy or malformed records cannot safely block every task. Count only
+        // diffs that can be positively attributed to this task.
+        return !!pending && pending.taskId === taskId;
+      } catch { return false; }
     }).length;
+  }
+
+  private async _storeGateBlockers(taskId: string, blockers: string[]): Promise<void> {
+    const key = `dod-blockers:${taskId}`;
+    if (blockers.length) {
+      this._memory.set('config', key, JSON.stringify(blockers), { tags: ['dod', 'blocker', taskId] });
+    } else {
+      this._memory.delete('config', key);
+    }
+    await this._memory.save().catch(() => { });
   }
 
   private async _hasCodeFiles(): Promise<boolean> {
@@ -1570,7 +1697,7 @@ export class MainPanel {
       const rejectedPaths = filePaths.filter(p => toWorkspaceRelative(p, this.workspaceRoot) === null);
       filePaths = [...new Set(filePaths.map(p => toWorkspaceRelative(p, this.workspaceRoot)).filter((p): p is string => p !== null))];
       if (rejectedPaths.length) {
-        this._post({ type: 'chat-chunk', content: `\n🛡️ Rutas fuera del proyecto descartadas: ${rejectedPaths.map(p => `\`${p}\``).join(', ')}` });
+        this._post({ type: 'chat-chunk', content: `\nRutas fuera del proyecto descartadas: ${rejectedPaths.map(p => `\`${p}\``).join(', ')}` });
       }
 
       this._post({ type: 'chat-chunk', content: `${header}\n\n**Plan:**\n${filePaths.length > 0 ? filePaths.join('\n') : '_Sin rutas detectadas_'}` });
@@ -1632,7 +1759,7 @@ export class MainPanel {
           } catch { before = ''; }
           const v = guardWrite(rel);
           if (v.verdict === 'deny') {
-            this._post({ type: 'chat-chunk', content: `\n🛡️ Bloqueado: ${v.reason}` });
+            this._post({ type: 'chat-chunk', content: `\nBloqueado: ${v.reason}` });
             continue;
           }
           const pending: PendingChange = {
@@ -1650,14 +1777,14 @@ export class MainPanel {
           const fd = unifiedDiff(rel, before, content);
           thoughtStream.fileChange(task.id, rel, 'proposed', fd.diff, fd.added, fd.removed);
           const preview = fd.diff.split('\n').slice(0, 25).join('\n');
-          this._post({ type: 'chat-chunk', content: `\n**Diff \`${rel}\` (+${fd.added}/-${fd.removed}) — pendiente**\n\`\`\`diff\n${preview}\n\`\`\`\n_si aplicar_ para escribir · _no_ para descartar · _diff ${rel}_ para ver completo` });
+          this._post({ type: 'chat-chunk', content: `\n**Cambio propuesto en \`${rel}\` (+${fd.added}/-${fd.removed})**\n\`\`\`diff\n${preview}\n\`\`\`\nRevisa el diff en Cambios. Usa **Revisar y aplicar** para ejecutar las comprobaciones o **Descartar cambios** para rechazarlo.` });
         } catch (e) {
           this._post({ type: 'chat-chunk', content: `\n(!)  No se pudo escribir \`${filePath}\`: ${e}` });
         }
       }
 
       if (written.length > 0) {
-        this._post({ type: 'chat-chunk', content: `\n\n**Diffs pendientes (${written.length}) — nada escrito aun:**\n${written.map(f => `- \`${f}\``).join('\n')}\n\n_si aplicar_ escribe todo con checkpoint · revisa cada uno con _diff <ruta>_` });
+        this._post({ type: 'chat-chunk', content: `\n\n**Cambios pendientes (${written.length}); aún no se ha escrito nada:**\n${written.map(f => `- \`${f}\``).join('\n')}\n\nRevísalos en Cambios y usa **Revisar y aplicar** o **Descartar cambios**.` });
 
         // A generated change is not Done. Keep the task in review until the user
         // applies the exact preview and executable quality gates pass.
@@ -2562,6 +2689,8 @@ export class MainPanel {
         orgContext: cfg.get('orgContext', ''),
         // Provider selection
         preferredProvider: cfg.get('preferredProvider', 'auto'),
+        localEngineEnabled: cfg.get('localEngine.enabled', false),
+        localEngineModelId: this.config.localEngine.modelId,
         // Anthropic
         anthropicModel: cfg.get('anthropic.model', DEFAULT_ANTHROPIC_MODEL),
         anthropicBaseUrl: cfg.get('anthropic.baseUrl', 'https://api.anthropic.com/v1'),
@@ -2595,6 +2724,11 @@ export class MainPanel {
     await set('systemPrompt', settings.systemPrompt);
     await set('orgContext', settings.orgContext);
     await set('preferredProvider', settings.preferredProvider);
+    await set('localEngine.enabled', settings.localEngineEnabled);
+    await set('localEngine.modelId', settings.localEngineModelId);
+    if (settings.preferredProvider === 'local-wasm') {
+      await cfg.update('localEngine.enabled', true, g);
+    }
     await set('anthropic.model', settings.anthropicModel);
     await set('anthropic.baseUrl', settings.anthropicBaseUrl);
     await set('openai.model', settings.openaiModel);
@@ -2606,9 +2740,10 @@ export class MainPanel {
     await set('mcp.git.enabled', settings.mcp_git);
     await set('indexing.enabled', settings.indexing);
     await set('specFile', settings.specFile, w);
-    // Re-initialize providers so the new model/endpoint takes effect immediately
+    // Re-initialize providers so the selection, enablement and model take effect immediately.
+    await this.aiManager.initialize();
+    await this._sendModels();
     vscode.window.showInformationMessage('Alpaquitay AI: Settings saved.');
-    this._sendModels().catch(() => {/* panel may be disposed */ });
   }
 
   // -- Utilities --------------------------------------------------------------
@@ -2768,6 +2903,18 @@ main{flex:1;overflow:hidden;position:relative}
 .card-id{font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:2px}
 .card-title{font-size:11px;font-weight:500;line-height:1.35;margin-bottom:2px}
 .card-epic{font-size:10px;color:var(--muted);font-style:italic}
+.card-trace{margin-top:5px;padding-top:4px;border-top:1px solid var(--border);font-size:9px;color:var(--muted-lt);cursor:default}
+.card-trace summary{font-size:9px;color:var(--signal);cursor:pointer;user-select:none}
+.card-trace ul{margin:4px 0 5px;padding-left:16px;line-height:1.45}
+.card-trace li{margin:2px 0;overflow-wrap:anywhere}
+.trace-label{margin-top:5px;color:var(--muted-lt);font-weight:600}
+.trace-muted{margin-top:5px;color:var(--muted);font-style:italic}
+.trace-tag{display:inline-block;margin:3px 3px 0 0;padding:2px 4px;background:var(--bg3);border-radius:3px;font-family:var(--mono)}
+.trace-link{display:inline-block;margin:3px 3px 0 0;padding:2px 5px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--signal);font:9px var(--mono);cursor:pointer}
+.trace-link:hover{border-color:var(--signal);color:var(--text)}
+.trace-evidence{margin-top:3px;font-family:var(--mono);font-size:8px;line-height:1.5}
+.trace-evidence.stale{color:var(--warn)}
+.trace-evidence.unknown{color:var(--muted)}
 .card-working{display:flex;align-items:center;gap:4px;margin-top:3px;font-family:var(--mono);font-size:9px;color:var(--signal)}
 .card-review{margin-top:5px;padding-top:4px;border-top:1px solid rgba(245,158,11,.18);font-family:var(--mono);font-size:9px;color:var(--warn)}
 .board-empty{color:var(--muted);font-size:10px;text-align:center;padding:14px 5px;opacity:.5}
@@ -3146,7 +3293,7 @@ ${HUX_FLOW_HTML}
       <h3>Live changes</h3>
       <div class="changes-actions">
         <button class="btn btn-danger btn-sm" data-harness-command="no" title="Discard every pending change">Discard all</button>
-        <button class="btn btn-p btn-sm" data-harness-command="si aplicar" title="Apply every pending change and run the quality gates">Apply &amp; run gates</button>
+        <button class="btn btn-p btn-sm" data-harness-command="si aplicar" title="Apply every pending change and run the quality gates">Revisar, aplicar y comprobar</button>
         <button class="clear" id="changesClear" title="Clear">Clear</button>
       </div>
     </div>
@@ -3283,7 +3430,7 @@ ${DOCS_HTML}
                 <div class="pending-list" id="pendingList"><div class="empty-evidence">No pending changes. The harness writes only after review.</div></div>
                 <div class="review-actions" id="pendingActions" style="display:none">
                   <button class="btn btn-danger" data-harness-command="no">Discard all</button>
-                  <button class="btn btn-p" data-harness-command="si aplicar">Apply &amp; run gates</button>
+                  <button class="btn btn-p" data-harness-command="si aplicar">Revisar, aplicar y comprobar</button>
                 </div>
               </div>
             </section>
@@ -3338,10 +3485,33 @@ ${DOCS_HTML}
       <div class="settings-section">
         <h4>AI Provider</h4>
         <div class="provider-tabs" id="providerTabs">
+          <button class="ptab" data-p="local-wasm">Alpaquitay AI · Local</button>
           <button class="ptab active" data-p="anthropic">Anthropic</button>
           <button class="ptab" data-p="openai">OpenAI</button>
           <button class="ptab" data-p="ollama">Ollama</button>
           <button class="ptab" data-p="lmstudio">LM Studio</button>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-lbl"><div class="setting-name">Preferred provider</div><div class="setting-desc">Choose which provider Alpaquitay uses by default</div></div>
+          <div class="setting-ctrl"><select class="si si-wide" id="s-preferred-provider">
+            <option value="auto">Automatic (local first)</option>
+            <option value="local-wasm">Alpaquitay AI · Qwen 2.5 (on-device)</option>
+            <option value="ollama">Ollama</option><option value="lmstudio">LM Studio</option>
+            <option value="anthropic">Anthropic</option><option value="openai">OpenAI</option>
+          </select></div>
+        </div>
+
+        <div id="ps-local-wasm" class="ps-section" style="display:none">
+          <div class="setting-note">Alpaquitay AI runs Qwen 2.5 Coder on this device. The model downloads on the first prompt and is cached locally; prompts and answers stay on this machine.</div>
+          <div class="setting-row">
+            <div class="setting-lbl"><div class="setting-name">Enable local model</div><div class="setting-desc">Register Alpaquitay AI as an available provider</div></div>
+            <div class="setting-ctrl"><input id="s-localEngine-enabled" type="checkbox" aria-label="Enable Alpaquitay AI local model"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-lbl"><div class="setting-name">Model</div><div class="setting-desc">Runs with WebGPU when available, otherwise Wasm</div></div>
+            <div class="setting-ctrl"><select class="si si-wide" id="s-localEngine-model"><option value="qwen2.5-coder-1.5b-instruct">Qwen 2.5 Coder · 1.5B</option></select></div>
+          </div>
         </div>
 
         <!-- Anthropic -->
@@ -3498,6 +3668,7 @@ const vscode = acquireVsCodeApi();
 const S = { tab:'studio', messages:[], thinking:false, spec:null, git:null, harness:null, skills:[], models:[], skillPickerOpen:false, settings:null, arch:{ nodes:[], edges:[] } };
 const workingTasks = new Set();
 const reviewTasks = new Set();
+const blockedTasks = new Map();
 vscode.postMessage({ type:'get-models' });
 vscode.postMessage({ type:'load-skills' });
 vscode.postMessage({ type:'load-spec' });
@@ -3530,6 +3701,7 @@ window.addEventListener('message', e => {
     case 'skill-needs-goal':       showSkillGoalForm(msg.skillId); break;
     case 'task-work-started':      onTaskWorkStarted(msg.taskId, msg.title); break;
     case 'task-work-review':       onTaskWorkReview(msg.taskId, msg.title, msg.files); break;
+    case 'task-work-blocked':      onTaskWorkBlocked(msg.taskId, msg.title, msg.blockers); break;
     case 'task-work-done':         onTaskWorkDone(msg.taskId, msg.title); break;
     case 'task-work-error':        onTaskWorkError(msg.taskId, msg.error); break;
     case 'task-correction-needed': showCorrectionForm(msg.taskId, msg.title); break;
@@ -3553,6 +3725,8 @@ function renderModels(models) {
   sel.innerHTML = models.length
     ? models.map(m => \`<option value="\${esc(m.id)}">\${esc(m.label)}\${m.isLocal ? ' [local]' : ''}</option>\`).join('')
     : '<option value="">No provider available</option>';
+  const active = models.find(m => m.active);
+  if (active) { sel.value = active.id; }
 }
 function renderHarness(data) {
   if (!data) return;
@@ -3771,10 +3945,11 @@ function chatError(err) {
   toast('Error: ' + err, 'err'); S.thinking=false; sendBtn.disabled=false;
   vscode.postMessage({ type:'load-harness' });
 }
-function onTaskWorkStarted(taskId, title) { reviewTasks.delete(taskId); workingTasks.add(taskId); renderBoard(); hideEmpty(); addSystemMessage('Starting: ' + title); }
-function onTaskWorkReview(taskId, title, files) { workingTasks.delete(taskId); reviewTasks.add(taskId); renderBoard(); vscode.postMessage({type:'load-harness'}); toast('Review required: ' + title + ' (' + files + ' file' + (files===1?'':'s') + ')','info'); }
-function onTaskWorkDone(taskId, title)    { workingTasks.delete(taskId); reviewTasks.delete(taskId); renderBoard(); toast('Verified: ' + title, 'ok'); }
-function onTaskWorkError(taskId, error)   { workingTasks.delete(taskId); reviewTasks.delete(taskId); renderBoard(); toast('Task error: ' + error, 'err'); }
+function onTaskWorkStarted(taskId, title) { reviewTasks.delete(taskId); blockedTasks.delete(taskId); workingTasks.add(taskId); renderBoard(); hideEmpty(); addSystemMessage('Starting: ' + title); }
+function onTaskWorkReview(taskId, title, files) { workingTasks.delete(taskId); blockedTasks.delete(taskId); reviewTasks.add(taskId); renderBoard(); vscode.postMessage({type:'load-harness'}); toast('Review required: ' + title + ' (' + files + ' file' + (files===1?'':'s') + ')','info'); }
+function onTaskWorkBlocked(taskId, title, blockers) { workingTasks.delete(taskId); reviewTasks.delete(taskId); blockedTasks.set(taskId, blockers || []); renderBoard(); toast('DoD gate blocked: ' + title + (blockers && blockers.length ? ' · ' + blockers[0] : ''), 'info'); }
+function onTaskWorkDone(taskId, title)    { workingTasks.delete(taskId); reviewTasks.delete(taskId); blockedTasks.delete(taskId); renderBoard(); toast('Verified: ' + title, 'ok'); }
+function onTaskWorkError(taskId, error)   { workingTasks.delete(taskId); reviewTasks.delete(taskId); blockedTasks.delete(taskId); renderBoard(); toast('Task error: ' + error, 'err'); }
 function showCorrectionForm(taskId, title) {
   hideEmpty();
   const div = document.createElement('div'); div.className = 'msg correction-msg';
@@ -3994,6 +4169,13 @@ function renderSpec() {
 }
 (function initBoardDrag() {
   document.querySelectorAll('.board-cols').forEach(board => {
+    board.addEventListener('change', e => {
+      const move = e.target.closest('[data-task-status]'); if(!move)return;
+      const taskId = move.dataset.taskId; const status = move.value;
+      if(!taskId || !['backlog','todo','in-progress','done'].includes(status))return;
+      vscode.postMessage({ type:'update-task-status', taskId, status });
+      move.value = '';
+    });
     board.addEventListener('dragstart', e => { const c=e.target.closest('.card'); if(!c)return; window._dragId=c.dataset.id; c.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
     board.addEventListener('dragend',   e => { const c=e.target.closest('.card'); if(c) c.classList.remove('dragging'); });
     board.addEventListener('dragover',  e => {
@@ -4022,17 +4204,35 @@ function renderBoard() {
     const tasks=S.spec.tasks.filter(t=>t.status===st);
     document.getElementById('bdg-'+st).textContent=tasks.length;
     col.innerHTML = tasks.length ? tasks.map(t => {
-      const w=workingTasks.has(t.id), r=reviewTasks.has(t.id);
+      const w=workingTasks.has(t.id), r=reviewTasks.has(t.id), b=blockedTasks.has(t.id)||(t.gateBlockers||[]).length>0;
       return \`<div class="card\${w?' working':''}\${r?' review-required':''}" draggable="true" data-id="\${esc(t.id)}">
         <div class="card-id">\${esc(t.id)}</div>
         <div class="card-title">\${esc(t.title)}</div>
         <div class="card-epic">\${esc(t.epicTitle)}</div>
+        <details class="card-trace"><summary>Traceability · \${(t.acceptanceCriteria||[]).length} criteria · \${(t.adrs||[]).length} ADR</summary>
+          \${(t.acceptanceCriteria||[]).length ? '<div class="trace-label">Acceptance criteria</div><ul>'+t.acceptanceCriteria.map(c=>'<li>'+esc(c)+'</li>').join('')+'</ul>' : '<div class="trace-muted">No nested acceptance criteria found in spec.</div>'}
+          \${(t.adrs||[]).length ? '<div class="trace-label">Architecture decisions</div><div>'+t.adrs.map(a=>{ const link=(t.adrLinks||[]).find(x=>x.id===a); return link ? '<button class="trace-link" type="button" data-open-adr="'+esc(link.path)+'">'+esc(a)+' ↗</button>' : '<span class="trace-tag" title="ADR file not found in workspace">'+esc(a)+'</span>'; }).join('')+'</div>' : ''}
+          \${t.qualityEvidence ? '<div class="trace-label">'+(t.qualityEvidence.freshness==='stale'?'QA evidence · stale':t.qualityEvidence.freshness==='unknown'?'QA evidence · freshness unknown':'Latest QA evidence')+'</div><div class="trace-evidence '+esc(t.qualityEvidence.freshness)+'">Build: '+esc(t.qualityEvidence.build)+' · Tests: '+esc(t.qualityEvidence.tests)+'<br>'+esc(new Date(t.qualityEvidence.recordedAt).toLocaleString())+'</div>' : '<div class="trace-muted">No QA evidence recorded for this task.</div>'}
+        </details>
         \${w ? '<div class="card-working"><div class="thinking"><span></span><span></span><span></span></div> working...</div>' : ''}
         \${r ? '<div class="card-review">Review required · apply diff</div><div class="card-actions"><button class="hux-card-btn" type="button" data-review-task="1">Review changes</button></div>' : ''}
-        \${(!w && !r && st!=='done') ? '<div class="card-actions"><button class="hux-card-btn primary" type="button" data-start-task="'+esc(t.id)+'">'+(st==='in-progress'?'Resume':'Start')+'</button></div>' : ''}
+        \${b ? '<div class="card-review">DoD blocked · no pending files</div><div class="trace-muted">'+esc((blockedTasks.get(t.id)||t.gateBlockers||[])[0]||'Review the DoD evidence.')+'</div><div class="card-actions"><button class="hux-card-btn" type="button" data-resolve-task="1">Resolve gate</button></div>' : ''}
+        \${(!w && !r && !b && st!=='done') ? '<div class="card-actions"><button class="hux-card-btn primary" type="button" data-start-task="'+esc(t.id)+'">'+(st==='in-progress'?'Resume':'Start')+'</button></div>' : ''}
+        <label class="sr-only" for="move-\${esc(t.id)}">Move \${esc(t.title)}</label>
+        <select class="card-move-select" id="move-\${esc(t.id)}" data-task-status data-task-id="\${esc(t.id)}" aria-label="Move \${esc(t.title)} to another lane">
+          <option value="" selected>Move to…</option>
+          <option value="backlog">Backlog</option><option value="todo">Todo</option>
+          <option value="in-progress">In Progress</option><option value="done">Done</option>
+        </select>
       </div>\`;
     }).join('') : '<div class="board-empty">No tasks</div>';
   });
+  document.querySelectorAll('[data-resolve-task]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation(); const id=btn.closest('.card')?.dataset.id; const task=(S.spec?.tasks||[]).find(t=>t.id===id); const blockers=blockedTasks.get(id)||task?.gateBlockers||[]; switchTab('studio'); chatInput.value='Help me resolve the DoD gate for '+id+'. Blocker: '+(blockers[0]||'unknown')+'. Give the precise next action and preserve review and quality gates.'; chatInput.focus();
+  }));
+  document.querySelectorAll('[data-open-adr]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation(); vscode.postMessage({ type:'open-adr', path:btn.dataset.openAdr });
+  }));
 }
 document.getElementById('refreshGitBtn').addEventListener('click', () => { S.git=null; vscode.postMessage({ type:'load-git' }); });
 function renderGit() {
@@ -4095,7 +4295,7 @@ function showSkillResult(msg) {
 }
 // -- Provider tabs -----------------------------------------------------------
 (function(){
-  const PROVIDERS=['anthropic','openai','ollama','lmstudio'];
+  const PROVIDERS=['local-wasm','anthropic','openai','ollama','lmstudio'];
   function switchProvider(p){
     document.querySelectorAll('.ptab').forEach(b=>b.classList.toggle('active',b.dataset.p===p));
     PROVIDERS.forEach(id=>{ const el=document.getElementById('ps-'+id); if(el) el.style.display=id===p?'':'none'; });
@@ -4137,6 +4337,9 @@ function renderSettings(cfg){
   setVal('s-systemPrompt',  cfg.systemPrompt??'');
   setVal('s-orgContext',     cfg.orgContext??'');
   setVal('s-specFile',      cfg.specFile??'spec.md');
+  setSel('s-preferred-provider', cfg.preferredProvider??'auto');
+  setChk('s-localEngine-enabled', cfg.localEngineEnabled??false);
+  setSel('s-localEngine-model', cfg.localEngineModelId??'qwen2.5-coder-1.5b-instruct');
   setChk('s-mcp-filesystem',cfg.mcp_filesystem??true);
   setChk('s-mcp-git',       cfg.mcp_git??true);
   document.getElementById('s-temperature-val').textContent=parseFloat(cfg.temperature??0.3).toFixed(2);
@@ -4178,6 +4381,9 @@ document.getElementById('s-save').addEventListener('click',()=>{
     systemPrompt:      v('s-systemPrompt'),
     orgContext:        v('s-orgContext'),
     specFile:          v('s-specFile')||'spec.md',
+    preferredProvider: v('s-preferred-provider')||'auto',
+    localEngineEnabled:g('s-localEngine-enabled')?.checked??false,
+    localEngineModelId:v('s-localEngine-model')||'qwen2.5-coder-1.5b-instruct',
     mcp_filesystem:    g('s-mcp-filesystem')?.checked??true,
     mcp_git:           g('s-mcp-git')?.checked??true,
     anthropicModel:    v('s-anthropic-model'),

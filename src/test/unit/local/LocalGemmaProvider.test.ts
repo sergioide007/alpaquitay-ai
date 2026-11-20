@@ -1,4 +1,4 @@
-import { LocalGemmaProvider } from '../../../local/LocalGemmaProvider';
+import { LocalGemmaProvider, LocalProgressRunner } from '../../../local/LocalGemmaProvider';
 import type { LocalEngineApi } from '../../../local/LocalEngineHost';
 import { AIProviderManager } from '../../../providers/AIProviderManager';
 import { isLocalAIProvider, PrivacyBoundaryProvider } from '../../../providers/PrivacyBoundaryProvider';
@@ -22,17 +22,35 @@ describe('LocalGemmaProvider', () => {
   it('chat forwards messages (system prompt first) and maps the response', async () => {
     const engine = fakeEngine();
     const p = new LocalGemmaProvider(engine, () => settings());
-    const res = await p.chat([{ role: 'user', content: 'hola' }], { systemPrompt: 'Sé breve', maxTokens: 256, temperature: 0.1 });
+    const onProgress = jest.fn();
+    const res = await p.chat([{ role: 'user', content: 'hola' }], { systemPrompt: 'Sé breve', maxTokens: 256, temperature: 0.1, onProgress });
     expect(engine.generate).toHaveBeenCalledWith(settings(), {
       messages: [{ role: 'system', content: 'Sé breve' }, { role: 'user', content: 'hola' }],
       maxNewTokens: 256, temperature: 0.1,
-    });
+    }, onProgress);
     expect(res).toMatchObject({ content: 'respuesta local', model: 'gemma-4-e2b-it' });
     expect(res.usage.completionTokens).toBe(12);
   });
 
   it('complete returns the text', async () => {
     expect(await new LocalGemmaProvider(fakeEngine(), () => settings()).complete('x')).toBe('respuesta local');
+  });
+
+  it('uses the shared progress surface for calls without a caller progress callback', async () => {
+    const engine = fakeEngine();
+    let progressCallback: ((stage: string, pct: number) => void) | undefined;
+    const runWithProgress = jest.fn(async (_model: string, run: (onProgress: (stage: string, pct: number) => void) => Promise<unknown>) => {
+      const onProgress = jest.fn();
+      progressCallback = onProgress;
+      return run(onProgress);
+    }) as unknown as jest.Mock & LocalProgressRunner;
+    const p = new LocalGemmaProvider(engine, () => settings(), runWithProgress);
+
+    await p.complete('genera una función');
+
+    expect(runWithProgress).toHaveBeenCalledWith('gemma-4-e2b-it', expect.any(Function));
+    expect(engine.generate).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.any(Function));
+    expect(progressCallback).toBeDefined();
   });
 
   it('is treated as local by the privacy boundary (never wrapped as cloud)', () => {

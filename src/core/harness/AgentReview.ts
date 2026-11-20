@@ -40,11 +40,10 @@ export function reviewDiff(relPath: string, before: string, after: string, sourc
   return { pass: !findings.some(f => f.level === 'block'), findings };
 }
 export function reviewMarkdown(relPath: string, r: ReviewReport): string {
-  const icon = r.pass ? '✅' : '⛔';
-  const lines = [`> ${icon} **Review \`${relPath}\`** (agente, pre-apply)`];
+  const lines = [`> **Revisión ${r.pass ? 'aprobada' : 'bloqueada'}: \`${relPath}\`** (antes de aplicar)`];
   for (const f of r.findings) {
-    const i = f.level === 'block' ? '⛔' : f.level === 'warn' ? '⚠️' : '✅';
-    lines.push(`> ${i} ${f.rule}: ${f.detail}`);
+    const level = f.level === 'block' ? 'Bloqueo' : f.level === 'warn' ? 'Aviso' : 'Correcto';
+    lines.push(`> ${level} · ${f.rule}: ${f.detail}`);
   }
   return lines.join('\n');
 }

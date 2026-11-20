@@ -2,7 +2,7 @@
   "name": "alpaquitay-ai",
   "displayName": "Alpaquitay AI",
   "description": "Astra-style AI harness for VS Code: SDLC gates, DORA metrics, debt tracking, diff-first writes, specialist routing, and a Docs agent for Word, Markdown, EPUB and PDF. Privacy-first, GDPR/CCPA compliant.",
-  "version": "3.8.1",
+  "version": "3.8.2",
   "publisher": "alpaquitay-ai",
   "icon": "resources/icon.png",
   "galleryBanner": {

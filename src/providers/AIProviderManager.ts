@@ -27,7 +27,7 @@ export class AIProviderManager {
   // ── Hybrid integration hooks ──────────────────────────────────────────────
   /** When set, LLM calls are routed through this integration instead of the core provider */
   private hybridLLM: ILLMIntegration | null = null;
-  /** Webview-backed Gemma engine; when set, the opt-in 'local-wasm' provider is registered. */
+  /** Webview-backed local engine; when set, the opt-in 'local-wasm' provider is registered. */
   private localEngine: LocalEngineApi | null = null;
   /** When set, every LLM call is automatically traced */
   private tracer: IObservabilityIntegration | null = null;
@@ -63,7 +63,21 @@ export class AIProviderManager {
     this.registerProvider(lmstudio, isLoopbackAIEndpoint(cfg.lmstudioEndpoint) ? 'local' : 'cloud');
 
     if (this.localEngine) {
-      this.registerProvider(new LocalGemmaProvider(this.localEngine, () => this.config.localEngine), 'local');
+      this.registerProvider(new LocalGemmaProvider(this.localEngine, () => this.config.localEngine, async (modelName, run) =>
+        vscode.window.withProgress({
+          location: vscode.ProgressLocation.Notification,
+          title: `Alpaquitay AI · ${modelName}`,
+          cancellable: false,
+        }, progress => {
+          let last = 0;
+          return run((stage, percentage) => {
+            const reported = Number.isFinite(percentage) ? Math.max(0, Math.min(100, percentage)) : last;
+            const current = Math.max(last, reported);
+            progress.report({ message: `${stage.slice(0, 80)} · ${current}%`, increment: current - last });
+            last = current;
+          });
+        })
+      ), 'local');
     }
 
     const anthropicKey = await this.secrets.getApiKey('anthropic');

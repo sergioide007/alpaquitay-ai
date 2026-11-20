@@ -115,7 +115,8 @@ export class LocalEngineHost implements LocalEngineApi, vscode.Disposable {
 
     const panel = vscode.window.createWebviewPanel(
       'alpaquitayLocalEngine', 'Alpaquitay · Motor local',
-      { viewColumn: vscode.ViewColumn.Beside, preserveFocus: true },
+      // Keep the Hub at full width while the model downloads in a background tab.
+      { viewColumn: vscode.ViewColumn.Active, preserveFocus: true },
       { enableScripts: true, retainContextWhenHidden: true, localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, 'dist')] },
     );
     this.panel = panel;

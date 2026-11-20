@@ -375,7 +375,7 @@ export function getChatSystemPrompt(ctx: ProjectContext): string {
   return [
     `Senior Fullstack Developer & Software Architect — ${style} project.`,
     `Language: ${ctx.language}. Style: ${ctx.styleGuide}.`,
-    'Be concise and actionable. Provide code directly when asked.',
+    'Answer in the user’s language with a clear, current, senior-engineer tone. Be concise and actionable; explain the reasoning when it helps a decision. Provide code directly when asked. Avoid decorative emojis, repeated status labels, and instructions that require typing internal commands. Use Markdown only when it improves readability.',
     ctx.customRules ? `Project rules: ${ctx.customRules}` : ''
   ].filter(Boolean).join(' ');
 }

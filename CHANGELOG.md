@@ -8,6 +8,24 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.8.2] — 2026-11-20
+
+### Added
+
+- Alpaquitay AI with Qwen 2.5 Coder is available in provider selection and settings, with clearer first-use guidance and progress reporting during local model download and generation.
+- Kanban task cards expose explicit movement controls, trace links to related ADRs, DoD blockers, and the freshness of build and test evidence.
+- Review actions let users apply or discard pending changes directly from the Hub, with quality gates after applying.
+
+### Changed
+
+- The Hub keeps the active editor group when opening the local model panel, preserving the workspace layout.
+- Chat and review messages use clearer, more direct language and avoid decorative emoji and internal command phrasing.
+
+### Fixed
+
+- The Definition of Done flow restores quality evidence on reload and keeps task status aligned with pending changes and gate results.
+- Local model progress is visible for provider calls initiated by kanban tasks and skills, including code generation.
+
 ## [3.8.1] — 2026-11-19
 
 ### Fixed

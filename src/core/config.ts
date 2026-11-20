@@ -31,7 +31,7 @@ export class AlpaquitayConfig {
   // ── LM Studio ─────────────────────────────────────────────────────────────
   get lmstudioEndpoint(): string { return this.cfg.get<string>('lmstudio.endpoint', 'http://localhost:1234'); }
 
-  // ── Local engine (Gemma ONNX in WebGPU/Wasm, weights from the static CDN) ──
+  // ── Local engine (Qwen 2.5 Coder ONNX in WebGPU/Wasm, weights from the static CDN) ──
   get localEngine(): LocalEngineSettings {
     return {
       enabled: this.cfg.get<boolean>('localEngine.enabled', false),

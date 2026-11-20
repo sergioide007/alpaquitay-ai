@@ -81,6 +81,10 @@ describe('LocalEngineHost', () => {
     await flush();
     expect(srv.calls).toHaveLength(2);                                   // manifest.json + manifest.sig.json
     expect((vscode.window.createWebviewPanel as jest.Mock).mock.calls[0][0]).toBe('alpaquitayLocalEngine');
+    expect((vscode.window.createWebviewPanel as jest.Mock).mock.calls[0][2]).toMatchObject({
+      viewColumn: vscode.ViewColumn.Active,
+      preserveFocus: true,
+    });
     expect((fake.panel as { webview: { html: string } }).webview.html).toContain('dist/engine-webview.js');
 
     fake.emit({ type: 'ready' });
