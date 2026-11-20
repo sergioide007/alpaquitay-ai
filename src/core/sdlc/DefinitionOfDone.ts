@@ -12,7 +12,7 @@ export function dodGateForDone(
   const checklist: string[] = [];
   const blockers: string[] = [];
   if (pendingDiffs > 0) {
-    blockers.push(`${pendingDiffs} diff(s) sin aplicar — \`si aplicar\` o \`no\` primero`);
+    blockers.push(`${pendingDiffs} cambio(s) sin aplicar: revísalos y aplícalos o descártalos antes de completar la tarea`);
   } else { checklist.push('sin diffs pendientes'); }
   if (contract && isPlatformContractVerified(contract)) {
     checklist.push(`golden path conocido: \`${contract.commands.build}\` + \`${contract.commands.test}\``);
@@ -39,9 +39,8 @@ export function dodGateForDone(
   return { pass: blockers.length === 0, blockers, checklist };
 }
 export function dodGateMarkdown(g: DodGate): string {
-  const icon = g.pass ? '✅' : '⛔';
-  const lines = [`> ${icon} **DoD gate ${g.pass ? 'pasado' : 'bloqueado'}**`];
-  for (const c of g.checklist) { lines.push(`> - ✅ ${c}`); }
-  for (const b of g.blockers) { lines.push(`> - ⛔ ${b}`); }
+  const lines = [`> **DoD ${g.pass ? 'completo' : 'pendiente'}**`];
+  for (const c of g.checklist) { lines.push(`> - ${c}`); }
+  for (const b of g.blockers) { lines.push(`> - Pendiente: ${b}`); }
   return lines.join('\n');
 }

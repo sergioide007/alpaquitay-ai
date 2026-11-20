@@ -101,6 +101,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     vscode.commands.registerCommand('alpaquitay-ai.configureProvider', async () => {
       const provider = await vscode.window.showQuickPick([
+        { label: '$(device-desktop) Alpaquitay AI · Qwen 2.5 Coder (local)', id: 'local-wasm', isLocal: true },
         { label: '$(desktop-download) LM Studio (local)', id: 'lmstudio', isLocal: true },
         { label: '$(desktop-download) Ollama (local)', id: 'ollama', isLocal: true },
         { label: '$(cloud) Anthropic Claude', id: 'anthropic', isLocal: false },
@@ -108,6 +109,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       ], { placeHolder: 'Seleccionar proveedor AI' });
       if (!provider) { return; }
       if (provider.isLocal) {
+        if (provider.id === 'local-wasm') {
+          await vscode.workspace.getConfiguration('alpaquitay-ai').update(
+            'localEngine.enabled', true, vscode.ConfigurationTarget.Global
+          );
+        }
         await vscode.workspace.getConfiguration('alpaquitay-ai').update(
           'preferredProvider', provider.id, vscode.ConfigurationTarget.Global
         );

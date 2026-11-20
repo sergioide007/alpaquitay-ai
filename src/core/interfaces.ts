@@ -25,6 +25,7 @@ export interface ChatOptions {
   maxTokens?: number;
   temperature?: number;
   systemPrompt?: string;
+  onProgress?: (stage: string, percentage: number) => void;
 }
 
 export interface MCPTool {
@@ -96,6 +97,11 @@ export interface SpecTask {
   done: boolean;
   status: TaskStatus;
   lineIndex: number;
+  acceptanceCriteria?: string[];
+  adrs?: string[];
+  adrLinks?: Array<{ id: string; path: string }>;
+  gateBlockers?: string[];
+  qualityEvidence?: { build: string; tests: string; recordedAt: string; freshness: 'current' | 'stale' | 'unknown' };
 }
 
 export interface SpecCandidate {
@@ -139,6 +145,7 @@ export interface ModelOption {
   label: string;
   provider: ProviderType;
   isLocal: boolean;
+  active?: boolean;
 }
 
 // ── Webview ↔ Extension messages ─────────────────────────────────────────────
@@ -185,6 +192,7 @@ export type WebviewMessage =
   | { type: 'docs-export'; format: 'md' | 'docx' | 'epub' }
   | { type: 'chat'; text: string; modelId: string }
   | { type: 'load-spec' }
+  | { type: 'open-adr'; path: string }
   | { type: 'update-task-status'; taskId: string; status: TaskStatus }
   | { type: 'load-git' }
   | { type: 'load-harness' }
@@ -230,6 +238,7 @@ export type ExtensionMessage =
   | { type: 'skill-needs-goal'; skillId: string }
   | { type: 'task-work-started'; taskId: string; title: string }
   | { type: 'task-work-review'; taskId: string; title: string; files: number }
+  | { type: 'task-work-blocked'; taskId: string; title: string; blockers: string[] }
   | { type: 'task-work-done'; taskId: string; title: string }
   | { type: 'task-work-error'; taskId: string; error: string }
   | { type: 'task-correction-needed'; taskId: string; title: string }

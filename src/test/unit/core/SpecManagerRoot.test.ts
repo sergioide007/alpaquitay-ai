@@ -48,6 +48,29 @@ describe('SpecManager fail-safe (sin carpeta escribible)', () => {
     }
   });
 
+  it('extracts task acceptance criteria and linked ADRs without consuming the next task', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'alpaquitay-trace-'));
+    try {
+      const sm = new SpecManager(dir, config);
+      await sm.create([
+        '## Epic: Checkout',
+        '- [ ] Apply discount',
+        '  - [ ] Reject expired codes',
+        '  - Customer sees the final price',
+        '  - Decision: ADR-012',
+        '- [ ] Confirm payment',
+        '  - [ ] Show receipt',
+      ].join('\n'));
+      const tasks = (await sm.load()).tasks;
+      expect(tasks[0].acceptanceCriteria).toEqual(['Reject expired codes', 'Customer sees the final price']);
+      expect(tasks[0].adrs).toEqual(['ADR-012']);
+      expect(tasks[1].acceptanceCriteria).toEqual(['Show receipt']);
+      expect(tasks[1].adrs).toEqual([]);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it('Given raiz invalida, Then discover() no escanea nada', async () => {
     expect(await new SpecManager('/', config).discover()).toEqual([]);
   });

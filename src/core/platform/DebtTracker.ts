@@ -25,8 +25,8 @@ export function applyDelta(state: DebtState, reason: string): DebtState {
 }
 export function debtMarkdown(s: DebtState): string {
   const bar = '█'.repeat(Math.round((s.score / s.ceiling) * 10)) + '░'.repeat(Math.max(0, 10 - Math.round((s.score / s.ceiling) * 10)));
-  const status = s.score >= s.ceiling ? '⛔ TECHO ROTO — paga deuda antes de Build' : s.score >= s.ceiling * 0.7 ? '⚠️ alta — revisa antes de seguir' : '✅ sana';
-  return [`> 🧾 Deuda agentica: **${s.score}/${s.ceiling}** ${status}`, `> \`${bar}\``, `> _Paga con: onboard, si aplicar, dones verificados._`].join('\n');
+  const status = s.score >= s.ceiling ? 'TECHO SUPERADO — paga deuda antes de Build' : s.score >= s.ceiling * 0.7 ? 'Alta — revisa antes de seguir' : 'Sana';
+  return [`> Deuda agéntica: **${s.score}/${s.ceiling}** · ${status}`, `> \`${bar}\``, '> Págala con onboard, revisión de cambios y DoD verificado.'].join('\n');
 }
 export const DEBT_FILE = FILE;
 export const DEBT_CEILING = CEILING;

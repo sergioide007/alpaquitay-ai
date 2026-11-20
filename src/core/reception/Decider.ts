@@ -22,15 +22,15 @@ export function decide(text: string, fp: WorkspaceFingerprint | null): Decision 
   const t = text.toLowerCase();
   const reasons: string[] = [];
   if (fp) { reasons.push(`stack:${fp.frameworks[0] ?? 'desconocido'}|src:${fp.sourceDirs.join(',') || '.'}`); }
-  if (OPS_RE.test(t)) { return { route: 'specialist', lane: 'deep', confidence: 0.85, reasons: ['ops/infra -> especialista'], needsConfirm: true, chip: '🧠 Deep · specialist' }; }
-  if (SPEC_RE.test(t)) { return { route: 'spec', lane: 'build', confidence: 0.88, reasons: ['menciona spec/kanban'], needsConfirm: false, chip: '🔨 Build · spec' }; }
-  if (IDEATE_RE.test(t)) { return { route: 'ideate', lane: 'flash', confidence: 0.8, reasons: ['idea desordenada -> inbox'], needsConfirm: false, chip: '⚡ Flash · ideate' }; }
+  if (OPS_RE.test(t)) { return { route: 'specialist', lane: 'deep', confidence: 0.85, reasons: ['ops/infra -> especialista'], needsConfirm: true, chip: 'Deep · specialist' }; }
+  if (SPEC_RE.test(t)) { return { route: 'spec', lane: 'build', confidence: 0.88, reasons: ['menciona spec/kanban'], needsConfirm: false, chip: 'Build · spec' }; }
+  if (IDEATE_RE.test(t)) { return { route: 'ideate', lane: 'flash', confidence: 0.8, reasons: ['idea desordenada -> inbox'], needsConfirm: false, chip: 'Flash · ideate' }; }
   if (CODE_RE.test(t)) {
     const conf = /hola|gracias/.test(t) ? 0.55 : 0.78;
-    return { route: 'code', lane: 'build', confidence: conf, reasons: ['verbo de codigo detectado'], needsConfirm: conf < 0.75, chip: '🔨 Build · code' };
+    return { route: 'code', lane: 'build', confidence: conf, reasons: ['verbo de codigo detectado'], needsConfirm: conf < 0.75, chip: 'Build · code' };
   }
   if (CHAT_RE.test(t) || text.trim().split(/\s+/).length <= 12) {
-    return { route: 'chat', lane: 'flash', confidence: 0.82, reasons: ['pregunta corta/general'], needsConfirm: false, chip: '⚡ Flash · chat' };
+    return { route: 'chat', lane: 'flash', confidence: 0.82, reasons: ['pregunta corta/general'], needsConfirm: false, chip: 'Flash · chat' };
   }
-  return { route: 'chat', lane: 'flash', confidence: 0.6, reasons: ['ambiguo -> aclarar'], needsConfirm: true, chip: '⚡ Flash · aclarar' };
+  return { route: 'chat', lane: 'flash', confidence: 0.6, reasons: ['ambiguo -> aclarar'], needsConfirm: true, chip: 'Flash · aclarar' };
 }

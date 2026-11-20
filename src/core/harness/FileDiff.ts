@@ -33,5 +33,5 @@ export function unifiedDiff(relPath: string, before: string, after: string, ctx 
 }
 export function diffMarkdown(d: FileDiff): string {
   const tag = d.isNew ? 'nuevo' : `+${d.added}/-${d.removed}`;
-  return [`**Diff \`${d.path}\` (${tag}) — sin aplicar aun**`, '', '```diff', d.diff.slice(0, 3000), '```', '', '_Responde `si aplicar` para escribir con checkpoint, o `no` para descartar._'].join('\n');
+  return [`**Cambio propuesto en \`${d.path}\` (${tag})**`, '', '```diff', d.diff.slice(0, 3000), '```', '', 'Revisa el cambio en la pestaña Cambios. Usa **Revisar y aplicar** para escribirlo y ejecutar las comprobaciones, o **Descartar cambios** para rechazarlo.'].join('\n');
 }
