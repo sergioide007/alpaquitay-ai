@@ -149,7 +149,7 @@ The harness detects the SDLC phase from the request and only lets it advance whe
 
 ## Core SDD Workflow
 
-![SDD workflow — move a task from Backlog to Todo and In Progress, review its diffs, apply and verify the DoD before Done](https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/media/demo-sdd.gif)
+![Kanban task running in In Progress; the DoD gate keeps it there when the sample build fails](https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/media/demo-sdd.gif)
 
 ```
   spec.md ──► Kanban Board ──► AI implements task ──► spec.md [x] ──► git #SPEC-XXX
