@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { DEFAULT_CDN_BASE, DEFAULT_LOCAL_MODEL_ID } from '../local/cdnPolicy';
+import { DEFAULT_CDN_BASE, DEFAULT_LOCAL_MODEL_ID, resolveLocalModelId } from '../local/cdnPolicy';
 import { DEFAULT_ANTHROPIC_MODEL, DEFAULT_OPENAI_MODEL } from './ModelCatalog';
 import type { DtypeSetting, EngineDevice, LocalEngineSettings } from '../local/protocol';
 
@@ -33,10 +33,12 @@ export class AlpaquitayConfig {
 
   // ── Local engine (Qwen 2.5 Coder ONNX in WebGPU/Wasm, weights from the static CDN) ──
   get localEngine(): LocalEngineSettings {
+    const cdnBase = this.cfg.get<string>('localEngine.cdnBaseUrl', DEFAULT_CDN_BASE);
     return {
       enabled: this.cfg.get<boolean>('localEngine.enabled', false),
-      cdnBase: this.cfg.get<string>('localEngine.cdnBaseUrl', DEFAULT_CDN_BASE),
-      modelId: this.cfg.get<string>('localEngine.modelId', DEFAULT_LOCAL_MODEL_ID),
+      cdnBase,
+      // One source of truth for the engine, the Hub selector and the Settings tab (see resolveLocalModelId).
+      modelId: resolveLocalModelId(this.cfg.get<string>('localEngine.modelId', DEFAULT_LOCAL_MODEL_ID), cdnBase),
       device: this.cfg.get<EngineDevice>('localEngine.device', 'auto'),
       dtype: this.cfg.get<DtypeSetting>('localEngine.dtype', 'auto'),
       maxNewTokens: this.cfg.get<number>('localEngine.maxNewTokens', 1024),

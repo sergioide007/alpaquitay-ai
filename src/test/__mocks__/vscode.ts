@@ -121,7 +121,8 @@ export const workspace = {
     update: jest.fn().mockResolvedValue(undefined)
   })),
   workspaceFolders: undefined as unknown,
-  onDidSaveTextDocument: jest.fn(() => ({ dispose: jest.fn() }))
+  onDidSaveTextDocument: jest.fn(() => ({ dispose: jest.fn() })),
+  onDidChangeConfiguration: jest.fn(() => ({ dispose: jest.fn() }))
 };
 
 export const commands = {
