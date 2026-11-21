@@ -37,7 +37,7 @@ El arnés decide con reglas legibles, no con otro modelo. Algunos ejemplos de lo
 | «prepara el pipeline de despliegue en AWS» | Deep · specialist | operaciones o infraestructura |
 
 > [!WARNING]
-> Confirmar con `si` una petición de código escrita en el chat (*«implementa el endpoint de reservas»*) **genera un `spec.md` nuevo a partir de esa petición y reemplaza el actual**. Antes guarda un *checkpoint* en Git, así que puedes recuperarlo, pero si ya tienes una especificación que quieres conservar, añade la tarea al tablero y arrástrala a *In Progress* en lugar de pedirla en el chat.
+> Confirmar con `si` una petición de código escrita en el chat (*«implementa el endpoint de reservas»*) **genera un `spec.md` nuevo a partir de esa petición y reemplaza el actual**. Antes guarda un *checkpoint* en Git, así que puedes recuperarlo, pero si ya tienes una especificación que quieres conservar, añade la tarea al tablero, muévela de *Backlog* a *Todo* y luego iníciala en *In Progress*.
 
 Cuando la confianza es baja o la ruta es Deep, el arnés **propone la ruta y espera**: contesta `si` (o `sí`, `dale`, `ok`, `confirmo`) para seguir. Cada respuesta muestra una línea legible con el carril, el *stack*, la fase, la compuerta y la economía de la sesión.
 
