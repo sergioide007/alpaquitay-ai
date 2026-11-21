@@ -11,7 +11,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
-[![Version](https://img.shields.io/badge/version-3.8.2-green)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.8.3-green)](./CHANGELOG.md)
 [![Tests](https://img.shields.io/badge/tests-737%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
