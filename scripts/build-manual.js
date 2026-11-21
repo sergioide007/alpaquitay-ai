@@ -260,7 +260,7 @@ ${alternates}
 <a class="skip" href="#contenido">${t.skip}</a>
 <header class="top">
   <button class="icon-btn menu" id="menuBtn" aria-label="${t.openIndex}" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="${t.home}"><span class="brand-mark">▲</span><span>Alpaquitay AI</span></a>
+  <a class="brand" href="/" aria-label="${t.home}"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
   <a class="crumb" href="${toLangRoot || './'}">${t.crumb}</a>
   <button class="search-btn" id="searchBtn" aria-label="${t.searchAria}"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>${t.search}</span><kbd>Ctrl K</kbd></button>
   <a class="lang" href="${otherHref}" hreflang="${other.code}" lang="${other.code}" aria-label="${t.otherAria}">${other.code.toUpperCase()}</a>

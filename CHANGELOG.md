@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.8.3] — 2026-11-21
+
+### Changed
+- New brand identity: the Alpaquitay alpaca (fleece topknot, coding goggles, `< >` brackets, gold verification seal) on a neon-blue tile. One master image drives every format: Marketplace icon, favicon set, Apple touch icon, Android and maskable icons, logo lockups and the social card.
+- Small-size favicon uses a face-only crop so the mark stays recognizable at 32–48 px; maskable 512 px icon keeps the face inside the Android safe zone.
+- Logo lockups with outlined text (no font dependency) in dark and light variants; real `alpaquitay-social.png` (1200×630) for Open Graph / Twitter cards.
+- Manual header uses the brand mark instead of a text triangle; web manifest and gallery banner aligned to the new palette.
+- `verify-marketplace` validates that the icon is a square PNG of at least 128×128 instead of requiring more than 100 KB.
+
 ## [3.8.2] — 2026-11-20
 
 ### Added

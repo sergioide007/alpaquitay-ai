@@ -41,9 +41,12 @@ check('HARNESS.md', fs.existsSync(path.join(root, 'HARNESS.md')));
 console.log('\n🖼️  Icono:');
 const iconPath = path.join(root, 'resources/icon.png');
 if (fs.existsSync(iconPath)) {
-  const stats = fs.statSync(iconPath);
+  const buf = fs.readFileSync(iconPath);
+  const isPng = buf.length > 24 && buf.toString('ascii', 1, 4) === 'PNG';
+  const w = isPng ? buf.readUInt32BE(16) : 0;
+  const h = isPng ? buf.readUInt32BE(20) : 0;
   check('icon.png exists', true);
-  check('icon.png size > 100KB', stats.size > 100000, `(${(stats.size/1024).toFixed(0)}KB)`);
+  check('icon.png is a square PNG of at least 128x128', isPng && w === h && w >= 128, `(${w}x${h}, ${(buf.length/1024).toFixed(0)}KB)`);
 } else {
   check('icon.png exists', false);
 }

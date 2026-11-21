@@ -1,12 +1,12 @@
 {
-  "name": "SpecSolid",
-  "short_name": "SpecSolid",
-  "description": "Spec-Driven Engineering for Senior Developers",
+  "name": "Alpaquitay AI",
+  "short_name": "Alpaquitay",
+  "description": "AI software development harness for VS Code. Plan from specs, review changes, and verify quality gates.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "theme_color": "#050a14",
-  "background_color": "#050a14",
+  "theme_color": "#07100d",
+  "background_color": "#021A5E",
   "icons": [
     {
       "src": "/icons/favicon-32x32.png",
@@ -27,13 +27,19 @@
       "src": "/icons/android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
