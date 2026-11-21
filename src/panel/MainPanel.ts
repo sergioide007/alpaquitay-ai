@@ -29,6 +29,7 @@ import { reviewDiff, reviewMarkdown, debtBlocksBuild } from '../core/harness/Age
 import { guardWrite } from '../core/harness/PolicyGuard';
 import { logDecision } from '../core/harness/DecisionLog';
 import { DocsController } from '../documents/DocsController';
+import { cleanDocumentText, documentTitle, nextFreeDocPath, slugify } from '../documents/NewDocument';
 import { SUPPORTED_EXTS, detectFormat } from '../documents/Documents';
 import { DOCS_CSS, DOCS_HTML, DOCS_JS, DOCS_TAB_BUTTON } from './DocsTab';
 import { HUX_CSS, HUX_FLOW_HTML, HUX_QUICK_HTML, HUX_OVERLAY_HTML, HUX_JS } from './HubUx';
@@ -64,6 +65,8 @@ interface PendingChange {
   taskTitle?: string;
   epicTitle?: string;
   language?: string;
+  /** 'document' = a new file proposed by the chat Document lane (reviewed without the source-dir scope rule). */
+  kind?: 'document';
 }
 
 // ── System evidence parsing (IO-free helpers for _scanSystemEvidence) ────────
@@ -153,6 +156,7 @@ export class MainPanel {
     );
     this._panel.webview.html = this._html();
     this._watchSpecFile();
+    this._watchProviderSettings();
     // Proactive spec push: ensures spec is sent even if the webview's
     // initial load-spec message is delayed or missed on first render.
     setImmediate(() => this._sendSpec().catch(() => { }));
@@ -731,7 +735,7 @@ export class MainPanel {
           const v = guardWrite(rel);
           if (v.verdict === 'deny') { this._post({ type: 'chat-chunk', content: `Bloqueado: ${v.reason}` }); blocked++; continue; }
           // Cap.12: review con agente antes de escribir (local, sin LLM).
-          const rev = reviewDiff(rel, before, after, fpSources);
+          const rev = reviewDiff(rel, before, after, pending.kind === 'document' ? [] : fpSources);
           this._post({ type: 'chat-chunk', content: reviewMarkdown(rel, rev) });
           if (!rev.pass) { blocked++; logDecision(this.mcpManager, `review-blocked:${rel}`, { route: 'code', lane: 'build', confidence: 1, reasons: rev.findings.map(f => f.detail), needsConfirm: false, chip: '⛔ review' }, {}).catch(() => { }); continue; }
           const exists = await this.mcpManager.executeTool('filesystem', 'file_exists', { path: rel }) as { exists: boolean };
@@ -2818,11 +2822,32 @@ export class MainPanel {
     this._status('Preparando contexto del proyecto');
     try {
       const base = await this._contextBuilder.getChatSystemPrompt();
-      const system = `${base} Write exactly ONE document that fulfils the request, in the user's language. Do not create epics, task lists, backlogs or a project plan unless the user asks for them. Size it to the request; if a key fact is missing, state the assumption in one line instead of asking.`;
+      const system = `${base} Write exactly ONE document that fulfils the request, in the user's language. Do not create epics, task lists, backlogs or a project plan unless the user asks for them. Size it to the request; if a key fact is missing, state the assumption in one line instead of asking. Output only the document in Markdown, starting with a single "# Title" line, with no text before or after it.`;
       this._status('Redactando documento', provider.modelName);
       const response = await provider.chat([{ role: 'user', content: text }], { systemPrompt: system, maxTokens: 2200, temperature: 0.3 });
-      this._post({ type: 'chat-chunk', content: response.content });
       this._econLlm(text.length + system.length, response.content.length).catch(() => { });
+      const content = cleanDocumentText(response.content);
+      if (!content.trim()) {
+        this._post({ type: 'chat-error', error: 'El modelo devolvio un documento vacio. Reintenta o elige otro modelo.' });
+        return;
+      }
+      // Before: the text was only echoed in the chat and no file was ever created. Now the document is staged as a
+      // pending change (same harness path as code: preview -> confirm -> checkpoint -> write), never overwriting.
+      const rel = await nextFreeDocPath(slugify(documentTitle(content, text)), async p => {
+        const e = await this.mcpManager.executeTool('filesystem', 'file_exists', { path: p }) as { exists: boolean };
+        return e.exists || !!this._memory.get('config', `pending-diff:${p}`);
+      });
+      const verdict = guardWrite(rel);
+      if (verdict.verdict === 'deny') {
+        this._post({ type: 'chat-chunk', content: `${content}\n\n---\nNo pude proponer el archivo \`${rel}\`: ${verdict.reason}. El texto de arriba no se guardo.` });
+        this._post({ type: 'chat-done', model: response.model });
+        return;
+      }
+      const pending: PendingChange = { before: '', after: content, language: 'markdown', kind: 'document' };
+      this._memory.set('config', `pending-diff:${rel}`, JSON.stringify(pending), { tags: ['diff', 'pending', 'document'] });
+      await this._memory.save().catch(() => { });
+      this._post({ type: 'chat-chunk', content: `${content}\n\n---\n**Documento propuesto en \`${rel}\`.** Aun no se ha escrito nada: usa **Revisar y aplicar** (o escribe \`si aplicar\`) para crear el archivo, o **Descartar cambios** (o \`no\`) para rechazarlo.` });
+      this._sendHarnessStatus().catch(() => { /* panel disposed */ });
       this._post({ type: 'chat-done', model: response.model });
     } catch (err) {
       this._post({ type: 'chat-error', error: err instanceof Error ? err.message : String(err) });
@@ -2840,6 +2865,25 @@ export class MainPanel {
 
   public refreshProviders(): void {
     this._sendModels().catch(() => { /* panel disposed */ });
+  }
+
+  /**
+   * The Hub selector is built from the provider settings, but nothing refreshed it when they changed outside the
+   * Settings tab (VS Code Settings UI, settings.json): the dropdown kept showing the model it had at open time.
+   */
+  private _watchProviderSettings(): void {
+    let timer: NodeJS.Timeout | undefined;
+    const sub = vscode.workspace.onDidChangeConfiguration(e => {
+      const relevant = ['localEngine', 'preferredProvider', 'ollama', 'lmstudio', 'anthropic', 'openai']
+        .some(k => e.affectsConfiguration(`alpaquitay-ai.${k}`));
+      if (!relevant) { return; }
+      if (timer) { clearTimeout(timer); }
+      // Debounced: saving the Settings tab writes several keys in a row.
+      timer = setTimeout(() => {
+        this.aiManager.initialize().then(() => this._sendModels()).catch(() => { /* panel disposed */ });
+      }, 200);
+    });
+    this._disposables.push(sub, { dispose: () => { if (timer) { clearTimeout(timer); } } });
   }
 
   private _watchSpecFile(): void {

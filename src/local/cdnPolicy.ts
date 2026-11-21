@@ -10,6 +10,12 @@ export const DEFAULT_CDN_BASE = 'https://alpaquitay.specsolid.com';
  * code-specialised candidate that loads in the WebGPU runtime, ~3.3-4.1 tok/s, Apache-2.0. Keep package.json in sync.
  */
 export const DEFAULT_LOCAL_MODEL_ID = 'qwen2.5-coder-1.5b-instruct';
+/**
+ * Ids that earlier releases and docs told people to put in `localEngine.modelId`. That setting lives in the user's
+ * settings.json, so changing the package.json default never reaches anyone who already saved one: the Hub kept showing
+ * (and running) the old model while the rest of the UI already said Qwen.
+ */
+export const LEGACY_LOCAL_MODEL_IDS: readonly string[] = ['gemma-4-e2b-it', 'gemma-3-1b-it'];
 export const MODELS_PATH_PREFIX = '/models/';
 
 /** Strict allow-list: anything not listed here is rejected with 415 by the Worker. */
@@ -262,4 +268,20 @@ export function manifestUrl(cdnBase: string, modelId: string): string {
 
 export function manifestSigUrl(cdnBase: string, modelId: string): string {
   return `${cdnBase}${MODELS_PATH_PREFIX}${modelId}/manifest.sig.json`;
+}
+
+function isOfficialCdn(cdnBase: string): boolean {
+  try { return normalizeCdnBase(cdnBase) === normalizeCdnBase(DEFAULT_CDN_BASE); } catch { return false; }
+}
+
+/**
+ * The model the engine really uses, and therefore the one every label must show. Empty -> default. A legacy id
+ * on the official CDN -> default. A custom mirror keeps whatever the user configured, and an invalid id is left
+ * untouched so the engine reports it instead of the typo being hidden.
+ */
+export function resolveLocalModelId(configured: string | undefined, cdnBase: string): string {
+  const id = (configured ?? '').trim();
+  if (!id) { return DEFAULT_LOCAL_MODEL_ID; }
+  if (LEGACY_LOCAL_MODEL_IDS.includes(id) && isOfficialCdn(cdnBase)) { return DEFAULT_LOCAL_MODEL_ID; }
+  return id;
 }

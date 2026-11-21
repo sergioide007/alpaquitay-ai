@@ -8,6 +8,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.9.1] — 2026-11-21
+
+### Fixed
+- Document lane: asking for a document ("crea un documento...", "redacta un informe...") only printed the text in the chat and never created a file. The document is now proposed as a Markdown file under `docs/` (never overwriting an existing one) through the usual pending-change flow, so **Revisar y aplicar** / `si aplicar` writes it with a checkpoint and `no` discards it.
+- Applying a proposed document no longer fails the source-directory scope check that is meant for code.
+- Hub model selector showed `gemma-3-1b-it` while Qwen was the intended local model. `localEngine.modelId` is stored in the user's settings.json, so the package.json default change to Qwen never reached anyone who had saved an earlier Gemma id. The id is now resolved in one place (`resolveLocalModelId`): a legacy Gemma id on the official CDN maps to `qwen2.5-coder-1.5b-instruct`, while a custom CDN mirror keeps the configured model. The selector, the Settings tab and the engine all use that value.
+- The Hub selector now refreshes when provider settings change outside the Settings tab (VS Code Settings UI, settings.json) instead of keeping the model it had when the panel opened.
+
 ## [3.9.0] — 2026-11-21
 
 ### Added
