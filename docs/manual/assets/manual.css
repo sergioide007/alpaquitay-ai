@@ -36,7 +36,7 @@ kbd { font: 11px var(--mono); padding: 1px 6px; border: 1px solid var(--line-str
 .top { position: sticky; top: 0; z-index: 40; height: var(--top); display: flex; align-items: center; gap: 12px; padding: 0 16px;
   background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(16px); border-bottom: 1px solid var(--line); }
 .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; }
-.brand-mark { width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 8px; background: var(--accent-soft); color: var(--accent); font: 12px var(--mono); }
+.brand-mark { width: 28px; height: 28px; display: block; flex: none; border-radius: 8px; }
 .crumb { color: var(--muted); text-decoration: none; font-size: 14px; padding-left: 12px; border-left: 1px solid var(--line-strong); }
 .crumb:hover { color: var(--ink); }
 .search-btn { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; min-width: 220px; height: 36px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 9px; background: var(--panel); color: var(--muted); font: inherit; font-size: 14px; cursor: pointer; }

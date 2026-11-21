@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/icons/alpaquitay-logo.svg">
+    <img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/icons/alpaquitay-logo-light.svg" alt="Alpaquitay AI" width="340">
+  </picture>
+</p>
+
 # Alpaquitay AI
 
 > **Astra-style AI harness for VS Code — SDLC gates, DORA metrics, debt tracking, diff-first writes, specialist routing, a Docs agent for Word, Markdown, EPUB and PDF, and now an on-device AI engine (WebGPU / Wasm).**
