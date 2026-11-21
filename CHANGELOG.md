@@ -8,6 +8,22 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.9.0] — 2026-11-21
+
+### Added
+- Investigate lane: read-only log and error analysis from the Hub chat (evidence condensing, secret redaction, structured diagnosis, answer cache).
+- Document lane: "write a document" produces one document instead of a spec with epics.
+- Activity indicator shows the current phase and elapsed time instead of bare dots.
+- Prompt caching: Anthropic `cache_control`, stable OpenAI prefix, Ollama `keep_alive`; usage reports `cachedTokens`.
+
+### Changed
+- Local provider label is generic ("Local model"); the exact model id is shown next to it.
+- Removed decorative emojis from chat output, skill reports and Docs tab messages.
+
+### Fixed
+- Anthropic and OpenAI providers ignored `options.systemPrompt`; project context and role prompts were never sent.
+- Requests containing "genera/crea" or "error/falla" were routed to spec/code generation even when the user asked for a document or a diagnosis.
+
 ## [3.8.3] — 2026-11-21
 
 ### Changed

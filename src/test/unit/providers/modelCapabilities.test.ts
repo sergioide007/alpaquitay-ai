@@ -72,7 +72,7 @@ describe('provider request bodies', () => {
     expect(r.content).toBe('hola mundo');
     expect(sent.temperature).toBeUndefined();
     expect(sent.max_tokens).toBe(REASONING_MIN_OUTPUT_TOKENS);
-    expect(sent.system).toBe('s');
+    expect(sent.system).toEqual([{ type: 'text', text: 's', cache_control: { type: 'ephemeral' } }]);
   });
 
   it('Anthropic 4.6 keeps temperature and the requested budget', async () => {

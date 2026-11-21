@@ -10,6 +10,7 @@ import { SecretManager } from '../core/SecretManager';
 import { SOURCE_CODE_EXTENSIONS, WorkspaceFingerprinter } from '../core/context/WorkspaceFingerprinter';
 import { ProjectContextBuilder } from '../core/ProjectContextBuilder';
 import { decide } from '../core/reception/Decider';
+import { collectEvidence, buildInvestigationPrompt, AnswerCache } from '../core/investigate/LogInvestigator';
 import { SpecialistRouter } from '../core/reception/SpecialistRouter';
 import { sdlcPhase } from '../core/sdlc/SdlcRouter';
 import {
@@ -101,6 +102,7 @@ export class MainPanel {
   private _workedTasks = new Set<string>();
   private _fingerprinter!: WorkspaceFingerprinter;
   private _inbox!: IdeaInbox;
+  private readonly _answerCache = new AnswerCache();
   private _checkpoints!: CheckpointManager;
   private _contextBuilder!: ProjectContextBuilder;
   private _specialists!: SpecialistRouter;
@@ -574,7 +576,7 @@ export class MainPanel {
   private async _handleChat(text: string, _modelId: string): Promise<void> {
     const provider = this.aiManager.getActive();
     if (!provider) {
-      this._post({ type: 'chat-error', error: 'No hay proveedor AI disponible. Configura uno en ⚙ o inicia Ollama/LM Studio.' });
+      this._post({ type: 'chat-error', error: 'No hay proveedor AI disponible. Configura uno en Settings o inicia Ollama/LM Studio.' });
       return;
     }
     // Confirmacion pendiente del harness ("si" continua la ruta propuesta)
@@ -810,7 +812,7 @@ export class MainPanel {
           }
           logDecision(this.mcpManager, `dod-blocked:${taskId}`, {
             route: 'code', lane: 'build', confidence: 1, reasons: gate.blockers,
-            needsConfirm: false, chip: '⛔ DoD gate',
+            needsConfirm: false, chip: 'DoD gate',
           }, { checkpoint: cp }).catch(() => { });
           this._trackDebt(`dod-blocked:${taskId}`).catch(() => { });
         }
@@ -863,7 +865,7 @@ export class MainPanel {
         const c = await loadOrBuild(this.mcpManager, fp);
         const sdlc0 = sdlcPhase(text, fp);
         dod = dodFor(sdlc0.phase, c);
-        platformChip = ` · 🏭 ${c.stack} · \`${c.commands.test}\`${isPlatformContractVerified(c) ? '' : ' (sin verificar — onboard)'}`;
+        platformChip = ` · ${c.stack} · \`${c.commands.test}\`${isPlatformContractVerified(c) ? '' : ' (sin verificar — onboard)'}`;
       } catch { /* chat sigue sin plataforma */ }
     }
     // SDLC experto: cada pedido entra a una fase con gate visible (FABLE-5 L/E).
@@ -874,6 +876,9 @@ export class MainPanel {
     const dodLine = dod ? `\n> DoD: ${dod}` : '';
     // FABLE-5 (E): toda decision queda en decisions.jsonl (best-effort).
     logDecision(this.mcpManager, text, d, { stack: fp?.frameworks[0], sources: fp?.sourceDirs.join(','), policy: d.needsConfirm ? 'confirm' : 'allow', checkpoint: `sdlc:${sdlc.phase}` }).catch(() => { });
+    // Lecturas puras: nunca piden confirmacion y nunca escriben en disco.
+    if (d.route === 'investigate') { await this._handleInvestigate(text, provider); return; }
+    if (d.route === 'document') { await this._handleDocument(text, provider); return; }
     // Rutas que tocan disco o delegan: piden confirmacion, no ejecutan directo.
     // FABLE-5 (B/L): code muestra preview legible acotado a fuentes evidenciadas.
     // SDLC: el chip incluye fase + gate para que el usuario sepa en que etapa esta.
@@ -1013,6 +1018,7 @@ export class MainPanel {
   private async _handleChatConfirmed(text: string, route: string): Promise<void> {
     if (route === 'code' || route === 'spec') {
       const cp = await this._checkpoints.save(route);
+      this._status('Generando especificacion', 'checkpoint ' + cp);
       this._post({ type: 'chat-chunk', content: `> checkpoint \`${cp}\`\n\n_Generando spec y plan desde tu pedido…_` });
       await this._handleRegenSpec(text);
       return;
@@ -1022,6 +1028,7 @@ export class MainPanel {
     const provider = this.aiManager.getActive();
     if (!provider) { return; }
     if (route === 'specialist') {
+      this._status('Derivando a especialista');
       const result = await this._specialists.route(text, provider);
       if (!result.handled) {
         this._post({
@@ -1045,7 +1052,7 @@ export class MainPanel {
       });
       logDecision(this.mcpManager, `specialist:${result.specialistId}:${result.useCaseId}`, {
         route: 'specialist', lane: 'deep', confidence: result.confidence,
-        reasons: result.reasons, needsConfirm: false, chip: `🧠 ${result.specialistName}`,
+        reasons: result.reasons, needsConfirm: false, chip: `Specialist ${result.specialistName}`,
       }, { checkpoint: 'sdlc:specialist' }).catch(() => { });
       this._econLlm(text.length, result.answer.length).catch(() => { });
       this._post({ type: 'chat-done', model: provider.modelName });
@@ -1054,6 +1061,7 @@ export class MainPanel {
 
     // Confirmed non-mutating chat/ideation route.
     try {
+      this._status('Consultando modelo', provider.modelName);
       const systemPrompt = await this._contextBuilder.getChatSystemPrompt();
       const response = await provider.chat([{ role: 'user', content: text }], { systemPrompt });
       this._post({ type: 'chat-chunk', content: response.content });
@@ -1238,7 +1246,7 @@ export class MainPanel {
     const lines: string[] = [];
     if (done.length) {
       lines.push(`Completed (${done.length}):`);
-      done.slice(0, 8).forEach(t => lines.push(`  ✓ ${t.title}`));
+      done.slice(0, 8).forEach(t => lines.push(`  [x] ${t.title}`));
     }
     if (pending.length) {
       lines.push(`Pending (${pending.length}):`);
@@ -1632,7 +1640,7 @@ export class MainPanel {
     try { pathFingerprint = await this._fingerprinter.fingerprint(); } catch { /* root-relative paths remain valid */ }
     const pathRule = sourceRule(pathFingerprint);
     const treeSection = tree ? `Project structure:\n${tree}\n\n` : '';
-    const header = correction ? `**🔄 Correction:** ${task.title}` : `**> Implementando:** ${task.title}`;
+    const header = correction ? `**Correction:** ${task.title}` : `**> Implementando:** ${task.title}`;
 
     try {
       const activeModelName = provider.modelName;
@@ -2183,7 +2191,7 @@ export class MainPanel {
         if (data.diagram) { patch = { replace: data.diagram }; }
         this._post({ type: 'arch-chat-chunk', content: explanation });
         if (result.guardrailResults?.length) {
-          const warns = result.guardrailResults.map(g => `⚠ ${g.rule}: ${g.message}`).join('\n');
+          const warns = result.guardrailResults.map(g => `Aviso ${g.rule}: ${g.message}`).join('\n');
           this._post({ type: 'arch-chat-chunk', content: `\n\n${warns}` });
         }
         this._post({ type: 'arch-chat-done', patch, model: provider.modelName });
@@ -2657,12 +2665,12 @@ export class MainPanel {
         if (data.risks?.length) {
           report += `### Risks\n`;
           for (const r of data.risks.slice(0, 6)) {
-            report += `- **${r.risk}** (${r.likelihood}↑ / ${r.impact}⚡): ${r.mitigation}\n`;
+            report += `- **${r.risk}** (likelihood ${r.likelihood} / impact ${r.impact}): ${r.mitigation}\n`;
           }
           report += '\n';
         }
         if (result.guardrailResults?.length) {
-          report += `### Guardrails\n` + result.guardrailResults.map(g => `⚠ ${g.rule}: ${g.message}`).join('\n');
+          report += `### Guardrails\n` + result.guardrailResults.map(g => `Aviso ${g.rule}: ${g.message}`).join('\n');
         }
         this._post({ type: 'arch-chat-chunk', content: report });
         this._post({ type: 'arch-chat-done', patch: null, model: provider.modelName });
@@ -2770,6 +2778,55 @@ export class MainPanel {
   private async _docsReveal(path: string): Promise<void> {
     if (!detectFormat(path)) { return; }
     await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(path));
+  }
+
+  /** Phase line shown next to the activity indicator: what is happening now, in plain words. */
+  private _status(phase: string, detail?: string): void {
+    this._post({ type: 'chat-status', phase, detail: detail ?? '' });
+  }
+
+  private async _handleInvestigate(text: string, provider: AIProvider): Promise<void> {
+    this._status('Recopilando evidencia', 'logs del proyecto y texto pegado');
+    const evidence = await collectEvidence(this.mcpManager, text, this._extractPathHints(text));
+    if (evidence.length === 0) {
+      this._post({ type: 'chat-chunk', content: 'No encontre logs en el proyecto ni un trace en tu mensaje. Pega el error completo o indica la ruta del archivo (por ejemplo `logs/app.log`) y lo analizo sin modificar nada.' });
+      this._post({ type: 'chat-done', model: provider.modelName });
+      return;
+    }
+    const { system, user, key } = buildInvestigationPrompt(text, evidence);
+    const hit = this._answerCache.get(key);
+    if (hit) {
+      this._post({ type: 'chat-chunk', content: `${hit.answer}\n\n_Respuesta reutilizada: mismos logs y misma pregunta, 0 tokens._` });
+      this._post({ type: 'chat-done', model: hit.model });
+      this._econLocal();
+      return;
+    }
+    this._status('Analizando evidencia', `${evidence.length} fuente(s), ~${Math.ceil(user.length / 4)} tokens`);
+    try {
+      const response = await provider.chat([{ role: 'user', content: user }], { systemPrompt: system, maxTokens: 900, temperature: 0.2 });
+      this._answerCache.set(key, response.content, response.model);
+      const sources = evidence.map(e => `\`${e.source}\``).join(', ');
+      this._post({ type: 'chat-chunk', content: `${response.content}\n\n_Solo lectura. Fuentes: ${sources}._` });
+      this._econLlm(user.length + system.length, response.content.length).catch(() => { });
+      this._post({ type: 'chat-done', model: response.model });
+    } catch (err) {
+      this._post({ type: 'chat-error', error: err instanceof Error ? err.message : String(err) });
+    }
+  }
+
+  private async _handleDocument(text: string, provider: AIProvider): Promise<void> {
+    this._status('Preparando contexto del proyecto');
+    try {
+      const base = await this._contextBuilder.getChatSystemPrompt();
+      const system = `${base} Write exactly ONE document that fulfils the request, in the user's language. Do not create epics, task lists, backlogs or a project plan unless the user asks for them. Size it to the request; if a key fact is missing, state the assumption in one line instead of asking.`;
+      this._status('Redactando documento', provider.modelName);
+      const response = await provider.chat([{ role: 'user', content: text }], { systemPrompt: system, maxTokens: 2200, temperature: 0.3 });
+      this._post({ type: 'chat-chunk', content: response.content });
+      this._econLlm(text.length + system.length, response.content.length).catch(() => { });
+      this._post({ type: 'chat-done', model: response.model });
+    } catch (err) {
+      this._post({ type: 'chat-error', error: err instanceof Error ? err.message : String(err) });
+    }
   }
 
   private _post(msg: object): void {
@@ -2937,6 +2994,9 @@ main{flex:1;overflow:hidden;position:relative}
 .thinking span{width:4px;height:4px;border-radius:50%;background:var(--signal);animation:blink 1.2s infinite}
 .thinking span:nth-child(2){animation-delay:.2s}
 .thinking span:nth-child(3){animation-delay:.4s}
+.think-row{display:flex;align-items:center;gap:8px}
+.think-label{font-size:11px;color:var(--muted)}
+.think-time{font-size:10px;color:var(--muted);font-family:var(--mono);margin-left:auto}
 @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 .empty-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:5px}
 .empty-chat p{font-size:11px}
@@ -3712,6 +3772,7 @@ window.addEventListener('message', e => {
     case 'arch-chat-chunk':        appendArchAiChunk(msg.content); break;
     case 'arch-chat-done':         finishArchAiChat(msg.patch, msg.model); break;
     case 'arch-chat-error':        archAiChatError(msg.error); break;
+    case 'chat-status':            setThinkingStatus(msg.phase, msg.detail); break;
     case 'agent-progress':         appendProgress(msg.sessionId, msg.step, msg.message, msg.timestamp); break;
     case 'agent-step-start':       appendStepStart(msg.sessionId, msg.step, msg.domainId, msg.useCaseId, msg.timestamp); break;
     case 'agent-step-done':        appendStepDone(msg.sessionId, msg.step, msg.success, msg.timestamp); break;
@@ -3830,9 +3891,18 @@ function addMessage(role, content, model) {
 function addThinking() {
   const div = document.createElement('div');
   div.className = 'msg assistant';
-  div.innerHTML = \`<div class="avatar av-ai">A</div><div><div class="msg-bubble"><div class="thinking"><span></span><span></span><span></span></div></div></div>\`;
+  div.innerHTML = \`<div class="avatar av-ai">A</div><div><div class="msg-bubble"><div class="think-row"><div class="thinking"><span></span><span></span><span></span></div><span class="think-label">Procesando solicitud</span><span class="think-time">0s</span></div></div></div>\`;
   messagesEl.appendChild(div); messagesEl.scrollTop = messagesEl.scrollHeight;
+  const t0 = Date.now(); const tm = div.querySelector('.think-time');
+  const iv = setInterval(function () {
+    if (!div.isConnected) { clearInterval(iv); return; }
+    if (tm) { tm.textContent = Math.floor((Date.now() - t0) / 1000) + 's'; }
+  }, 1000);
   return div;
+}
+function setThinkingStatus(phase, detail) {
+  const el = window._thinkBubble && window._thinkBubble.querySelector('.think-label');
+  if (el) { el.textContent = detail ? phase + ' · ' + detail : phase; }
 }
 function addSystemMessage(text) {
   hideEmpty();

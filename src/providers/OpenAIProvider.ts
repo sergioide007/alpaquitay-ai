@@ -23,7 +23,8 @@ export class OpenAIProvider implements AIProvider {
     // and also counts reasoning tokens, so reasoning models get room for both.
     const body: Record<string, unknown> = {
       model: this.model,
-      messages: messages.map(m => ({ role: m.role, content: m.content })),
+      // System prompt first and byte-stable: OpenAI caches the longest common prefix automatically.
+      messages: (options.systemPrompt ? [{ role: 'system', content: options.systemPrompt }, ...messages] : messages).map(m => ({ role: m.role, content: m.content })),
       max_completion_tokens: outputBudget(options.maxTokens ?? 4096, reasoning)
     };
     if (options.temperature !== undefined && !reasoning) { body.temperature = options.temperature; }

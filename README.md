@@ -11,7 +11,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
-[![Version](https://img.shields.io/badge/version-3.8.3-green)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.9.0-green)](./CHANGELOG.md)
 [![Tests](https://img.shields.io/badge/tests-737%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
@@ -129,6 +129,15 @@ Every request is perceived, routed to exactly one lane, previewed before any wri
 | `no` | Discard all pending diffs |
 | `promover` | Promote last idea to spec.md epic |
 | `si` | Confirm proposed route |
+
+### Read-only lanes (no confirmation, nothing is written)
+
+| You ask | What happens |
+|---------|--------------|
+| "Review the logs and tell me why this error happens" | **Investigate**: finds `*.log` files (and any path or trace you paste), keeps only error lines with context, collapses repeats, redacts secrets, then asks the model for Diagnosis, Evidence, Probable cause, How to verify and Proposed fix. Same question over unchanged logs is answered from cache with 0 tokens. |
+| "Write a report / README / memo / ADR" | **Document**: one deliverable, no epics or task lists unless you ask for them. |
+
+Token savings: stable system-prompt prefix (Anthropic `cache_control`, OpenAI automatic prefix cache, Ollama `keep_alive`), log condensing before the model sees it, and an answer cache for repeated diagnoses.
 
 ---
 

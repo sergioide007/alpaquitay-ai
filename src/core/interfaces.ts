@@ -8,7 +8,7 @@ export interface Message {
 export interface AIResponse {
   content: string;
   model: string;
-  usage: { promptTokens: number; completionTokens: number };
+  usage: { promptTokens: number; completionTokens: number; cachedTokens?: number };
 }
 
 export interface AIProvider {

@@ -2,7 +2,7 @@ import { WorkspaceFingerprint } from '../context/WorkspaceFingerprinter';
 export type { WorkspaceFingerprint };
 
 export type Lane = 'flash' | 'build' | 'deep';
-export type Route = 'chat' | 'ideate' | 'spec' | 'code' | 'specialist' | 'docs';
+export type Route = 'chat' | 'ideate' | 'spec' | 'code' | 'specialist' | 'docs' | 'document' | 'investigate';
 export interface Decision {
   route: Route; lane: Lane; confidence: number;
   reasons: string[]; needsConfirm: boolean; chip: string;
@@ -18,11 +18,22 @@ const CODE_RE = /(crea|genera|implementa|corrige|arregla|refactor|test|error|fal
 // Spanish equivalents and unambiguous specialist vocabulary (STRIDE, SBOM, OWASP...): before this, "modelo de amenazas"
 // or "genera un SBOM" never reached the registered specialists.
 const OPS_RE = /\b(deploy\w*|despliegue\w*|desplegar|pipeline\w*|docker\w*|terraform|aws|azure|gcp|iac|dora|pentest\w*|threat\w*|amenazas?|stride|sbom|cbom|owasp|samm|finops|runbook\w*|mlops|zero[- ]?trust|well[- ]?architected)\b/i;
+// Read-only lanes. A senior does not open a sprint to answer "why did this fail" or "write me a memo":
+// 'investigate' reads logs/traces and explains the cause; 'document' writes ONE document and stops (no epics, no tasks).
+const INVESTIGATE_RE = /(\blogs?\b|stack ?trace|traceback|exception|excepci[oó]n|por ?qu[eé] (ocurre|falla|sale|pasa|se cae|da)|por ?qu[eé] (me )?(da|sale|marca) (el )?error|diagn[oó]stic\w*|causa (ra[ií]z|del error)|root cause|revisa (el|los) (error|logs?)|analiza (el|los) (error|logs?))/i;
+const DOC_VERB_RE = /(genera\w*|crea\w*|redacta\w*|escribe\w*|elabora\w*|prepara\w*|arma\w*|write|draft|create|generate)/i;
+const DOC_NOUN_RE = /(documento|informe|reporte|memo|acta|readme|manual|gu[ií]a|resumen ejecutivo|one[- ]pager|propuesta|adr\b|runbook|changelog|document\b|report\b)/i;
 export function decide(text: string, fp: WorkspaceFingerprint | null): Decision {
   const t = text.toLowerCase();
   const reasons: string[] = [];
   if (fp) { reasons.push(`stack:${fp.frameworks[0] ?? 'desconocido'}|src:${fp.sourceDirs.join(',') || '.'}`); }
   if (OPS_RE.test(t)) { return { route: 'specialist', lane: 'deep', confidence: 0.85, reasons: ['ops/infra -> especialista'], needsConfirm: true, chip: 'Deep · specialist' }; }
+  if (INVESTIGATE_RE.test(t) && !/(crea|genera|implementa|refactor)\w*\s+(el\s+|un\s+|una\s+)?(test|endpoint|componente)/i.test(t)) {
+    return { route: 'investigate', lane: 'flash', confidence: 0.86, reasons: ['pide diagnostico de error/log -> lectura sin escritura'], needsConfirm: false, chip: 'Investigar · solo lectura' };
+  }
+  if (DOC_VERB_RE.test(t) && DOC_NOUN_RE.test(t) && !SPEC_RE.test(t)) {
+    return { route: 'document', lane: 'flash', confidence: 0.84, reasons: ['pide un documento puntual -> un solo entregable'], needsConfirm: false, chip: 'Documento · un entregable' };
+  }
   if (SPEC_RE.test(t)) { return { route: 'spec', lane: 'build', confidence: 0.88, reasons: ['menciona spec/kanban'], needsConfirm: false, chip: 'Build · spec' }; }
   if (IDEATE_RE.test(t)) { return { route: 'ideate', lane: 'flash', confidence: 0.8, reasons: ['idea desordenada -> inbox'], needsConfirm: false, chip: 'Flash · ideate' }; }
   if (CODE_RE.test(t)) {
