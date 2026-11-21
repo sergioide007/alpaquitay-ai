@@ -1,185 +1,141 @@
 <!doctype html>
 <html lang="es" data-theme="dark">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Work: especificación, tablero y chat · Manual de Alpaquitay AI</title>
-  <meta name="description"
-    content="Cómo crear un spec.md con épicas y tareas, moverlo por el tablero Kanban, dejar que la IA implemente una tarea con diffs revisables y enlazar commits con #SPEC.">
-  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/work/">
-  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/work/">
-  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/work/">
-  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/work/">
-  <meta property="og:type" content="article">
-  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/work/">
-  <meta property="og:title" content="Work: especificación, tablero y chat">
-  <meta property="og:description"
-    content="Cómo crear un spec.md con épicas y tareas, moverlo por el tablero Kanban, dejar que la IA implemente una tarea con diffs revisables y enlazar commits con #SPEC.">
-  <meta property="og:locale" content="es_ES">
-  <meta name="theme-color" content="#07100d">
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-  <link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
-  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
-  <script
-    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Work: especificación, tablero y chat","description":"Cómo crear un spec.md con épicas y tareas, moverlo por el tablero Kanban, dejar que la IA implemente una tarea con diffs revisables y enlazar commits con #SPEC.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/work/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work: especificación, tablero y chat · Manual de Alpaquitay AI</title>
+<meta name="description" content="Cómo crear un spec.md con épicas y tareas, moverlo por el tablero Kanban, dejar que la IA implemente una tarea con diffs revisables y enlazar commits con #SPEC.">
+<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/work/">
+<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/work/">
+<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/work/">
+<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/work/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/work/">
+<meta property="og:title" content="Work: especificación, tablero y chat">
+<meta property="og:description" content="Cómo crear un spec.md con épicas y tareas, moverlo por el tablero Kanban, dejar que la IA implemente una tarea con diffs revisables y enlazar commits con #SPEC.">
+<meta property="og:locale" content="es_ES">
+<meta name="theme-color" content="#07100d">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+<link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
+<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Work: especificación, tablero y chat","description":"Cómo crear un spec.md con épicas y tareas, moverlo por el tablero Kanban, dejar que la IA implemente una tarea con diffs revisables y enlazar commits con #SPEC.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/work/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
-
 <body>
-  <a class="skip" href="#contenido">Saltar al contenido</a>
-  <header class="top">
-    <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar"
-      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
-        <path d="M3 5h14M3 10h14M3 15h14" />
-      </svg></button>
-    <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><img class="brand-mark"
-        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-    <a class="crumb" href="../">Manual</a>
-    <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20"
-        aria-hidden="true">
-        <circle cx="9" cy="9" r="5.5" />
-        <path d="m13.5 13.5 3.5 3.5" />
-      </svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
-    <a class="lang" href="../en/work/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
-    <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20"
-        aria-hidden="true">
-        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
-      </svg></button>
-    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg
-        viewBox="0 0 16 16" aria-hidden="true" class="fill">
-        <path
-          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
-      </svg></a>
-    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
-  </header>
-  <div class="layout">
-    <aside class="sidebar" id="sidebar" aria-label="Índice del manual">
-      <p class="side-title">Manual de uso <span class="ver">v3.8.3</span></p>
-      <ol class="chapters">
-        <li><a href="../"><span class="n">00</span>Inicio</a></li>
-        <li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
-        <li><a href="../proveedores/"><span class="n">02</span>Proveedores y privacidad</a></li>
-        <li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
-        <li><a href="../work/" aria-current="page"><span class="n">04</span>Work · spec, tablero y chat</a></li>
-        <li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
-        <li><a href="../docs/"><span class="n">06</span>Docs · documentos con un agente</a></li>
-        <li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
-        <li><a href="../arquitectura/"><span class="n">08</span>Architecture · ADR e IaC</a></li>
-        <li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
-        <li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
-        <li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
-        <li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
-        <li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
-        <li><a href="../referencia/"><span class="n">14</span>Referencia</a></li>
-        <li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
-        <li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
-      </ol>
-      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
-          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a
-          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-    </aside>
-    <main class="content" id="contenido">
-      <article class="doc">
-        <p class="kicker">Capítulo 04</p>
-        <h1 id="work-especificacion-tablero-y-chat">Work: especificación, tablero y chat</h1>
-        <p>La pestaña <strong>Work</strong> es donde se hace el trabajo de código. Tiene tres paneles: la
-          <strong>especificación</strong> (<code>spec.md</code>), el <strong>tablero</strong> Kanban que se deriva de
-          ella y el <strong>chat</strong> con el arnés. Es el flujo SDD (<em>spec-driven development</em>) de
-          Alpaquitay: primero se acuerda <em>qué</em>, después se implementa <em>tarea a tarea</em> y cada cambio queda
-          enlazado a un requisito.</p>
-        <figure class="figure"><a class="zoom" href="../media/hub-work.png"
-            aria-label="Ampliar: Pestaña Work con especificación, tablero y chat"><img src="../media/hub-work.png"
-              alt="Pestaña Work con especificación, tablero y chat" width="1600" height="1000" loading="lazy"
-              decoding="async"></a>
-          <figcaption>Work: especificación a la izquierda, tablero en el centro y chat a la derecha.</figcaption>
-        </figure>
-        <div class="code" data-lang="Texto">
-          <pre><code class="language-text">  spec.md ──► Tablero ──► la IA implementa una tarea ──► diff ──► si aplicar ──► spec.md [x] ──► commit #SPEC-001
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="top">
+  <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+  <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+  <a class="crumb" href="../">Manual</a>
+  <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
+  <a class="lang" href="../en/work/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
+  <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
+  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
+  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
+</header>
+<div class="layout">
+<aside class="sidebar" id="sidebar" aria-label="Índice del manual">
+  <p class="side-title">Manual de uso <span class="ver">v3.8.3</span></p>
+  <ol class="chapters">
+<li><a href="../"><span class="n">00</span>Inicio</a></li>
+<li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
+<li><a href="../proveedores/"><span class="n">02</span>Proveedores y privacidad</a></li>
+<li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
+<li><a href="../work/" aria-current="page"><span class="n">04</span>Work · spec, tablero y chat</a></li>
+<li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
+<li><a href="../docs/"><span class="n">06</span>Docs · documentos con un agente</a></li>
+<li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
+<li><a href="../arquitectura/"><span class="n">08</span>Architecture · ADR e IaC</a></li>
+<li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
+<li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
+<li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
+<li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
+<li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
+<li><a href="../referencia/"><span class="n">14</span>Referencia</a></li>
+<li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
+<li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
+  </ol>
+  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+</aside>
+<main class="content" id="contenido">
+<article class="doc">
+<p class="kicker">Capítulo 04</p>
+<h1 id="work-especificacion-tablero-y-chat">Work: especificación, tablero y chat</h1>
+<p>La pestaña <strong>Work</strong> es donde se hace el trabajo de código. Tiene tres paneles: la <strong>especificación</strong> (<code>spec.md</code>), el <strong>tablero</strong> Kanban que se deriva de ella y el <strong>chat</strong> con el arnés. Es el flujo SDD (<em>spec-driven development</em>) de Alpaquitay: primero se acuerda <em>qué</em>, después se implementa <em>tarea a tarea</em> y cada cambio queda enlazado a un requisito.</p>
+<figure class="figure"><a class="zoom" href="../media/hub-work.png" aria-label="Ampliar: Pestaña Work con especificación, tablero y chat"><img src="../media/hub-work.png" alt="Pestaña Work con especificación, tablero y chat" width="1600" height="1000" loading="lazy" decoding="async"></a><figcaption>Work: especificación a la izquierda, tablero en el centro y chat a la derecha.</figcaption></figure>
+<div class="code" data-lang="Texto"><pre><code class="language-text">  spec.md ──► Tablero ──► la IA implementa una tarea ──► diff ──► si aplicar ──► spec.md [x] ──► commit #SPEC-001
      ▲                                                                                              │
      └──────────────────────────────────── ciclo de retroalimentación ─────────────────────────────┘
-</code></pre>
-        </div>
-        <h2 id="tu-siguiente-paso-siempre-a-la-vista">Tu siguiente paso, siempre a la vista</h2>
-        <p>Debajo de las pestañas, la <strong>barra de siguiente paso</strong> sigue el flujo SDD, <em>Spec → Build →
-            Review → Verify</em>, y muestra un botón principal con lo que toca hacer ahora:</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Dónde estás</th>
-                <th>Qué dice la barra</th>
-                <th>El botón</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Aún no hay <code>spec.md</code></td>
-                <td>Start with a spec</td>
-                <td><strong>Create spec with AI</strong></td>
-              </tr>
-              <tr>
-                <td>Hay tareas pendientes</td>
-                <td>Next task: …</td>
-                <td><strong>Start SPEC-00x</strong> (equivale a arrastrar la tarjeta a <em>In Progress</em>)</td>
-              </tr>
-              <tr>
-                <td>La IA está trabajando</td>
-                <td>AI is building …</td>
-                <td><strong>Watch progress</strong></td>
-              </tr>
-              <tr>
-                <td>Hay diffs pendientes</td>
-                <td>Review N pending changes</td>
-                <td><strong>Review changes</strong> y <strong>Apply &amp; run gates</strong></td>
-              </tr>
-              <tr>
-                <td>La deuda llegó al tope</td>
-                <td>Build is blocked by technical debt</td>
-                <td><strong>See debt</strong></td>
-              </tr>
-              <tr>
-                <td>Todas las tareas hechas</td>
-                <td>All N tasks are done</td>
-                <td><strong>Validate against spec</strong></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>Cada tarjeta de <em>Backlog</em>, <em>Todo</em> e <em>In Progress</em> tiene además un botón
-          <strong>Start</strong> (o <strong>Resume</strong>), así que arrastrar es opcional. Sobre el campo del chat,
-          botones rápidos ejecutan lo habitual: <em>Build next task</em>, <em>Validate</em>, <em>Tests</em>,
-          <em>Refactor</em> y, mientras haya diffs pendientes, <em>Apply changes</em>.</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Atajo</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>Cmd</kbd>+<kbd>K</kbd> en macOS)</td>
-                <td>Abre la paleta de comandos: cada pestaña, acción y agente, con búsqueda</td>
-              </tr>
-              <tr>
-                <td><kbd>Alt</kbd>+<kbd>1</kbd> a <kbd>7</kbd> (<kbd>Option</kbd> en macOS)</td>
-                <td>Cambia de pestaña</td>
-              </tr>
-              <tr>
-                <td><kbd>/</kbd></td>
-                <td>Enfoca el chat</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <h2 id="1-la-especificacion-spec-md">1. La especificación (<code>spec.md</code>)</h2>
-        <p><code>spec.md</code> es Markdown normal en la raíz de tu proyecto, y es <strong>la base de datos del
-            tablero</strong>: el estado de las tarjetas se lee de este archivo, no se guarda aparte. Así que lo puedes
-          editar a mano, revisarlo en un <em>pull request</em> y versionarlo como cualquier otro archivo.</p>
-        <div class="code" data-lang="Markdown">
-          <pre><code class="language-markdown"># Portal de reservas del club
+</code></pre></div>
+<h2 id="tu-siguiente-paso-siempre-a-la-vista">Tu siguiente paso, siempre a la vista</h2>
+<p>Debajo de las pestañas, la <strong>barra de siguiente paso</strong> sigue el flujo SDD, <em>Spec → Build → Review → Verify</em>, y muestra un botón principal con lo que toca hacer ahora:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Dónde estás</th>
+<th>Qué dice la barra</th>
+<th>El botón</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Aún no hay <code>spec.md</code></td>
+<td>Start with a spec</td>
+<td><strong>Create spec with AI</strong></td>
+</tr>
+<tr>
+<td>Hay tareas pendientes</td>
+<td>Next task: …</td>
+<td><strong>Start SPEC-00x</strong> (equivale a arrastrar la tarjeta a <em>In Progress</em>)</td>
+</tr>
+<tr>
+<td>La IA está trabajando</td>
+<td>AI is building …</td>
+<td><strong>Watch progress</strong></td>
+</tr>
+<tr>
+<td>Hay diffs pendientes</td>
+<td>Review N pending changes</td>
+<td><strong>Review changes</strong> y <strong>Apply &amp; run gates</strong></td>
+</tr>
+<tr>
+<td>La deuda llegó al tope</td>
+<td>Build is blocked by technical debt</td>
+<td><strong>See debt</strong></td>
+</tr>
+<tr>
+<td>Todas las tareas hechas</td>
+<td>All N tasks are done</td>
+<td><strong>Validate against spec</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Cada tarjeta de <em>Backlog</em>, <em>Todo</em> e <em>In Progress</em> tiene además un botón <strong>Start</strong> (o <strong>Resume</strong>), así que arrastrar es opcional. Sobre el campo del chat, botones rápidos ejecutan lo habitual: <em>Build next task</em>, <em>Validate</em>, <em>Tests</em>, <em>Refactor</em> y, mientras haya diffs pendientes, <em>Apply changes</em>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Atajo</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>Cmd</kbd>+<kbd>K</kbd> en macOS)</td>
+<td>Abre la paleta de comandos: cada pestaña, acción y agente, con búsqueda</td>
+</tr>
+<tr>
+<td><kbd>Alt</kbd>+<kbd>1</kbd> a <kbd>7</kbd> (<kbd>Option</kbd> en macOS)</td>
+<td>Cambia de pestaña</td>
+</tr>
+<tr>
+<td><kbd>/</kbd></td>
+<td>Enfoca el chat</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="1-la-especificacion-spec-md">1. La especificación (<code>spec.md</code>)</h2>
+<p><code>spec.md</code> es Markdown normal en la raíz de tu proyecto, y es <strong>la base de datos del tablero</strong>: el estado de las tarjetas se lee de este archivo, no se guarda aparte. Así que lo puedes editar a mano, revisarlo en un <em>pull request</em> y versionarlo como cualquier otro archivo.</p>
+<div class="code" data-lang="Markdown"><pre><code class="language-markdown"># Portal de reservas del club
 
 Reservas de pistas con pago online y recordatorios por correo.
 
@@ -191,200 +147,116 @@ Reservas de pistas con pago online y recordatorios por correo.
 ## Epic: Pagos
 - [ ] SPEC-004 Cobrar la reserva con la pasarela de pago
 - [ ] SPEC-005 Enviar el recibo por correo
-</code></pre>
-        </div>
-        <p>Reglas del formato:</p>
-        <ul>
-          <li><code># Título</code> y un párrafo de contexto al principio.</li>
-          <li>Cada <code>## Epic: …</code> (o cualquier encabezado de nivel 2) agrupa tareas.</li>
-          <li><code>- [ ] texto</code> es una tarea pendiente; <code>- [x] texto</code> una terminada.</li>
-          <li>Los identificadores <code>SPEC-001</code>, <code>SPEC-002</code>… se asignan por posición.</li>
-          <li>El texto libre entre tareas se usa como contexto para la IA.</li>
-        </ul>
-        <p>¿Tu proyecto usa otro nombre, como <code>tasks.md</code> o <code>backlog.md</code>? Cámbialo en
-          <strong>Settings → Workspace → Spec file</strong> (<code>alpaquitay-ai.specFile</code>). Si el archivo no
-          existe, Alpaquitay busca otros parecidos.</p>
-        <h3 id="tres-formas-de-crearla">Tres formas de crearla</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Forma</th>
-                <th>Cuándo</th>
-                <th>Dónde</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>+ Create with AI</strong> / <strong>Regen</strong></td>
-                <td>Tienes un proveedor configurado y quieres que la IA analice el workspace. <em>Regen</em> admite una
-                  descripción opcional del proyecto.</td>
-                <td>Panel <em>Spec</em> del Hub.</td>
-              </tr>
-              <tr>
-                <td><strong>Generate Specification (Local Model)</strong></td>
-                <td>Quieres que tu descripción no salga del equipo. Escribe <code>specs/&lt;nombre&gt;.md</code> y nunca
-                  sobrescribe.</td>
-                <td>Paleta de comandos o <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd>. Ver <a
-                    href="../motor-local/">Motor local</a>.</td>
-              </tr>
-              <tr>
-                <td><strong>A mano</strong></td>
-                <td>Ya sabes lo que quieres.</td>
-                <td>Cualquier editor. Pulsa ↻ en el panel <em>Spec</em> para recargar.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <aside class="callout callout-tip">
-          <p class="callout-title">Consejo</p>
-          <p>Una buena especificación tiene tareas pequeñas que empiezan por un verbo y que se pueden verificar:
-            «Validar el correo del formulario de registro» es mejor que «Usuarios». La IA implementa mucho mejor una
-            tarea de un par de archivos que una épica entera.</p>
-        </aside>
-        <h2 id="2-el-tablero">2. El tablero</h2>
-        <p>Todas las tareas pendientes empiezan en <strong>Backlog</strong>. Las columnas son <em>Backlog</em>,
-          <em>Todo</em>, <em>In Progress</em> y <em>Done</em>.</p>
-        <figure class="video">
-          <video controls preload="none" playsinline poster="../media/work-task.jpg" width="1440" height="900"
-            aria-label="Una tarea del tablero, de principio a fin">
-            <source src="../media/work-task.mp4" type="video/mp4">Tu navegador no reproduce vídeo MP4. <a
-              href="../media/work-task.mp4">Descarga el vídeo</a>.
-          </video>
-          <figcaption><strong>Una tarea del tablero, de principio a fin</strong> <span class="video-len">0:25</span> —
-            Se arrastra SPEC-003 a In Progress; el agente planifica y genera el archivo, el chat muestra el diff y
-            <code>si aplicar</code> lo escribe con checkpoint. Los tests pasan, pero el build falla (el proyecto de
-            ejemplo no tiene <code>vite</code> instalado), así que la compuerta DoD deja la tarjeta en In Progress y la
-            deuda sube. Grabado con Ollama (llama3.2 3B), acelerado en las esperas.</figcaption>
-        </figure>
-        <p><strong>Arrastrar una tarjeta a <em>In Progress</em> arranca la IA</strong>, y no escribe nada a ciegas:</p>
-        <ol>
-          <li><strong>Plan.</strong> El agente revisa el workspace y decide qué archivos crear o cambiar (como mucho 6).
-            Las rutas que saldrían del proyecto se descartan; una ruta que el modelo escriba como <code>/api/x.js</code>
-            se lee como <code>api/x.js</code> dentro del proyecto.</li>
-          <li><strong>Generación.</strong> Genera cada archivo y lo guarda como <strong>diff pendiente</strong>. El chat
-            muestra cada diff (<code>+añadidas/−quitadas</code>).</li>
-          <li><strong>Tu revisión.</strong> Lee los diffs. Usa <code>diff &lt;ruta&gt;</code> para ver uno completo.
-          </li>
-          <li><strong>Aplicar o descartar.</strong> <code>si aplicar</code> escribe todos los pendientes con la
-            política, la revisión automática y el <em>checkpoint</em> descritos en <a
-              href="../arnes/#que-protege-una-escritura">Cómo piensa el arnés</a>. <code>no</code> los descarta todos.
-          </li>
-          <li><strong>Verificación.</strong> Tras aplicar se ejecutan los comandos reales de build y test.</li>
-          <li><strong>Done.</strong> La tarjeta pasa a <em>Done</em> y <code>spec.md</code> se actualiza a
-            <code>- [x]</code> <strong>solo si</strong> la compuerta DoD tiene evidencia. Si no, se queda en <em>In
-              Progress</em> y el chat explica qué falta.</li>
-        </ol>
-        <p>Si una tarea antigua contiene una ruta de ejemplo como
-          <code>&lt;carpeta-fuente&gt;/services/validator.ts</code>, el arnés la resuelve usando la carpeta fuente
-          detectada (o la raíz del workspace), actualiza la vista previa en la ruta real y pide confirmación otra vez.
-          Si el archivo cambió desde que se generó el diff, no lo sobrescribe: conserva esa propuesta para regenerarla.
-          Un diff que falla queda pendiente, pero los demás se siguen procesando. Si no hay repositorio Git, la
-          aplicación continúa con un aviso de que no se pudo crear el <em>checkpoint</em>.</p>
-        <figure class="figure"><a class="zoom" href="../diagrams/03-sdd-task-sequence.svg"
-            aria-label="Ampliar: Secuencia de una tarea: planificar, generar, diff, aprobar, aplicar, probar"><img
-              src="../diagrams/03-sdd-task-sequence.svg"
-              alt="Secuencia de una tarea: planificar, generar, diff, aprobar, aplicar, probar" width="1120"
-              height="1358" loading="lazy" decoding="async"></a>
-          <figcaption>Lo que ocurre entre arrastrar la tarjeta y que llegue a Done.</figcaption>
-        </figure>
+</code></pre></div>
+<p>Reglas del formato:</p>
+<ul>
+<li><code># Título</code> y un párrafo de contexto al principio.</li>
+<li>Cada <code>## Epic: …</code> (o cualquier encabezado de nivel 2) agrupa tareas.</li>
+<li><code>- [ ] texto</code> es una tarea pendiente; <code>- [x] texto</code> una terminada.</li>
+<li>Los identificadores <code>SPEC-001</code>, <code>SPEC-002</code>… se asignan por posición.</li>
+<li>El texto libre entre tareas se usa como contexto para la IA.</li>
+</ul>
+<p>¿Tu proyecto usa otro nombre, como <code>tasks.md</code> o <code>backlog.md</code>? Cámbialo en <strong>Settings → Workspace → Spec file</strong> (<code>alpaquitay-ai.specFile</code>). Si el archivo no existe, Alpaquitay busca otros parecidos.</p>
+<h3 id="tres-formas-de-crearla">Tres formas de crearla</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Forma</th>
+<th>Cuándo</th>
+<th>Dónde</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>+ Create with AI</strong> / <strong>Regen</strong></td>
+<td>Tienes un proveedor configurado y quieres que la IA analice el workspace. <em>Regen</em> admite una descripción opcional del proyecto.</td>
+<td>Panel <em>Spec</em> del Hub.</td>
+</tr>
+<tr>
+<td><strong>Generate Specification (Local Model)</strong></td>
+<td>Quieres que tu descripción no salga del equipo. Escribe <code>specs/&lt;nombre&gt;.md</code> y nunca sobrescribe.</td>
+<td>Paleta de comandos o <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd>. Ver <a href="../motor-local/">Motor local</a>.</td>
+</tr>
+<tr>
+<td><strong>A mano</strong></td>
+<td>Ya sabes lo que quieres.</td>
+<td>Cualquier editor. Pulsa ↻ en el panel <em>Spec</em> para recargar.</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="callout callout-tip"><p class="callout-title">Consejo</p>
+<p>Una buena especificación tiene tareas pequeñas que empiezan por un verbo y que se pueden verificar: «Validar el correo del formulario de registro» es mejor que «Usuarios». La IA implementa mucho mejor una tarea de un par de archivos que una épica entera.</p>
+</aside>
+<h2 id="2-el-tablero">2. El tablero</h2>
+<p>Todas las tareas pendientes empiezan en <strong>Backlog</strong>. Las columnas son <em>Backlog</em>, <em>Todo</em>, <em>In Progress</em> y <em>Done</em>.</p>
+<figure class="video">
+<video controls preload="none" playsinline poster="../media/work-task.jpg" width="1440" height="900" aria-label="Una tarea del tablero, de principio a fin"><source src="../media/work-task.mp4" type="video/mp4">Tu navegador no reproduce vídeo MP4. <a href="../media/work-task.mp4">Descarga el vídeo</a>.</video>
+<figcaption><strong>Una tarea del tablero, de principio a fin</strong> <span class="video-len">0:25</span> — Se arrastra SPEC-003 a In Progress; el agente planifica y genera el archivo, el chat muestra el diff y <code>si aplicar</code> lo escribe con checkpoint. Los tests pasan, pero el build falla (el proyecto de ejemplo no tiene <code>vite</code> instalado), así que la compuerta DoD deja la tarjeta en In Progress y la deuda sube. Grabado con Ollama (llama3.2 3B), acelerado en las esperas.</figcaption>
+</figure>
+<p><strong>Arrastrar una tarjeta a <em>In Progress</em> arranca la IA</strong>, y no escribe nada a ciegas:</p>
+<ol>
+<li><strong>Plan.</strong> El agente revisa el workspace y decide qué archivos crear o cambiar (como mucho 6). Las rutas que saldrían del proyecto se descartan; una ruta que el modelo escriba como <code>/api/x.js</code> se lee como <code>api/x.js</code> dentro del proyecto.</li>
+<li><strong>Generación.</strong> Genera cada archivo y lo guarda como <strong>diff pendiente</strong>. El chat muestra cada diff (<code>+añadidas/−quitadas</code>).</li>
+<li><strong>Tu revisión.</strong> Lee los diffs. Usa <code>diff &lt;ruta&gt;</code> para ver uno completo.</li>
+<li><strong>Aplicar o descartar.</strong> <code>si aplicar</code> escribe todos los pendientes con la política, la revisión automática y el <em>checkpoint</em> descritos en <a href="../arnes/#que-protege-una-escritura">Cómo piensa el arnés</a>. <code>no</code> los descarta todos.</li>
+<li><strong>Verificación.</strong> Tras aplicar se ejecutan los comandos reales de build y test.</li>
+<li><strong>Done.</strong> La tarjeta pasa a <em>Done</em> y <code>spec.md</code> se actualiza a <code>- [x]</code> <strong>solo si</strong> la compuerta DoD tiene evidencia. Si no, se queda en <em>In Progress</em> y el chat explica qué falta.</li>
+</ol>
+<p>Si una tarea antigua contiene una ruta de ejemplo como <code>&lt;carpeta-fuente&gt;/services/validator.ts</code>, el arnés la resuelve usando la carpeta fuente detectada (o la raíz del workspace), actualiza la vista previa en la ruta real y pide confirmación otra vez. Si el archivo cambió desde que se generó el diff, no lo sobrescribe: conserva esa propuesta para regenerarla. Un diff que falla queda pendiente, pero los demás se siguen procesando. Si no hay repositorio Git, la aplicación continúa con un aviso de que no se pudo crear el <em>checkpoint</em>.</p>
+<figure class="figure"><a class="zoom" href="../diagrams/03-sdd-task-sequence.svg" aria-label="Ampliar: Secuencia de una tarea: planificar, generar, diff, aprobar, aplicar, probar"><img src="../diagrams/03-sdd-task-sequence.svg" alt="Secuencia de una tarea: planificar, generar, diff, aprobar, aplicar, probar" width="1120" height="1358" loading="lazy" decoding="async"></a><figcaption>Lo que ocurre entre arrastrar la tarjeta y que llegue a Done.</figcaption></figure>
 
-        <p>La pestaña <strong>Evidence</strong> muestra la misma cola de revisión con botones (<em>Discard all</em> y
-          <em>Apply &amp; run gates</em>), por si prefieres hacer clic en vez de escribir.</p>
-        <aside class="callout callout-important">
-          <p class="callout-title">Importante</p>
-          <p>Mientras trabaja una tarea, la IA <strong>no puede escribir <code>spec.md</code></strong>: si lo intenta,
-            esa escritura se ignora. Así un modelo despistado no puede borrar tus casillas. El tablero actualiza
-            <code>spec.md</code> por su cuenta cuando la tarea llega a <em>Done</em>.</p>
-        </aside>
-        <p>Si la llamada al modelo falla, el error aparece en el chat y la tarjeta vuelve a su columna: no hay fallos
-          silenciosos.</p>
-        <h2 id="3-el-chat">3. El chat</h2>
-        <p>El chat del panel derecho entiende tres tipos de mensaje:</p>
-        <ul>
-          <li><strong>Lenguaje natural.</strong> El arnés decide el carril (Flash, Build o Deep), te enseña su decisión
-            y, si hace falta, te pide confirmación. Ver <a href="../arnes/#los-tres-carriles">Cómo piensa el arnés</a>.
-          </li>
-          <li><strong>Comandos del arnés</strong>, como <code>onboard</code>, <code>dora</code>, <code>deuda</code> o
-            <code>si aplicar</code>. La mayoría no gastan llamadas a modelos. Están todos en <a
-              href="../comandos-chat/">Comandos del chat</a>.</li>
-          <li><strong>Skills</strong>, con el botón <strong>/skill</strong>: crear un archivo, refactorizar, generar
-            tests, el <em>standup</em> diario… Ver <a href="../agentes/">Agentes</a>.</li>
-        </ul>
-        <h2 id="ideas-que-todavia-no-son-tareas">Ideas que todavía no son tareas</h2>
-        <p>Escribe una idea desordenada («se me ocurre que los socios podrían reservar con prioridad…»). El arnés la
-          detecta como carril <em>Flash · ideate</em> y la guarda en la <strong>bandeja de ideas</strong>
-          (<code>.alpaquitay/ideas.json</code>) con un objetivo, un alcance y un no-alcance propuestos. Cuando la tengas
-          clara, escribe <code>promover</code> y la última idea se convierte en una épica nueva de <code>spec.md</code>.
-        </p>
-        <h2 id="enlazar-commits-con-tareas">Enlazar commits con tareas</h2>
-        <p>Menciona la tarea en el mensaje del commit:</p>
-        <div class="code" data-lang="Texto">
-          <pre><code class="language-text">feat(reservas): calendario de pistas disponibles #SPEC-001
+<p>La pestaña <strong>Evidence</strong> muestra la misma cola de revisión con botones (<em>Discard all</em> y <em>Apply &amp; run gates</em>), por si prefieres hacer clic en vez de escribir.</p>
+<aside class="callout callout-important"><p class="callout-title">Importante</p>
+<p>Mientras trabaja una tarea, la IA <strong>no puede escribir <code>spec.md</code></strong>: si lo intenta, esa escritura se ignora. Así un modelo despistado no puede borrar tus casillas. El tablero actualiza <code>spec.md</code> por su cuenta cuando la tarea llega a <em>Done</em>.</p>
+</aside>
+<p>Si la llamada al modelo falla, el error aparece en el chat y la tarjeta vuelve a su columna: no hay fallos silenciosos.</p>
+<h2 id="3-el-chat">3. El chat</h2>
+<p>El chat del panel derecho entiende tres tipos de mensaje:</p>
+<ul>
+<li><strong>Lenguaje natural.</strong> El arnés decide el carril (Flash, Build o Deep), te enseña su decisión y, si hace falta, te pide confirmación. Ver <a href="../arnes/#los-tres-carriles">Cómo piensa el arnés</a>.</li>
+<li><strong>Comandos del arnés</strong>, como <code>onboard</code>, <code>dora</code>, <code>deuda</code> o <code>si aplicar</code>. La mayoría no gastan llamadas a modelos. Están todos en <a href="../comandos-chat/">Comandos del chat</a>.</li>
+<li><strong>Skills</strong>, con el botón <strong>/skill</strong>: crear un archivo, refactorizar, generar tests, el <em>standup</em> diario… Ver <a href="../agentes/">Agentes</a>.</li>
+</ul>
+<h2 id="ideas-que-todavia-no-son-tareas">Ideas que todavía no son tareas</h2>
+<p>Escribe una idea desordenada («se me ocurre que los socios podrían reservar con prioridad…»). El arnés la detecta como carril <em>Flash · ideate</em> y la guarda en la <strong>bandeja de ideas</strong> (<code>.alpaquitay/ideas.json</code>) con un objetivo, un alcance y un no-alcance propuestos. Cuando la tengas clara, escribe <code>promover</code> y la última idea se convierte en una épica nueva de <code>spec.md</code>.</p>
+<h2 id="enlazar-commits-con-tareas">Enlazar commits con tareas</h2>
+<p>Menciona la tarea en el mensaje del commit:</p>
+<div class="code" data-lang="Texto"><pre><code class="language-text">feat(reservas): calendario de pistas disponibles #SPEC-001
 
 Muestra las franjas libres de los próximos 7 días.
-</code></pre>
-        </div>
-        <p>Se reconocen <code>#SPEC-001</code> y <code>[SPEC: 001]</code>. La pestaña <strong>Evidence</strong> marca
-          esos commits en el historial y los cuenta en las señales del repositorio: cuantos más commits enlazados, mejor
-          trazabilidad.</p>
-        <h2 id="generate-from-spec-y-validate-against-spec">Generate from Spec y Validate Against Spec</h2>
-        <p>Además del tablero, el menú rápido tiene dos comandos clásicos que trabajan con <strong>cualquier archivo de
-            especificación</strong> (<code>.md</code>, <code>.yaml</code>, <code>.yml</code>, <code>.json</code> o
-          <code>.feature</code>):</p>
-        <ul>
-          <li><strong>Generate from Spec</strong> elige un archivo, planifica los archivos necesarios y los genera.</li>
-          <li><strong>Validate Against Spec</strong> compara el código del proyecto con la especificación y te informa
-            de lo que no cumple.</li>
-        </ul>
-        <aside class="callout callout-warning">
-          <p class="callout-title">Atención</p>
-          <p><em>Generate from Spec</em> <strong>escribe los archivos directamente</strong>, sin diff previo ni
-            <code>si aplicar</code>, y puede sobrescribir archivos con el mismo nombre. Úsalo con el árbol de Git limpio
-            para revisar el resultado con <code>git diff</code> y deshacerlo si hace falta. Para trabajo con revisión
-            previa, usa el tablero.</p>
-        </aside>
-        <p><strong>New Specification</strong> crea una plantilla en <code>specs/</code>: API REST (OpenAPI 3.0),
-          <em>feature</em> BDD (Gherkin), esquema de base de datos, microservicio Spring Boot o componente React.</p>
+</code></pre></div>
+<p>Se reconocen <code>#SPEC-001</code> y <code>[SPEC: 001]</code>. La pestaña <strong>Evidence</strong> marca esos commits en el historial y los cuenta en las señales del repositorio: cuantos más commits enlazados, mejor trazabilidad.</p>
+<h2 id="generate-from-spec-y-validate-against-spec">Generate from Spec y Validate Against Spec</h2>
+<p>Además del tablero, el menú rápido tiene dos comandos clásicos que trabajan con <strong>cualquier archivo de especificación</strong> (<code>.md</code>, <code>.yaml</code>, <code>.yml</code>, <code>.json</code> o <code>.feature</code>):</p>
+<ul>
+<li><strong>Generate from Spec</strong> elige un archivo, planifica los archivos necesarios y los genera.</li>
+<li><strong>Validate Against Spec</strong> compara el código del proyecto con la especificación y te informa de lo que no cumple.</li>
+</ul>
+<aside class="callout callout-warning"><p class="callout-title">Atención</p>
+<p><em>Generate from Spec</em> <strong>escribe los archivos directamente</strong>, sin diff previo ni <code>si aplicar</code>, y puede sobrescribir archivos con el mismo nombre. Úsalo con el árbol de Git limpio para revisar el resultado con <code>git diff</code> y deshacerlo si hace falta. Para trabajo con revisión previa, usa el tablero.</p>
+</aside>
+<p><strong>New Specification</strong> crea una plantilla en <code>specs/</code>: API REST (OpenAPI 3.0), <em>feature</em> BDD (Gherkin), esquema de base de datos, microservicio Spring Boot o componente React.</p>
 
-        <div class="doc-foot">
-          <a class="edit"
-            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/04-work.md">Proponer una mejora
-            a esta página</a>
-          <span>Manual para Alpaquitay AI 3.8.3 · MIT</span>
-        </div>
-        <nav class="pager" aria-label="Capítulos">
-          <a class="prev" href="../arnes/"><span>Anterior</span>Cómo piensa el arnés</a>
-          <a class="next" href="../comandos-chat/"><span>Siguiente</span>Comandos del chat</a>
-        </nav>
-      </article>
-      <nav class="toc" aria-label="En esta página">
-        <p class="toc-title">En esta página</p>
-        <ul>
-          <li class="l2"><a href="#tu-siguiente-paso-siempre-a-la-vista">Tu siguiente paso, siempre a la vista</a></li>
-          <li class="l2"><a href="#1-la-especificacion-spec-md">1. La especificación (spec.md)</a></li>
-          <li class="l3"><a href="#tres-formas-de-crearla">Tres formas de crearla</a></li>
-          <li class="l2"><a href="#2-el-tablero">2. El tablero</a></li>
-          <li class="l2"><a href="#3-el-chat">3. El chat</a></li>
-          <li class="l2"><a href="#ideas-que-todavia-no-son-tareas">Ideas que todavía no son tareas</a></li>
-          <li class="l2"><a href="#enlazar-commits-con-tareas">Enlazar commits con tareas</a></li>
-          <li class="l2"><a href="#generate-from-spec-y-validate-against-spec">Generate from Spec y Validate Against
-              Spec</a></li>
-        </ul>
-      </nav>
-    </main>
+<div class="doc-foot">
+  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/04-work.md">Proponer una mejora a esta página</a>
+  <span>Manual para Alpaquitay AI 3.8.3 · MIT</span>
+</div>
+<nav class="pager" aria-label="Capítulos">
+<a class="prev" href="../arnes/"><span>Anterior</span>Cómo piensa el arnés</a>
+<a class="next" href="../comandos-chat/"><span>Siguiente</span>Comandos del chat</a>
+</nav>
+</article>
+<nav class="toc" aria-label="En esta página"><p class="toc-title">En esta página</p><ul><li class="l2"><a href="#tu-siguiente-paso-siempre-a-la-vista">Tu siguiente paso, siempre a la vista</a></li><li class="l2"><a href="#1-la-especificacion-spec-md">1. La especificación (spec.md)</a></li><li class="l3"><a href="#tres-formas-de-crearla">Tres formas de crearla</a></li><li class="l2"><a href="#2-el-tablero">2. El tablero</a></li><li class="l2"><a href="#3-el-chat">3. El chat</a></li><li class="l2"><a href="#ideas-que-todavia-no-son-tareas">Ideas que todavía no son tareas</a></li><li class="l2"><a href="#enlazar-commits-con-tareas">Enlazar commits con tareas</a></li><li class="l2"><a href="#generate-from-spec-y-validate-against-spec">Generate from Spec y Validate Against Spec</a></li></ul></nav>
+</main>
+</div>
+<div class="search" id="search" hidden>
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
+    <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off" aria-label="Texto a buscar">
+    <ol id="searchResults" class="search-results"></ol>
+    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para cerrar</p>
   </div>
-  <div class="search" id="search" hidden>
-    <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
-      <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off"
-        aria-label="Texto a buscar">
-      <ol id="searchResults" class="search-results"></ol>
-      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para
-        cerrar</p>
-    </div>
-  </div>
-  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
-  <script src="../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+</div>
+<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
+<script src="../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
-
 </html>

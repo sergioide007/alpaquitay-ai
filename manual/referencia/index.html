@@ -1,421 +1,358 @@
 <!doctype html>
 <html lang="es" data-theme="dark">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Referencia de comandos, atajos y ajustes · Manual de Alpaquitay AI</title>
-  <meta name="description"
-    content="Todos los comandos, atajos de teclado y ajustes de Alpaquitay AI con sus valores por defecto.">
-  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/referencia/">
-  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/referencia/">
-  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/reference/">
-  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/reference/">
-  <meta property="og:type" content="article">
-  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/referencia/">
-  <meta property="og:title" content="Referencia de comandos, atajos y ajustes">
-  <meta property="og:description"
-    content="Todos los comandos, atajos de teclado y ajustes de Alpaquitay AI con sus valores por defecto.">
-  <meta property="og:locale" content="es_ES">
-  <meta name="theme-color" content="#07100d">
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-  <link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
-  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
-  <script
-    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Referencia de comandos, atajos y ajustes","description":"Todos los comandos, atajos de teclado y ajustes de Alpaquitay AI con sus valores por defecto.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/referencia/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Referencia de comandos, atajos y ajustes · Manual de Alpaquitay AI</title>
+<meta name="description" content="Todos los comandos, atajos de teclado y ajustes de Alpaquitay AI con sus valores por defecto.">
+<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/referencia/">
+<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/referencia/">
+<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/reference/">
+<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/reference/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/referencia/">
+<meta property="og:title" content="Referencia de comandos, atajos y ajustes">
+<meta property="og:description" content="Todos los comandos, atajos de teclado y ajustes de Alpaquitay AI con sus valores por defecto.">
+<meta property="og:locale" content="es_ES">
+<meta name="theme-color" content="#07100d">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+<link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
+<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Referencia de comandos, atajos y ajustes","description":"Todos los comandos, atajos de teclado y ajustes de Alpaquitay AI con sus valores por defecto.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/referencia/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
-
 <body>
-  <a class="skip" href="#contenido">Saltar al contenido</a>
-  <header class="top">
-    <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar"
-      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
-        <path d="M3 5h14M3 10h14M3 15h14" />
-      </svg></button>
-    <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><img class="brand-mark"
-        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-    <a class="crumb" href="../">Manual</a>
-    <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20"
-        aria-hidden="true">
-        <circle cx="9" cy="9" r="5.5" />
-        <path d="m13.5 13.5 3.5 3.5" />
-      </svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
-    <a class="lang" href="../en/reference/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
-    <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20"
-        aria-hidden="true">
-        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
-      </svg></button>
-    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg
-        viewBox="0 0 16 16" aria-hidden="true" class="fill">
-        <path
-          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
-      </svg></a>
-    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
-  </header>
-  <div class="layout">
-    <aside class="sidebar" id="sidebar" aria-label="Índice del manual">
-      <p class="side-title">Manual de uso <span class="ver">v3.8.3</span></p>
-      <ol class="chapters">
-        <li><a href="../"><span class="n">00</span>Inicio</a></li>
-        <li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
-        <li><a href="../proveedores/"><span class="n">02</span>Proveedores y privacidad</a></li>
-        <li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
-        <li><a href="../work/"><span class="n">04</span>Work · spec, tablero y chat</a></li>
-        <li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
-        <li><a href="../docs/"><span class="n">06</span>Docs · documentos con un agente</a></li>
-        <li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
-        <li><a href="../arquitectura/"><span class="n">08</span>Architecture · ADR e IaC</a></li>
-        <li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
-        <li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
-        <li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
-        <li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
-        <li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
-        <li><a href="../referencia/" aria-current="page"><span class="n">14</span>Referencia</a></li>
-        <li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
-        <li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
-      </ol>
-      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
-          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a
-          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-    </aside>
-    <main class="content" id="contenido">
-      <article class="doc">
-        <p class="kicker">Capítulo 14</p>
-        <h1 id="referencia-de-comandos-atajos-y-ajustes">Referencia de comandos, atajos y ajustes</h1>
-        <h2 id="comandos">Comandos</h2>
-        <p>Todos están en la paleta de comandos (<kbd>F1</kbd>) con el prefijo <strong>Alpaquitay AI:</strong>.</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Comando</th>
-                <th>Atajo</th>
-                <th>Qué hace</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Open Alpaquitay Hub</td>
-                <td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd></td>
-                <td>Abre el panel principal.</td>
-              </tr>
-              <tr>
-                <td>Show Alpaquitay Commands</td>
-                <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd></td>
-                <td>Menú rápido con los comandos principales.</td>
-              </tr>
-              <tr>
-                <td>New Specification</td>
-                <td>—</td>
-                <td>Crea una especificación desde una plantilla en <code>specs/</code>.</td>
-              </tr>
-              <tr>
-                <td>Generate from Specification</td>
-                <td>—</td>
-                <td>Genera código desde un archivo de especificación (escribe directamente).</td>
-              </tr>
-              <tr>
-                <td>Validate Against Specification</td>
-                <td>—</td>
-                <td>Comprueba el código frente a una especificación.</td>
-              </tr>
-              <tr>
-                <td>Generate Specification (Local Model)</td>
-                <td>—</td>
-                <td>Escribe una especificación con el modelo local, en tu GPU.</td>
-              </tr>
-              <tr>
-                <td>Clear Local Model Cache</td>
-                <td>—</td>
-                <td>Borra los archivos del modelo guardados en caché.</td>
-              </tr>
-              <tr>
-                <td>Configure AI Provider</td>
-                <td>—</td>
-                <td>Guarda una clave de API o configura un servidor local.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>En macOS, usa <kbd>Cmd</kbd> en lugar de <kbd>Ctrl</kbd>.</p>
-        <h2 id="comandos-del-chat">Comandos del chat</h2>
-        <p><code>onboard</code> · <code>dora</code> · <code>deuda</code> · <code>economía</code> ·
-          <code>postmortem &lt;texto&gt;</code> · <code>diff &lt;ruta&gt;</code> · <code>si aplicar</code> ·
-          <code>no</code> · <code>promover</code> · <code>si</code>. Detalle en <a href="../comandos-chat/">Comandos del
-            chat</a>.</p>
-        <h2 id="ajustes">Ajustes</h2>
-        <p>Se cambian en la interfaz de ajustes de VS Code, en <code>settings.json</code> o, los del proveedor, en la
-          pestaña <strong>Settings</strong> del Hub.</p>
-        <h3 id="proveedor-y-modelo">Proveedor y modelo</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Ajuste</th>
-                <th>Por defecto</th>
-                <th>Descripción</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>alpaquitay-ai.preferredProvider</code></td>
-                <td><code>auto</code></td>
-                <td><code>auto</code>, <code>ollama</code>, <code>lmstudio</code>, <code>local-wasm</code>,
-                  <code>anthropic</code> u <code>openai</code>. <code>auto</code> prueba primero los locales.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.anthropic.model</code></td>
-                <td><code>claude-opus-5-5</code></td>
-                <td>Identificador del modelo de Anthropic.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.anthropic.baseUrl</code></td>
-                <td><code>https://api.anthropic.com/v1</code></td>
-                <td>Para proxies o APIs compatibles.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.openai.model</code></td>
-                <td><code>gpt-6.1-sol</code></td>
-                <td>Identificador del modelo de OpenAI.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.openai.baseUrl</code></td>
-                <td><code>https://api.openai.com/v1</code></td>
-                <td>Para Azure OpenAI o proxies.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.ollama.endpoint</code></td>
-                <td><code>http://localhost:11434</code></td>
-                <td>Dirección del servidor Ollama.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.ollama.model</code></td>
-                <td><code>codellama</code></td>
-                <td>Modelo de Ollama.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.lmstudio.endpoint</code></td>
-                <td><code>http://localhost:1234</code></td>
-                <td>Dirección del servidor LM Studio.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.maxTokens</code></td>
-                <td><code>4096</code></td>
-                <td>Máximo de tokens por petición.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.temperature</code></td>
-                <td><code>0.3</code></td>
-                <td>0 = determinista, 2 = creativo.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.requestTimeout</code></td>
-                <td><code>120000</code></td>
-                <td>Tiempo máximo por petición, en milisegundos.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.systemPrompt</code></td>
-                <td>vacío</td>
-                <td>Instrucciones globales para todas las peticiones.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.orgContext</code></td>
-                <td>vacío</td>
-                <td>Nombre o contexto de tu organización.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <h3 id="proyecto-y-herramientas">Proyecto y herramientas</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Ajuste</th>
-                <th>Por defecto</th>
-                <th>Descripción</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>alpaquitay-ai.specFile</code></td>
-                <td><code>spec.md</code></td>
-                <td>Archivo de especificación en la raíz (por ejemplo <code>tasks.md</code>).</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.skill.maxParallel</code></td>
-                <td><code>3</code></td>
-                <td>Máximo de skills en paralelo.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.mcp.filesystem.enabled</code></td>
-                <td><code>true</code></td>
-                <td>Permite a la IA leer y escribir archivos del workspace.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.mcp.git.enabled</code></td>
-                <td><code>true</code></td>
-                <td>Permite a la IA leer el historial de Git.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.indexing.enabled</code></td>
-                <td><code>false</code></td>
-                <td>Indexado del workspace (próximamente).</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.enableTelemetry</code></td>
-                <td><code>false</code></td>
-                <td>Estadísticas anónimas de uso. Nunca código ni <em>prompts</em>.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <h3 id="motor-local">Motor local</h3>
-        <p><code>enabled</code>, <code>modelId</code>, <code>cdnBaseUrl</code> y <code>extraTrustedKeys</code> solo se
-          leen de tu <strong>configuración de usuario</strong> (ámbito de aplicación): un proyecto que abras no puede
-          activar el motor, cambiar el modelo, redirigir la descarga ni añadir claves.</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Ajuste</th>
-                <th>Por defecto</th>
-                <th>Descripción</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>alpaquitay-ai.localEngine.enabled</code></td>
-                <td><code>false</code></td>
-                <td>Usar el motor local como proveedor.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.localEngine.modelId</code></td>
-                <td><code>qwen2.5-coder-1.5b-instruct</code></td>
-                <td>Modelo bajo <code>/models/</code> en el CDN.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.localEngine.cdnBaseUrl</code></td>
-                <td><code>https://alpaquitay.specsolid.com</code></td>
-                <td>CDN de los modelos (https).</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.localEngine.extraTrustedKeys</code></td>
-                <td><code>[]</code></td>
-                <td>Claves públicas Ed25519 adicionales (espejo propio).</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.localEngine.device</code></td>
-                <td><code>auto</code></td>
-                <td><code>auto</code>, <code>webgpu</code> o <code>wasm</code>.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.localEngine.dtype</code></td>
-                <td><code>auto</code></td>
-                <td><code>auto</code>, <code>q4</code>, <code>q4f16</code>, <code>q8</code>, <code>fp16</code> o
-                  <code>fp32</code>.</td>
-              </tr>
-              <tr>
-                <td><code>alpaquitay-ai.localEngine.maxNewTokens</code></td>
-                <td><code>1024</code></td>
-                <td>Máximo de tokens nuevos por generación local.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <h3 id="un-ajuste-de-vs-code-que-conviene-conocer">Un ajuste de VS Code que conviene conocer</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Ajuste</th>
-                <th>Para qué</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>window.dialogStyle</code></td>
-                <td><code>native</code> (por defecto) muestra los diálogos modales, como la confirmación de descarga del
-                  modelo, como ventanas del sistema. <code>custom</code> los dibuja dentro de VS Code.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <h2 id="archivos-que-escribe-alpaquitay">Archivos que escribe Alpaquitay</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Ruta</th>
-                <th>Quién la escribe</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>spec.md</code></td>
-                <td>Tú, <em>Create with AI</em>, <em>Regen</em>, <code>promover</code>, una petición de código
-                  confirmada en el chat (reemplaza el archivo) y el tablero al cerrar tareas.</td>
-              </tr>
-              <tr>
-                <td><code>specs/*.md</code></td>
-                <td><em>New Specification</em> y <em>Generate Specification (Local Model)</em>.</td>
-              </tr>
-              <tr>
-                <td><code>infra/main.*</code></td>
-                <td><em>Export as IaC</em> en Architecture.</td>
-              </tr>
-              <tr>
-                <td><code>*.edited.*</code></td>
-                <td>El agente de Docs al aplicar cambios (salvo que elijas sobrescribir).</td>
-              </tr>
-              <tr>
-                <td><code>.alpaquitay/</code></td>
-                <td>El arnés: decisiones, deuda, economía, huella, plataforma, ADR, memoria, ideas, arquitectura y
-                  copias de seguridad.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="top">
+  <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+  <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+  <a class="crumb" href="../">Manual</a>
+  <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
+  <a class="lang" href="../en/reference/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
+  <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
+  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
+  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
+</header>
+<div class="layout">
+<aside class="sidebar" id="sidebar" aria-label="Índice del manual">
+  <p class="side-title">Manual de uso <span class="ver">v3.8.3</span></p>
+  <ol class="chapters">
+<li><a href="../"><span class="n">00</span>Inicio</a></li>
+<li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
+<li><a href="../proveedores/"><span class="n">02</span>Proveedores y privacidad</a></li>
+<li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
+<li><a href="../work/"><span class="n">04</span>Work · spec, tablero y chat</a></li>
+<li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
+<li><a href="../docs/"><span class="n">06</span>Docs · documentos con un agente</a></li>
+<li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
+<li><a href="../arquitectura/"><span class="n">08</span>Architecture · ADR e IaC</a></li>
+<li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
+<li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
+<li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
+<li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
+<li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
+<li><a href="../referencia/" aria-current="page"><span class="n">14</span>Referencia</a></li>
+<li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
+<li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
+  </ol>
+  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+</aside>
+<main class="content" id="contenido">
+<article class="doc">
+<p class="kicker">Capítulo 14</p>
+<h1 id="referencia-de-comandos-atajos-y-ajustes">Referencia de comandos, atajos y ajustes</h1>
+<h2 id="comandos">Comandos</h2>
+<p>Todos están en la paleta de comandos (<kbd>F1</kbd>) con el prefijo <strong>Alpaquitay AI:</strong>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Comando</th>
+<th>Atajo</th>
+<th>Qué hace</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Open Alpaquitay Hub</td>
+<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd></td>
+<td>Abre el panel principal.</td>
+</tr>
+<tr>
+<td>Show Alpaquitay Commands</td>
+<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd></td>
+<td>Menú rápido con los comandos principales.</td>
+</tr>
+<tr>
+<td>New Specification</td>
+<td>—</td>
+<td>Crea una especificación desde una plantilla en <code>specs/</code>.</td>
+</tr>
+<tr>
+<td>Generate from Specification</td>
+<td>—</td>
+<td>Genera código desde un archivo de especificación (escribe directamente).</td>
+</tr>
+<tr>
+<td>Validate Against Specification</td>
+<td>—</td>
+<td>Comprueba el código frente a una especificación.</td>
+</tr>
+<tr>
+<td>Generate Specification (Local Model)</td>
+<td>—</td>
+<td>Escribe una especificación con el modelo local, en tu GPU.</td>
+</tr>
+<tr>
+<td>Clear Local Model Cache</td>
+<td>—</td>
+<td>Borra los archivos del modelo guardados en caché.</td>
+</tr>
+<tr>
+<td>Configure AI Provider</td>
+<td>—</td>
+<td>Guarda una clave de API o configura un servidor local.</td>
+</tr>
+</tbody>
+</table></div>
+<p>En macOS, usa <kbd>Cmd</kbd> en lugar de <kbd>Ctrl</kbd>.</p>
+<h2 id="comandos-del-chat">Comandos del chat</h2>
+<p><code>onboard</code> · <code>dora</code> · <code>deuda</code> · <code>economía</code> · <code>postmortem &lt;texto&gt;</code> · <code>diff &lt;ruta&gt;</code> · <code>si aplicar</code> · <code>no</code> · <code>promover</code> · <code>si</code>. Detalle en <a href="../comandos-chat/">Comandos del chat</a>.</p>
+<h2 id="ajustes">Ajustes</h2>
+<p>Se cambian en la interfaz de ajustes de VS Code, en <code>settings.json</code> o, los del proveedor, en la pestaña <strong>Settings</strong> del Hub.</p>
+<h3 id="proveedor-y-modelo">Proveedor y modelo</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ajuste</th>
+<th>Por defecto</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>alpaquitay-ai.preferredProvider</code></td>
+<td><code>auto</code></td>
+<td><code>auto</code>, <code>ollama</code>, <code>lmstudio</code>, <code>local-wasm</code>, <code>anthropic</code> u <code>openai</code>. <code>auto</code> prueba primero los locales.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.anthropic.model</code></td>
+<td><code>claude-opus-5-5</code></td>
+<td>Identificador del modelo de Anthropic.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.anthropic.baseUrl</code></td>
+<td><code>https://api.anthropic.com/v1</code></td>
+<td>Para proxies o APIs compatibles.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.openai.model</code></td>
+<td><code>gpt-6.1-sol</code></td>
+<td>Identificador del modelo de OpenAI.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.openai.baseUrl</code></td>
+<td><code>https://api.openai.com/v1</code></td>
+<td>Para Azure OpenAI o proxies.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.ollama.endpoint</code></td>
+<td><code>http://localhost:11434</code></td>
+<td>Dirección del servidor Ollama.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.ollama.model</code></td>
+<td><code>codellama</code></td>
+<td>Modelo de Ollama.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.lmstudio.endpoint</code></td>
+<td><code>http://localhost:1234</code></td>
+<td>Dirección del servidor LM Studio.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.maxTokens</code></td>
+<td><code>4096</code></td>
+<td>Máximo de tokens por petición.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.temperature</code></td>
+<td><code>0.3</code></td>
+<td>0 = determinista, 2 = creativo.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.requestTimeout</code></td>
+<td><code>120000</code></td>
+<td>Tiempo máximo por petición, en milisegundos.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.systemPrompt</code></td>
+<td>vacío</td>
+<td>Instrucciones globales para todas las peticiones.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.orgContext</code></td>
+<td>vacío</td>
+<td>Nombre o contexto de tu organización.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="proyecto-y-herramientas">Proyecto y herramientas</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ajuste</th>
+<th>Por defecto</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>alpaquitay-ai.specFile</code></td>
+<td><code>spec.md</code></td>
+<td>Archivo de especificación en la raíz (por ejemplo <code>tasks.md</code>).</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.skill.maxParallel</code></td>
+<td><code>3</code></td>
+<td>Máximo de skills en paralelo.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.mcp.filesystem.enabled</code></td>
+<td><code>true</code></td>
+<td>Permite a la IA leer y escribir archivos del workspace.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.mcp.git.enabled</code></td>
+<td><code>true</code></td>
+<td>Permite a la IA leer el historial de Git.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.indexing.enabled</code></td>
+<td><code>false</code></td>
+<td>Indexado del workspace (próximamente).</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.enableTelemetry</code></td>
+<td><code>false</code></td>
+<td>Estadísticas anónimas de uso. Nunca código ni <em>prompts</em>.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="motor-local">Motor local</h3>
+<p><code>enabled</code>, <code>modelId</code>, <code>cdnBaseUrl</code> y <code>extraTrustedKeys</code> solo se leen de tu <strong>configuración de usuario</strong> (ámbito de aplicación): un proyecto que abras no puede activar el motor, cambiar el modelo, redirigir la descarga ni añadir claves.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ajuste</th>
+<th>Por defecto</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>alpaquitay-ai.localEngine.enabled</code></td>
+<td><code>false</code></td>
+<td>Usar el motor local como proveedor.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.localEngine.modelId</code></td>
+<td><code>qwen2.5-coder-1.5b-instruct</code></td>
+<td>Modelo bajo <code>/models/</code> en el CDN.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.localEngine.cdnBaseUrl</code></td>
+<td><code>https://alpaquitay.specsolid.com</code></td>
+<td>CDN de los modelos (https).</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.localEngine.extraTrustedKeys</code></td>
+<td><code>[]</code></td>
+<td>Claves públicas Ed25519 adicionales (espejo propio).</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.localEngine.device</code></td>
+<td><code>auto</code></td>
+<td><code>auto</code>, <code>webgpu</code> o <code>wasm</code>.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.localEngine.dtype</code></td>
+<td><code>auto</code></td>
+<td><code>auto</code>, <code>q4</code>, <code>q4f16</code>, <code>q8</code>, <code>fp16</code> o <code>fp32</code>.</td>
+</tr>
+<tr>
+<td><code>alpaquitay-ai.localEngine.maxNewTokens</code></td>
+<td><code>1024</code></td>
+<td>Máximo de tokens nuevos por generación local.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="un-ajuste-de-vs-code-que-conviene-conocer">Un ajuste de VS Code que conviene conocer</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ajuste</th>
+<th>Para qué</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>window.dialogStyle</code></td>
+<td><code>native</code> (por defecto) muestra los diálogos modales, como la confirmación de descarga del modelo, como ventanas del sistema. <code>custom</code> los dibuja dentro de VS Code.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="archivos-que-escribe-alpaquitay">Archivos que escribe Alpaquitay</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ruta</th>
+<th>Quién la escribe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>spec.md</code></td>
+<td>Tú, <em>Create with AI</em>, <em>Regen</em>, <code>promover</code>, una petición de código confirmada en el chat (reemplaza el archivo) y el tablero al cerrar tareas.</td>
+</tr>
+<tr>
+<td><code>specs/*.md</code></td>
+<td><em>New Specification</em> y <em>Generate Specification (Local Model)</em>.</td>
+</tr>
+<tr>
+<td><code>infra/main.*</code></td>
+<td><em>Export as IaC</em> en Architecture.</td>
+</tr>
+<tr>
+<td><code>*.edited.*</code></td>
+<td>El agente de Docs al aplicar cambios (salvo que elijas sobrescribir).</td>
+</tr>
+<tr>
+<td><code>.alpaquitay/</code></td>
+<td>El arnés: decisiones, deuda, economía, huella, plataforma, ADR, memoria, ideas, arquitectura y copias de seguridad.</td>
+</tr>
+</tbody>
+</table></div>
 
-        <div class="doc-foot">
-          <a class="edit"
-            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/14-referencia.md">Proponer una
-            mejora a esta página</a>
-          <span>Manual para Alpaquitay AI 3.8.3 · MIT</span>
-        </div>
-        <nav class="pager" aria-label="Capítulos">
-          <a class="prev" href="../diagramas/"><span>Anterior</span>Diagramas de arquitectura</a>
-          <a class="next" href="../problemas/"><span>Siguiente</span>Problemas y preguntas</a>
-        </nav>
-      </article>
-      <nav class="toc" aria-label="En esta página">
-        <p class="toc-title">En esta página</p>
-        <ul>
-          <li class="l2"><a href="#comandos">Comandos</a></li>
-          <li class="l2"><a href="#comandos-del-chat">Comandos del chat</a></li>
-          <li class="l2"><a href="#ajustes">Ajustes</a></li>
-          <li class="l3"><a href="#proveedor-y-modelo">Proveedor y modelo</a></li>
-          <li class="l3"><a href="#proyecto-y-herramientas">Proyecto y herramientas</a></li>
-          <li class="l3"><a href="#motor-local">Motor local</a></li>
-          <li class="l3"><a href="#un-ajuste-de-vs-code-que-conviene-conocer">Un ajuste de VS Code que conviene
-              conocer</a></li>
-          <li class="l2"><a href="#archivos-que-escribe-alpaquitay">Archivos que escribe Alpaquitay</a></li>
-        </ul>
-      </nav>
-    </main>
+<div class="doc-foot">
+  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/14-referencia.md">Proponer una mejora a esta página</a>
+  <span>Manual para Alpaquitay AI 3.8.3 · MIT</span>
+</div>
+<nav class="pager" aria-label="Capítulos">
+<a class="prev" href="../diagramas/"><span>Anterior</span>Diagramas de arquitectura</a>
+<a class="next" href="../problemas/"><span>Siguiente</span>Problemas y preguntas</a>
+</nav>
+</article>
+<nav class="toc" aria-label="En esta página"><p class="toc-title">En esta página</p><ul><li class="l2"><a href="#comandos">Comandos</a></li><li class="l2"><a href="#comandos-del-chat">Comandos del chat</a></li><li class="l2"><a href="#ajustes">Ajustes</a></li><li class="l3"><a href="#proveedor-y-modelo">Proveedor y modelo</a></li><li class="l3"><a href="#proyecto-y-herramientas">Proyecto y herramientas</a></li><li class="l3"><a href="#motor-local">Motor local</a></li><li class="l3"><a href="#un-ajuste-de-vs-code-que-conviene-conocer">Un ajuste de VS Code que conviene conocer</a></li><li class="l2"><a href="#archivos-que-escribe-alpaquitay">Archivos que escribe Alpaquitay</a></li></ul></nav>
+</main>
+</div>
+<div class="search" id="search" hidden>
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
+    <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off" aria-label="Texto a buscar">
+    <ol id="searchResults" class="search-results"></ol>
+    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para cerrar</p>
   </div>
-  <div class="search" id="search" hidden>
-    <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
-      <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off"
-        aria-label="Texto a buscar">
-      <ol id="searchResults" class="search-results"></ol>
-      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para
-        cerrar</p>
-    </div>
-  </div>
-  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
-  <script src="../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+</div>
+<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
+<script src="../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
-
 </html>

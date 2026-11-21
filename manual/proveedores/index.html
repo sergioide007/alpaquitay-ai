@@ -1,399 +1,290 @@
 <!doctype html>
 <html lang="es" data-theme="dark">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Proveedores de IA y privacidad · Manual de Alpaquitay AI</title>
-  <meta name="description"
-    content="Cómo conectar Ollama, LM Studio, el motor local con WebGPU, Anthropic u OpenAI en Alpaquitay AI, cómo elige el modo auto y qué protege el límite de privacidad.">
-  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/proveedores/">
-  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/proveedores/">
-  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/providers/">
-  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/providers/">
-  <meta property="og:type" content="article">
-  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/proveedores/">
-  <meta property="og:title" content="Proveedores de IA y privacidad">
-  <meta property="og:description"
-    content="Cómo conectar Ollama, LM Studio, el motor local con WebGPU, Anthropic u OpenAI en Alpaquitay AI, cómo elige el modo auto y qué protege el límite de privacidad.">
-  <meta property="og:locale" content="es_ES">
-  <meta name="theme-color" content="#07100d">
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-  <link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
-  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
-  <script
-    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Proveedores de IA y privacidad","description":"Cómo conectar Ollama, LM Studio, el motor local con WebGPU, Anthropic u OpenAI en Alpaquitay AI, cómo elige el modo auto y qué protege el límite de privacidad.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/proveedores/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proveedores de IA y privacidad · Manual de Alpaquitay AI</title>
+<meta name="description" content="Cómo conectar Ollama, LM Studio, el motor local con WebGPU, Anthropic u OpenAI en Alpaquitay AI, cómo elige el modo auto y qué protege el límite de privacidad.">
+<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/proveedores/">
+<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/proveedores/">
+<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/providers/">
+<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/providers/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/proveedores/">
+<meta property="og:title" content="Proveedores de IA y privacidad">
+<meta property="og:description" content="Cómo conectar Ollama, LM Studio, el motor local con WebGPU, Anthropic u OpenAI en Alpaquitay AI, cómo elige el modo auto y qué protege el límite de privacidad.">
+<meta property="og:locale" content="es_ES">
+<meta name="theme-color" content="#07100d">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+<link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
+<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Proveedores de IA y privacidad","description":"Cómo conectar Ollama, LM Studio, el motor local con WebGPU, Anthropic u OpenAI en Alpaquitay AI, cómo elige el modo auto y qué protege el límite de privacidad.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/proveedores/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
-
 <body>
-  <a class="skip" href="#contenido">Saltar al contenido</a>
-  <header class="top">
-    <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar"
-      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
-        <path d="M3 5h14M3 10h14M3 15h14" />
-      </svg></button>
-    <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><img class="brand-mark"
-        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-    <a class="crumb" href="../">Manual</a>
-    <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20"
-        aria-hidden="true">
-        <circle cx="9" cy="9" r="5.5" />
-        <path d="m13.5 13.5 3.5 3.5" />
-      </svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
-    <a class="lang" href="../en/providers/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
-    <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20"
-        aria-hidden="true">
-        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
-      </svg></button>
-    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg
-        viewBox="0 0 16 16" aria-hidden="true" class="fill">
-        <path
-          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
-      </svg></a>
-    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
-  </header>
-  <div class="layout">
-    <aside class="sidebar" id="sidebar" aria-label="Índice del manual">
-      <p class="side-title">Manual de uso <span class="ver">v3.8.3</span></p>
-      <ol class="chapters">
-        <li><a href="../"><span class="n">00</span>Inicio</a></li>
-        <li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
-        <li><a href="../proveedores/" aria-current="page"><span class="n">02</span>Proveedores y privacidad</a></li>
-        <li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
-        <li><a href="../work/"><span class="n">04</span>Work · spec, tablero y chat</a></li>
-        <li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
-        <li><a href="../docs/"><span class="n">06</span>Docs · documentos con un agente</a></li>
-        <li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
-        <li><a href="../arquitectura/"><span class="n">08</span>Architecture · ADR e IaC</a></li>
-        <li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
-        <li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
-        <li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
-        <li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
-        <li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
-        <li><a href="../referencia/"><span class="n">14</span>Referencia</a></li>
-        <li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
-        <li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
-      </ol>
-      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
-          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a
-          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-    </aside>
-    <main class="content" id="contenido">
-      <article class="doc">
-        <p class="kicker">Capítulo 02</p>
-        <h1 id="proveedores-de-ia-y-privacidad">Proveedores de IA y privacidad</h1>
-        <p>Alpaquitay no trae un modelo propio en la nube ni pasa tus datos por un servidor suyo. Tú eliges quién
-          responde: un modelo en tu equipo o una API en la nube a la que la extensión llama directamente.</p>
-        <h2 id="los-cinco-proveedores">Los cinco proveedores</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Proveedor</th>
-                <th>Dónde corre</th>
-                <th>Privacidad</th>
-                <th>Coste</th>
-                <th>Cómo se activa</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Ollama</strong></td>
-                <td>Tu equipo</td>
-                <td>Todo en local</td>
-                <td>Gratis</td>
-                <td>Instala Ollama y descarga un modelo (<code>ollama pull &lt;modelo&gt;</code>). Se detecta en
-                  <code>http://localhost:11434</code>.</td>
-              </tr>
-              <tr>
-                <td><strong>LM Studio</strong></td>
-                <td>Tu equipo</td>
-                <td>Todo en local</td>
-                <td>Gratis</td>
-                <td>Carga un modelo en LM Studio y arranca su servidor local. Se detecta en
-                  <code>http://localhost:1234</code>.</td>
-              </tr>
-              <tr>
-                <td><strong>Modelo local (WebGPU)</strong></td>
-                <td>Dentro de VS Code, en tu GPU</td>
-                <td>Todo en local (solo descarga una vez el modelo firmado)</td>
-                <td>Gratis</td>
-                <td><code>alpaquitay-ai.localEngine.enabled: true</code>. Ver <a href="../motor-local/">Motor local</a>.
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Anthropic Claude</strong></td>
-                <td>Nube de Anthropic</td>
-                <td>Llamada directa, con límite de privacidad</td>
-                <td>Precio de la API</td>
-                <td>Clave de API en el llavero del sistema.</td>
-              </tr>
-              <tr>
-                <td><strong>OpenAI</strong></td>
-                <td>Nube de OpenAI (o Azure OpenAI)</td>
-                <td>Llamada directa, con límite de privacidad</td>
-                <td>Precio de la API</td>
-                <td>Clave de API en el llavero del sistema.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <figure class="video">
-          <video controls preload="none" playsinline poster="../media/providers.jpg" width="1440" height="900"
-            aria-label="Configurar un proveedor">
-            <source src="../media/providers.mp4" type="video/mp4">Tu navegador no reproduce vídeo MP4. <a
-              href="../media/providers.mp4">Descarga el vídeo</a>.
-          </video>
-          <figcaption><strong>Configurar un proveedor</strong> <span class="video-len">0:21</span> — Pestaña Settings:
-            se elige el proveedor, el modelo, el límite de tokens y la temperatura. Las claves de API nunca se escriben
-            en los ajustes.</figcaption>
-        </figure>
-        <h2 id="como-elige-el-modo-auto">Cómo elige el modo <code>auto</code></h2>
-        <p>Con <code>alpaquitay-ai.preferredProvider</code> en <code>auto</code> (el valor por defecto), Alpaquitay usa
-          <strong>el primero disponible</strong> en este orden:</p>
-        <ol>
-          <li>Ollama</li>
-          <li>LM Studio</li>
-          <li>Modelo local (solo si lo activaste con <code>localEngine.enabled</code>)</li>
-          <li>Anthropic (solo si guardaste su clave)</li>
-          <li>OpenAI (solo si guardaste su clave)</li>
-        </ol>
-        <p>Es decir: <strong>local primero</strong>. Si prefieres uno concreto, ponlo en <code>preferredProvider</code>
-          (<code>ollama</code>, <code>lmstudio</code>, <code>local-wasm</code>, <code>anthropic</code> u
-          <code>openai</code>); si ese no está disponible, se vuelve al orden anterior. También puedes cambiar de modelo
-          en cualquier momento con el selector de la cabecera del Hub.</p>
-        <h2 id="conectar-un-modelo-local">Conectar un modelo local</h2>
-        <h3 id="ollama">Ollama</h3>
-        <div class="code" data-lang="Bash">
-          <pre><code class="language-bash"># Instala Ollama desde https://ollama.com y luego:
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="top">
+  <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+  <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+  <a class="crumb" href="../">Manual</a>
+  <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
+  <a class="lang" href="../en/providers/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
+  <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
+  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
+  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
+</header>
+<div class="layout">
+<aside class="sidebar" id="sidebar" aria-label="Índice del manual">
+  <p class="side-title">Manual de uso <span class="ver">v3.8.3</span></p>
+  <ol class="chapters">
+<li><a href="../"><span class="n">00</span>Inicio</a></li>
+<li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
+<li><a href="../proveedores/" aria-current="page"><span class="n">02</span>Proveedores y privacidad</a></li>
+<li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
+<li><a href="../work/"><span class="n">04</span>Work · spec, tablero y chat</a></li>
+<li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
+<li><a href="../docs/"><span class="n">06</span>Docs · documentos con un agente</a></li>
+<li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
+<li><a href="../arquitectura/"><span class="n">08</span>Architecture · ADR e IaC</a></li>
+<li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
+<li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
+<li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
+<li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
+<li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
+<li><a href="../referencia/"><span class="n">14</span>Referencia</a></li>
+<li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
+<li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
+  </ol>
+  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+</aside>
+<main class="content" id="contenido">
+<article class="doc">
+<p class="kicker">Capítulo 02</p>
+<h1 id="proveedores-de-ia-y-privacidad">Proveedores de IA y privacidad</h1>
+<p>Alpaquitay no trae un modelo propio en la nube ni pasa tus datos por un servidor suyo. Tú eliges quién responde: un modelo en tu equipo o una API en la nube a la que la extensión llama directamente.</p>
+<h2 id="los-cinco-proveedores">Los cinco proveedores</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Proveedor</th>
+<th>Dónde corre</th>
+<th>Privacidad</th>
+<th>Coste</th>
+<th>Cómo se activa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ollama</strong></td>
+<td>Tu equipo</td>
+<td>Todo en local</td>
+<td>Gratis</td>
+<td>Instala Ollama y descarga un modelo (<code>ollama pull &lt;modelo&gt;</code>). Se detecta en <code>http://localhost:11434</code>.</td>
+</tr>
+<tr>
+<td><strong>LM Studio</strong></td>
+<td>Tu equipo</td>
+<td>Todo en local</td>
+<td>Gratis</td>
+<td>Carga un modelo en LM Studio y arranca su servidor local. Se detecta en <code>http://localhost:1234</code>.</td>
+</tr>
+<tr>
+<td><strong>Modelo local (WebGPU)</strong></td>
+<td>Dentro de VS Code, en tu GPU</td>
+<td>Todo en local (solo descarga una vez el modelo firmado)</td>
+<td>Gratis</td>
+<td><code>alpaquitay-ai.localEngine.enabled: true</code>. Ver <a href="../motor-local/">Motor local</a>.</td>
+</tr>
+<tr>
+<td><strong>Anthropic Claude</strong></td>
+<td>Nube de Anthropic</td>
+<td>Llamada directa, con límite de privacidad</td>
+<td>Precio de la API</td>
+<td>Clave de API en el llavero del sistema.</td>
+</tr>
+<tr>
+<td><strong>OpenAI</strong></td>
+<td>Nube de OpenAI (o Azure OpenAI)</td>
+<td>Llamada directa, con límite de privacidad</td>
+<td>Precio de la API</td>
+<td>Clave de API en el llavero del sistema.</td>
+</tr>
+</tbody>
+</table></div>
+<figure class="video">
+<video controls preload="none" playsinline poster="../media/providers.jpg" width="1440" height="900" aria-label="Configurar un proveedor"><source src="../media/providers.mp4" type="video/mp4">Tu navegador no reproduce vídeo MP4. <a href="../media/providers.mp4">Descarga el vídeo</a>.</video>
+<figcaption><strong>Configurar un proveedor</strong> <span class="video-len">0:21</span> — Pestaña Settings: se elige el proveedor, el modelo, el límite de tokens y la temperatura. Las claves de API nunca se escriben en los ajustes.</figcaption>
+</figure>
+<h2 id="como-elige-el-modo-auto">Cómo elige el modo <code>auto</code></h2>
+<p>Con <code>alpaquitay-ai.preferredProvider</code> en <code>auto</code> (el valor por defecto), Alpaquitay usa <strong>el primero disponible</strong> en este orden:</p>
+<ol>
+<li>Ollama</li>
+<li>LM Studio</li>
+<li>Modelo local (solo si lo activaste con <code>localEngine.enabled</code>)</li>
+<li>Anthropic (solo si guardaste su clave)</li>
+<li>OpenAI (solo si guardaste su clave)</li>
+</ol>
+<p>Es decir: <strong>local primero</strong>. Si prefieres uno concreto, ponlo en <code>preferredProvider</code> (<code>ollama</code>, <code>lmstudio</code>, <code>local-wasm</code>, <code>anthropic</code> u <code>openai</code>); si ese no está disponible, se vuelve al orden anterior. También puedes cambiar de modelo en cualquier momento con el selector de la cabecera del Hub.</p>
+<h2 id="conectar-un-modelo-local">Conectar un modelo local</h2>
+<h3 id="ollama">Ollama</h3>
+<div class="code" data-lang="Bash"><pre><code class="language-bash"># Instala Ollama desde https://ollama.com y luego:
 ollama pull qwen2.5-coder
 # Otros que funcionan bien para código: llama3.2, deepseek-coder, codellama
-</code></pre>
-        </div>
-        <p>En <strong>Settings → AI Provider → Ollama</strong> escribe el nombre del modelo (por defecto
-          <code>codellama</code>) y, si hace falta, el <em>endpoint</em>.</p>
-        <h3 id="lm-studio">LM Studio</h3>
-        <p>Carga cualquier modelo GGUF en LM Studio y pulsa <em>Start Server</em>. Alpaquitay usa el modelo que tengas
-          cargado allí; no hay que elegirlo en la extensión.</p>
-        <aside class="callout callout-note">
-          <p class="callout-title">Nota</p>
-          <p>Un servidor Ollama o LM Studio <strong>fuera de tu equipo</strong> (por ejemplo
-            <code>http://192.168.1.20:11434</code>) se trata como <strong>nube</strong>: sus peticiones pasan por el
-            límite de privacidad igual que las de Anthropic u OpenAI. Solo las direcciones de <em>loopback</em>
-            (<code>localhost</code>, <code>127.0.0.1</code>) cuentan como locales.</p>
-        </aside>
-        <h3 id="modelos-pequenos">Modelos pequeños</h3>
-        <p>Los modelos de menos de unos 4 000 millones de parámetros (nombres con <code>1.3b</code>, <code>3b</code>,
-          <code>mini</code>, <code>nano</code>, <code>gemma:2b</code>…) se detectan por su nombre. Para ellos Alpaquitay
-          usa instrucciones más cortas y estrictas, baja la temperatura y limpia los comentarios de relleno que suelen
-          añadir. Aun así, para implementar tareas de varios archivos un modelo de 7B o más da resultados claramente
-          mejores.</p>
-        <h2 id="conectar-anthropic-u-openai">Conectar Anthropic u OpenAI</h2>
-        <ol>
-          <li>Pulsa <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd> → <strong>Configure AI Provider</strong>.</li>
-          <li>Elige el proveedor y pega tu clave.</li>
-          <li>Elige el modelo en <strong>Settings</strong>. El selector trae una lista de modelos conocidos, pero los
-            ajustes <code>alpaquitay-ai.anthropic.model</code> y <code>alpaquitay-ai.openai.model</code> aceptan
-            <strong>cualquier identificador</strong> que tu cuenta tenga disponible.</li>
-        </ol>
-        <p>Modelos del selector (revisados el 15 de noviembre de 2026 en la documentación de cada proveedor; precio por
-          millón de tokens de entrada y salida):</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Proveedor</th>
-                <th>Modelo</th>
-                <th>Precio</th>
-                <th>Para qué</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Anthropic</td>
-                <td><strong>Claude Opus 5.5</strong> (<code>claude-opus-5-5</code>, por defecto)</td>
-                <td>$4 / $20</td>
-                <td>Arquitectura, tareas de varios archivos, revisiones</td>
-              </tr>
-              <tr>
-                <td>Anthropic</td>
-                <td>Claude Sonnet 5.5 (<code>claude-sonnet-5-5</code>)</td>
-                <td>$2 / $10</td>
-                <td>Código del día a día, a la mitad de precio</td>
-              </tr>
-              <tr>
-                <td>Anthropic</td>
-                <td>Claude Haiku 5.5 (<code>claude-haiku-5-5</code>)</td>
-                <td>$0.10 / $0.50</td>
-                <td>Tareas rápidas y de mucho volumen</td>
-              </tr>
-              <tr>
-                <td>Anthropic</td>
-                <td>Claude Fable 5.2 (<code>claude-fable-5-2</code>)</td>
-                <td>$8 / $40</td>
-                <td>El razonamiento más exigente (requiere retención de datos de 30 días en tu cuenta)</td>
-              </tr>
-              <tr>
-                <td>OpenAI</td>
-                <td><strong>GPT-6.1 Sol</strong> (<code>gpt-6.1-sol</code>, por defecto)</td>
-                <td>$2 / $10</td>
-                <td>Equilibrio entre capacidad y coste</td>
-              </tr>
-              <tr>
-                <td>OpenAI</td>
-                <td>GPT-6 Astra (<code>gpt-6-astra</code>)</td>
-                <td>$10 / $50</td>
-                <td>El más capaz de OpenAI</td>
-              </tr>
-              <tr>
-                <td>OpenAI</td>
-                <td>GPT-6.1 Terra (<code>gpt-6.1-terra</code>)</td>
-                <td>$1 / $5</td>
-                <td>Rápido; redactar y revisar texto</td>
-              </tr>
-              <tr>
-                <td>OpenAI</td>
-                <td>GPT-6 Luna (<code>gpt-6-luna</code>)</td>
-                <td>$0.10 / $0.50</td>
-                <td>Mucho volumen al menor coste</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>Todos tienen alrededor de un millón de tokens de contexto y hasta 128 000 de salida, y todos razonan antes de
-          responder. Por eso Alpaquitay no les envía la temperatura (la rechazan) y les deja margen de salida para ese
-          razonamiento: si tu límite de tokens es menor de 16 000, con estos modelos se usa 16 000.</p>
-        <p>La clave se guarda en el <strong>llavero del sistema operativo</strong> mediante el <em>SecretStorage</em> de
-          VS Code: nunca en <code>settings.json</code>, nunca en texto plano y nunca en el repositorio. Para Azure
-          OpenAI o un proxy compatible, cambia <code>alpaquitay-ai.openai.baseUrl</code> (o
-          <code>anthropic.baseUrl</code>).</p>
-        <h2 id="el-limite-de-privacidad">El límite de privacidad</h2>
-        <p>Cuando la petición va a un proveedor en la nube, pasa antes por el <strong>límite de privacidad</strong>
-          (<code>PrivacyBoundaryProvider</code>):</p>
-        <ol>
-          <li><strong>Detecta y sustituye</strong> datos personales (correos, teléfonos, documentos de identidad,
-            tarjetas, IBAN, direcciones IP, fechas de nacimiento, historias clínicas) y <strong>secretos</strong>
-            (credenciales, <em>bearer tokens</em>, claves privadas, claves de API de proveedores, claves de AWS, JWT)
-            por marcadores.</li>
-          <li><strong>Envía</strong> la petición ya limpia directamente a tu proveedor.</li>
-          <li><strong>Devuelve</strong> la respuesta tal como la escribió el proveedor. Los marcadores <strong>no se
-              revierten</strong>: si la respuesta cita un dato que se ocultó, verás el marcador en su lugar.</li>
-          <li><strong>Registra solo metadatos</strong>: cuántas sustituciones hubo y de qué tipo, nunca los valores
-            detectados. El registro se hace antes de la llamada, así que también quedan auditadas las peticiones que
-            fallan.</li>
-        </ol>
-        <figure class="figure"><a class="zoom" href="../diagrams/05-provider-privacy.svg"
-            aria-label="Ampliar: Flujo de proveedores y límite de privacidad"><img
-              src="../diagrams/05-provider-privacy.svg" alt="Flujo de proveedores y límite de privacidad" width="1120"
-              height="914" loading="lazy" decoding="async"></a>
-          <figcaption>Los modelos locales reciben el texto tal cual. Lo que sale del equipo se limpia antes y se audita
-            sin valores.</figcaption>
-        </figure>
+</code></pre></div>
+<p>En <strong>Settings → AI Provider → Ollama</strong> escribe el nombre del modelo (por defecto <code>codellama</code>) y, si hace falta, el <em>endpoint</em>.</p>
+<h3 id="lm-studio">LM Studio</h3>
+<p>Carga cualquier modelo GGUF en LM Studio y pulsa <em>Start Server</em>. Alpaquitay usa el modelo que tengas cargado allí; no hay que elegirlo en la extensión.</p>
+<aside class="callout callout-note"><p class="callout-title">Nota</p>
+<p>Un servidor Ollama o LM Studio <strong>fuera de tu equipo</strong> (por ejemplo <code>http://192.168.1.20:11434</code>) se trata como <strong>nube</strong>: sus peticiones pasan por el límite de privacidad igual que las de Anthropic u OpenAI. Solo las direcciones de <em>loopback</em> (<code>localhost</code>, <code>127.0.0.1</code>) cuentan como locales.</p>
+</aside>
+<h3 id="modelos-pequenos">Modelos pequeños</h3>
+<p>Los modelos de menos de unos 4 000 millones de parámetros (nombres con <code>1.3b</code>, <code>3b</code>, <code>mini</code>, <code>nano</code>, <code>gemma:2b</code>…) se detectan por su nombre. Para ellos Alpaquitay usa instrucciones más cortas y estrictas, baja la temperatura y limpia los comentarios de relleno que suelen añadir. Aun así, para implementar tareas de varios archivos un modelo de 7B o más da resultados claramente mejores.</p>
+<h2 id="conectar-anthropic-u-openai">Conectar Anthropic u OpenAI</h2>
+<ol>
+<li>Pulsa <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd> → <strong>Configure AI Provider</strong>.</li>
+<li>Elige el proveedor y pega tu clave.</li>
+<li>Elige el modelo en <strong>Settings</strong>. El selector trae una lista de modelos conocidos, pero los ajustes <code>alpaquitay-ai.anthropic.model</code> y <code>alpaquitay-ai.openai.model</code> aceptan <strong>cualquier identificador</strong> que tu cuenta tenga disponible.</li>
+</ol>
+<p>Modelos del selector (revisados el 15 de noviembre de 2026 en la documentación de cada proveedor; precio por millón de tokens de entrada y salida):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Proveedor</th>
+<th>Modelo</th>
+<th>Precio</th>
+<th>Para qué</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Anthropic</td>
+<td><strong>Claude Opus 5.5</strong> (<code>claude-opus-5-5</code>, por defecto)</td>
+<td>$4 / $20</td>
+<td>Arquitectura, tareas de varios archivos, revisiones</td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td>Claude Sonnet 5.5 (<code>claude-sonnet-5-5</code>)</td>
+<td>$2 / $10</td>
+<td>Código del día a día, a la mitad de precio</td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td>Claude Haiku 5.5 (<code>claude-haiku-5-5</code>)</td>
+<td>$0.10 / $0.50</td>
+<td>Tareas rápidas y de mucho volumen</td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td>Claude Fable 5.2 (<code>claude-fable-5-2</code>)</td>
+<td>$8 / $40</td>
+<td>El razonamiento más exigente (requiere retención de datos de 30 días en tu cuenta)</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td><strong>GPT-6.1 Sol</strong> (<code>gpt-6.1-sol</code>, por defecto)</td>
+<td>$2 / $10</td>
+<td>Equilibrio entre capacidad y coste</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>GPT-6 Astra (<code>gpt-6-astra</code>)</td>
+<td>$10 / $50</td>
+<td>El más capaz de OpenAI</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>GPT-6.1 Terra (<code>gpt-6.1-terra</code>)</td>
+<td>$1 / $5</td>
+<td>Rápido; redactar y revisar texto</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>GPT-6 Luna (<code>gpt-6-luna</code>)</td>
+<td>$0.10 / $0.50</td>
+<td>Mucho volumen al menor coste</td>
+</tr>
+</tbody>
+</table></div>
+<p>Todos tienen alrededor de un millón de tokens de contexto y hasta 128 000 de salida, y todos razonan antes de responder. Por eso Alpaquitay no les envía la temperatura (la rechazan) y les deja margen de salida para ese razonamiento: si tu límite de tokens es menor de 16 000, con estos modelos se usa 16 000.</p>
+<p>La clave se guarda en el <strong>llavero del sistema operativo</strong> mediante el <em>SecretStorage</em> de VS Code: nunca en <code>settings.json</code>, nunca en texto plano y nunca en el repositorio. Para Azure OpenAI o un proxy compatible, cambia <code>alpaquitay-ai.openai.baseUrl</code> (o <code>anthropic.baseUrl</code>).</p>
+<h2 id="el-limite-de-privacidad">El límite de privacidad</h2>
+<p>Cuando la petición va a un proveedor en la nube, pasa antes por el <strong>límite de privacidad</strong> (<code>PrivacyBoundaryProvider</code>):</p>
+<ol>
+<li><strong>Detecta y sustituye</strong> datos personales (correos, teléfonos, documentos de identidad, tarjetas, IBAN, direcciones IP, fechas de nacimiento, historias clínicas) y <strong>secretos</strong> (credenciales, <em>bearer tokens</em>, claves privadas, claves de API de proveedores, claves de AWS, JWT) por marcadores.</li>
+<li><strong>Envía</strong> la petición ya limpia directamente a tu proveedor.</li>
+<li><strong>Devuelve</strong> la respuesta tal como la escribió el proveedor. Los marcadores <strong>no se revierten</strong>: si la respuesta cita un dato que se ocultó, verás el marcador en su lugar.</li>
+<li><strong>Registra solo metadatos</strong>: cuántas sustituciones hubo y de qué tipo, nunca los valores detectados. El registro se hace antes de la llamada, así que también quedan auditadas las peticiones que fallan.</li>
+</ol>
+<figure class="figure"><a class="zoom" href="../diagrams/05-provider-privacy.svg" aria-label="Ampliar: Flujo de proveedores y límite de privacidad"><img src="../diagrams/05-provider-privacy.svg" alt="Flujo de proveedores y límite de privacidad" width="1120" height="914" loading="lazy" decoding="async"></a><figcaption>Los modelos locales reciben el texto tal cual. Lo que sale del equipo se limpia antes y se audita sin valores.</figcaption></figure>
 
-        <p>La pestaña <strong>Evidence</strong> muestra el estado del límite (tarjeta <em>Privacy boundary</em>):
-          telemetría, sustituciones y dónde se guardan las claves.</p>
-        <aside class="callout callout-important">
-          <p class="callout-title">Importante</p>
-          <p>El límite de privacidad reduce el riesgo, pero no hace anónimo tu código: el código fuente en sí sí se
-            envía al proveedor en la nube que elijas. Si tu código no puede salir de tu equipo, usa un proveedor local.
-          </p>
-        </aside>
-        <h2 id="telemetria">Telemetría</h2>
-        <p><code>alpaquitay-ai.enableTelemetry</code> viene en <code>false</code>. Si la activas, solo se envían
-          estadísticas anónimas de uso; <strong>nunca</strong> código ni <em>prompts</em>. Los detalles están en la <a
-            href="https://github.com/sergioide007/alpaquitay-ai/blob/main/PRIVACY.md" rel="noopener">política de
-            privacidad</a>.</p>
-        <h2 id="ajustes-globales-del-modelo">Ajustes globales del modelo</h2>
-        <figure class="figure"><a class="zoom" href="../media/hub-settings.png"
-            aria-label="Ampliar: Pestaña Settings con proveedor, modelo y valores globales"><img
-              src="../media/hub-settings.png" alt="Pestaña Settings con proveedor, modelo y valores globales"
-              width="1600" height="1000" loading="lazy" decoding="async"></a>
-          <figcaption>Settings: pestañas de proveedor, modelo, límites globales, system prompt y herramientas.
-          </figcaption>
-        </figure>
+<p>La pestaña <strong>Evidence</strong> muestra el estado del límite (tarjeta <em>Privacy boundary</em>): telemetría, sustituciones y dónde se guardan las claves.</p>
+<aside class="callout callout-important"><p class="callout-title">Importante</p>
+<p>El límite de privacidad reduce el riesgo, pero no hace anónimo tu código: el código fuente en sí sí se envía al proveedor en la nube que elijas. Si tu código no puede salir de tu equipo, usa un proveedor local.</p>
+</aside>
+<h2 id="telemetria">Telemetría</h2>
+<p><code>alpaquitay-ai.enableTelemetry</code> viene en <code>false</code>. Si la activas, solo se envían estadísticas anónimas de uso; <strong>nunca</strong> código ni <em>prompts</em>. Los detalles están en la <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/PRIVACY.md" rel="noopener">política de privacidad</a>.</p>
+<h2 id="ajustes-globales-del-modelo">Ajustes globales del modelo</h2>
+<figure class="figure"><a class="zoom" href="../media/hub-settings.png" aria-label="Ampliar: Pestaña Settings con proveedor, modelo y valores globales"><img src="../media/hub-settings.png" alt="Pestaña Settings con proveedor, modelo y valores globales" width="1600" height="1000" loading="lazy" decoding="async"></a><figcaption>Settings: pestañas de proveedor, modelo, límites globales, system prompt y herramientas.</figcaption></figure>
 
-        <p>En <strong>Settings → Global Defaults</strong>:</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Ajuste</th>
-                <th>Por defecto</th>
-                <th>Efecto</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Max output tokens</td>
-                <td>4096</td>
-                <td>Límite de respuesta cuando el proveedor no tiene uno propio.</td>
-              </tr>
-              <tr>
-                <td>Temperature</td>
-                <td>0.3</td>
-                <td>0 = determinista, 2 = creativo. Para código, quédate entre 0 y 0.4. Se envía a los modelos locales y
-                  a los de la nube que la aceptan; Alpaquitay no se la envía a los modelos de razonamiento actuales.
-                </td>
-              </tr>
-              <tr>
-                <td>Request timeout</td>
-                <td>120 000 ms</td>
-                <td>Tiempo máximo por petición. Súbelo con modelos locales lentos.</td>
-              </tr>
-              <tr>
-                <td>System Prompt</td>
-                <td>vacío</td>
-                <td>Instrucciones que se añaden a todas las peticiones (por ejemplo, convenciones de tu equipo).</td>
-              </tr>
-              <tr>
-                <td>Organization context</td>
-                <td>vacío</td>
-                <td>Nombre o contexto de tu equipo, para personalizar respuestas.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+<p>En <strong>Settings → Global Defaults</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ajuste</th>
+<th>Por defecto</th>
+<th>Efecto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Max output tokens</td>
+<td>4096</td>
+<td>Límite de respuesta cuando el proveedor no tiene uno propio.</td>
+</tr>
+<tr>
+<td>Temperature</td>
+<td>0.3</td>
+<td>0 = determinista, 2 = creativo. Para código, quédate entre 0 y 0.4. Se envía a los modelos locales y a los de la nube que la aceptan; Alpaquitay no se la envía a los modelos de razonamiento actuales.</td>
+</tr>
+<tr>
+<td>Request timeout</td>
+<td>120 000 ms</td>
+<td>Tiempo máximo por petición. Súbelo con modelos locales lentos.</td>
+</tr>
+<tr>
+<td>System Prompt</td>
+<td>vacío</td>
+<td>Instrucciones que se añaden a todas las peticiones (por ejemplo, convenciones de tu equipo).</td>
+</tr>
+<tr>
+<td>Organization context</td>
+<td>vacío</td>
+<td>Nombre o contexto de tu equipo, para personalizar respuestas.</td>
+</tr>
+</tbody>
+</table></div>
 
-        <div class="doc-foot">
-          <a class="edit"
-            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/02-proveedores.md">Proponer una
-            mejora a esta página</a>
-          <span>Manual para Alpaquitay AI 3.8.3 · MIT</span>
-        </div>
-        <nav class="pager" aria-label="Capítulos">
-          <a class="prev" href="../instalacion/"><span>Anterior</span>Instalación y primeros pasos</a>
-          <a class="next" href="../arnes/"><span>Siguiente</span>Cómo piensa el arnés</a>
-        </nav>
-      </article>
-      <nav class="toc" aria-label="En esta página">
-        <p class="toc-title">En esta página</p>
-        <ul>
-          <li class="l2"><a href="#los-cinco-proveedores">Los cinco proveedores</a></li>
-          <li class="l2"><a href="#como-elige-el-modo-auto">Cómo elige el modo auto</a></li>
-          <li class="l2"><a href="#conectar-un-modelo-local">Conectar un modelo local</a></li>
-          <li class="l3"><a href="#ollama">Ollama</a></li>
-          <li class="l3"><a href="#lm-studio">LM Studio</a></li>
-          <li class="l3"><a href="#modelos-pequenos">Modelos pequeños</a></li>
-          <li class="l2"><a href="#conectar-anthropic-u-openai">Conectar Anthropic u OpenAI</a></li>
-          <li class="l2"><a href="#el-limite-de-privacidad">El límite de privacidad</a></li>
-          <li class="l2"><a href="#telemetria">Telemetría</a></li>
-          <li class="l2"><a href="#ajustes-globales-del-modelo">Ajustes globales del modelo</a></li>
-        </ul>
-      </nav>
-    </main>
+<div class="doc-foot">
+  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/02-proveedores.md">Proponer una mejora a esta página</a>
+  <span>Manual para Alpaquitay AI 3.8.3 · MIT</span>
+</div>
+<nav class="pager" aria-label="Capítulos">
+<a class="prev" href="../instalacion/"><span>Anterior</span>Instalación y primeros pasos</a>
+<a class="next" href="../arnes/"><span>Siguiente</span>Cómo piensa el arnés</a>
+</nav>
+</article>
+<nav class="toc" aria-label="En esta página"><p class="toc-title">En esta página</p><ul><li class="l2"><a href="#los-cinco-proveedores">Los cinco proveedores</a></li><li class="l2"><a href="#como-elige-el-modo-auto">Cómo elige el modo auto</a></li><li class="l2"><a href="#conectar-un-modelo-local">Conectar un modelo local</a></li><li class="l3"><a href="#ollama">Ollama</a></li><li class="l3"><a href="#lm-studio">LM Studio</a></li><li class="l3"><a href="#modelos-pequenos">Modelos pequeños</a></li><li class="l2"><a href="#conectar-anthropic-u-openai">Conectar Anthropic u OpenAI</a></li><li class="l2"><a href="#el-limite-de-privacidad">El límite de privacidad</a></li><li class="l2"><a href="#telemetria">Telemetría</a></li><li class="l2"><a href="#ajustes-globales-del-modelo">Ajustes globales del modelo</a></li></ul></nav>
+</main>
+</div>
+<div class="search" id="search" hidden>
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
+    <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off" aria-label="Texto a buscar">
+    <ol id="searchResults" class="search-results"></ol>
+    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para cerrar</p>
   </div>
-  <div class="search" id="search" hidden>
-    <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
-      <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off"
-        aria-label="Texto a buscar">
-      <ol id="searchResults" class="search-results"></ol>
-      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para
-        cerrar</p>
-    </div>
-  </div>
-  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
-  <script src="../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+</div>
+<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
+<script src="../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
-
 </html>

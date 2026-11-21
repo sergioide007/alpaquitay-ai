@@ -1,319 +1,227 @@
 <!doctype html>
 <html lang="es" data-theme="dark">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Architecture: diagramas, ADR e IaC · Manual de Alpaquitay AI</title>
-  <meta name="description"
-    content="Cómo Alpaquitay AI infiere la arquitectura de tu sistema a partir del proyecto, docker-compose y spec.md, la muestra en un lienzo editable, registra ADR, la evalúa con IA y la exporta a Terraform, AWS CDK, Azure Bicep o GCP.">
-  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/arquitectura/">
-  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/arquitectura/">
-  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/architecture/">
-  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/architecture/">
-  <meta property="og:type" content="article">
-  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/arquitectura/">
-  <meta property="og:title" content="Architecture: diagramas, ADR e IaC">
-  <meta property="og:description"
-    content="Cómo Alpaquitay AI infiere la arquitectura de tu sistema a partir del proyecto, docker-compose y spec.md, la muestra en un lienzo editable, registra ADR, la evalúa con IA y la exporta a Terraform, AWS CDK, Azure Bicep o GCP.">
-  <meta property="og:locale" content="es_ES">
-  <meta name="theme-color" content="#07100d">
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-  <link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
-  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
-  <script
-    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Architecture: diagramas, ADR e IaC","description":"Cómo Alpaquitay AI infiere la arquitectura de tu sistema a partir del proyecto, docker-compose y spec.md, la muestra en un lienzo editable, registra ADR, la evalúa con IA y la exporta a Terraform, AWS CDK, Azure Bicep o GCP.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/arquitectura/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture: diagramas, ADR e IaC · Manual de Alpaquitay AI</title>
+<meta name="description" content="Cómo Alpaquitay AI infiere la arquitectura de tu sistema a partir del proyecto, docker-compose y spec.md, la muestra en un lienzo editable, registra ADR, la evalúa con IA y la exporta a Terraform, AWS CDK, Azure Bicep o GCP.">
+<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/arquitectura/">
+<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/arquitectura/">
+<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/architecture/">
+<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/architecture/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/arquitectura/">
+<meta property="og:title" content="Architecture: diagramas, ADR e IaC">
+<meta property="og:description" content="Cómo Alpaquitay AI infiere la arquitectura de tu sistema a partir del proyecto, docker-compose y spec.md, la muestra en un lienzo editable, registra ADR, la evalúa con IA y la exporta a Terraform, AWS CDK, Azure Bicep o GCP.">
+<meta property="og:locale" content="es_ES">
+<meta name="theme-color" content="#07100d">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+<link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
+<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Architecture: diagramas, ADR e IaC","description":"Cómo Alpaquitay AI infiere la arquitectura de tu sistema a partir del proyecto, docker-compose y spec.md, la muestra en un lienzo editable, registra ADR, la evalúa con IA y la exporta a Terraform, AWS CDK, Azure Bicep o GCP.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/arquitectura/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
-
 <body>
-  <a class="skip" href="#contenido">Saltar al contenido</a>
-  <header class="top">
-    <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar"
-      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
-        <path d="M3 5h14M3 10h14M3 15h14" />
-      </svg></button>
-    <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><img class="brand-mark"
-        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-    <a class="crumb" href="../">Manual</a>
-    <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20"
-        aria-hidden="true">
-        <circle cx="9" cy="9" r="5.5" />
-        <path d="m13.5 13.5 3.5 3.5" />
-      </svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
-    <a class="lang" href="../en/architecture/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
-    <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20"
-        aria-hidden="true">
-        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
-      </svg></button>
-    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg
-        viewBox="0 0 16 16" aria-hidden="true" class="fill">
-        <path
-          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
-      </svg></a>
-    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
-  </header>
-  <div class="layout">
-    <aside class="sidebar" id="sidebar" aria-label="Índice del manual">
-      <p class="side-title">Manual de uso <span class="ver">v3.8.3</span></p>
-      <ol class="chapters">
-        <li><a href="../"><span class="n">00</span>Inicio</a></li>
-        <li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
-        <li><a href="../proveedores/"><span class="n">02</span>Proveedores y privacidad</a></li>
-        <li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
-        <li><a href="../work/"><span class="n">04</span>Work · spec, tablero y chat</a></li>
-        <li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
-        <li><a href="../docs/"><span class="n">06</span>Docs · documentos con un agente</a></li>
-        <li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
-        <li><a href="../arquitectura/" aria-current="page"><span class="n">08</span>Architecture · ADR e IaC</a></li>
-        <li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
-        <li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
-        <li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
-        <li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
-        <li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
-        <li><a href="../referencia/"><span class="n">14</span>Referencia</a></li>
-        <li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
-        <li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
-      </ol>
-      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
-          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a
-          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-    </aside>
-    <main class="content" id="contenido">
-      <article class="doc">
-        <p class="kicker">Capítulo 08</p>
-        <h1 id="architecture-diagramas-adr-e-iac">Architecture: diagramas, ADR e IaC</h1>
-        <p>La pestaña <strong>Architecture</strong> es un lienzo de arquitectura que <strong>empieza relleno</strong>:
-          Alpaquitay deduce el sistema a partir de lo que ya hay en tu proyecto y de lo que la especificación dice que
-          se va a construir. Después puedes editarlo, pedir cambios en lenguaje natural, documentar decisiones y
-          exportar infraestructura como código.</p>
-        <figure class="video">
-          <video controls preload="none" playsinline poster="../media/arch.jpg" width="1440" height="900"
-            aria-label="Arquitectura inferida y exportada">
-            <source src="../media/arch.mp4" type="video/mp4">Tu navegador no reproduce vídeo MP4. <a
-              href="../media/arch.mp4">Descarga el vídeo</a>.
-          </video>
-          <figcaption><strong>Arquitectura inferida y exportada</strong> <span class="video-len">0:24</span> — Re-infer
-            sobre un proyecto con Express, React, PostgreSQL y Redis en docker-compose, propiedades de un nodo y
-            exportación a Terraform.</figcaption>
-        </figure>
-        <h2 id="de-donde-sale-el-diagrama">De dónde sale el diagrama</h2>
-        <figure class="figure"><a class="zoom" href="../diagrams/08-arch-inference.svg"
-            aria-label="Ampliar: Inferencia de arquitectura: manifiestos, compose y spec hacia el lienzo y la exportación IaC"><img
-              src="../diagrams/08-arch-inference.svg"
-              alt="Inferencia de arquitectura: manifiestos, compose y spec hacia el lienzo y la exportación IaC"
-              width="1120" height="820" loading="lazy" decoding="async"></a>
-          <figcaption>Las pruebas que usa la inferencia y lo que produce.</figcaption>
-        </figure>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="top">
+  <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+  <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+  <a class="crumb" href="../">Manual</a>
+  <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
+  <a class="lang" href="../en/architecture/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
+  <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
+  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
+  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
+</header>
+<div class="layout">
+<aside class="sidebar" id="sidebar" aria-label="Índice del manual">
+  <p class="side-title">Manual de uso <span class="ver">v3.8.3</span></p>
+  <ol class="chapters">
+<li><a href="../"><span class="n">00</span>Inicio</a></li>
+<li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
+<li><a href="../proveedores/"><span class="n">02</span>Proveedores y privacidad</a></li>
+<li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
+<li><a href="../work/"><span class="n">04</span>Work · spec, tablero y chat</a></li>
+<li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
+<li><a href="../docs/"><span class="n">06</span>Docs · documentos con un agente</a></li>
+<li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
+<li><a href="../arquitectura/" aria-current="page"><span class="n">08</span>Architecture · ADR e IaC</a></li>
+<li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
+<li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
+<li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
+<li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
+<li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
+<li><a href="../referencia/"><span class="n">14</span>Referencia</a></li>
+<li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
+<li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
+  </ol>
+  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+</aside>
+<main class="content" id="contenido">
+<article class="doc">
+<p class="kicker">Capítulo 08</p>
+<h1 id="architecture-diagramas-adr-e-iac">Architecture: diagramas, ADR e IaC</h1>
+<p>La pestaña <strong>Architecture</strong> es un lienzo de arquitectura que <strong>empieza relleno</strong>: Alpaquitay deduce el sistema a partir de lo que ya hay en tu proyecto y de lo que la especificación dice que se va a construir. Después puedes editarlo, pedir cambios en lenguaje natural, documentar decisiones y exportar infraestructura como código.</p>
+<figure class="video">
+<video controls preload="none" playsinline poster="../media/arch.jpg" width="1440" height="900" aria-label="Arquitectura inferida y exportada"><source src="../media/arch.mp4" type="video/mp4">Tu navegador no reproduce vídeo MP4. <a href="../media/arch.mp4">Descarga el vídeo</a>.</video>
+<figcaption><strong>Arquitectura inferida y exportada</strong> <span class="video-len">0:24</span> — Re-infer sobre un proyecto con Express, React, PostgreSQL y Redis en docker-compose, propiedades de un nodo y exportación a Terraform.</figcaption>
+</figure>
+<h2 id="de-donde-sale-el-diagrama">De dónde sale el diagrama</h2>
+<figure class="figure"><a class="zoom" href="../diagrams/08-arch-inference.svg" aria-label="Ampliar: Inferencia de arquitectura: manifiestos, compose y spec hacia el lienzo y la exportación IaC"><img src="../diagrams/08-arch-inference.svg" alt="Inferencia de arquitectura: manifiestos, compose y spec hacia el lienzo y la exportación IaC" width="1120" height="820" loading="lazy" decoding="async"></a><figcaption>Las pruebas que usa la inferencia y lo que produce.</figcaption></figure>
 
-        <p>La inferencia es <strong>determinista y local</strong> (no usa modelo). Lee:</p>
-        <ul>
-          <li><strong>Dependencias</strong> de <code>package.json</code> (raíz y subpaquetes) y otros manifiestos:
-            <code>pom.xml</code>, <code>requirements.txt</code>, <code>go.mod</code>, <code>*.csproj</code>…</li>
-          <li><strong>Servicios de <code>docker-compose</code></strong>: nombres e imágenes (por ejemplo
-            <code>postgres</code>, <code>redis</code>, <code>rabbitmq</code>).</li>
-          <li><strong>Nombres de carpetas</strong> del primer y segundo nivel (<code>api/</code>, <code>web/</code>,
-            <code>worker/</code>…).</li>
-          <li><strong><code>spec.md</code></strong>: lo que el proyecto <em>va a</em> construir, y sus épicas como
-            módulos.</li>
-        </ul>
-        <p>Con eso coloca como mucho 14 nodos de sistema y 8 módulos de épica. Cada nodo recuerda su origen: el
-          workspace actual, la especificación o una épica.</p>
-        <h2 id="trabajar-en-el-lienzo">Trabajar en el lienzo</h2>
-        <figure class="figure"><a class="zoom" href="../media/hub-arch.png"
-            aria-label="Ampliar: Pestaña Architecture con el lienzo, la paleta y las propiedades"><img
-              src="../media/hub-arch.png" alt="Pestaña Architecture con el lienzo, la paleta y las propiedades"
-              width="1600" height="1000" loading="lazy" decoding="async"></a>
-          <figcaption>La paleta a la izquierda, el lienzo en el centro y las propiedades y la exportación a la derecha.
-          </figcaption>
-        </figure>
+<p>La inferencia es <strong>determinista y local</strong> (no usa modelo). Lee:</p>
+<ul>
+<li><strong>Dependencias</strong> de <code>package.json</code> (raíz y subpaquetes) y otros manifiestos: <code>pom.xml</code>, <code>requirements.txt</code>, <code>go.mod</code>, <code>*.csproj</code>…</li>
+<li><strong>Servicios de <code>docker-compose</code></strong>: nombres e imágenes (por ejemplo <code>postgres</code>, <code>redis</code>, <code>rabbitmq</code>).</li>
+<li><strong>Nombres de carpetas</strong> del primer y segundo nivel (<code>api/</code>, <code>web/</code>, <code>worker/</code>…).</li>
+<li><strong><code>spec.md</code></strong>: lo que el proyecto <em>va a</em> construir, y sus épicas como módulos.</li>
+</ul>
+<p>Con eso coloca como mucho 14 nodos de sistema y 8 módulos de épica. Cada nodo recuerda su origen: el workspace actual, la especificación o una épica.</p>
+<h2 id="trabajar-en-el-lienzo">Trabajar en el lienzo</h2>
+<figure class="figure"><a class="zoom" href="../media/hub-arch.png" aria-label="Ampliar: Pestaña Architecture con el lienzo, la paleta y las propiedades"><img src="../media/hub-arch.png" alt="Pestaña Architecture con el lienzo, la paleta y las propiedades" width="1600" height="1000" loading="lazy" decoding="async"></a><figcaption>La paleta a la izquierda, el lienzo en el centro y las propiedades y la exportación a la derecha.</figcaption></figure>
 
-        <ul>
-          <li><strong>Añadir nodos</strong> desde la paleta: <em>Compute</em> (Lambda, Container, Service),
-            <em>Network</em> (API Gateway, CDN, Client), <em>Data</em> (Database, Storage, Queue, Cache) y
-            <em>Security</em> (Auth).</li>
-          <li><strong>Conectar:</strong> <kbd>Shift</kbd>+clic en el nodo de origen y después <kbd>Shift</kbd>+clic en
-            el de destino. <strong>Seleccionar:</strong> clic (sus propiedades aparecen a la derecha).
-            <strong>Mover:</strong> arrastra. <strong>Borrar:</strong> selecciona y pulsa <kbd>Delete</kbd>.</li>
-          <li><strong>Nivel C4:</strong> los botones <em>Context</em>, <em>Container</em> y <em>Component</em> marcan el
-            nivel en el que estás trabajando. En esta versión no filtran el diagrama: todos los nodos se ven en los tres
-            niveles. Para un diagrama C4 por niveles, pídeselo al especialista de arquitectura en el chat (<em>«genera
-              un diagrama C4 de contenedores de este proyecto»</em>).</li>
-          <li><strong>Save</strong> guarda el diagrama en <code>.alpaquitay/arch.json</code>; <strong>Clear</strong> lo
-            vacía; <strong>↻ Re-infer</strong> lo regenera desde el proyecto aunque haya uno guardado.</li>
-        </ul>
-        <h2 id="pedir-cambios-en-lenguaje-natural">Pedir cambios en lenguaje natural</h2>
-        <p>Pulsa <strong>▲ AI</strong> para abrir el <em>AI Architect</em> y escribe, por ejemplo:</p>
-        <ul>
-          <li><em>«Diseña microservicios para un comercio electrónico»</em></li>
-          <li><em>«Añade una caché Redis entre la API y la base de datos»</em></li>
-          <li><em>«Conviértelo a serverless en AWS»</em></li>
-        </ul>
-        <p>El arquitecto (el especialista de arquitectura de software) modifica el diagrama actual en lugar de empezar
-          de cero.</p>
-        <h2 id="evaluar-y-documentar-decisiones">Evaluar y documentar decisiones</h2>
-        <ul>
-          <li><strong>▲ Assess</strong> pide una evaluación de la arquitectura actual: atributos de calidad, riesgos y
-            recomendaciones.</li>
-          <li><strong>ADR</strong> abre un formulario con dos campos: el <strong>contexto</strong> (la situación actual)
-            y la <strong>decisión</strong> que estás considerando. <em>Create ADR</em> genera el registro y lo guarda en
-            <code>.alpaquitay/adrs/</code>.</li>
-        </ul>
-        <p>Assess, ADR y AI Architect usan el proveedor activo.</p>
-        <h2 id="exportar-a-infraestructura-como-codigo">Exportar a infraestructura como código</h2>
-        <p>En el panel derecho, <strong>Export as IaC</strong> genera un punto de partida a partir del diagrama:</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Botón</th>
-                <th>Archivo</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Terraform (AWS)</td>
-                <td><code>infra/main.tf</code></td>
-              </tr>
-              <tr>
-                <td>AWS CDK (TS)</td>
-                <td><code>infra/main.ts</code></td>
-              </tr>
-              <tr>
-                <td>Azure Bicep</td>
-                <td><code>infra/main.bicep</code></td>
-              </tr>
-              <tr>
-                <td>GCP YAML</td>
-                <td><code>infra/main.yaml</code></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <aside class="callout callout-warning">
-          <p class="callout-title">Atención</p>
-          <p>La exportación escribe <code>infra/main.&lt;ext&gt;</code> <strong>directamente y sobrescribe</strong> el
-            archivo si ya existe. Es un esqueleto para empezar, no infraestructura lista para producción: revísalo,
-            añade redes, permisos y secretos, y pásalo por tu pipeline antes de aplicarlo.</p>
-        </aside>
-        <h2 id="arquitecturas-que-reconoce">Arquitecturas que reconoce</h2>
-        <p>Alpaquitay detecta el estilo del proyecto y adapta las instrucciones y la estructura de carpetas que propone:
-        </p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Estilo</th>
-                <th>Se detecta por</th>
-                <th>Estructura</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>React SPA</td>
-                <td><code>package.json</code> con react</td>
-                <td><code>src/components</code>, <code>pages</code></td>
-              </tr>
-              <tr>
-                <td>Next.js</td>
-                <td><code>package.json</code> con next</td>
-                <td><code>app/</code> (App Router)</td>
-              </tr>
-              <tr>
-                <td>Vue</td>
-                <td><code>package.json</code> con vue</td>
-                <td><code>src/components</code>, <code>views</code></td>
-              </tr>
-              <tr>
-                <td>Angular</td>
-                <td><code>angular.json</code></td>
-                <td><code>src/app/</code></td>
-              </tr>
-              <tr>
-                <td>Express API</td>
-                <td><code>package.json</code> con express</td>
-                <td><code>routes</code>, <code>controllers</code>, <code>services</code></td>
-              </tr>
-              <tr>
-                <td>Java (Maven o Gradle)</td>
-                <td><code>pom.xml</code> o <code>build.gradle</code></td>
-                <td><strong>Clean Architecture</strong>: <code>domain</code>, <code>application</code>,
-                  <code>infrastructure</code>, <code>shared</code></td>
-              </tr>
-              <tr>
-                <td>C# Web API</td>
-                <td><code>*.csproj</code></td>
-                <td><code>Controllers</code>, <code>Services</code>, <code>Models</code></td>
-              </tr>
-              <tr>
-                <td>Go</td>
-                <td><code>go.mod</code></td>
-                <td><code>cmd</code>, <code>internal</code>, <code>pkg</code></td>
-              </tr>
-              <tr>
-                <td>Django / Flask</td>
-                <td><code>requirements.txt</code></td>
-                <td><code>apps/</code> / <code>blueprints/</code></td>
-              </tr>
-              <tr>
-                <td>Paquete Python</td>
-                <td><code>pyproject.toml</code></td>
-                <td>paquete con <code>__init__.py</code></td>
-              </tr>
-              <tr>
-                <td>React Native</td>
-                <td><code>package.json</code> con expo</td>
-                <td><code>src/screens</code>, <code>components</code></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>Todos los proyectos Java siguen Clean Architecture con inversión de dependencias estricta:
-          <code>infrastructure → application → domain</code>.</p>
-        <figure class="figure"><a class="zoom" href="../diagrams/09-clean-architecture.svg"
-            aria-label="Ampliar: Estructuras de Clean Architecture generadas para Java Spring y React"><img
-              src="../diagrams/09-clean-architecture.svg"
-              alt="Estructuras de Clean Architecture generadas para Java Spring y React" width="1120" height="770"
-              loading="lazy" decoding="async"></a>
-          <figcaption>Las dos estructuras de Clean Architecture que genera el constructor de proyectos.</figcaption>
-        </figure>
+<ul>
+<li><strong>Añadir nodos</strong> desde la paleta: <em>Compute</em> (Lambda, Container, Service), <em>Network</em> (API Gateway, CDN, Client), <em>Data</em> (Database, Storage, Queue, Cache) y <em>Security</em> (Auth).</li>
+<li><strong>Conectar:</strong> <kbd>Shift</kbd>+clic en el nodo de origen y después <kbd>Shift</kbd>+clic en el de destino. <strong>Seleccionar:</strong> clic (sus propiedades aparecen a la derecha). <strong>Mover:</strong> arrastra. <strong>Borrar:</strong> selecciona y pulsa <kbd>Delete</kbd>.</li>
+<li><strong>Nivel C4:</strong> los botones <em>Context</em>, <em>Container</em> y <em>Component</em> marcan el nivel en el que estás trabajando. En esta versión no filtran el diagrama: todos los nodos se ven en los tres niveles. Para un diagrama C4 por niveles, pídeselo al especialista de arquitectura en el chat (<em>«genera un diagrama C4 de contenedores de este proyecto»</em>).</li>
+<li><strong>Save</strong> guarda el diagrama en <code>.alpaquitay/arch.json</code>; <strong>Clear</strong> lo vacía; <strong>↻ Re-infer</strong> lo regenera desde el proyecto aunque haya uno guardado.</li>
+</ul>
+<h2 id="pedir-cambios-en-lenguaje-natural">Pedir cambios en lenguaje natural</h2>
+<p>Pulsa <strong>▲ AI</strong> para abrir el <em>AI Architect</em> y escribe, por ejemplo:</p>
+<ul>
+<li><em>«Diseña microservicios para un comercio electrónico»</em></li>
+<li><em>«Añade una caché Redis entre la API y la base de datos»</em></li>
+<li><em>«Conviértelo a serverless en AWS»</em></li>
+</ul>
+<p>El arquitecto (el especialista de arquitectura de software) modifica el diagrama actual en lugar de empezar de cero.</p>
+<h2 id="evaluar-y-documentar-decisiones">Evaluar y documentar decisiones</h2>
+<ul>
+<li><strong>▲ Assess</strong> pide una evaluación de la arquitectura actual: atributos de calidad, riesgos y recomendaciones.</li>
+<li><strong>ADR</strong> abre un formulario con dos campos: el <strong>contexto</strong> (la situación actual) y la <strong>decisión</strong> que estás considerando. <em>Create ADR</em> genera el registro y lo guarda en <code>.alpaquitay/adrs/</code>.</li>
+</ul>
+<p>Assess, ADR y AI Architect usan el proveedor activo.</p>
+<h2 id="exportar-a-infraestructura-como-codigo">Exportar a infraestructura como código</h2>
+<p>En el panel derecho, <strong>Export as IaC</strong> genera un punto de partida a partir del diagrama:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Botón</th>
+<th>Archivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Terraform (AWS)</td>
+<td><code>infra/main.tf</code></td>
+</tr>
+<tr>
+<td>AWS CDK (TS)</td>
+<td><code>infra/main.ts</code></td>
+</tr>
+<tr>
+<td>Azure Bicep</td>
+<td><code>infra/main.bicep</code></td>
+</tr>
+<tr>
+<td>GCP YAML</td>
+<td><code>infra/main.yaml</code></td>
+</tr>
+</tbody>
+</table></div>
+<aside class="callout callout-warning"><p class="callout-title">Atención</p>
+<p>La exportación escribe <code>infra/main.&lt;ext&gt;</code> <strong>directamente y sobrescribe</strong> el archivo si ya existe. Es un esqueleto para empezar, no infraestructura lista para producción: revísalo, añade redes, permisos y secretos, y pásalo por tu pipeline antes de aplicarlo.</p>
+</aside>
+<h2 id="arquitecturas-que-reconoce">Arquitecturas que reconoce</h2>
+<p>Alpaquitay detecta el estilo del proyecto y adapta las instrucciones y la estructura de carpetas que propone:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Estilo</th>
+<th>Se detecta por</th>
+<th>Estructura</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>React SPA</td>
+<td><code>package.json</code> con react</td>
+<td><code>src/components</code>, <code>pages</code></td>
+</tr>
+<tr>
+<td>Next.js</td>
+<td><code>package.json</code> con next</td>
+<td><code>app/</code> (App Router)</td>
+</tr>
+<tr>
+<td>Vue</td>
+<td><code>package.json</code> con vue</td>
+<td><code>src/components</code>, <code>views</code></td>
+</tr>
+<tr>
+<td>Angular</td>
+<td><code>angular.json</code></td>
+<td><code>src/app/</code></td>
+</tr>
+<tr>
+<td>Express API</td>
+<td><code>package.json</code> con express</td>
+<td><code>routes</code>, <code>controllers</code>, <code>services</code></td>
+</tr>
+<tr>
+<td>Java (Maven o Gradle)</td>
+<td><code>pom.xml</code> o <code>build.gradle</code></td>
+<td><strong>Clean Architecture</strong>: <code>domain</code>, <code>application</code>, <code>infrastructure</code>, <code>shared</code></td>
+</tr>
+<tr>
+<td>C# Web API</td>
+<td><code>*.csproj</code></td>
+<td><code>Controllers</code>, <code>Services</code>, <code>Models</code></td>
+</tr>
+<tr>
+<td>Go</td>
+<td><code>go.mod</code></td>
+<td><code>cmd</code>, <code>internal</code>, <code>pkg</code></td>
+</tr>
+<tr>
+<td>Django / Flask</td>
+<td><code>requirements.txt</code></td>
+<td><code>apps/</code> / <code>blueprints/</code></td>
+</tr>
+<tr>
+<td>Paquete Python</td>
+<td><code>pyproject.toml</code></td>
+<td>paquete con <code>__init__.py</code></td>
+</tr>
+<tr>
+<td>React Native</td>
+<td><code>package.json</code> con expo</td>
+<td><code>src/screens</code>, <code>components</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Todos los proyectos Java siguen Clean Architecture con inversión de dependencias estricta: <code>infrastructure → application → domain</code>.</p>
+<figure class="figure"><a class="zoom" href="../diagrams/09-clean-architecture.svg" aria-label="Ampliar: Estructuras de Clean Architecture generadas para Java Spring y React"><img src="../diagrams/09-clean-architecture.svg" alt="Estructuras de Clean Architecture generadas para Java Spring y React" width="1120" height="770" loading="lazy" decoding="async"></a><figcaption>Las dos estructuras de Clean Architecture que genera el constructor de proyectos.</figcaption></figure>
 
-        <div class="doc-foot">
-          <a class="edit"
-            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/08-arquitectura.md">Proponer
-            una mejora a esta página</a>
-          <span>Manual para Alpaquitay AI 3.8.3 · MIT</span>
-        </div>
-        <nav class="pager" aria-label="Capítulos">
-          <a class="prev" href="../evidence/"><span>Anterior</span>Evidence · señales y revisión</a>
-          <a class="next" href="../agentes/"><span>Siguiente</span>Agents · skills y especialistas</a>
-        </nav>
-      </article>
-      <nav class="toc" aria-label="En esta página">
-        <p class="toc-title">En esta página</p>
-        <ul>
-          <li class="l2"><a href="#de-donde-sale-el-diagrama">De dónde sale el diagrama</a></li>
-          <li class="l2"><a href="#trabajar-en-el-lienzo">Trabajar en el lienzo</a></li>
-          <li class="l2"><a href="#pedir-cambios-en-lenguaje-natural">Pedir cambios en lenguaje natural</a></li>
-          <li class="l2"><a href="#evaluar-y-documentar-decisiones">Evaluar y documentar decisiones</a></li>
-          <li class="l2"><a href="#exportar-a-infraestructura-como-codigo">Exportar a infraestructura como código</a>
-          </li>
-          <li class="l2"><a href="#arquitecturas-que-reconoce">Arquitecturas que reconoce</a></li>
-        </ul>
-      </nav>
-    </main>
+<div class="doc-foot">
+  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/08-arquitectura.md">Proponer una mejora a esta página</a>
+  <span>Manual para Alpaquitay AI 3.8.3 · MIT</span>
+</div>
+<nav class="pager" aria-label="Capítulos">
+<a class="prev" href="../evidence/"><span>Anterior</span>Evidence · señales y revisión</a>
+<a class="next" href="../agentes/"><span>Siguiente</span>Agents · skills y especialistas</a>
+</nav>
+</article>
+<nav class="toc" aria-label="En esta página"><p class="toc-title">En esta página</p><ul><li class="l2"><a href="#de-donde-sale-el-diagrama">De dónde sale el diagrama</a></li><li class="l2"><a href="#trabajar-en-el-lienzo">Trabajar en el lienzo</a></li><li class="l2"><a href="#pedir-cambios-en-lenguaje-natural">Pedir cambios en lenguaje natural</a></li><li class="l2"><a href="#evaluar-y-documentar-decisiones">Evaluar y documentar decisiones</a></li><li class="l2"><a href="#exportar-a-infraestructura-como-codigo">Exportar a infraestructura como código</a></li><li class="l2"><a href="#arquitecturas-que-reconoce">Arquitecturas que reconoce</a></li></ul></nav>
+</main>
+</div>
+<div class="search" id="search" hidden>
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
+    <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off" aria-label="Texto a buscar">
+    <ol id="searchResults" class="search-results"></ol>
+    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para cerrar</p>
   </div>
-  <div class="search" id="search" hidden>
-    <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
-      <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off"
-        aria-label="Texto a buscar">
-      <ol id="searchResults" class="search-results"></ol>
-      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para
-        cerrar</p>
-    </div>
-  </div>
-  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
-  <script src="../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+</div>
+<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
+<script src="../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
-
 </html>
