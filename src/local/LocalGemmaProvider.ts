@@ -10,7 +10,8 @@ export type LocalProgressRunner = <T>(modelName: string, run: (onProgress: Progr
  * Weights are downloaded once from the static CDN; prompts and answers never leave the machine.
  */
 export class LocalGemmaProvider implements AIProvider {
-  readonly name = 'Alpaquitay AI · Qwen 2.5 local';
+  /** Generic on purpose: the exact model is shown next to it (modelId), so a model swap never leaves a stale name. */
+  readonly name = 'Alpaquitay AI · Local model';
   readonly type = 'local-wasm' as const;
   get modelName(): string { return this.settings().modelId; }
 

@@ -40,6 +40,7 @@ export class OllamaProvider implements AIProvider {
           num_predict: options.maxTokens ?? 512,
           temperature: options.temperature ?? 0.3
         },
+        keep_alive: '30m',
         stream: false
       }),
       signal: AbortSignal.timeout(this.timeout)

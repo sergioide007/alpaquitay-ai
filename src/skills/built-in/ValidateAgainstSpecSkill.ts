@@ -46,15 +46,15 @@ const steps: AgentStep[] = [
         `Implementation files found:\n${implFiles}\n\n` +
         `Produce a structured compliance report using this exact format:\n\n` +
         `## Spec Compliance Report\n\n` +
-        `### ✅ Implemented Requirements\n` +
+        `### Implemented Requirements\n` +
         `- [List each requirement that has a corresponding implementation file]\n\n` +
-        `### ⚠️ Partial Implementations\n` +
+        `### Partial Implementations\n` +
         `- [List requirements that exist but are incomplete]\n\n` +
-        `### ❌ Missing Implementations\n` +
+        `### Missing Implementations\n` +
         `- [List requirements in the spec with NO corresponding code]\n\n` +
-        `### 🔄 Spec Changes Not Yet Implemented\n` +
+        `### Spec Changes Not Yet Implemented\n` +
         `- [List anything in the spec that appears newer than the code]\n\n` +
-        `### 📊 Summary\n` +
+        `### Summary\n` +
         `- Coverage: X of Y requirements implemented\n` +
         `- Next steps: [1-3 concrete actions]\n\n` +
         `Be specific. Reference actual file names from the implementation scan when possible.`

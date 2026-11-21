@@ -6,7 +6,7 @@ interface AnthropicResponse {
   model: string;
   stop_reason?: string;
   stop_details?: { category?: string | null; explanation?: string } | null;
-  usage?: { input_tokens: number; output_tokens: number };
+  usage?: { input_tokens: number; output_tokens: number; cache_creation_input_tokens?: number; cache_read_input_tokens?: number };
 }
 
 export class AnthropicProvider implements AIProvider {
@@ -26,7 +26,8 @@ export class AnthropicProvider implements AIProvider {
   }
 
   async chat(messages: Message[], options: ChatOptions = {}): Promise<AIResponse> {
-    const system = messages.find(m => m.role === 'system')?.content;
+    // options.systemPrompt used to be dropped here: every caller that passes it (chat, investigation, documents) lost its context.
+    const system = options.systemPrompt ?? messages.find(m => m.role === 'system')?.content;
     const userMessages = messages.filter(m => m.role !== 'system');
 
     // Claude 5.x / Fable think by default and the thinking counts against max_tokens: leave room for the answer.
@@ -35,7 +36,8 @@ export class AnthropicProvider implements AIProvider {
       max_tokens: outputBudget(options.maxTokens ?? 4096, anthropicThinksByDefault(this.model)),
       messages: userMessages.map(m => ({ role: m.role, content: m.content }))
     };
-    if (system) { body.system = system; }
+    // Stable prefix -> prompt cache: repeated calls with the same system prompt bill the cached part at a fraction.
+    if (system) { body.system = [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }]; }
     // Opus 4.7+ and the 5.x family reject sampling parameters with a 400; only older models get temperature.
     if (options.temperature !== undefined && anthropicAcceptsSampling(this.model)) { body.temperature = options.temperature; }
 
@@ -69,8 +71,9 @@ export class AnthropicProvider implements AIProvider {
       content,
       model: data.model,
       usage: {
-        promptTokens: data.usage?.input_tokens ?? 0,
-        completionTokens: data.usage?.output_tokens ?? 0
+        promptTokens: (data.usage?.input_tokens ?? 0) + (data.usage?.cache_creation_input_tokens ?? 0) + (data.usage?.cache_read_input_tokens ?? 0),
+        completionTokens: data.usage?.output_tokens ?? 0,
+        cachedTokens: data.usage?.cache_read_input_tokens ?? 0
       }
     };
   }
