@@ -83,7 +83,7 @@ Además del comando, el motor puede ser un proveedor más, como Ollama:
 }
 ```
 
-Con `preferredProvider` en `auto`, se usa después de Ollama y LM Studio. Ten en cuenta su tamaño: sirve para preguntas, ideas y especificaciones; para implementar tareas de varios archivos, un modelo mayor en Ollama o en la nube da mejores resultados.
+En **Settings → AI Provider**, selecciona **Alpaquitay AI · Qwen 2.5 (on-device)** y habilita el motor. La primera vez, confirma la descarga del modelo firmado; VS Code muestra el progreso y el espacio requerido antes de usarlo. El modelo Qwen2.5-Coder 1.5B se ejecuta en tu equipo y tus prompts no se envían a la CDN. Con `preferredProvider` en `auto`, se usa después de Ollama y LM Studio. Por su tamaño, sirve para preguntas, ideas y especificaciones; para tareas de varios archivos conviene un modelo mayor.
 
 ## Caché y espacio en disco
 

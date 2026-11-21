@@ -23,13 +23,13 @@ Under the tabs, the **next-step bar** follows the SDD flow, *Spec → Build → 
 | Where you are | The bar says | The button |
 |---|---|---|
 | No `spec.md` yet | Start with a spec | **Create spec with AI** |
-| Tasks waiting | Next task: … | **Start SPEC-00x** (the same as dragging the card to *In Progress*) |
+| Tasks waiting | Next task: … | **Start SPEC-00x** (prioritizes in *Todo* and starts work in *In Progress*) |
 | The AI is working | AI is building … | **Watch progress** |
 | Diffs pending | Review N pending changes | **Review changes** and **Apply & run gates** |
 | Debt at its ceiling | Build is blocked by technical debt | **See debt** |
 | Every task done | All N tasks are done | **Validate against spec** |
 
-Every card in *Backlog*, *Todo* and *In Progress* also has a **Start** (or **Resume**) button, so dragging is optional. Above the chat input, quick buttons run the common actions: *Build next task*, *Validate*, *Tests*, *Refactor* and, while diffs are pending, *Apply changes*.
+Every card in *Backlog*, *Todo* and *In Progress* also has a **Start** (or **Resume**) button, so dragging is optional. Above the chat input, quick buttons run *Build next task*, *Validate*, *Tests* and *Refactor*; when diffs are pending, **Review and apply** and **Discard changes** appear.
 
 | Shortcut | Action |
 |---|---|
@@ -79,22 +79,22 @@ Does your project use another name, such as `tasks.md` or `backlog.md`? Change i
 
 ## 2. The board
 
-Every pending task starts in **Backlog**. The columns are *Backlog*, *Todo*, *In Progress* and *Done*.
+Every pending task starts in **Backlog**. The usual flow is **Backlog → Todo → In Progress → Done**: move a task to *Todo* to prioritize it, then press **Start** to begin. Review happens within *In Progress*; it is not a fifth column.
 
 ```video
 title: A board task, end to end
 src: media/work-task-en.mp4
 poster: media/work-task-en.jpg
 duration: 0:29
-caption: SPEC-003 is dragged to In Progress; the agent plans and generates the file, the chat shows the diff and `si aplicar` writes it with a checkpoint. Tests pass but the build fails (the sample project has no `vite` installed), so the DoD gate keeps the card in In Progress and the debt goes up. Recorded with Ollama (llama3.2 3B), sped up while waiting.
+caption: SPEC-003 is started from the board; the agent proposes a diff to review and apply. Tests pass but the build fails (the sample project has no `vite` installed), so the DoD gate keeps the card in In Progress and explains what is missing. Recorded with Ollama (llama3.2 3B), sped up while waiting.
 ```
 
-**Dragging a card to *In Progress* starts the AI**, and it writes nothing blindly:
+**Starting a card from *Todo* (or moving it to *In Progress*) starts the AI**, and it writes nothing blindly:
 
 1. **Plan.** The agent looks at the workspace and decides which files to create or change (6 at most). Paths that would leave the project are dropped; a path the model writes as `/api/x.js` is read as `api/x.js` inside the project.
 2. **Generate.** It generates each file and stores it as a **pending diff**. The chat shows each diff (`+added/−removed`).
 3. **Your review.** Read the diffs. Use `diff <path>` to see one in full.
-4. **Apply or discard.** `si aplicar` writes every pending file with the policy, automatic review and checkpoint described in [How the harness thinks](../harness/#what-guards-a-write). `no` discards them all.
+4. **Review and apply or discard.** Choose **Review and apply** to process the changes with the policy, automatic review and checkpoint described in [How the harness thinks](../harness/#what-guards-a-write), or **Discard changes** to discard them. You can also use `si aplicar` and `no` in chat.
 5. **Verify.** After applying, the real build and test commands run.
 6. **Done.** The card moves to *Done* and `spec.md` becomes `- [x]` **only if** the DoD gate has evidence. Otherwise it stays *In Progress* and the chat explains what is missing.
 
@@ -102,7 +102,7 @@ If an older task contains an example path such as `<carpeta-fuente>/services/val
 
 ![Task sequence: plan, generate, diff, approve, apply, prove](diagrams/03-sdd-task-sequence.svg "What happens between dragging the card and it reaching Done.")
 
-The **Evidence** tab shows the same review queue with buttons (*Discard all* and *Apply & run gates*), if you prefer clicking to typing.
+The **Evidence** tab shows the same review queue with buttons (*Discard all* and *Apply & run gates*). Review is a task state while it stays in *In Progress*, not an extra board column.
 
 > [!IMPORTANT]
 > While working a task, the AI **cannot write `spec.md`**: if it tries, that write is skipped. A confused model cannot wipe your checkboxes. The board updates `spec.md` itself when the task reaches *Done*.

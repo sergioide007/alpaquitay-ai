@@ -80,7 +80,7 @@ Measured on 15 November 2026 on a laptop with an Intel UHD (gen 9) integrated GP
 
 ## Using it as an AI provider
 
-Besides the command, the engine can be one more provider, like Ollama:
+Besides the command, the engine can be one more provider, like Ollama. In **Settings → AI Provider**, select **Alpaquitay AI · Qwen 2.5 (on-device)** and enable the engine. On first use, confirm the signed model download; VS Code shows progress and required disk space before using it. Qwen2.5-Coder 1.5B runs on your machine, and your prompts are never sent to the CDN.
 
 ```json
 {

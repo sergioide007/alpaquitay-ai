@@ -23,13 +23,13 @@ Debajo de las pestañas, la **barra de siguiente paso** sigue el flujo SDD, *Spe
 | Dónde estás | Qué dice la barra | El botón |
 |---|---|---|
 | Aún no hay `spec.md` | Start with a spec | **Create spec with AI** |
-| Hay tareas pendientes | Next task: … | **Start SPEC-00x** (equivale a arrastrar la tarjeta a *In Progress*) |
+| Hay tareas pendientes | Next task: … | **Start SPEC-00x** (prioriza en *Todo* e inicia el trabajo en *In Progress*) |
 | La IA está trabajando | AI is building … | **Watch progress** |
 | Hay diffs pendientes | Review N pending changes | **Review changes** y **Apply & run gates** |
 | La deuda llegó al tope | Build is blocked by technical debt | **See debt** |
 | Todas las tareas hechas | All N tasks are done | **Validate against spec** |
 
-Cada tarjeta de *Backlog*, *Todo* e *In Progress* tiene además un botón **Start** (o **Resume**), así que arrastrar es opcional. Sobre el campo del chat, botones rápidos ejecutan lo habitual: *Build next task*, *Validate*, *Tests*, *Refactor* y, mientras haya diffs pendientes, *Apply changes*.
+Cada tarjeta de *Backlog*, *Todo* e *In Progress* tiene además un botón **Start** (o **Resume**), así que arrastrar es opcional. Sobre el campo del chat, los botones rápidos ejecutan *Build next task*, *Validate*, *Tests* y *Refactor*; cuando hay diffs pendientes aparecen **Review and apply** y **Discard changes**.
 
 | Atajo | Acción |
 |---|---|
@@ -79,22 +79,22 @@ Reglas del formato:
 
 ## 2. El tablero
 
-Todas las tareas pendientes empiezan en **Backlog**. Las columnas son *Backlog*, *Todo*, *In Progress* y *Done*.
+Todas las tareas pendientes empiezan en **Backlog**. El flujo habitual es **Backlog → Todo → In Progress → Done**: mueve a *Todo* para priorizar y pulsa **Start** para comenzar. La revisión ocurre dentro de *In Progress*; no es una quinta columna.
 
 ```video
 title: Una tarea del tablero, de principio a fin
 src: media/work-task.mp4
 poster: media/work-task.jpg
 duration: 0:25
-caption: Se arrastra SPEC-003 a In Progress; el agente planifica y genera el archivo, el chat muestra el diff y `si aplicar` lo escribe con checkpoint. Los tests pasan, pero el build falla (el proyecto de ejemplo no tiene `vite` instalado), así que la compuerta DoD deja la tarjeta en In Progress y la deuda sube. Grabado con Ollama (llama3.2 3B), acelerado en las esperas.
+caption: Recorrido de SPEC-003: se inicia desde el tablero, el agente propone un diff para revisar y aplicar. Los tests pasan, pero el build falla (el proyecto de ejemplo no tiene `vite` instalado), así que la compuerta DoD conserva la tarjeta en In Progress y muestra qué falta. Grabado con Ollama (llama3.2 3B), acelerado en las esperas.
 ```
 
-**Arrastrar una tarjeta a *In Progress* arranca la IA**, y no escribe nada a ciegas:
+**Al iniciar una tarjeta desde *Todo* (o moverla a *In Progress*) arranca la IA**, y no escribe nada a ciegas:
 
 1. **Plan.** El agente revisa el workspace y decide qué archivos crear o cambiar (como mucho 6). Las rutas que saldrían del proyecto se descartan; una ruta que el modelo escriba como `/api/x.js` se lee como `api/x.js` dentro del proyecto.
 2. **Generación.** Genera cada archivo y lo guarda como **diff pendiente**. El chat muestra cada diff (`+añadidas/−quitadas`).
 3. **Tu revisión.** Lee los diffs. Usa `diff <ruta>` para ver uno completo.
-4. **Aplicar o descartar.** `si aplicar` escribe todos los pendientes con la política, la revisión automática y el *checkpoint* descritos en [Cómo piensa el arnés](../arnes/#que-protege-una-escritura). `no` los descarta todos.
+4. **Revisar y aplicar o descartar.** Usa **Review and apply** para procesar los cambios con la política, la revisión automática y el *checkpoint* descritos en [Cómo piensa el arnés](../arnes/#que-protege-una-escritura), o **Discard changes** para descartarlos. También puedes usar los comandos `si aplicar` y `no` en el chat.
 5. **Verificación.** Tras aplicar se ejecutan los comandos reales de build y test.
 6. **Done.** La tarjeta pasa a *Done* y `spec.md` se actualiza a `- [x]` **solo si** la compuerta DoD tiene evidencia. Si no, se queda en *In Progress* y el chat explica qué falta.
 
@@ -102,7 +102,7 @@ Si una tarea antigua contiene una ruta de ejemplo como `<carpeta-fuente>/service
 
 ![Secuencia de una tarea: planificar, generar, diff, aprobar, aplicar, probar](diagrams/03-sdd-task-sequence.svg "Lo que ocurre entre arrastrar la tarjeta y que llegue a Done.")
 
-La pestaña **Evidence** muestra la misma cola de revisión con botones (*Discard all* y *Apply & run gates*), por si prefieres hacer clic en vez de escribir.
+La pestaña **Evidence** muestra la misma cola de revisión con botones (*Discard all* y *Apply & run gates*). Review es un estado de la tarea mientras permanece en *In Progress*, no una columna adicional.
 
 > [!IMPORTANT]
 > Mientras trabaja una tarea, la IA **no puede escribir `spec.md`**: si lo intenta, esa escritura se ignora. Así un modelo despistado no puede borrar tus casillas. El tablero actualiza `spec.md` por su cuenta cuando la tarea llega a *Done*.

@@ -86,7 +86,7 @@
 <tr>
 <td>Hay tareas pendientes</td>
 <td>Next task: …</td>
-<td><strong>Start SPEC-00x</strong> (equivale a arrastrar la tarjeta a <em>In Progress</em>)</td>
+<td><strong>Start SPEC-00x</strong> (prioriza en <em>Todo</em> e inicia el trabajo en <em>In Progress</em>)</td>
 </tr>
 <tr>
 <td>La IA está trabajando</td>
@@ -110,7 +110,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>Cada tarjeta de <em>Backlog</em>, <em>Todo</em> e <em>In Progress</em> tiene además un botón <strong>Start</strong> (o <strong>Resume</strong>), así que arrastrar es opcional. Sobre el campo del chat, botones rápidos ejecutan lo habitual: <em>Build next task</em>, <em>Validate</em>, <em>Tests</em>, <em>Refactor</em> y, mientras haya diffs pendientes, <em>Apply changes</em>.</p>
+<p>Cada tarjeta de <em>Backlog</em>, <em>Todo</em> e <em>In Progress</em> tiene además un botón <strong>Start</strong> (o <strong>Resume</strong>), así que arrastrar es opcional. Sobre el campo del chat, los botones rápidos ejecutan <em>Build next task</em>, <em>Validate</em>, <em>Tests</em> y <em>Refactor</em>; cuando hay diffs pendientes aparecen <strong>Review and apply</strong> y <strong>Discard changes</strong>.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -188,24 +188,24 @@ Reservas de pistas con pago online y recordatorios por correo.
 <p>Una buena especificación tiene tareas pequeñas que empiezan por un verbo y que se pueden verificar: «Validar el correo del formulario de registro» es mejor que «Usuarios». La IA implementa mucho mejor una tarea de un par de archivos que una épica entera.</p>
 </aside>
 <h2 id="2-el-tablero">2. El tablero</h2>
-<p>Todas las tareas pendientes empiezan en <strong>Backlog</strong>. Las columnas son <em>Backlog</em>, <em>Todo</em>, <em>In Progress</em> y <em>Done</em>.</p>
+<p>Todas las tareas pendientes empiezan en <strong>Backlog</strong>. El flujo habitual es <strong>Backlog → Todo → In Progress → Done</strong>: mueve a <em>Todo</em> para priorizar y pulsa <strong>Start</strong> para comenzar. La revisión ocurre dentro de <em>In Progress</em>; no es una quinta columna.</p>
 <figure class="video">
 <video controls preload="none" playsinline poster="../media/work-task.jpg" width="1440" height="900" aria-label="Una tarea del tablero, de principio a fin"><source src="../media/work-task.mp4" type="video/mp4">Tu navegador no reproduce vídeo MP4. <a href="../media/work-task.mp4">Descarga el vídeo</a>.</video>
-<figcaption><strong>Una tarea del tablero, de principio a fin</strong> <span class="video-len">0:25</span> — Se arrastra SPEC-003 a In Progress; el agente planifica y genera el archivo, el chat muestra el diff y <code>si aplicar</code> lo escribe con checkpoint. Los tests pasan, pero el build falla (el proyecto de ejemplo no tiene <code>vite</code> instalado), así que la compuerta DoD deja la tarjeta en In Progress y la deuda sube. Grabado con Ollama (llama3.2 3B), acelerado en las esperas.</figcaption>
+<figcaption><strong>Una tarea del tablero, de principio a fin</strong> <span class="video-len">0:25</span> — Recorrido de SPEC-003: se inicia desde el tablero, el agente propone un diff para revisar y aplicar. Los tests pasan, pero el build falla (el proyecto de ejemplo no tiene <code>vite</code> instalado), así que la compuerta DoD conserva la tarjeta en In Progress y muestra qué falta. Grabado con Ollama (llama3.2 3B), acelerado en las esperas.</figcaption>
 </figure>
-<p><strong>Arrastrar una tarjeta a <em>In Progress</em> arranca la IA</strong>, y no escribe nada a ciegas:</p>
+<p><strong>Al iniciar una tarjeta desde <em>Todo</em> (o moverla a <em>In Progress</em>) arranca la IA</strong>, y no escribe nada a ciegas:</p>
 <ol>
 <li><strong>Plan.</strong> El agente revisa el workspace y decide qué archivos crear o cambiar (como mucho 6). Las rutas que saldrían del proyecto se descartan; una ruta que el modelo escriba como <code>/api/x.js</code> se lee como <code>api/x.js</code> dentro del proyecto.</li>
 <li><strong>Generación.</strong> Genera cada archivo y lo guarda como <strong>diff pendiente</strong>. El chat muestra cada diff (<code>+añadidas/−quitadas</code>).</li>
 <li><strong>Tu revisión.</strong> Lee los diffs. Usa <code>diff &lt;ruta&gt;</code> para ver uno completo.</li>
-<li><strong>Aplicar o descartar.</strong> <code>si aplicar</code> escribe todos los pendientes con la política, la revisión automática y el <em>checkpoint</em> descritos en <a href="../arnes/#que-protege-una-escritura">Cómo piensa el arnés</a>. <code>no</code> los descarta todos.</li>
+<li><strong>Revisar y aplicar o descartar.</strong> Usa <strong>Review and apply</strong> para procesar los cambios con la política, la revisión automática y el <em>checkpoint</em> descritos en <a href="../arnes/#que-protege-una-escritura">Cómo piensa el arnés</a>, o <strong>Discard changes</strong> para descartarlos. También puedes usar los comandos <code>si aplicar</code> y <code>no</code> en el chat.</li>
 <li><strong>Verificación.</strong> Tras aplicar se ejecutan los comandos reales de build y test.</li>
 <li><strong>Done.</strong> La tarjeta pasa a <em>Done</em> y <code>spec.md</code> se actualiza a <code>- [x]</code> <strong>solo si</strong> la compuerta DoD tiene evidencia. Si no, se queda en <em>In Progress</em> y el chat explica qué falta.</li>
 </ol>
 <p>Si una tarea antigua contiene una ruta de ejemplo como <code>&lt;carpeta-fuente&gt;/services/validator.ts</code>, el arnés la resuelve usando la carpeta fuente detectada (o la raíz del workspace), actualiza la vista previa en la ruta real y pide confirmación otra vez. Si el archivo cambió desde que se generó el diff, no lo sobrescribe: conserva esa propuesta para regenerarla. Un diff que falla queda pendiente, pero los demás se siguen procesando. Si no hay repositorio Git, la aplicación continúa con un aviso de que no se pudo crear el <em>checkpoint</em>.</p>
 <figure class="figure"><a class="zoom" href="../diagrams/03-sdd-task-sequence.svg" aria-label="Ampliar: Secuencia de una tarea: planificar, generar, diff, aprobar, aplicar, probar"><img src="../diagrams/03-sdd-task-sequence.svg" alt="Secuencia de una tarea: planificar, generar, diff, aprobar, aplicar, probar" width="1120" height="1358" loading="lazy" decoding="async"></a><figcaption>Lo que ocurre entre arrastrar la tarjeta y que llegue a Done.</figcaption></figure>
 
-<p>La pestaña <strong>Evidence</strong> muestra la misma cola de revisión con botones (<em>Discard all</em> y <em>Apply &amp; run gates</em>), por si prefieres hacer clic en vez de escribir.</p>
+<p>La pestaña <strong>Evidence</strong> muestra la misma cola de revisión con botones (<em>Discard all</em> y <em>Apply &amp; run gates</em>). Review es un estado de la tarea mientras permanece en <em>In Progress</em>, no una columna adicional.</p>
 <aside class="callout callout-important"><p class="callout-title">Importante</p>
 <p>Mientras trabaja una tarea, la IA <strong>no puede escribir <code>spec.md</code></strong>: si lo intenta, esa escritura se ignora. Así un modelo despistado no puede borrar tus casillas. El tablero actualiza <code>spec.md</code> por su cuenta cuando la tarea llega a <em>Done</em>.</p>
 </aside>

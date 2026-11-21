@@ -86,7 +86,7 @@
 <tr>
 <td>Tasks waiting</td>
 <td>Next task: …</td>
-<td><strong>Start SPEC-00x</strong> (the same as dragging the card to <em>In Progress</em>)</td>
+<td><strong>Start SPEC-00x</strong> (prioritizes in <em>Todo</em> and starts work in <em>In Progress</em>)</td>
 </tr>
 <tr>
 <td>The AI is working</td>
@@ -110,7 +110,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>Every card in <em>Backlog</em>, <em>Todo</em> and <em>In Progress</em> also has a <strong>Start</strong> (or <strong>Resume</strong>) button, so dragging is optional. Above the chat input, quick buttons run the common actions: <em>Build next task</em>, <em>Validate</em>, <em>Tests</em>, <em>Refactor</em> and, while diffs are pending, <em>Apply changes</em>.</p>
+<p>Every card in <em>Backlog</em>, <em>Todo</em> and <em>In Progress</em> also has a <strong>Start</strong> (or <strong>Resume</strong>) button, so dragging is optional. Above the chat input, quick buttons run <em>Build next task</em>, <em>Validate</em>, <em>Tests</em> and <em>Refactor</em>; when diffs are pending, <strong>Review and apply</strong> and <strong>Discard changes</strong> appear.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -188,24 +188,24 @@ Court bookings with online payment and email reminders.
 <p>A good spec has small, verifiable tasks that start with a verb: &quot;Validate the email in the sign-up form&quot; beats &quot;Users&quot;. The AI implements a task of a couple of files far better than a whole epic.</p>
 </aside>
 <h2 id="2-the-board">2. The board</h2>
-<p>Every pending task starts in <strong>Backlog</strong>. The columns are <em>Backlog</em>, <em>Todo</em>, <em>In Progress</em> and <em>Done</em>.</p>
+<p>Every pending task starts in <strong>Backlog</strong>. The usual flow is <strong>Backlog → Todo → In Progress → Done</strong>: move a task to <em>Todo</em> to prioritize it, then press <strong>Start</strong> to begin. Review happens within <em>In Progress</em>; it is not a fifth column.</p>
 <figure class="video">
 <video controls preload="none" playsinline poster="../../media/work-task-en.jpg" width="1440" height="900" aria-label="A board task, end to end"><source src="../../media/work-task-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a href="../../media/work-task-en.mp4">Download the video</a>.</video>
-<figcaption><strong>A board task, end to end</strong> <span class="video-len">0:29</span> — SPEC-003 is dragged to In Progress; the agent plans and generates the file, the chat shows the diff and <code>si aplicar</code> writes it with a checkpoint. Tests pass but the build fails (the sample project has no <code>vite</code> installed), so the DoD gate keeps the card in In Progress and the debt goes up. Recorded with Ollama (llama3.2 3B), sped up while waiting.</figcaption>
+<figcaption><strong>A board task, end to end</strong> <span class="video-len">0:29</span> — SPEC-003 is started from the board; the agent proposes a diff to review and apply. Tests pass but the build fails (the sample project has no <code>vite</code> installed), so the DoD gate keeps the card in In Progress and explains what is missing. Recorded with Ollama (llama3.2 3B), sped up while waiting.</figcaption>
 </figure>
-<p><strong>Dragging a card to <em>In Progress</em> starts the AI</strong>, and it writes nothing blindly:</p>
+<p><strong>Starting a card from <em>Todo</em> (or moving it to <em>In Progress</em>) starts the AI</strong>, and it writes nothing blindly:</p>
 <ol>
 <li><strong>Plan.</strong> The agent looks at the workspace and decides which files to create or change (6 at most). Paths that would leave the project are dropped; a path the model writes as <code>/api/x.js</code> is read as <code>api/x.js</code> inside the project.</li>
 <li><strong>Generate.</strong> It generates each file and stores it as a <strong>pending diff</strong>. The chat shows each diff (<code>+added/−removed</code>).</li>
 <li><strong>Your review.</strong> Read the diffs. Use <code>diff &lt;path&gt;</code> to see one in full.</li>
-<li><strong>Apply or discard.</strong> <code>si aplicar</code> writes every pending file with the policy, automatic review and checkpoint described in <a href="../harness/#what-guards-a-write">How the harness thinks</a>. <code>no</code> discards them all.</li>
+<li><strong>Review and apply or discard.</strong> Choose <strong>Review and apply</strong> to process the changes with the policy, automatic review and checkpoint described in <a href="../harness/#what-guards-a-write">How the harness thinks</a>, or <strong>Discard changes</strong> to discard them. You can also use <code>si aplicar</code> and <code>no</code> in chat.</li>
 <li><strong>Verify.</strong> After applying, the real build and test commands run.</li>
 <li><strong>Done.</strong> The card moves to <em>Done</em> and <code>spec.md</code> becomes <code>- [x]</code> <strong>only if</strong> the DoD gate has evidence. Otherwise it stays <em>In Progress</em> and the chat explains what is missing.</li>
 </ol>
 <p>If an older task contains an example path such as <code>&lt;carpeta-fuente&gt;/services/validator.ts</code>, the harness resolves it using the detected source folder (or the workspace root), refreshes the preview at the real path, and asks for confirmation again. If the file changed since the diff was generated, it will not overwrite it; the proposal stays pending so you can regenerate it. A failed diff remains pending while other diffs continue processing. If the workspace is not a Git repository, applying continues with a warning that no checkpoint could be created.</p>
 <figure class="figure"><a class="zoom" href="../../diagrams/03-sdd-task-sequence.svg" aria-label="Enlarge: Task sequence: plan, generate, diff, approve, apply, prove"><img src="../../diagrams/03-sdd-task-sequence.svg" alt="Task sequence: plan, generate, diff, approve, apply, prove" width="1120" height="1358" loading="lazy" decoding="async"></a><figcaption>What happens between dragging the card and it reaching Done.</figcaption></figure>
 
-<p>The <strong>Evidence</strong> tab shows the same review queue with buttons (<em>Discard all</em> and <em>Apply &amp; run gates</em>), if you prefer clicking to typing.</p>
+<p>The <strong>Evidence</strong> tab shows the same review queue with buttons (<em>Discard all</em> and <em>Apply &amp; run gates</em>). Review is a task state while it stays in <em>In Progress</em>, not an extra board column.</p>
 <aside class="callout callout-important"><p class="callout-title">Important</p>
 <p>While working a task, the AI <strong>cannot write <code>spec.md</code></strong>: if it tries, that write is skipped. A confused model cannot wipe your checkboxes. The board updates <code>spec.md</code> itself when the task reaches <em>Done</em>.</p>
 </aside>

@@ -37,7 +37,7 @@ The harness decides with readable rules, not with another model. The keyword lis
 | "prepare the deployment pipeline on AWS" | Deep · specialist | operations or infrastructure |
 
 > [!WARNING]
-> Confirming with `si` a code request typed in the chat (*"implement the bookings endpoint"*) **generates a new `spec.md` from that request and replaces the current one**. A Git checkpoint is saved first, so you can get it back, but if you already have a spec you want to keep, add the task to the board and drag it to *In Progress* instead of asking in the chat.
+> Confirming with `si` a code request typed in the chat (*"implement the bookings endpoint"*) **generates a new `spec.md` from that request and replaces the current one**. A Git checkpoint is saved first, so you can get it back, but if you already have a spec you want to keep, add the task to the board, move it from *Backlog* to *Todo*, then start it in *In Progress*.
 
 When confidence is low or the route is Deep, the harness **proposes the route and waits**: reply `si` (or `sí`, `dale`, `ok`, `confirmo`) to go ahead. Every answer shows a readable line with the lane, stack, phase, gate and session economy.
 

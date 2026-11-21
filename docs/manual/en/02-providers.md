@@ -14,7 +14,7 @@ Alpaquitay has no cloud model of its own and never routes your data through a se
 |---|---|---|---|---|
 | **Ollama** | Your machine | Fully local | Free | Install Ollama and pull a model (`ollama pull <model>`). Detected at `http://localhost:11434`. |
 | **LM Studio** | Your machine | Fully local | Free | Load a model in LM Studio and start its local server. Detected at `http://localhost:1234`. |
-| **Local model (WebGPU)** | Inside VS Code, on your GPU | Fully local (the signed model is downloaded once) | Free | `alpaquitay-ai.localEngine.enabled: true`. See [Local engine](../local-engine/). |
+| **Alpaquitay AI · Qwen 2.5 (on-device)** | Inside VS Code, on your GPU | Fully local (initial download of the signed model) | Free | Enable it in the **Settings** provider picker; model: Qwen2.5-Coder 1.5B. See [Local engine](../local-engine/). |
 | **Anthropic Claude** | Anthropic's cloud | Direct call, through the privacy boundary | API pricing | API key in the OS keychain. |
 | **OpenAI** | OpenAI's cloud (or Azure OpenAI) | Direct call, through the privacy boundary | API pricing | API key in the OS keychain. |
 
