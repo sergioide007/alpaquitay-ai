@@ -1,316 +1,427 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Local engine: AI on your machine with WebGPU · Alpaquitay AI manual</title>
-<meta name="description" content="How to generate specs with a model that runs inside VS Code on your own GPU, without sending your text to any server: requirements, download confirmation, measured performance, cache, security and troubleshooting.">
-<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/local-engine/">
-<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/local-engine/">
-<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/motor-local/">
-<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/local-engine/">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/local-engine/">
-<meta property="og:title" content="Local engine: AI on your machine with WebGPU">
-<meta property="og:description" content="How to generate specs with a model that runs inside VS Code on your own GPU, without sending your text to any server: requirements, download confirmation, measured performance, cache, security and troubleshooting.">
-<meta property="og:locale" content="en_US">
-<meta name="theme-color" content="#07100d">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
-<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Local engine: AI on your machine with WebGPU","description":"How to generate specs with a model that runs inside VS Code on your own GPU, without sending your text to any server: requirements, download confirmation, measured performance, cache, security and troubleshooting.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/local-engine/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
-</head>
-<body>
-<a class="skip" href="#contenido">Skip to content</a>
-<header class="top">
-  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-  <a class="crumb" href="../">Manual</a>
-  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
-  <a class="lang" href="../../motor-local/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
-  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
-  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
-  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.8.2</span></p>
-  <ol class="chapters">
-<li><a href="../"><span class="n">00</span>Home</a></li>
-<li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
-<li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
-<li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
-<li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
-<li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
-<li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
-<li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
-<li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
-<li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
-<li><a href="../local-engine/" aria-current="page"><span class="n">10</span>Local engine (WebGPU)</a></li>
-<li><a href="../models/"><span class="n">11</span>Available models</a></li>
-<li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
-<li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
-<li><a href="../reference/"><span class="n">14</span>Reference</a></li>
-<li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
-<li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
-  </ol>
-  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-</aside>
-<main class="content" id="contenido">
-<article class="doc">
-<p class="kicker">Chapter 10</p>
-<h1 id="local-engine-ai-on-your-machine-with-webgpu">Local engine: AI on your machine with WebGPU</h1>
-<aside class="callout callout-note"><p class="callout-title">Note</p>
-<p>Available from version <strong>3.6.1</strong> of the extension.</p>
-</aside>
-<p>The local engine runs a language model <strong>inside VS Code, on your own GPU</strong>. Your text never leaves the machine: the only network traffic is a one-time download of the model files, which are signed. After that it works offline, and the server-side inference cost is <strong>zero</strong>.</p>
-<figure class="video">
-<video controls preload="none" playsinline poster="../../media/spec-local-en.jpg" width="1440" height="900" aria-label="A spec generated on your machine"><source src="../../media/spec-local-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a href="../../media/spec-local-en.mp4">Download the video</a>.</video>
-<figcaption><strong>A spec generated on your machine</strong> <span class="video-len">0:53</span> — The Generate Specification (Local Model) command, the download confirmation, progress on the GPU and the resulting spec in specs/. Download and generation are sped up.</figcaption>
-</figure>
-<h2 id="what-you-need">What you need</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Requirement</th>
-<th>Details</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>WebGPU in VS Code</td>
-<td>A GPU with an up-to-date driver. The default model also needs the <code>shader-f16</code> feature. Recent integrated GPUs (for example Intel UHD/Iris) work.</td>
-</tr>
-<tr>
-<td>Memory</td>
-<td>At least 8 GB of RAM.</td>
-</tr>
-<tr>
-<td>Disk</td>
-<td>About 1.3 GB for the default model's cache.</td>
-</tr>
-<tr>
-<td>Network</td>
-<td>Only the first time (or when a new model revision is published).</td>
-</tr>
-</tbody>
-</table></div>
-<p>If your machine misses any of these, the command <strong>refuses before downloading anything</strong> and tells you why.</p>
-<h2 id="using-it-generate-specification-local-model">Using it: Generate Specification (Local Model)</h2>
-<ol>
-<li>Open a project folder.</li>
-<li><strong>Select text</strong> in the editor describing what you want to specify, or select nothing.</li>
-<li>Run <strong>Alpaquitay AI: Generate Specification (Local Model)</strong> from the Command Palette (<kbd>F1</kbd>) or the <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd> menu.</li>
-<li>If you selected nothing, type the description in the box (<em>«Describe el proyecto o la funcionalidad que quieres especificar (se procesa en tu equipo)»</em>: describe the project or feature; it is processed on your machine). A request written in English produces a spec in English.</li>
-<li><strong>The first time, confirm the download</strong> (see the next section).</li>
-<li>Follow the progress in the notification: runtime check, download, caching, loading on the GPU and token-by-token generation with its speed.</li>
-<li>The result is written to <code>specs/&lt;name&gt;.md</code> in the same format the Work tab reads. It <strong>never overwrites</strong> an existing spec: if the name is taken, it adds <code>-2</code>, <code>-3</code>…</li>
-</ol>
-<p>You can cancel at any time from the notification.</p>
-<h2 id="the-download-confirmation">The download confirmation</h2>
-<p>Before downloading anything, VS Code shows a <strong>modal dialog</strong>:</p>
-<figure class="figure"><a class="zoom" href="../../media/local-consent.png" aria-label="Enlarge: The model download confirmation dialog"><img src="../../media/local-consent.png" alt="The model download confirmation dialog" width="1243" height="798" loading="lazy" decoding="async"></a><figcaption>The confirmation dialog: model, license, download size and privacy guarantees. Shown here drawn inside VS Code (window.dialogStyle: custom).</figcaption></figure>
 
-<p>It shows the model and its license, the <strong>verified download size</strong> and these guarantees: integrity is checked against a signed manifest before any file is used, and your text is never sent to the CDN. In English:</p>
-<ul>
-<li><em>«Alpaquitay: el motor local necesita descargar el modelo.»</em> — the local engine needs to download the model.</li>
-<li><em>«La integridad se verifica con un manifiesto firmado antes de usar cualquier archivo.»</em> — integrity is verified against a signed manifest before any file is used.</li>
-<li><em>«Tu texto nunca se envía a la CDN: la inferencia ocurre en tu equipo.»</em> — your text is never sent to the CDN; inference happens on your machine.</li>
-</ul>
-<p>Then:</p>
-<ul>
-<li><strong>Descargar y generar</strong> (download and generate) starts the download.</li>
-<li><strong>Cancel</strong> (or <kbd>Esc</kbd>) stops the command: nothing is downloaded and nothing leaves your machine.</li>
-</ul>
-<aside class="callout callout-important"><p class="callout-title">Important</p>
-<p><strong>The dialog needs your click.</strong> With VS Code's default setting (<code>window.dialogStyle: native</code>) it is an <strong>operating-system dialog</strong>: a separate window that may open away from where you are looking. Until you answer, the notification stays on <em>«Preparando motor local…»</em> (preparing the local engine). If you see that and nothing happens, look for the dialog in the taskbar. If you prefer it drawn inside the VS Code window, set <code>&quot;window.dialogStyle&quot;: &quot;custom&quot;</code> in your settings.</p>
-</aside>
-<p>The dialog shows again when a <strong>new revision</strong> of the model is published, because it has to be downloaded again.</p>
-<h2 id="real-performance">Real performance</h2>
-<p>Measured on 15 November 2026 on a laptop with an Intel UHD (gen 9) integrated GPU, VS Code 1.146, from the production CDN, with the default model:</p>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Phase</th>
-<th>Time</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Downloading and verifying 1.26 GB</td>
-<td>about 3 minutes at ~7 MB/s (depends on your connection)</td>
-</tr>
-<tr>
-<td>Caching and loading on the GPU</td>
-<td>about 15 seconds</td>
-</tr>
-<tr>
-<td>Generation</td>
-<td><strong>4.5–4.7 tokens/s</strong>; a spec with 3 epics in ~45 s</td>
-</tr>
-<tr>
-<td>Later runs</td>
-<td>no download: just loading and generation</td>
-</tr>
-</tbody>
-</table></div>
-<aside class="callout callout-note"><p class="callout-title">Note</p>
-<p>This is a 1.5-billion-parameter model. It writes good <strong>first drafts</strong> of specs; it does not replace a large model. If the result does not follow the <code>spec.md</code> format, the command warns you so you can review it.</p>
-</aside>
-<h2 id="using-it-as-an-ai-provider">Using it as an AI provider</h2>
-<p>Besides the command, the engine can be one more provider, like Ollama:</p>
-<div class="code" data-lang="JSON"><pre><code class="language-json">{
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local engine: AI on your machine with WebGPU · Alpaquitay AI manual</title>
+  <meta name="description"
+    content="How to generate specs with a model that runs inside VS Code on your own GPU, without sending your text to any server: requirements, download confirmation, measured performance, cache, security and troubleshooting.">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/local-engine/">
+  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/local-engine/">
+  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/motor-local/">
+  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/local-engine/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/local-engine/">
+  <meta property="og:title" content="Local engine: AI on your machine with WebGPU">
+  <meta property="og:description"
+    content="How to generate specs with a model that runs inside VS Code on your own GPU, without sending your text to any server: requirements, download confirmation, measured performance, cache, security and troubleshooting.">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#07100d">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
+  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Local engine: AI on your machine with WebGPU","description":"How to generate specs with a model that runs inside VS Code on your own GPU, without sending your text to any server: requirements, download confirmation, measured performance, cache, security and troubleshooting.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/local-engine/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+</head>
+
+<body>
+  <a class="skip" href="#contenido">Skip to content</a>
+  <header class="top">
+    <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar"
+      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M3 5h14M3 10h14M3 15h14" />
+      </svg></button>
+    <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark"
+        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+    <a class="crumb" href="../">Manual</a>
+    <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <circle cx="9" cy="9" r="5.5" />
+        <path d="m13.5 13.5 3.5 3.5" />
+      </svg><span>Search</span><kbd>Ctrl K</kbd></button>
+    <a class="lang" href="../../motor-local/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
+      </svg></button>
+    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg
+        viewBox="0 0 16 16" aria-hidden="true" class="fill">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+      </svg></a>
+    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Manual contents">
+      <p class="side-title">User manual <span class="ver">v3.8.3</span></p>
+      <ol class="chapters">
+        <li><a href="../"><span class="n">00</span>Home</a></li>
+        <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
+        <li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
+        <li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
+        <li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
+        <li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
+        <li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
+        <li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
+        <li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+        <li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
+        <li><a href="../local-engine/" aria-current="page"><span class="n">10</span>Local engine (WebGPU)</a></li>
+        <li><a href="../models/"><span class="n">11</span>Available models</a></li>
+        <li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
+        <li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
+        <li><a href="../reference/"><span class="n">14</span>Reference</a></li>
+        <li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+        <li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
+      </ol>
+      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+    </aside>
+    <main class="content" id="contenido">
+      <article class="doc">
+        <p class="kicker">Chapter 10</p>
+        <h1 id="local-engine-ai-on-your-machine-with-webgpu">Local engine: AI on your machine with WebGPU</h1>
+        <aside class="callout callout-note">
+          <p class="callout-title">Note</p>
+          <p>Available from version <strong>3.6.1</strong> of the extension.</p>
+        </aside>
+        <p>The local engine runs a language model <strong>inside VS Code, on your own GPU</strong>. Your text never
+          leaves the machine: the only network traffic is a one-time download of the model files, which are signed.
+          After that it works offline, and the server-side inference cost is <strong>zero</strong>.</p>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="../../media/spec-local-en.jpg" width="1440" height="900"
+            aria-label="A spec generated on your machine">
+            <source src="../../media/spec-local-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a
+              href="../../media/spec-local-en.mp4">Download the video</a>.
+          </video>
+          <figcaption><strong>A spec generated on your machine</strong> <span class="video-len">0:53</span> — The
+            Generate Specification (Local Model) command, the download confirmation, progress on the GPU and the
+            resulting spec in specs/. Download and generation are sped up.</figcaption>
+        </figure>
+        <h2 id="what-you-need">What you need</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Requirement</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>WebGPU in VS Code</td>
+                <td>A GPU with an up-to-date driver. The default model also needs the <code>shader-f16</code> feature.
+                  Recent integrated GPUs (for example Intel UHD/Iris) work.</td>
+              </tr>
+              <tr>
+                <td>Memory</td>
+                <td>At least 8 GB of RAM.</td>
+              </tr>
+              <tr>
+                <td>Disk</td>
+                <td>About 1.3 GB for the default model's cache.</td>
+              </tr>
+              <tr>
+                <td>Network</td>
+                <td>Only the first time (or when a new model revision is published).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>If your machine misses any of these, the command <strong>refuses before downloading anything</strong> and
+          tells you why.</p>
+        <h2 id="using-it-generate-specification-local-model">Using it: Generate Specification (Local Model)</h2>
+        <ol>
+          <li>Open a project folder.</li>
+          <li><strong>Select text</strong> in the editor describing what you want to specify, or select nothing.</li>
+          <li>Run <strong>Alpaquitay AI: Generate Specification (Local Model)</strong> from the Command Palette
+            (<kbd>F1</kbd>) or the <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd> menu.</li>
+          <li>If you selected nothing, type the description in the box (<em>«Describe el proyecto o la funcionalidad que
+              quieres especificar (se procesa en tu equipo)»</em>: describe the project or feature; it is processed on
+            your machine). A request written in English produces a spec in English.</li>
+          <li><strong>The first time, confirm the download</strong> (see the next section).</li>
+          <li>Follow the progress in the notification: runtime check, download, caching, loading on the GPU and
+            token-by-token generation with its speed.</li>
+          <li>The result is written to <code>specs/&lt;name&gt;.md</code> in the same format the Work tab reads. It
+            <strong>never overwrites</strong> an existing spec: if the name is taken, it adds <code>-2</code>,
+            <code>-3</code>…</li>
+        </ol>
+        <p>You can cancel at any time from the notification.</p>
+        <h2 id="the-download-confirmation">The download confirmation</h2>
+        <p>Before downloading anything, VS Code shows a <strong>modal dialog</strong>:</p>
+        <figure class="figure"><a class="zoom" href="../../media/local-consent.png"
+            aria-label="Enlarge: The model download confirmation dialog"><img src="../../media/local-consent.png"
+              alt="The model download confirmation dialog" width="1243" height="798" loading="lazy"
+              decoding="async"></a>
+          <figcaption>The confirmation dialog: model, license, download size and privacy guarantees. Shown here drawn
+            inside VS Code (window.dialogStyle: custom).</figcaption>
+        </figure>
+
+        <p>It shows the model and its license, the <strong>verified download size</strong> and these guarantees:
+          integrity is checked against a signed manifest before any file is used, and your text is never sent to the
+          CDN. In English:</p>
+        <ul>
+          <li><em>«Alpaquitay: el motor local necesita descargar el modelo.»</em> — the local engine needs to download
+            the model.</li>
+          <li><em>«La integridad se verifica con un manifiesto firmado antes de usar cualquier archivo.»</em> —
+            integrity is verified against a signed manifest before any file is used.</li>
+          <li><em>«Tu texto nunca se envía a la CDN: la inferencia ocurre en tu equipo.»</em> — your text is never sent
+            to the CDN; inference happens on your machine.</li>
+        </ul>
+        <p>Then:</p>
+        <ul>
+          <li><strong>Descargar y generar</strong> (download and generate) starts the download.</li>
+          <li><strong>Cancel</strong> (or <kbd>Esc</kbd>) stops the command: nothing is downloaded and nothing leaves
+            your machine.</li>
+        </ul>
+        <aside class="callout callout-important">
+          <p class="callout-title">Important</p>
+          <p><strong>The dialog needs your click.</strong> With VS Code's default setting
+            (<code>window.dialogStyle: native</code>) it is an <strong>operating-system dialog</strong>: a separate
+            window that may open away from where you are looking. Until you answer, the notification stays on
+            <em>«Preparando motor local…»</em> (preparing the local engine). If you see that and nothing happens, look
+            for the dialog in the taskbar. If you prefer it drawn inside the VS Code window, set
+            <code>&quot;window.dialogStyle&quot;: &quot;custom&quot;</code> in your settings.</p>
+        </aside>
+        <p>The dialog shows again when a <strong>new revision</strong> of the model is published, because it has to be
+          downloaded again.</p>
+        <h2 id="real-performance">Real performance</h2>
+        <p>Measured on 15 November 2026 on a laptop with an Intel UHD (gen 9) integrated GPU, VS Code 1.146, from the
+          production CDN, with the default model:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Downloading and verifying 1.26 GB</td>
+                <td>about 3 minutes at ~7 MB/s (depends on your connection)</td>
+              </tr>
+              <tr>
+                <td>Caching and loading on the GPU</td>
+                <td>about 15 seconds</td>
+              </tr>
+              <tr>
+                <td>Generation</td>
+                <td><strong>4.5–4.7 tokens/s</strong>; a spec with 3 epics in ~45 s</td>
+              </tr>
+              <tr>
+                <td>Later runs</td>
+                <td>no download: just loading and generation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="callout callout-note">
+          <p class="callout-title">Note</p>
+          <p>This is a 1.5-billion-parameter model. It writes good <strong>first drafts</strong> of specs; it does not
+            replace a large model. If the result does not follow the <code>spec.md</code> format, the command warns you
+            so you can review it.</p>
+        </aside>
+        <h2 id="using-it-as-an-ai-provider">Using it as an AI provider</h2>
+        <p>Besides the command, the engine can be one more provider, like Ollama:</p>
+        <div class="code" data-lang="JSON">
+          <pre><code class="language-json">{
   &quot;alpaquitay-ai.localEngine.enabled&quot;: true,
   &quot;alpaquitay-ai.preferredProvider&quot;: &quot;local-wasm&quot;
 }
-</code></pre></div>
-<p>With <code>preferredProvider</code> set to <code>auto</code>, it is used after Ollama and LM Studio. Keep its size in mind: it is fine for questions, ideas and specs; for multi-file tasks a larger model in Ollama or the cloud gives better results.</p>
-<h2 id="cache-and-disk-space">Cache and disk space</h2>
-<ul>
-<li>Files are stored in VS Code's own cache (the engine panel's IndexedDB), in 8 MiB blocks. A half-finished download is never used.</li>
-<li>When the model revision changes, the old weights are deleted automatically.</li>
-<li><strong>Alpaquitay AI: Clear Local Model Cache</strong> empties the cache completely.</li>
-</ul>
-<h2 id="security-why-you-can-trust-what-is-downloaded">Security: why you can trust what is downloaded</h2>
-<p>The CDN is treated as <strong>untrusted</strong> by design. What makes a file valid is its signature, not the server:</p>
-<ol>
-<li>Every model has a <code>manifest.json</code> <strong>signed with Ed25519</strong>. The extension ships the project's public keys and refuses any manifest not signed by them, or older than the last one it saw (rollback protection).</li>
-<li>The manifest lists a <strong>SHA-256 for every 8 MiB block</strong> of every file. A changed byte, an unlisted file or a block that does not match is refused.</li>
-<li>The <strong>ONNX Runtime</strong> files are pinned by hash inside the extension itself, and the engine panel cannot load remote scripts.</li>
-<li>The manifest is downloaded <strong>without decompression</strong>: no decompressor parses network bytes before the signature check.</li>
-<li>The CDN address, the model and the trusted keys can <strong>only</strong> be changed in your user settings, never in a project's: a repository you open cannot redirect the download.</li>
-</ol>
-<figure class="figure"><a class="zoom" href="../../diagrams/11-local-gemma-engine.svg" aria-label="Enlarge: Local engine architecture"><img src="../../diagrams/11-local-gemma-engine.svg" alt="Local engine architecture" width="1120" height="780" loading="lazy" decoding="async"></a><figcaption>The extension host, the engine panel with its cache, the static CDN behind a Cloudflare Worker, and your GPU.</figcaption></figure>
+</code></pre>
+        </div>
+        <p>With <code>preferredProvider</code> set to <code>auto</code>, it is used after Ollama and LM Studio. Keep its
+          size in mind: it is fine for questions, ideas and specs; for multi-file tasks a larger model in Ollama or the
+          cloud gives better results.</p>
+        <h2 id="cache-and-disk-space">Cache and disk space</h2>
+        <ul>
+          <li>Files are stored in VS Code's own cache (the engine panel's IndexedDB), in 8 MiB blocks. A half-finished
+            download is never used.</li>
+          <li>When the model revision changes, the old weights are deleted automatically.</li>
+          <li><strong>Alpaquitay AI: Clear Local Model Cache</strong> empties the cache completely.</li>
+        </ul>
+        <h2 id="security-why-you-can-trust-what-is-downloaded">Security: why you can trust what is downloaded</h2>
+        <p>The CDN is treated as <strong>untrusted</strong> by design. What makes a file valid is its signature, not the
+          server:</p>
+        <ol>
+          <li>Every model has a <code>manifest.json</code> <strong>signed with Ed25519</strong>. The extension ships the
+            project's public keys and refuses any manifest not signed by them, or older than the last one it saw
+            (rollback protection).</li>
+          <li>The manifest lists a <strong>SHA-256 for every 8 MiB block</strong> of every file. A changed byte, an
+            unlisted file or a block that does not match is refused.</li>
+          <li>The <strong>ONNX Runtime</strong> files are pinned by hash inside the extension itself, and the engine
+            panel cannot load remote scripts.</li>
+          <li>The manifest is downloaded <strong>without decompression</strong>: no decompressor parses network bytes
+            before the signature check.</li>
+          <li>The CDN address, the model and the trusted keys can <strong>only</strong> be changed in your user
+            settings, never in a project's: a repository you open cannot redirect the download.</li>
+        </ol>
+        <figure class="figure"><a class="zoom" href="../../diagrams/11-local-gemma-engine.svg"
+            aria-label="Enlarge: Local engine architecture"><img src="../../diagrams/11-local-gemma-engine.svg"
+              alt="Local engine architecture" width="1120" height="780" loading="lazy" decoding="async"></a>
+          <figcaption>The extension host, the engine panel with its cache, the static CDN behind a Cloudflare Worker,
+            and your GPU.</figcaption>
+        </figure>
 
-<p>You can check for yourself which models are published and whether their signature is valid in <a href="../models/">Available models</a>.</p>
-<h2 id="settings">Settings</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Setting</th>
-<th>Default</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>alpaquitay-ai.localEngine.enabled</code></td>
-<td><code>false</code></td>
-<td>Use the engine as an AI provider. The command works even when it is off.</td>
-</tr>
-<tr>
-<td><code>alpaquitay-ai.localEngine.modelId</code></td>
-<td><code>qwen2.5-coder-1.5b-instruct</code></td>
-<td>Which model to use (see <a href="../models/">Models</a>). User settings only.</td>
-</tr>
-<tr>
-<td><code>alpaquitay-ai.localEngine.device</code></td>
-<td><code>auto</code></td>
-<td><code>auto</code>, <code>webgpu</code> or <code>wasm</code> (CPU).</td>
-</tr>
-<tr>
-<td><code>alpaquitay-ai.localEngine.dtype</code></td>
-<td><code>auto</code></td>
-<td>Weight precision. Change it only if you see corrupted output.</td>
-</tr>
-<tr>
-<td><code>alpaquitay-ai.localEngine.maxNewTokens</code></td>
-<td><code>1024</code></td>
-<td>Maximum new tokens per generation.</td>
-</tr>
-<tr>
-<td><code>alpaquitay-ai.localEngine.cdnBaseUrl</code></td>
-<td><code>https://alpaquitay.specsolid.com</code></td>
-<td>CDN the models are downloaded from. User settings only.</td>
-</tr>
-<tr>
-<td><code>alpaquitay-ai.localEngine.extraTrustedKeys</code></td>
-<td><code>[]</code></td>
-<td>Extra public keys for your own CDN mirror. User settings only.</td>
-</tr>
-</tbody>
-</table></div>
-<h2 id="if-something-goes-wrong">If something goes wrong</h2>
-<p>The engine's messages are in Spanish; here they are with their meaning.</p>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Message or symptom</th>
-<th>What it means</th>
-<th>What to do</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Stuck on <em>«Preparando motor local…»</em></td>
-<td>The confirmation dialog is waiting for your answer.</td>
-<td>Find it in the taskbar and answer it.</td>
-</tr>
-<tr>
-<td><em>«VS Code está en renderizado por software…»</em> (software rendering)</td>
-<td>VS Code's GPU process failed and Chromium switched to software rendering.</td>
-<td>Close <strong>every</strong> VS Code window and open it again. <code>code --status</code> must show <code>webgpu: enabled</code> under <em>GPU Status</em>.</td>
-</tr>
-<tr>
-<td><em>«la GPU (…) no concede un adaptador WebGPU»</em> (no WebGPU adapter)</td>
-<td>The driver or Chromium's blocklist prevents WebGPU.</td>
-<td>Update your graphics driver.</td>
-</tr>
-<tr>
-<td><em>«este VS Code no expone la API navigator.gpu»</em></td>
-<td>VS Code is too old.</td>
-<td>Update VS Code.</td>
-</tr>
-<tr>
-<td><em>«Este modelo requiere WebGPU…»</em> (this model requires WebGPU)</td>
-<td>Without WebGPU this model would be unusably slow on the CPU (single thread).</td>
-<td>Fix WebGPU with the rows above.</td>
-</tr>
-<tr>
-<td><em>«La GPU se quedó sin memoria o falló durante la generación»</em> (GPU out of memory)</td>
-<td>The GPU had no memory for that request. The model is released.</td>
-<td>Close other apps using the GPU, shorten the description and try again.</td>
-</tr>
-<tr>
-<td><em>«Memoria agotada al cargar el modelo: reintentando en un panel nuevo»</em> (out of memory, retrying in a new panel)</td>
-<td>On the first run the engine panel held the download, the cache and the model at once and ran out of memory.</td>
-<td>Nothing: the extension retries once by itself in a new panel.</td>
-</tr>
-<tr>
-<td><em>«No hubo memoria suficiente para cargar el modelo…»</em> (not enough memory)</td>
-<td>The new panel ran out of memory too.</td>
-<td>Close memory-hungry apps (virtual machines, browsers with many tabs) and try again; what is already cached is not downloaded again.</td>
-</tr>
-<tr>
-<td>Quota or storage error</td>
-<td>No space for the cache.</td>
-<td>Free disk space and try again.</td>
-</tr>
-</tbody>
-</table></div>
-<p>More cases in <a href="../troubleshooting/">Troubleshooting</a>.</p>
+        <p>You can check for yourself which models are published and whether their signature is valid in <a
+            href="../models/">Available models</a>.</p>
+        <h2 id="settings">Settings</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Setting</th>
+                <th>Default</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>alpaquitay-ai.localEngine.enabled</code></td>
+                <td><code>false</code></td>
+                <td>Use the engine as an AI provider. The command works even when it is off.</td>
+              </tr>
+              <tr>
+                <td><code>alpaquitay-ai.localEngine.modelId</code></td>
+                <td><code>qwen2.5-coder-1.5b-instruct</code></td>
+                <td>Which model to use (see <a href="../models/">Models</a>). User settings only.</td>
+              </tr>
+              <tr>
+                <td><code>alpaquitay-ai.localEngine.device</code></td>
+                <td><code>auto</code></td>
+                <td><code>auto</code>, <code>webgpu</code> or <code>wasm</code> (CPU).</td>
+              </tr>
+              <tr>
+                <td><code>alpaquitay-ai.localEngine.dtype</code></td>
+                <td><code>auto</code></td>
+                <td>Weight precision. Change it only if you see corrupted output.</td>
+              </tr>
+              <tr>
+                <td><code>alpaquitay-ai.localEngine.maxNewTokens</code></td>
+                <td><code>1024</code></td>
+                <td>Maximum new tokens per generation.</td>
+              </tr>
+              <tr>
+                <td><code>alpaquitay-ai.localEngine.cdnBaseUrl</code></td>
+                <td><code>https://alpaquitay.specsolid.com</code></td>
+                <td>CDN the models are downloaded from. User settings only.</td>
+              </tr>
+              <tr>
+                <td><code>alpaquitay-ai.localEngine.extraTrustedKeys</code></td>
+                <td><code>[]</code></td>
+                <td>Extra public keys for your own CDN mirror. User settings only.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 id="if-something-goes-wrong">If something goes wrong</h2>
+        <p>The engine's messages are in Spanish; here they are with their meaning.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Message or symptom</th>
+                <th>What it means</th>
+                <th>What to do</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Stuck on <em>«Preparando motor local…»</em></td>
+                <td>The confirmation dialog is waiting for your answer.</td>
+                <td>Find it in the taskbar and answer it.</td>
+              </tr>
+              <tr>
+                <td><em>«VS Code está en renderizado por software…»</em> (software rendering)</td>
+                <td>VS Code's GPU process failed and Chromium switched to software rendering.</td>
+                <td>Close <strong>every</strong> VS Code window and open it again. <code>code --status</code> must show
+                  <code>webgpu: enabled</code> under <em>GPU Status</em>.</td>
+              </tr>
+              <tr>
+                <td><em>«la GPU (…) no concede un adaptador WebGPU»</em> (no WebGPU adapter)</td>
+                <td>The driver or Chromium's blocklist prevents WebGPU.</td>
+                <td>Update your graphics driver.</td>
+              </tr>
+              <tr>
+                <td><em>«este VS Code no expone la API navigator.gpu»</em></td>
+                <td>VS Code is too old.</td>
+                <td>Update VS Code.</td>
+              </tr>
+              <tr>
+                <td><em>«Este modelo requiere WebGPU…»</em> (this model requires WebGPU)</td>
+                <td>Without WebGPU this model would be unusably slow on the CPU (single thread).</td>
+                <td>Fix WebGPU with the rows above.</td>
+              </tr>
+              <tr>
+                <td><em>«La GPU se quedó sin memoria o falló durante la generación»</em> (GPU out of memory)</td>
+                <td>The GPU had no memory for that request. The model is released.</td>
+                <td>Close other apps using the GPU, shorten the description and try again.</td>
+              </tr>
+              <tr>
+                <td><em>«Memoria agotada al cargar el modelo: reintentando en un panel nuevo»</em> (out of memory,
+                  retrying in a new panel)</td>
+                <td>On the first run the engine panel held the download, the cache and the model at once and ran out of
+                  memory.</td>
+                <td>Nothing: the extension retries once by itself in a new panel.</td>
+              </tr>
+              <tr>
+                <td><em>«No hubo memoria suficiente para cargar el modelo…»</em> (not enough memory)</td>
+                <td>The new panel ran out of memory too.</td>
+                <td>Close memory-hungry apps (virtual machines, browsers with many tabs) and try again; what is already
+                  cached is not downloaded again.</td>
+              </tr>
+              <tr>
+                <td>Quota or storage error</td>
+                <td>No space for the cache.</td>
+                <td>Free disk space and try again.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>More cases in <a href="../troubleshooting/">Troubleshooting</a>.</p>
 
-<div class="doc-foot">
-  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/10-local-engine.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.8.2 · MIT</span>
-</div>
-<nav class="pager" aria-label="Chapters">
-<a class="prev" href="../agents/"><span>Previous</span>Agents · skills and specialists</a>
-<a class="next" href="../models/"><span>Next</span>Available models</a>
-</nav>
-</article>
-<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#what-you-need">What you need</a></li><li class="l2"><a href="#using-it-generate-specification-local-model">Using it: Generate Specification (Local Model)</a></li><li class="l2"><a href="#the-download-confirmation">The download confirmation</a></li><li class="l2"><a href="#real-performance">Real performance</a></li><li class="l2"><a href="#using-it-as-an-ai-provider">Using it as an AI provider</a></li><li class="l2"><a href="#cache-and-disk-space">Cache and disk space</a></li><li class="l2"><a href="#security-why-you-can-trust-what-is-downloaded">Security: why you can trust what is downloaded</a></li><li class="l2"><a href="#settings">Settings</a></li><li class="l2"><a href="#if-something-goes-wrong">If something goes wrong</a></li></ul></nav>
-</main>
-</div>
-<div class="search" id="search" hidden>
-  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
-    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
-    <ol id="searchResults" class="search-results"></ol>
-    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+        <div class="doc-foot">
+          <a class="edit"
+            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/10-local-engine.md">Suggest an
+            improvement to this page</a>
+          <span>Manual for Alpaquitay AI 3.8.3 · MIT</span>
+        </div>
+        <nav class="pager" aria-label="Chapters">
+          <a class="prev" href="../agents/"><span>Previous</span>Agents · skills and specialists</a>
+          <a class="next" href="../models/"><span>Next</span>Available models</a>
+        </nav>
+      </article>
+      <nav class="toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul>
+          <li class="l2"><a href="#what-you-need">What you need</a></li>
+          <li class="l2"><a href="#using-it-generate-specification-local-model">Using it: Generate Specification (Local
+              Model)</a></li>
+          <li class="l2"><a href="#the-download-confirmation">The download confirmation</a></li>
+          <li class="l2"><a href="#real-performance">Real performance</a></li>
+          <li class="l2"><a href="#using-it-as-an-ai-provider">Using it as an AI provider</a></li>
+          <li class="l2"><a href="#cache-and-disk-space">Cache and disk space</a></li>
+          <li class="l2"><a href="#security-why-you-can-trust-what-is-downloaded">Security: why you can trust what is
+              downloaded</a></li>
+          <li class="l2"><a href="#settings">Settings</a></li>
+          <li class="l2"><a href="#if-something-goes-wrong">If something goes wrong</a></li>
+        </ul>
+      </nav>
+    </main>
   </div>
-</div>
-<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
-<script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+  <div class="search" id="search" hidden>
+    <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+      <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off"
+        aria-label="Search text">
+      <ol id="searchResults" class="search-results"></ol>
+      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+    </div>
+  </div>
+  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+  <script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
+
 </html>

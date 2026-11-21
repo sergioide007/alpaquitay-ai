@@ -1,16 +1,19 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07100d">
-  <meta name="description" content="Alpaquitay AI is an AI software development harness for VS Code. Plan work from specs, review every code change, and verify quality gates before done.">
+  <meta name="description"
+    content="Alpaquitay AI is an AI software development harness for VS Code. Plan work from specs, review every code change, and verify quality gates before done.">
   <title>Alpaquitay AI — AI Software Development Harness for VS Code</title>
   <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/">
   <meta property="og:title" content="Alpaquitay AI — AI Software Development Harness for VS Code">
-  <meta property="og:description" content="Plan work from specs, review every code change, and verify quality gates before done. A privacy-first development harness for human and AI teams.">
+  <meta property="og:description"
+    content="Plan work from specs, review every code change, and verify quality gates before done. A privacy-first development harness for human and AI teams.">
   <meta property="og:image" content="https://alpaquitay-ai.specsolid.com/icons/alpaquitay-social.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -19,7 +22,8 @@
   <meta name="twitter:title" content="Alpaquitay AI — AI Software Development Harness for VS Code">
   <meta name="twitter:description" content="Plan from specs. Review every change. Verify before done.">
   <meta name="twitter:image" content="https://alpaquitay-ai.specsolid.com/icons/alpaquitay-social.png">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Alpaquitay AI","alternateName":"Alpaquitay AI Development Harness","url":"https://alpaquitay-ai.specsolid.com/","image":"https://alpaquitay-ai.specsolid.com/icons/alpaquitay-social.png","description":"AI software development harness for VS Code. Plan work from specs, orchestrate coding agents, review diffs, and verify SDLC quality gates before done.","keywords":["AI software development","AI coding agent harness","spec-driven development","AI code review","SDLC quality gates","privacy-first developer tools"],"applicationCategory":"DeveloperApplication","applicationSubCategory":"AI coding assistant and software development tools","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Spec-driven task planning","Reviewable diffs before writing","Executable SDLC quality gates","Local on-device AI provider","DORA and technical debt tracking"],"codeRepository":"https://github.com/sergioide007/alpaquitay-ai","author":{"@type":"Person","@id":"https://www.specsolid.com/#sergio-perez-ruiz","name":"Sergio Perez Ruiz","jobTitle":"Senior Software Engineer","email":"sergio@specsolid.com","url":"https://www.specsolid.com/","sameAs":["https://github.com/sergioide007","https://www.linkedin.com/in/sergioide007/","https://medium.com/@sergioide007","https://www.youtube.com/@codigosinteticolibro","https://codigosintetico.specsolid.com/"]}}</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Alpaquitay AI","alternateName":"Alpaquitay AI Development Harness","url":"https://alpaquitay-ai.specsolid.com/","image":"https://alpaquitay-ai.specsolid.com/icons/alpaquitay-social.png","description":"AI software development harness for VS Code. Plan work from specs, orchestrate coding agents, review diffs, and verify SDLC quality gates before done.","keywords":["AI software development","AI coding agent harness","spec-driven development","AI code review","SDLC quality gates","privacy-first developer tools"],"applicationCategory":"DeveloperApplication","applicationSubCategory":"AI coding assistant and software development tools","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Spec-driven task planning","Reviewable diffs before writing","Executable SDLC quality gates","Local on-device AI provider","DORA and technical debt tracking"],"codeRepository":"https://github.com/sergioide007/alpaquitay-ai","author":{"@type":"Person","@id":"https://www.specsolid.com/#sergio-perez-ruiz","name":"Sergio Perez Ruiz","jobTitle":"Senior Software Engineer","email":"sergio@specsolid.com","url":"https://www.specsolid.com/","sameAs":["https://github.com/sergioide007","https://www.linkedin.com/in/sergioide007/","https://medium.com/@sergioide007","https://www.youtube.com/@codigosinteticolibro","https://codigosintetico.specsolid.com/"]}}</script>
   <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
@@ -48,8 +52,14 @@
       --sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
       min-width: 320px;
@@ -76,11 +86,27 @@
       mask-image: linear-gradient(to bottom, black, transparent 72%);
     }
 
-    a { color: inherit; }
-    button, a { -webkit-tap-highlight-color: transparent; }
-    button { font: inherit; }
-    .wrap { width: min(calc(100% - 40px), var(--max)); margin-inline: auto; }
-    .mono { font-family: var(--mono); }
+    a {
+      color: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .wrap {
+      width: min(calc(100% - 40px), var(--max));
+      margin-inline: auto;
+    }
+
+    .mono {
+      font-family: var(--mono);
+    }
 
     .site-header {
       position: sticky;
@@ -115,15 +141,27 @@
       height: auto;
     }
 
-    .brand span:last-child { font-size: 15px; }
-    .nav-links { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+    .brand span:last-child {
+      font-size: 15px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      margin-left: auto;
+    }
+
     .nav-links a {
       color: var(--ink-soft);
       text-decoration: none;
       font-size: 13px;
       transition: color .18s ease;
     }
-    .nav-links a:hover { color: var(--mint-2); }
+
+    .nav-links a:hover {
+      color: var(--mint-2);
+    }
 
     .nav-meta {
       display: flex;
@@ -140,7 +178,8 @@
       font: 10px var(--mono);
     }
 
-    .nav-cta, .button {
+    .nav-cta,
+    .button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -156,15 +195,33 @@
       transition: transform .18s ease, border-color .18s ease, background .18s ease;
     }
 
-    .nav-cta { min-height: 36px; background: var(--ink); color: #08100d; }
-    .button:hover, .nav-cta:hover { transform: translateY(-2px); }
+    .nav-cta {
+      min-height: 36px;
+      background: var(--ink);
+      color: #08100d;
+    }
+
+    .button:hover,
+    .nav-cta:hover {
+      transform: translateY(-2px);
+    }
+
     .button-primary {
       background: var(--mint);
       color: #06100c;
       box-shadow: 0 12px 36px rgba(101, 242, 174, .12);
     }
-    .button-secondary { border-color: var(--line-strong); background: rgba(255,255,255,.025); color: var(--ink); }
-    .button-secondary:hover { border-color: rgba(101, 242, 174, .35); background: rgba(101, 242, 174, .04); }
+
+    .button-secondary {
+      border-color: var(--line-strong);
+      background: rgba(255, 255, 255, .025);
+      color: var(--ink);
+    }
+
+    .button-secondary:hover {
+      border-color: rgba(101, 242, 174, .35);
+      background: rgba(101, 242, 174, .04);
+    }
 
     .menu-button {
       display: none;
@@ -197,9 +254,21 @@
       letter-spacing: .14em;
       text-transform: uppercase;
     }
-    .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--mint); }
 
-    h1, h2, h3, p { margin-top: 0; }
+    .eyebrow::before {
+      content: "";
+      width: 22px;
+      height: 1px;
+      background: var(--mint);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
     h1 {
       max-width: 640px;
       margin-bottom: 22px;
@@ -208,9 +277,13 @@
       letter-spacing: -.065em;
       font-weight: 650;
     }
-    h1 em { color: var(--mint); font-style: normal; }
 
-    .hero-copy > p {
+    h1 em {
+      color: var(--mint);
+      font-style: normal;
+    }
+
+    .hero-copy>p {
       max-width: 590px;
       margin-bottom: 30px;
       color: var(--ink-soft);
@@ -218,8 +291,16 @@
       line-height: 1.65;
     }
 
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 11px; }
-    .button svg { width: 16px; height: 16px; }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 11px;
+    }
+
+    .button svg {
+      width: 16px;
+      height: 16px;
+    }
 
     .trust-row {
       display: flex;
@@ -229,14 +310,20 @@
       color: var(--muted);
       font: 10px var(--mono);
     }
-    .trust-row span { display: inline-flex; align-items: center; gap: 7px; }
+
+    .trust-row span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
     .trust-row span::before {
       content: "";
       width: 5px;
       height: 5px;
       border-radius: 50%;
       background: var(--mint);
-      box-shadow: 0 0 8px rgba(101,242,174,.7);
+      box-shadow: 0 0 8px rgba(101, 242, 174, .7);
     }
 
     .product-frame {
@@ -244,16 +331,17 @@
       border: 1px solid var(--line-strong);
       border-radius: 16px;
       background: #07100e;
-      box-shadow: 0 36px 100px rgba(0,0,0,.42);
+      box-shadow: 0 36px 100px rgba(0, 0, 0, .42);
       overflow: hidden;
       isolation: isolate;
     }
+
     .product-frame::after {
       content: "";
       position: absolute;
       inset: 0;
       pointer-events: none;
-      box-shadow: inset 0 0 60px rgba(101,242,174,.025);
+      box-shadow: inset 0 0 60px rgba(101, 242, 174, .025);
     }
 
     .window-bar {
@@ -265,8 +353,20 @@
       border-bottom: 1px solid var(--line);
       background: #0a1411;
     }
-    .window-dot { width: 7px; height: 7px; border-radius: 50%; background: #26342e; }
-    .window-title { margin-left: 7px; color: #718078; font: 9px var(--mono); }
+
+    .window-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #26342e;
+    }
+
+    .window-title {
+      margin-left: 7px;
+      color: #718078;
+      font: 9px var(--mono);
+    }
+
     .window-status {
       margin-left: auto;
       display: inline-flex;
@@ -277,7 +377,13 @@
       text-transform: uppercase;
       letter-spacing: .08em;
     }
-    .window-status i { width: 5px; height: 5px; border-radius: 50%; background: var(--mint); }
+
+    .window-status i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--mint);
+    }
 
     .app-tabs {
       height: 34px;
@@ -287,6 +393,7 @@
       border-bottom: 1px solid var(--line);
       background: #0b1713;
     }
+
     .app-tab {
       display: flex;
       align-items: center;
@@ -295,7 +402,11 @@
       font-size: 9px;
       border-bottom: 1px solid transparent;
     }
-    .app-tab.active { color: var(--mint); border-bottom-color: var(--mint); }
+
+    .app-tab.active {
+      color: var(--mint);
+      border-bottom-color: var(--mint);
+    }
 
     .app-strip {
       min-height: 28px;
@@ -308,17 +419,58 @@
       background: #09130f;
       font: 7.5px var(--mono);
     }
-    .app-strip strong { color: var(--ink-soft); font-weight: 500; }
-    .app-strip b { color: var(--mint); font-weight: 500; }
-    .app-strip span + span::before { content: "/"; color: #304039; margin-right: 9px; }
 
-    .app-body { padding: 14px; }
-    .app-heading { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 11px; }
-    .app-heading span { color: var(--mint); font: 7px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
-    .app-heading h3 { margin: 3px 0 0; font-size: 13px; letter-spacing: -.02em; }
-    .sync { color: #697870; font: 7px var(--mono); }
+    .app-strip strong {
+      color: var(--ink-soft);
+      font-weight: 500;
+    }
 
-    .mini-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .app-strip b {
+      color: var(--mint);
+      font-weight: 500;
+    }
+
+    .app-strip span+span::before {
+      content: "/";
+      color: #304039;
+      margin-right: 9px;
+    }
+
+    .app-body {
+      padding: 14px;
+    }
+
+    .app-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 11px;
+    }
+
+    .app-heading span {
+      color: var(--mint);
+      font: 7px var(--mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .app-heading h3 {
+      margin: 3px 0 0;
+      font-size: 13px;
+      letter-spacing: -.02em;
+    }
+
+    .sync {
+      color: #697870;
+      font: 7px var(--mono);
+    }
+
+    .mini-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+
     .mini-metric {
       min-width: 0;
       padding: 8px;
@@ -326,12 +478,49 @@
       border-radius: 6px;
       background: #0d1a15;
     }
-    .mini-metric label { display: block; margin-bottom: 6px; color: #66756d; font: 6px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
-    .mini-metric strong { display: block; overflow: hidden; color: var(--ink); font: 10px var(--mono); white-space: nowrap; text-overflow: ellipsis; }
-    .mini-metric small { display: block; margin-top: 3px; color: #66756d; font: 6px var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .app-grid { display: grid; grid-template-columns: 1.3fr .7fr; gap: 6px; margin-top: 6px; }
-    .mini-card { border: 1px solid var(--line); border-radius: 6px; background: #0b1713; overflow: hidden; }
+    .mini-metric label {
+      display: block;
+      margin-bottom: 6px;
+      color: #66756d;
+      font: 6px var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .mini-metric strong {
+      display: block;
+      overflow: hidden;
+      color: var(--ink);
+      font: 10px var(--mono);
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .mini-metric small {
+      display: block;
+      margin-top: 3px;
+      color: #66756d;
+      font: 6px var(--mono);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .mini-card {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0b1713;
+      overflow: hidden;
+    }
+
     .mini-card-hd {
       height: 25px;
       display: flex;
@@ -341,8 +530,21 @@
       font-size: 7px;
       font-weight: 600;
     }
-    .mini-card-hd span { margin-left: auto; color: #607068; font: 6px var(--mono); text-transform: uppercase; }
-    .gate-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; padding: 7px; }
+
+    .mini-card-hd span {
+      margin-left: auto;
+      color: #607068;
+      font: 6px var(--mono);
+      text-transform: uppercase;
+    }
+
+    .gate-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 3px;
+      padding: 7px;
+    }
+
     .gate {
       min-width: 0;
       padding: 5px 4px;
@@ -350,11 +552,36 @@
       border-radius: 4px;
       background: #0f1e18;
     }
-    .gate b { display: block; color: var(--mint); font: 6px var(--mono); }
-    .gate span { display: block; margin-top: 3px; color: #87968e; font-size: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .gate i { display: block; width: 4px; height: 4px; margin-top: 5px; border-radius: 50%; background: var(--mint); }
 
-    .diff-body { padding: 7px; }
+    .gate b {
+      display: block;
+      color: var(--mint);
+      font: 6px var(--mono);
+    }
+
+    .gate span {
+      display: block;
+      margin-top: 3px;
+      color: #87968e;
+      font-size: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gate i {
+      display: block;
+      width: 4px;
+      height: 4px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--mint);
+    }
+
+    .diff-body {
+      padding: 7px;
+    }
+
     .diff-file {
       display: grid;
       grid-template-columns: 1fr auto auto;
@@ -366,9 +593,23 @@
       background: rgba(243, 189, 105, .025);
       font: 6px var(--mono);
     }
-    .diff-file strong { color: #dbe5df; font-weight: 500; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-    .plus { color: var(--mint); }
-    .minus { color: var(--red); }
+
+    .diff-file strong {
+      color: #dbe5df;
+      font-weight: 500;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .plus {
+      color: var(--mint);
+    }
+
+    .minus {
+      color: var(--red);
+    }
+
     .diff-code {
       margin-top: 5px;
       padding: 7px;
@@ -378,18 +619,86 @@
       font: 5.8px/1.65 var(--mono);
       overflow: hidden;
     }
-    .diff-code .add { color: #90dcb5; }
-    .diff-actions { display: flex; justify-content: flex-end; gap: 4px; margin-top: 6px; }
-    .mini-button { padding: 4px 7px; border: 1px solid var(--line); border-radius: 4px; color: #8a9991; font: 6px var(--mono); }
-    .mini-button.apply { border-color: transparent; background: var(--mint); color: #06100c; }
 
-    .route-body { padding: 7px; }
-    .route-receipt { padding: 7px; border-radius: 5px; background: #0e1e18; border: 1px solid rgba(190,156,255,.16); }
-    .route-receipt b { display: block; color: var(--violet); font: 6px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
-    .route-receipt strong { display: block; margin: 4px 0 2px; font-size: 8px; }
-    .route-receipt span { display: block; color: #65756d; font-size: 6px; line-height: 1.5; }
-    .privacy-mini { display: flex; align-items: center; gap: 6px; margin-top: 6px; padding: 7px; border: 1px solid var(--line); border-radius: 5px; color: #75867d; font: 6px var(--mono); }
-    .shield { width: 14px; height: 14px; display: grid; place-items: center; border-radius: 50%; background: rgba(101,242,174,.1); color: var(--mint); font-size: 7px; }
+    .diff-code .add {
+      color: #90dcb5;
+    }
+
+    .diff-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .mini-button {
+      padding: 4px 7px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: #8a9991;
+      font: 6px var(--mono);
+    }
+
+    .mini-button.apply {
+      border-color: transparent;
+      background: var(--mint);
+      color: #06100c;
+    }
+
+    .route-body {
+      padding: 7px;
+    }
+
+    .route-receipt {
+      padding: 7px;
+      border-radius: 5px;
+      background: #0e1e18;
+      border: 1px solid rgba(190, 156, 255, .16);
+    }
+
+    .route-receipt b {
+      display: block;
+      color: var(--violet);
+      font: 6px var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .route-receipt strong {
+      display: block;
+      margin: 4px 0 2px;
+      font-size: 8px;
+    }
+
+    .route-receipt span {
+      display: block;
+      color: #65756d;
+      font-size: 6px;
+      line-height: 1.5;
+    }
+
+    .privacy-mini {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      color: #75867d;
+      font: 6px var(--mono);
+    }
+
+    .shield {
+      width: 14px;
+      height: 14px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(101, 242, 174, .1);
+      color: var(--mint);
+      font-size: 7px;
+    }
 
     .frame-note {
       position: absolute;
@@ -398,24 +707,31 @@
       z-index: 3;
       width: 160px;
       padding: 10px 12px;
-      border: 1px solid rgba(101,242,174,.22);
+      border: 1px solid rgba(101, 242, 174, .22);
       border-radius: 9px;
       background: rgba(12, 27, 21, .96);
-      box-shadow: 0 18px 48px rgba(0,0,0,.36);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, .36);
       color: var(--ink-soft);
       font: 8px/1.5 var(--mono);
     }
-    .frame-note strong { display: block; color: var(--mint); font-size: 8px; }
+
+    .frame-note strong {
+      display: block;
+      color: var(--mint);
+      font-size: 8px;
+    }
 
     .signal-band {
       border-block: 1px solid var(--line);
       background: rgba(13, 26, 21, .55);
     }
+
     .signals {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       min-height: 108px;
     }
+
     .signal {
       display: flex;
       flex-direction: column;
@@ -423,12 +739,31 @@
       padding: 20px 26px;
       border-left: 1px solid var(--line);
     }
-    .signal:last-child { border-right: 1px solid var(--line); }
-    .signal strong { margin-bottom: 5px; font: 600 21px var(--mono); color: var(--ink); }
-    .signal span { color: var(--muted); font-size: 11px; }
 
-    .section { padding-block: 112px; }
-    .section-head { max-width: 720px; margin-bottom: 52px; }
+    .signal:last-child {
+      border-right: 1px solid var(--line);
+    }
+
+    .signal strong {
+      margin-bottom: 5px;
+      font: 600 21px var(--mono);
+      color: var(--ink);
+    }
+
+    .signal span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .section {
+      padding-block: 112px;
+    }
+
+    .section-head {
+      max-width: 720px;
+      margin-bottom: 52px;
+    }
+
     .section-head h2 {
       margin-bottom: 18px;
       font-size: clamp(34px, 5vw, 56px);
@@ -436,7 +771,12 @@
       letter-spacing: -.055em;
       font-weight: 640;
     }
-    .section-head p { color: var(--ink-soft); font-size: 17px; line-height: 1.65; }
+
+    .section-head p {
+      color: var(--ink-soft);
+      font-size: 17px;
+      line-height: 1.65;
+    }
 
     .loop-grid {
       display: grid;
@@ -444,10 +784,20 @@
       border: 1px solid var(--line);
       border-radius: var(--radius);
       overflow: hidden;
-      background: rgba(10,21,17,.55);
+      background: rgba(10, 21, 17, .55);
     }
-    .loop-step { position: relative; min-height: 250px; padding: 24px 22px; border-right: 1px solid var(--line); }
-    .loop-step:last-child { border: 0; }
+
+    .loop-step {
+      position: relative;
+      min-height: 250px;
+      padding: 24px 22px;
+      border-right: 1px solid var(--line);
+    }
+
+    .loop-step:last-child {
+      border: 0;
+    }
+
     .loop-step::after {
       content: "→";
       position: absolute;
@@ -458,26 +808,78 @@
       font: 11px var(--mono);
       background: var(--night-2);
     }
-    .loop-step:last-child::after { display: none; }
-    .step-no { color: var(--mint); font: 10px var(--mono); }
-    .loop-step h3 { margin: 72px 0 10px; font-size: 18px; letter-spacing: -.025em; }
-    .loop-step p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
-    .step-state { position: absolute; left: 22px; bottom: 22px; color: var(--ink-soft); font: 8px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
-    .step-state::before { content: ""; display: inline-block; width: 5px; height: 5px; margin-right: 7px; border-radius: 50%; background: var(--mint); }
 
-    .bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+    .loop-step:last-child::after {
+      display: none;
+    }
+
+    .step-no {
+      color: var(--mint);
+      font: 10px var(--mono);
+    }
+
+    .loop-step h3 {
+      margin: 72px 0 10px;
+      font-size: 18px;
+      letter-spacing: -.025em;
+    }
+
+    .loop-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .step-state {
+      position: absolute;
+      left: 22px;
+      bottom: 22px;
+      color: var(--ink-soft);
+      font: 8px var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .step-state::before {
+      content: "";
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: var(--mint);
+    }
+
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+    }
+
     .feature {
       position: relative;
       min-height: 280px;
       padding: 26px;
       border: 1px solid var(--line);
       border-radius: 16px;
-      background: linear-gradient(145deg, rgba(17,34,27,.72), rgba(10,21,17,.72));
+      background: linear-gradient(145deg, rgba(17, 34, 27, .72), rgba(10, 21, 17, .72));
       overflow: hidden;
     }
-    .feature.large { grid-column: span 7; }
-    .feature.medium { grid-column: span 5; }
-    .feature.third { grid-column: span 4; min-height: 245px; }
+
+    .feature.large {
+      grid-column: span 7;
+    }
+
+    .feature.medium {
+      grid-column: span 5;
+    }
+
+    .feature.third {
+      grid-column: span 4;
+      min-height: 245px;
+    }
+
     .feature-code {
       display: inline-flex;
       padding: 5px 8px;
@@ -487,33 +889,138 @@
       font: 9px var(--mono);
       letter-spacing: .08em;
     }
-    .feature h3 { margin: 44px 0 11px; font-size: 24px; letter-spacing: -.04em; }
-    .feature p { max-width: 510px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
-    .feature-lines { position: absolute; right: 25px; bottom: 22px; left: 25px; display: grid; gap: 7px; }
-    .feature-line { height: 5px; border-radius: 5px; background: rgba(255,255,255,.055); overflow: hidden; }
-    .feature-line i { display: block; height: 100%; border-radius: inherit; background: var(--mint); opacity: .72; }
-    .agent-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 27px; }
-    .agent-chip { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink-soft); font: 8px var(--mono); }
-    .agent-chip.active { color: var(--violet); border-color: rgba(190,156,255,.25); background: rgba(190,156,255,.05); }
-    .diff-snippet { margin-top: 22px; padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #07100d; font: 9px/1.7 var(--mono); color: var(--muted); }
-    .diff-snippet .a { color: #99d9b7; }
-    .diff-snippet .d { color: #dd8594; }
+
+    .feature h3 {
+      margin: 44px 0 11px;
+      font-size: 24px;
+      letter-spacing: -.04em;
+    }
+
+    .feature p {
+      max-width: 510px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .feature-lines {
+      position: absolute;
+      right: 25px;
+      bottom: 22px;
+      left: 25px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .feature-line {
+      height: 5px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, .055);
+      overflow: hidden;
+    }
+
+    .feature-line i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--mint);
+      opacity: .72;
+    }
+
+    .agent-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 27px;
+    }
+
+    .agent-chip {
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink-soft);
+      font: 8px var(--mono);
+    }
+
+    .agent-chip.active {
+      color: var(--violet);
+      border-color: rgba(190, 156, 255, .25);
+      background: rgba(190, 156, 255, .05);
+    }
+
+    .diff-snippet {
+      margin-top: 22px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #07100d;
+      font: 9px/1.7 var(--mono);
+      color: var(--muted);
+    }
+
+    .diff-snippet .a {
+      color: #99d9b7;
+    }
+
+    .diff-snippet .d {
+      color: #dd8594;
+    }
 
     .privacy-section {
       position: relative;
       padding-block: 112px;
       border-block: 1px solid var(--line);
       background:
-        radial-gradient(circle at 85% 50%, rgba(101,242,174,.07), transparent 24rem),
-        rgba(9,20,16,.66);
+        radial-gradient(circle at 85% 50%, rgba(101, 242, 174, .07), transparent 24rem),
+        rgba(9, 20, 16, .66);
     }
-    .privacy-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: 80px; align-items: center; }
-    .privacy-grid h2 { margin-bottom: 18px; font-size: clamp(36px, 5vw, 58px); line-height: 1.02; letter-spacing: -.055em; }
-    .privacy-grid > div > p { color: var(--ink-soft); font-size: 16px; line-height: 1.7; }
-    .privacy-points { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 28px; }
-    .privacy-point { padding: 13px; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,.018); }
-    .privacy-point strong { display: block; margin-bottom: 4px; font-size: 12px; }
-    .privacy-point span { color: var(--muted); font-size: 10px; line-height: 1.45; }
+
+    .privacy-grid {
+      display: grid;
+      grid-template-columns: .85fr 1.15fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .privacy-grid h2 {
+      margin-bottom: 18px;
+      font-size: clamp(36px, 5vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -.055em;
+    }
+
+    .privacy-grid>div>p {
+      color: var(--ink-soft);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .privacy-points {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 28px;
+    }
+
+    .privacy-point {
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, .018);
+    }
+
+    .privacy-point strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+
+    .privacy-point span {
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.45;
+    }
 
     .boundary {
       padding: 20px;
@@ -521,19 +1028,86 @@
       border-radius: var(--radius);
       background: #0a1612;
     }
-    .boundary-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
-    .boundary-head span:first-child { font-size: 12px; font-weight: 700; }
-    .boundary-state { color: var(--mint); font: 8px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
-    .data-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 8px; padding: 30px 0; }
-    .data-node { padding: 16px 8px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); text-align: center; }
-    .data-node b { display: block; margin-bottom: 5px; font-size: 11px; }
-    .data-node span { color: var(--muted); font: 7px var(--mono); }
-    .data-node.guard { border-color: rgba(101,242,174,.28); box-shadow: inset 0 0 26px rgba(101,242,174,.04); }
-    .data-arrow { color: var(--mint); font: 11px var(--mono); }
-    .boundary-log { display: grid; gap: 7px; }
-    .log-row { display: grid; grid-template-columns: 76px 1fr auto; gap: 10px; color: var(--muted); font: 8px var(--mono); }
-    .log-row b { color: var(--ink-soft); font-weight: 500; }
-    .log-row em { color: var(--mint); font-style: normal; }
+
+    .boundary-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .boundary-head span:first-child {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .boundary-state {
+      color: var(--mint);
+      font: 8px var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .data-flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+      padding: 30px 0;
+    }
+
+    .data-node {
+      padding: 16px 8px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel);
+      text-align: center;
+    }
+
+    .data-node b {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 11px;
+    }
+
+    .data-node span {
+      color: var(--muted);
+      font: 7px var(--mono);
+    }
+
+    .data-node.guard {
+      border-color: rgba(101, 242, 174, .28);
+      box-shadow: inset 0 0 26px rgba(101, 242, 174, .04);
+    }
+
+    .data-arrow {
+      color: var(--mint);
+      font: 11px var(--mono);
+    }
+
+    .boundary-log {
+      display: grid;
+      gap: 7px;
+    }
+
+    .log-row {
+      display: grid;
+      grid-template-columns: 76px 1fr auto;
+      gap: 10px;
+      color: var(--muted);
+      font: 8px var(--mono);
+    }
+
+    .log-row b {
+      color: var(--ink-soft);
+      font-weight: 500;
+    }
+
+    .log-row em {
+      color: var(--mint);
+      font-style: normal;
+    }
 
     .install-card {
       display: grid;
@@ -541,15 +1115,29 @@
       align-items: center;
       gap: 30px;
       padding: 48px;
-      border: 1px solid rgba(101,242,174,.2);
+      border: 1px solid rgba(101, 242, 174, .2);
       border-radius: 22px;
       background:
-        linear-gradient(115deg, rgba(101,242,174,.08), transparent 45%),
+        linear-gradient(115deg, rgba(101, 242, 174, .08), transparent 45%),
         var(--panel);
     }
-    .install-card h2 { margin-bottom: 10px; font-size: clamp(31px, 4vw, 49px); line-height: 1; letter-spacing: -.05em; }
-    .install-card p { margin: 0; color: var(--ink-soft); }
-    .install-actions { display: flex; gap: 8px; }
+
+    .install-card h2 {
+      margin-bottom: 10px;
+      font-size: clamp(31px, 4vw, 49px);
+      line-height: 1;
+      letter-spacing: -.05em;
+    }
+
+    .install-card p {
+      margin: 0;
+      color: var(--ink-soft);
+    }
+
+    .install-actions {
+      display: flex;
+      gap: 8px;
+    }
 
     .command {
       display: inline-flex;
@@ -564,29 +1152,92 @@
       font: 10px var(--mono);
       cursor: pointer;
     }
-    .command span { color: var(--mint); }
-    .command small { color: var(--muted); }
 
-    footer { padding: 36px 0 42px; border-top: 1px solid var(--line); }
-    .footer-row { display: flex; align-items: center; gap: 24px; }
-    .footer-copy { margin-left: auto; color: var(--muted); font: 9px var(--mono); }
-    .footer-links { display: flex; gap: 12px 20px; flex-wrap: wrap; }
-    .footer-links a { color: var(--muted); text-decoration: none; font-size: 11px; }
-    .footer-links a:hover { color: var(--mint); }
+    .command span {
+      color: var(--mint);
+    }
 
-    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .65s ease, transform .65s ease; }
-    .reveal.visible { opacity: 1; transform: none; }
+    .command small {
+      color: var(--muted);
+    }
+
+    footer {
+      padding: 36px 0 42px;
+      border-top: 1px solid var(--line);
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .footer-copy {
+      margin-left: auto;
+      color: var(--muted);
+      font: 9px var(--mono);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 12px 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 11px;
+    }
+
+    .footer-links a:hover {
+      color: var(--mint);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
 
     @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-      .reveal { opacity: 1; transform: none; }
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
     }
 
     @media (max-width: 980px) {
-      .nav-links { display: none; }
-      .menu-button { display: grid; place-items: center; }
-      .nav.open { flex-wrap: wrap; padding-block: 14px; }
+      .nav-links {
+        display: none;
+      }
+
+      .menu-button {
+        display: grid;
+        place-items: center;
+      }
+
+      .nav.open {
+        flex-wrap: wrap;
+        padding-block: 14px;
+      }
+
       .nav.open .nav-links {
         display: flex;
         order: 4;
@@ -596,48 +1247,170 @@
         gap: 0;
         padding-top: 8px;
       }
-      .nav.open .nav-links a { width: 100%; padding: 11px 0; border-top: 1px solid var(--line); }
-      .nav-meta .version { display: none; }
-      .hero { grid-template-columns: 1fr; min-height: auto; }
-      .hero-copy { max-width: 720px; }
-      .product-frame { max-width: 760px; }
-      .loop-grid { grid-template-columns: repeat(2, 1fr); }
-      .loop-step { border-bottom: 1px solid var(--line); }
-      .loop-step:nth-child(2n) { border-right: 0; }
-      .loop-step::after { display: none; }
-      .loop-step:last-child { grid-column: span 2; }
-      .feature.large, .feature.medium, .feature.third { grid-column: span 6; }
-      .privacy-grid { grid-template-columns: 1fr; gap: 44px; }
-      .install-card { grid-template-columns: 1fr; }
+
+      .nav.open .nav-links a {
+        width: 100%;
+        padding: 11px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .nav-meta .version {
+        display: none;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .hero-copy {
+        max-width: 720px;
+      }
+
+      .product-frame {
+        max-width: 760px;
+      }
+
+      .loop-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .loop-step {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .loop-step:nth-child(2n) {
+        border-right: 0;
+      }
+
+      .loop-step::after {
+        display: none;
+      }
+
+      .loop-step:last-child {
+        grid-column: span 2;
+      }
+
+      .feature.large,
+      .feature.medium,
+      .feature.third {
+        grid-column: span 6;
+      }
+
+      .privacy-grid {
+        grid-template-columns: 1fr;
+        gap: 44px;
+      }
+
+      .install-card {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 700px) {
-      .wrap { width: min(calc(100% - 26px), var(--max)); }
-      .nav-meta .nav-cta { display: none; }
-      .hero { padding-block: 58px; gap: 42px; }
-      h1 { font-size: clamp(43px, 14vw, 64px); }
-      .frame-note { display: none; }
-      .app-grid { grid-template-columns: 1fr; }
-      .mini-metrics { grid-template-columns: 1fr 1fr; }
-      .signals { grid-template-columns: 1fr 1fr; }
-      .signal:nth-child(2) { border-right: 1px solid var(--line); }
-      .signal:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
-      .section, .privacy-section { padding-block: 80px; }
-      .loop-grid { grid-template-columns: 1fr; }
-      .loop-step, .loop-step:nth-child(2n) { border-right: 0; }
-      .loop-step:last-child { grid-column: auto; }
-      .feature.large, .feature.medium, .feature.third { grid-column: 1 / -1; }
-      .feature { min-height: 255px; }
-      .privacy-points { grid-template-columns: 1fr; }
-      .data-flow { grid-template-columns: 1fr; }
-      .data-arrow { transform: rotate(90deg); justify-self: center; }
-      .install-card { padding: 30px 24px; }
-      .install-actions { align-items: stretch; flex-direction: column; }
-      .footer-row { align-items: flex-start; flex-direction: column; }
-      .footer-copy { margin: 0; }
+      .wrap {
+        width: min(calc(100% - 26px), var(--max));
+      }
+
+      .nav-meta .nav-cta {
+        display: none;
+      }
+
+      .hero {
+        padding-block: 58px;
+        gap: 42px;
+      }
+
+      h1 {
+        font-size: clamp(43px, 14vw, 64px);
+      }
+
+      .frame-note {
+        display: none;
+      }
+
+      .app-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .mini-metrics {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .signals {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .signal:nth-child(2) {
+        border-right: 1px solid var(--line);
+      }
+
+      .signal:nth-child(-n+2) {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section,
+      .privacy-section {
+        padding-block: 80px;
+      }
+
+      .loop-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .loop-step,
+      .loop-step:nth-child(2n) {
+        border-right: 0;
+      }
+
+      .loop-step:last-child {
+        grid-column: auto;
+      }
+
+      .feature.large,
+      .feature.medium,
+      .feature.third {
+        grid-column: 1 / -1;
+      }
+
+      .feature {
+        min-height: 255px;
+      }
+
+      .privacy-points {
+        grid-template-columns: 1fr;
+      }
+
+      .data-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .data-arrow {
+        transform: rotate(90deg);
+        justify-self: center;
+      }
+
+      .install-card {
+        padding: 30px 24px;
+      }
+
+      .install-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .footer-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .footer-copy {
+        margin: 0;
+      }
     }
   </style>
 </head>
+
 <body>
   <header class="site-header">
     <div class="wrap nav" id="nav">
@@ -653,8 +1426,9 @@
         <a href="https://github.com/sergioide007/alpaquitay-ai">GitHub</a>
       </nav>
       <div class="nav-meta">
-        <span class="version">v3.8.2</span>
-        <a class="nav-cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install for VS Code</a>
+        <span class="version">v3.8.3</span>
+        <a class="nav-cta"
+          href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install for VS Code</a>
       </div>
       <button class="menu-button" id="menuButton" aria-label="Open navigation" aria-expanded="false">☰</button>
     </div>
@@ -665,15 +1439,23 @@
       <div class="hero-copy reveal">
         <div class="eyebrow">AI software development harness for VS Code</div>
         <h1>Ship software<br>with <em>evidence.</em></h1>
-        <p>Alpaquitay puts a trust layer between intent and code: it routes work, previews every change, enforces SDLC gates, and keeps a local record of what happened.</p>
+        <p>Alpaquitay puts a trust layer between intent and code: it routes work, previews every change, enforces SDLC
+          gates, and keeps a local record of what happened.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">
+          <a class="button button-primary"
+            href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">
             Install from Marketplace
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
           </a>
           <a class="button button-secondary" href="https://github.com/sergioide007/alpaquitay-ai">
             View source
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 4H4v12h12v-3M10 3h7v7m0-7-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M7 4H4v12h12v-3M10 3h7v7m0-7-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
           </a>
         </div>
         <div class="trust-row">
@@ -705,13 +1487,18 @@
           </div>
           <div class="app-body">
             <div class="app-heading">
-              <div><span>Delivery control plane</span><h3>Evidence before autonomy.</h3></div>
+              <div><span>Delivery control plane</span>
+                <h3>Evidence before autonomy.</h3>
+              </div>
               <div class="sync">synced 2s ago</div>
             </div>
             <div class="mini-metrics">
-              <div class="mini-metric"><label>Repo signal</label><strong>High</strong><small>18 commits · 14 linked</small></div>
-              <div class="mini-metric"><label>Agentic debt</label><strong>18 / 100</strong><small>healthy range</small></div>
-              <div class="mini-metric"><label>Review queue</label><strong>2 files</strong><small>approval required</small></div>
+              <div class="mini-metric"><label>Repo signal</label><strong>High</strong><small>18 commits · 14
+                  linked</small></div>
+              <div class="mini-metric"><label>Agentic debt</label><strong>18 / 100</strong><small>healthy range</small>
+              </div>
+              <div class="mini-metric"><label>Review queue</label><strong>2 files</strong><small>approval
+                  required</small></div>
               <div class="mini-metric"><label>Economy</label><strong>12 / 3</strong><small>local ops / LLM</small></div>
             </div>
             <div class="app-grid">
@@ -730,13 +1517,15 @@
                 <div class="mini-card" style="margin-top:6px">
                   <div class="mini-card-hd">Diff-first review queue <span>2 pending</span></div>
                   <div class="diff-body">
-                    <div class="diff-file"><strong>src/payments/charge.ts</strong><span class="plus">+24</span><span class="minus">−6</span></div>
+                    <div class="diff-file"><strong>src/payments/charge.ts</strong><span class="plus">+24</span><span
+                        class="minus">−6</span></div>
                     <div class="diff-code">
                       <div class="add">+ const result = await gateway.authorize(intent);</div>
                       <div class="add">+ audit.record("charge.authorized", result.id);</div>
                       <div class="d">− return gateway.charge(amount);</div>
                     </div>
-                    <div class="diff-actions"><span class="mini-button">Discard</span><span class="mini-button apply">Apply &amp; run gates</span></div>
+                    <div class="diff-actions"><span class="mini-button">Discard</span><span
+                        class="mini-button apply">Apply &amp; run gates</span></div>
                   </div>
                 </div>
               </div>
@@ -744,15 +1533,18 @@
                 <div class="mini-card">
                   <div class="mini-card-hd">Specialist route <span>Deep</span></div>
                   <div class="route-body">
-                    <div class="route-receipt"><b>Route receipt · 92%</b><strong>Security Agent</strong><span>threat-model · one registered specialist</span></div>
-                    <div class="privacy-mini"><span class="shield">✓</span><span>PII boundary checked<br>0 values retained</span></div>
+                    <div class="route-receipt"><b>Route receipt · 92%</b><strong>Security
+                        Agent</strong><span>threat-model · one registered specialist</span></div>
+                    <div class="privacy-mini"><span class="shield">✓</span><span>PII boundary checked<br>0 values
+                        retained</span></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="frame-note"><strong>Review required</strong>Task stays In Progress until the diff is applied and quality gates pass.</div>
+        <div class="frame-note"><strong>Review required</strong>Task stays In Progress until the diff is applied and
+          quality gates pass.</div>
       </div>
     </section>
 
@@ -769,14 +1561,35 @@
       <div class="section-head reveal">
         <div class="eyebrow">The trust loop</div>
         <h2>Autonomy should be earned at every step.</h2>
-        <p>A request does not jump straight to a filesystem write. The harness gathers evidence, picks a bounded route, and leaves a receipt you can inspect.</p>
+        <p>A request does not jump straight to a filesystem write. The harness gathers evidence, picks a bounded route,
+          and leaves a receipt you can inspect.</p>
       </div>
       <div class="loop-grid reveal">
-        <article class="loop-step"><span class="step-no">01</span><h3>Perceive</h3><p>Fingerprint the real workspace, stack, source directories, and platform commands.</p><span class="step-state">local evidence</span></article>
-        <article class="loop-step"><span class="step-no">02</span><h3>Route</h3><p>Choose Flash, Build, or one registered Deep specialist with a confidence receipt.</p><span class="step-state">bounded intent</span></article>
-        <article class="loop-step"><span class="step-no">03</span><h3>Preview</h3><p>Generate a bounded unified diff. Protected paths and likely secrets are blocked.</p><span class="step-state">no write yet</span></article>
-        <article class="loop-step"><span class="step-no">04</span><h3>Verify</h3><p>Apply the approved patch, then execute the detected build and test commands.</p><span class="step-state">real exit codes</span></article>
-        <article class="loop-step"><span class="step-no">05</span><h3>Evidence</h3><p>Only green work moves to Done. Decisions, debt, and traceability stay local.</p><span class="step-state">auditable receipt</span></article>
+        <article class="loop-step"><span class="step-no">01</span>
+          <h3>Perceive</h3>
+          <p>Fingerprint the real workspace, stack, source directories, and platform commands.</p><span
+            class="step-state">local evidence</span>
+        </article>
+        <article class="loop-step"><span class="step-no">02</span>
+          <h3>Route</h3>
+          <p>Choose Flash, Build, or one registered Deep specialist with a confidence receipt.</p><span
+            class="step-state">bounded intent</span>
+        </article>
+        <article class="loop-step"><span class="step-no">03</span>
+          <h3>Preview</h3>
+          <p>Generate a bounded unified diff. Protected paths and likely secrets are blocked.</p><span
+            class="step-state">no write yet</span>
+        </article>
+        <article class="loop-step"><span class="step-no">04</span>
+          <h3>Verify</h3>
+          <p>Apply the approved patch, then execute the detected build and test commands.</p><span
+            class="step-state">real exit codes</span>
+        </article>
+        <article class="loop-step"><span class="step-no">05</span>
+          <h3>Evidence</h3>
+          <p>Only green work moves to Done. Decisions, debt, and traceability stay local.</p><span
+            class="step-state">auditable receipt</span>
+        </article>
       </div>
     </section>
 
@@ -784,13 +1597,15 @@
       <div class="section-head reveal">
         <div class="eyebrow">Built for engineering systems</div>
         <h2>More control plane. Less prompt wrapper.</h2>
-        <p>The assistant works inside the lifecycle your team already cares about: requirements, architecture, quality, delivery, and maintenance.</p>
+        <p>The assistant works inside the lifecycle your team already cares about: requirements, architecture, quality,
+          delivery, and maintenance.</p>
       </div>
       <div class="bento">
         <article class="feature large reveal">
           <span class="feature-code">GATE / SDLC</span>
           <h3>Executable gates, not green labels.</h3>
-          <p>Done requires no pending diffs, a verified platform contract, and fresh build/test evidence. A known command is not treated as a successful run.</p>
+          <p>Done requires no pending diffs, a verified platform contract, and fresh build/test evidence. A known
+            command is not treated as a successful run.</p>
           <div class="feature-lines">
             <div class="feature-line"><i style="width:100%"></i></div>
             <div class="feature-line"><i style="width:82%"></i></div>
@@ -800,24 +1615,30 @@
         <article class="feature medium reveal">
           <span class="feature-code">ROUTE / DEEP</span>
           <h3>Specialists with receipts.</h3>
-          <p>Security, QA, architecture, DevOps, FinOps, AI, cloud, and more—selected deterministically and limited to one registered shell.</p>
-          <div class="agent-chips"><span class="agent-chip active">Security · 92%</span><span class="agent-chip">QA</span><span class="agent-chip">Architecture</span><span class="agent-chip">DevOps</span><span class="agent-chip">FinOps</span></div>
+          <p>Security, QA, architecture, DevOps, FinOps, AI, cloud, and more—selected deterministically and limited to
+            one registered shell.</p>
+          <div class="agent-chips"><span class="agent-chip active">Security · 92%</span><span
+              class="agent-chip">QA</span><span class="agent-chip">Architecture</span><span
+              class="agent-chip">DevOps</span><span class="agent-chip">FinOps</span></div>
         </article>
         <article class="feature third reveal">
           <span class="feature-code">WRITE / DIFF</span>
           <h3>Diff first. Always reviewable.</h3>
           <p>Generated work remains In Progress until you approve the exact change set.</p>
-          <div class="diff-snippet"><span class="a">+ review(change)</span><br><span class="a">+ checkpoint.save()</span><br><span class="d">− writeImmediately()</span></div>
+          <div class="diff-snippet"><span class="a">+ review(change)</span><br><span class="a">+
+              checkpoint.save()</span><br><span class="d">− writeImmediately()</span></div>
         </article>
         <article class="feature third reveal">
           <span class="feature-code">SIGNAL / DORA</span>
           <h3>Delivery signals with honest labels.</h3>
-          <p>Repository-derived frequency, traceability, and change-failure proxies are visible without pretending Git history is a deployment system.</p>
+          <p>Repository-derived frequency, traceability, and change-failure proxies are visible without pretending Git
+            history is a deployment system.</p>
         </article>
         <article class="feature third reveal">
           <span class="feature-code">LIMIT / DEBT</span>
           <h3>Debt that can stop the line.</h3>
-          <p>Risky decisions add agentic debt. Verified Done, onboarding, and safe applies pay it down. The ceiling blocks new Build work.</p>
+          <p>Risky decisions add agentic debt. Verified Done, onboarding, and safe applies pay it down. The ceiling
+            blocks new Build work.</p>
         </article>
       </div>
     </section>
@@ -827,16 +1648,22 @@
         <div class="reveal">
           <div class="eyebrow">Privacy by architecture</div>
           <h2>Your code does not visit us.</h2>
-          <p>Alpaquitay has no intermediary inference server. Local providers stay on-device; cloud calls go directly to the provider you configure through a redaction boundary.</p>
+          <p>Alpaquitay has no intermediary inference server. Local providers stay on-device; cloud calls go directly to
+            the provider you configure through a redaction boundary.</p>
           <div class="privacy-points">
-            <div class="privacy-point"><strong>Opt-in telemetry</strong><span>Disabled by default and never includes prompts or source.</span></div>
-            <div class="privacy-point"><strong>Encrypted secrets</strong><span>API keys live in VS Code SecretStorage, not plaintext settings.</span></div>
-            <div class="privacy-point"><strong>Data minimization</strong><span>Value-free disclosure metadata records redaction counts, never detected values.</span></div>
-            <div class="privacy-point"><strong>Open implementation</strong><span>Inspect the provider boundary and local evidence formats yourself.</span></div>
+            <div class="privacy-point"><strong>Opt-in telemetry</strong><span>Disabled by default and never includes
+                prompts or source.</span></div>
+            <div class="privacy-point"><strong>Encrypted secrets</strong><span>API keys live in VS Code SecretStorage,
+                not plaintext settings.</span></div>
+            <div class="privacy-point"><strong>Data minimization</strong><span>Value-free disclosure metadata records
+                redaction counts, never detected values.</span></div>
+            <div class="privacy-point"><strong>Open implementation</strong><span>Inspect the provider boundary and local
+                evidence formats yourself.</span></div>
           </div>
         </div>
         <div class="boundary reveal">
-          <div class="boundary-head"><span>Cloud request boundary</span><span class="boundary-state">policy active</span></div>
+          <div class="boundary-head"><span>Cloud request boundary</span><span class="boundary-state">policy
+              active</span></div>
           <div class="data-flow">
             <div class="data-node"><b>Workspace</b><span>selected context</span></div>
             <span class="data-arrow">→</span>
@@ -859,11 +1686,16 @@
         <div>
           <div class="eyebrow">Open source · MIT</div>
           <h2>Put a harness around the model.</h2>
-          <p>Install Alpaquitay AI, open a project, and run <span class="mono" style="color:var(--mint)">onboard</span>. New to it? Read the <a href="/manual/en/" style="color:var(--mint)">user manual</a> (also <a href="/manual/" hreflang="es" lang="es" style="color:var(--mint)">en español</a>), with videos of every feature.</p>
+          <p>Install Alpaquitay AI, open a project, and run <span class="mono" style="color:var(--mint)">onboard</span>.
+            New to it? Read the <a href="/manual/en/" style="color:var(--mint)">user manual</a> (also <a href="/manual/"
+              hreflang="es" lang="es" style="color:var(--mint)">en español</a>), with videos of every feature.</p>
         </div>
         <div class="install-actions">
-          <button class="command" id="copyCommand" type="button" aria-label="Copy VS Code install command"><span>$</span> code --install-extension alpaquitay-ai.alpaquitay-ai <small>copy</small></button>
-          <a class="button button-primary" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+          <button class="command" id="copyCommand" type="button"
+            aria-label="Copy VS Code install command"><span>$</span> code --install-extension
+            alpaquitay-ai.alpaquitay-ai <small>copy</small></button>
+          <a class="button button-primary"
+            href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
         </div>
       </div>
     </section>
@@ -871,7 +1703,8 @@
 
   <footer>
     <div class="wrap footer-row">
-      <a class="brand" href="#" aria-label="Alpaquitay AI home"><img class="brand-mark" src="/icons/alpaquitay-logo.svg" alt="Alpaquitay AI" width="162" height="46"></a>
+      <a class="brand" href="#" aria-label="Alpaquitay AI home"><img class="brand-mark" src="/icons/alpaquitay-logo.svg"
+          alt="Alpaquitay AI" width="162" height="46"></a>
       <div class="footer-links">
         <a href="/manual/en/">Manual</a>
         <a href="/manual/" hreflang="es" lang="es">Manual (ES)</a>
@@ -882,7 +1715,8 @@
         <a href="mailto:sergio@specsolid.com">Email</a>
         <a href="https://www.linkedin.com/in/sergioide007/" rel="noopener">LinkedIn</a>
         <a href="https://medium.com/@sergioide007" rel="noopener">Medium</a>
-        <a href="https://www.youtube.com/@codigosinteticolibro" rel="noopener" title="Videos about the book Código Sintético (Spanish)">YouTube</a>
+        <a href="https://www.youtube.com/@codigosinteticolibro" rel="noopener"
+          title="Videos about the book Código Sintético (Spanish)">YouTube</a>
       </div>
       <span class="footer-copy">Local-first delivery infrastructure · MIT</span>
     </div>
@@ -935,4 +1769,5 @@
     }());
   </script>
 </body>
+
 </html>

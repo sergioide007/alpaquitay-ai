@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [Unreleased]
+## [3.8.3] — 2026-11-21
 
 ### Changed
 - New brand identity: the Alpaquitay alpaca (fleece topknot, coding goggles, `< >` brackets, gold verification seal) on a neon-blue tile. One master image drives every format: Marketplace icon, favicon set, Apple touch icon, Android and maskable icons, logo lockups and the social card.

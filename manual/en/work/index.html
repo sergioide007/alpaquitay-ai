@@ -1,141 +1,184 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Work: spec, board and chat · Alpaquitay AI manual</title>
-<meta name="description" content="How to create a spec.md with epics and tasks, move it across the Kanban board, let the AI implement a task with reviewable diffs and link commits with #SPEC.">
-<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/work/">
-<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/work/">
-<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/work/">
-<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/work/">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/work/">
-<meta property="og:title" content="Work: spec, board and chat">
-<meta property="og:description" content="How to create a spec.md with epics and tasks, move it across the Kanban board, let the AI implement a task with reviewable diffs and link commits with #SPEC.">
-<meta property="og:locale" content="en_US">
-<meta name="theme-color" content="#07100d">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
-<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Work: spec, board and chat","description":"How to create a spec.md with epics and tasks, move it across the Kanban board, let the AI implement a task with reviewable diffs and link commits with #SPEC.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/work/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Work: spec, board and chat · Alpaquitay AI manual</title>
+  <meta name="description"
+    content="How to create a spec.md with epics and tasks, move it across the Kanban board, let the AI implement a task with reviewable diffs and link commits with #SPEC.">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/work/">
+  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/work/">
+  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/work/">
+  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/work/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/work/">
+  <meta property="og:title" content="Work: spec, board and chat">
+  <meta property="og:description"
+    content="How to create a spec.md with epics and tasks, move it across the Kanban board, let the AI implement a task with reviewable diffs and link commits with #SPEC.">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#07100d">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
+  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Work: spec, board and chat","description":"How to create a spec.md with epics and tasks, move it across the Kanban board, let the AI implement a task with reviewable diffs and link commits with #SPEC.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/work/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
+
 <body>
-<a class="skip" href="#contenido">Skip to content</a>
-<header class="top">
-  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-  <a class="crumb" href="../">Manual</a>
-  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
-  <a class="lang" href="../../work/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
-  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
-  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
-  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.8.2</span></p>
-  <ol class="chapters">
-<li><a href="../"><span class="n">00</span>Home</a></li>
-<li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
-<li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
-<li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
-<li><a href="../work/" aria-current="page"><span class="n">04</span>Work · spec, board and chat</a></li>
-<li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
-<li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
-<li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
-<li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
-<li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
-<li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
-<li><a href="../models/"><span class="n">11</span>Available models</a></li>
-<li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
-<li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
-<li><a href="../reference/"><span class="n">14</span>Reference</a></li>
-<li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
-<li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
-  </ol>
-  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-</aside>
-<main class="content" id="contenido">
-<article class="doc">
-<p class="kicker">Chapter 04</p>
-<h1 id="work-spec-board-and-chat">Work: spec, board and chat</h1>
-<p>The <strong>Work</strong> tab is where the coding happens. It has three panes: the <strong>spec</strong> (<code>spec.md</code>), the Kanban <strong>board</strong> derived from it and the <strong>chat</strong> with the harness. This is Alpaquitay's SDD (<em>spec-driven development</em>) flow: first agree on <em>what</em>, then implement <em>task by task</em>, and every change stays linked to a requirement.</p>
-<figure class="figure"><a class="zoom" href="../../media/hub-work.png" aria-label="Enlarge: The Work tab with spec, board and chat"><img src="../../media/hub-work.png" alt="The Work tab with spec, board and chat" width="1600" height="1000" loading="lazy" decoding="async"></a><figcaption>Work: the spec on the left, the board in the middle and the chat on the right.</figcaption></figure>
-<div class="code" data-lang="Text"><pre><code class="language-text">  spec.md ──► Board ──► the AI implements a task ──► diff ──► si aplicar ──► spec.md [x] ──► commit #SPEC-001
+  <a class="skip" href="#contenido">Skip to content</a>
+  <header class="top">
+    <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar"
+      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M3 5h14M3 10h14M3 15h14" />
+      </svg></button>
+    <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark"
+        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+    <a class="crumb" href="../">Manual</a>
+    <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <circle cx="9" cy="9" r="5.5" />
+        <path d="m13.5 13.5 3.5 3.5" />
+      </svg><span>Search</span><kbd>Ctrl K</kbd></button>
+    <a class="lang" href="../../work/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
+      </svg></button>
+    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg
+        viewBox="0 0 16 16" aria-hidden="true" class="fill">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+      </svg></a>
+    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Manual contents">
+      <p class="side-title">User manual <span class="ver">v3.8.3</span></p>
+      <ol class="chapters">
+        <li><a href="../"><span class="n">00</span>Home</a></li>
+        <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
+        <li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
+        <li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
+        <li><a href="../work/" aria-current="page"><span class="n">04</span>Work · spec, board and chat</a></li>
+        <li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
+        <li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
+        <li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
+        <li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+        <li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
+        <li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
+        <li><a href="../models/"><span class="n">11</span>Available models</a></li>
+        <li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
+        <li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
+        <li><a href="../reference/"><span class="n">14</span>Reference</a></li>
+        <li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+        <li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
+      </ol>
+      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+    </aside>
+    <main class="content" id="contenido">
+      <article class="doc">
+        <p class="kicker">Chapter 04</p>
+        <h1 id="work-spec-board-and-chat">Work: spec, board and chat</h1>
+        <p>The <strong>Work</strong> tab is where the coding happens. It has three panes: the <strong>spec</strong>
+          (<code>spec.md</code>), the Kanban <strong>board</strong> derived from it and the <strong>chat</strong> with
+          the harness. This is Alpaquitay's SDD (<em>spec-driven development</em>) flow: first agree on <em>what</em>,
+          then implement <em>task by task</em>, and every change stays linked to a requirement.</p>
+        <figure class="figure"><a class="zoom" href="../../media/hub-work.png"
+            aria-label="Enlarge: The Work tab with spec, board and chat"><img src="../../media/hub-work.png"
+              alt="The Work tab with spec, board and chat" width="1600" height="1000" loading="lazy"
+              decoding="async"></a>
+          <figcaption>Work: the spec on the left, the board in the middle and the chat on the right.</figcaption>
+        </figure>
+        <div class="code" data-lang="Text">
+          <pre><code class="language-text">  spec.md ──► Board ──► the AI implements a task ──► diff ──► si aplicar ──► spec.md [x] ──► commit #SPEC-001
      ▲                                                                                          │
      └──────────────────────────────────────── feedback loop ──────────────────────────────────┘
-</code></pre></div>
-<h2 id="your-next-step-always-visible">Your next step, always visible</h2>
-<p>Under the tabs, the <strong>next-step bar</strong> follows the SDD flow, <em>Spec → Build → Review → Verify</em>, and shows one primary button for what to do now:</p>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Where you are</th>
-<th>The bar says</th>
-<th>The button</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>No <code>spec.md</code> yet</td>
-<td>Start with a spec</td>
-<td><strong>Create spec with AI</strong></td>
-</tr>
-<tr>
-<td>Tasks waiting</td>
-<td>Next task: …</td>
-<td><strong>Start SPEC-00x</strong> (the same as dragging the card to <em>In Progress</em>)</td>
-</tr>
-<tr>
-<td>The AI is working</td>
-<td>AI is building …</td>
-<td><strong>Watch progress</strong></td>
-</tr>
-<tr>
-<td>Diffs pending</td>
-<td>Review N pending changes</td>
-<td><strong>Review changes</strong> and <strong>Apply &amp; run gates</strong></td>
-</tr>
-<tr>
-<td>Debt at its ceiling</td>
-<td>Build is blocked by technical debt</td>
-<td><strong>See debt</strong></td>
-</tr>
-<tr>
-<td>Every task done</td>
-<td>All N tasks are done</td>
-<td><strong>Validate against spec</strong></td>
-</tr>
-</tbody>
-</table></div>
-<p>Every card in <em>Backlog</em>, <em>Todo</em> and <em>In Progress</em> also has a <strong>Start</strong> (or <strong>Resume</strong>) button, so dragging is optional. Above the chat input, quick buttons run the common actions: <em>Build next task</em>, <em>Validate</em>, <em>Tests</em>, <em>Refactor</em> and, while diffs are pending, <em>Apply changes</em>.</p>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Shortcut</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>Cmd</kbd>+<kbd>K</kbd> on macOS)</td>
-<td>Open the command palette: every tab, action and agent, searchable</td>
-</tr>
-<tr>
-<td><kbd>Alt</kbd>+<kbd>1</kbd> to <kbd>7</kbd> (<kbd>Option</kbd> on macOS)</td>
-<td>Switch tab</td>
-</tr>
-<tr>
-<td><kbd>/</kbd></td>
-<td>Focus the chat</td>
-</tr>
-</tbody>
-</table></div>
-<h2 id="1-the-spec-spec-md">1. The spec (<code>spec.md</code>)</h2>
-<p><code>spec.md</code> is plain Markdown at the root of your project, and it is <strong>the board's database</strong>: card state is read from this file, not stored elsewhere. So you can edit it by hand, review it in a pull request and version it like any other file.</p>
-<div class="code" data-lang="Markdown"><pre><code class="language-markdown"># Club booking portal
+</code></pre>
+        </div>
+        <h2 id="your-next-step-always-visible">Your next step, always visible</h2>
+        <p>Under the tabs, the <strong>next-step bar</strong> follows the SDD flow, <em>Spec → Build → Review →
+            Verify</em>, and shows one primary button for what to do now:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Where you are</th>
+                <th>The bar says</th>
+                <th>The button</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>No <code>spec.md</code> yet</td>
+                <td>Start with a spec</td>
+                <td><strong>Create spec with AI</strong></td>
+              </tr>
+              <tr>
+                <td>Tasks waiting</td>
+                <td>Next task: …</td>
+                <td><strong>Start SPEC-00x</strong> (the same as dragging the card to <em>In Progress</em>)</td>
+              </tr>
+              <tr>
+                <td>The AI is working</td>
+                <td>AI is building …</td>
+                <td><strong>Watch progress</strong></td>
+              </tr>
+              <tr>
+                <td>Diffs pending</td>
+                <td>Review N pending changes</td>
+                <td><strong>Review changes</strong> and <strong>Apply &amp; run gates</strong></td>
+              </tr>
+              <tr>
+                <td>Debt at its ceiling</td>
+                <td>Build is blocked by technical debt</td>
+                <td><strong>See debt</strong></td>
+              </tr>
+              <tr>
+                <td>Every task done</td>
+                <td>All N tasks are done</td>
+                <td><strong>Validate against spec</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Every card in <em>Backlog</em>, <em>Todo</em> and <em>In Progress</em> also has a <strong>Start</strong> (or
+          <strong>Resume</strong>) button, so dragging is optional. Above the chat input, quick buttons run the common
+          actions: <em>Build next task</em>, <em>Validate</em>, <em>Tests</em>, <em>Refactor</em> and, while diffs are
+          pending, <em>Apply changes</em>.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Shortcut</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>Cmd</kbd>+<kbd>K</kbd> on macOS)</td>
+                <td>Open the command palette: every tab, action and agent, searchable</td>
+              </tr>
+              <tr>
+                <td><kbd>Alt</kbd>+<kbd>1</kbd> to <kbd>7</kbd> (<kbd>Option</kbd> on macOS)</td>
+                <td>Switch tab</td>
+              </tr>
+              <tr>
+                <td><kbd>/</kbd></td>
+                <td>Focus the chat</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 id="1-the-spec-spec-md">1. The spec (<code>spec.md</code>)</h2>
+        <p><code>spec.md</code> is plain Markdown at the root of your project, and it is <strong>the board's
+            database</strong>: card state is read from this file, not stored elsewhere. So you can edit it by hand,
+          review it in a pull request and version it like any other file.</p>
+        <div class="code" data-lang="Markdown">
+          <pre><code class="language-markdown"># Club booking portal
 
 Court bookings with online payment and email reminders.
 
@@ -147,116 +190,194 @@ Court bookings with online payment and email reminders.
 ## Epic: Payments
 - [ ] SPEC-004 Charge the booking through the payment gateway
 - [ ] SPEC-005 Email the receipt
-</code></pre></div>
-<p>Format rules:</p>
-<ul>
-<li>A <code># Title</code> and a paragraph of context at the top.</li>
-<li>Each <code>## Epic: …</code> (or any level-2 heading) groups tasks.</li>
-<li><code>- [ ] text</code> is a pending task; <code>- [x] text</code> a finished one.</li>
-<li>The IDs <code>SPEC-001</code>, <code>SPEC-002</code>… are assigned by position.</li>
-<li>Free text between tasks is used as context for the AI.</li>
-</ul>
-<p>Does your project use another name, such as <code>tasks.md</code> or <code>backlog.md</code>? Change it in <strong>Settings → Workspace → Spec file</strong> (<code>alpaquitay-ai.specFile</code>). If the file does not exist, Alpaquitay looks for similar ones.</p>
-<h3 id="three-ways-to-create-it">Three ways to create it</h3>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>How</th>
-<th>When</th>
-<th>Where</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>+ Create with AI</strong> / <strong>Regen</strong></td>
-<td>You have a provider and want the AI to analyse the workspace. <em>Regen</em> takes an optional project description.</td>
-<td>The Hub's <em>Spec</em> pane.</td>
-</tr>
-<tr>
-<td><strong>Generate Specification (Local Model)</strong></td>
-<td>Your description must not leave your machine. It writes <code>specs/&lt;name&gt;.md</code> and never overwrites.</td>
-<td>Command Palette or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd>. See <a href="../local-engine/">Local engine</a>.</td>
-</tr>
-<tr>
-<td><strong>By hand</strong></td>
-<td>You already know what you want.</td>
-<td>Any editor. Click ↻ in the <em>Spec</em> pane to reload.</td>
-</tr>
-</tbody>
-</table></div>
-<aside class="callout callout-tip"><p class="callout-title">Tip</p>
-<p>A good spec has small, verifiable tasks that start with a verb: &quot;Validate the email in the sign-up form&quot; beats &quot;Users&quot;. The AI implements a task of a couple of files far better than a whole epic.</p>
-</aside>
-<h2 id="2-the-board">2. The board</h2>
-<p>Every pending task starts in <strong>Backlog</strong>. The columns are <em>Backlog</em>, <em>Todo</em>, <em>In Progress</em> and <em>Done</em>.</p>
-<figure class="video">
-<video controls preload="none" playsinline poster="../../media/work-task-en.jpg" width="1440" height="900" aria-label="A board task, end to end"><source src="../../media/work-task-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a href="../../media/work-task-en.mp4">Download the video</a>.</video>
-<figcaption><strong>A board task, end to end</strong> <span class="video-len">0:29</span> — SPEC-003 is dragged to In Progress; the agent plans and generates the file, the chat shows the diff and <code>si aplicar</code> writes it with a checkpoint. Tests pass but the build fails (the sample project has no <code>vite</code> installed), so the DoD gate keeps the card in In Progress and the debt goes up. Recorded with Ollama (llama3.2 3B), sped up while waiting.</figcaption>
-</figure>
-<p><strong>Dragging a card to <em>In Progress</em> starts the AI</strong>, and it writes nothing blindly:</p>
-<ol>
-<li><strong>Plan.</strong> The agent looks at the workspace and decides which files to create or change (6 at most). Paths that would leave the project are dropped; a path the model writes as <code>/api/x.js</code> is read as <code>api/x.js</code> inside the project.</li>
-<li><strong>Generate.</strong> It generates each file and stores it as a <strong>pending diff</strong>. The chat shows each diff (<code>+added/−removed</code>).</li>
-<li><strong>Your review.</strong> Read the diffs. Use <code>diff &lt;path&gt;</code> to see one in full.</li>
-<li><strong>Apply or discard.</strong> <code>si aplicar</code> writes every pending file with the policy, automatic review and checkpoint described in <a href="../harness/#what-guards-a-write">How the harness thinks</a>. <code>no</code> discards them all.</li>
-<li><strong>Verify.</strong> After applying, the real build and test commands run.</li>
-<li><strong>Done.</strong> The card moves to <em>Done</em> and <code>spec.md</code> becomes <code>- [x]</code> <strong>only if</strong> the DoD gate has evidence. Otherwise it stays <em>In Progress</em> and the chat explains what is missing.</li>
-</ol>
-<p>If an older task contains an example path such as <code>&lt;carpeta-fuente&gt;/services/validator.ts</code>, the harness resolves it using the detected source folder (or the workspace root), refreshes the preview at the real path, and asks for confirmation again. If the file changed since the diff was generated, it will not overwrite it; the proposal stays pending so you can regenerate it. A failed diff remains pending while other diffs continue processing. If the workspace is not a Git repository, applying continues with a warning that no checkpoint could be created.</p>
-<figure class="figure"><a class="zoom" href="../../diagrams/03-sdd-task-sequence.svg" aria-label="Enlarge: Task sequence: plan, generate, diff, approve, apply, prove"><img src="../../diagrams/03-sdd-task-sequence.svg" alt="Task sequence: plan, generate, diff, approve, apply, prove" width="1120" height="1358" loading="lazy" decoding="async"></a><figcaption>What happens between dragging the card and it reaching Done.</figcaption></figure>
+</code></pre>
+        </div>
+        <p>Format rules:</p>
+        <ul>
+          <li>A <code># Title</code> and a paragraph of context at the top.</li>
+          <li>Each <code>## Epic: …</code> (or any level-2 heading) groups tasks.</li>
+          <li><code>- [ ] text</code> is a pending task; <code>- [x] text</code> a finished one.</li>
+          <li>The IDs <code>SPEC-001</code>, <code>SPEC-002</code>… are assigned by position.</li>
+          <li>Free text between tasks is used as context for the AI.</li>
+        </ul>
+        <p>Does your project use another name, such as <code>tasks.md</code> or <code>backlog.md</code>? Change it in
+          <strong>Settings → Workspace → Spec file</strong> (<code>alpaquitay-ai.specFile</code>). If the file does not
+          exist, Alpaquitay looks for similar ones.</p>
+        <h3 id="three-ways-to-create-it">Three ways to create it</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>How</th>
+                <th>When</th>
+                <th>Where</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>+ Create with AI</strong> / <strong>Regen</strong></td>
+                <td>You have a provider and want the AI to analyse the workspace. <em>Regen</em> takes an optional
+                  project description.</td>
+                <td>The Hub's <em>Spec</em> pane.</td>
+              </tr>
+              <tr>
+                <td><strong>Generate Specification (Local Model)</strong></td>
+                <td>Your description must not leave your machine. It writes <code>specs/&lt;name&gt;.md</code> and never
+                  overwrites.</td>
+                <td>Command Palette or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd>. See <a
+                    href="../local-engine/">Local engine</a>.</td>
+              </tr>
+              <tr>
+                <td><strong>By hand</strong></td>
+                <td>You already know what you want.</td>
+                <td>Any editor. Click ↻ in the <em>Spec</em> pane to reload.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="callout callout-tip">
+          <p class="callout-title">Tip</p>
+          <p>A good spec has small, verifiable tasks that start with a verb: &quot;Validate the email in the sign-up
+            form&quot; beats &quot;Users&quot;. The AI implements a task of a couple of files far better than a whole
+            epic.</p>
+        </aside>
+        <h2 id="2-the-board">2. The board</h2>
+        <p>Every pending task starts in <strong>Backlog</strong>. The columns are <em>Backlog</em>, <em>Todo</em>,
+          <em>In Progress</em> and <em>Done</em>.</p>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="../../media/work-task-en.jpg" width="1440" height="900"
+            aria-label="A board task, end to end">
+            <source src="../../media/work-task-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a
+              href="../../media/work-task-en.mp4">Download the video</a>.
+          </video>
+          <figcaption><strong>A board task, end to end</strong> <span class="video-len">0:29</span> — SPEC-003 is
+            dragged to In Progress; the agent plans and generates the file, the chat shows the diff and
+            <code>si aplicar</code> writes it with a checkpoint. Tests pass but the build fails (the sample project has
+            no <code>vite</code> installed), so the DoD gate keeps the card in In Progress and the debt goes up.
+            Recorded with Ollama (llama3.2 3B), sped up while waiting.</figcaption>
+        </figure>
+        <p><strong>Dragging a card to <em>In Progress</em> starts the AI</strong>, and it writes nothing blindly:</p>
+        <ol>
+          <li><strong>Plan.</strong> The agent looks at the workspace and decides which files to create or change (6 at
+            most). Paths that would leave the project are dropped; a path the model writes as <code>/api/x.js</code> is
+            read as <code>api/x.js</code> inside the project.</li>
+          <li><strong>Generate.</strong> It generates each file and stores it as a <strong>pending diff</strong>. The
+            chat shows each diff (<code>+added/−removed</code>).</li>
+          <li><strong>Your review.</strong> Read the diffs. Use <code>diff &lt;path&gt;</code> to see one in full.</li>
+          <li><strong>Apply or discard.</strong> <code>si aplicar</code> writes every pending file with the policy,
+            automatic review and checkpoint described in <a href="../harness/#what-guards-a-write">How the harness
+              thinks</a>. <code>no</code> discards them all.</li>
+          <li><strong>Verify.</strong> After applying, the real build and test commands run.</li>
+          <li><strong>Done.</strong> The card moves to <em>Done</em> and <code>spec.md</code> becomes <code>- [x]</code>
+            <strong>only if</strong> the DoD gate has evidence. Otherwise it stays <em>In Progress</em> and the chat
+            explains what is missing.</li>
+        </ol>
+        <p>If an older task contains an example path such as <code>&lt;carpeta-fuente&gt;/services/validator.ts</code>,
+          the harness resolves it using the detected source folder (or the workspace root), refreshes the preview at the
+          real path, and asks for confirmation again. If the file changed since the diff was generated, it will not
+          overwrite it; the proposal stays pending so you can regenerate it. A failed diff remains pending while other
+          diffs continue processing. If the workspace is not a Git repository, applying continues with a warning that no
+          checkpoint could be created.</p>
+        <figure class="figure"><a class="zoom" href="../../diagrams/03-sdd-task-sequence.svg"
+            aria-label="Enlarge: Task sequence: plan, generate, diff, approve, apply, prove"><img
+              src="../../diagrams/03-sdd-task-sequence.svg"
+              alt="Task sequence: plan, generate, diff, approve, apply, prove" width="1120" height="1358" loading="lazy"
+              decoding="async"></a>
+          <figcaption>What happens between dragging the card and it reaching Done.</figcaption>
+        </figure>
 
-<p>The <strong>Evidence</strong> tab shows the same review queue with buttons (<em>Discard all</em> and <em>Apply &amp; run gates</em>), if you prefer clicking to typing.</p>
-<aside class="callout callout-important"><p class="callout-title">Important</p>
-<p>While working a task, the AI <strong>cannot write <code>spec.md</code></strong>: if it tries, that write is skipped. A confused model cannot wipe your checkboxes. The board updates <code>spec.md</code> itself when the task reaches <em>Done</em>.</p>
-</aside>
-<p>If the model call fails, the error shows in the chat and the card goes back to its column: no silent failures.</p>
-<h2 id="3-the-chat">3. The chat</h2>
-<p>The chat in the right pane understands three kinds of message:</p>
-<ul>
-<li><strong>Natural language.</strong> The harness picks the lane (Flash, Build or Deep), shows its decision and asks for confirmation when needed. See <a href="../harness/#the-three-lanes">How the harness thinks</a>.</li>
-<li><strong>Harness commands</strong>, such as <code>onboard</code>, <code>dora</code>, <code>deuda</code> or <code>si aplicar</code>. Most of them use no model calls. They are all in <a href="../chat-commands/">Chat commands</a>.</li>
-<li><strong>Skills</strong>, with the <strong>/skill</strong> button: create a file, refactor, generate tests, the daily standup… See <a href="../agents/">Agents</a>.</li>
-</ul>
-<h2 id="ideas-that-are-not-tasks-yet">Ideas that are not tasks yet</h2>
-<p>Type a messy idea (&quot;I have an idea: members could book with priority…&quot;). The harness recognises the <em>Flash · ideate</em> lane and files it in the <strong>idea inbox</strong> (<code>.alpaquitay/ideas.json</code>) with a proposed objective, scope and out-of-scope. When it is clear, type <code>promover</code> and the latest idea becomes a new epic in <code>spec.md</code>.</p>
-<h2 id="linking-commits-to-tasks">Linking commits to tasks</h2>
-<p>Mention the task in the commit message:</p>
-<div class="code" data-lang="Text"><pre><code class="language-text">feat(bookings): calendar of free courts #SPEC-001
+        <p>The <strong>Evidence</strong> tab shows the same review queue with buttons (<em>Discard all</em> and
+          <em>Apply &amp; run gates</em>), if you prefer clicking to typing.</p>
+        <aside class="callout callout-important">
+          <p class="callout-title">Important</p>
+          <p>While working a task, the AI <strong>cannot write <code>spec.md</code></strong>: if it tries, that write is
+            skipped. A confused model cannot wipe your checkboxes. The board updates <code>spec.md</code> itself when
+            the task reaches <em>Done</em>.</p>
+        </aside>
+        <p>If the model call fails, the error shows in the chat and the card goes back to its column: no silent
+          failures.</p>
+        <h2 id="3-the-chat">3. The chat</h2>
+        <p>The chat in the right pane understands three kinds of message:</p>
+        <ul>
+          <li><strong>Natural language.</strong> The harness picks the lane (Flash, Build or Deep), shows its decision
+            and asks for confirmation when needed. See <a href="../harness/#the-three-lanes">How the harness thinks</a>.
+          </li>
+          <li><strong>Harness commands</strong>, such as <code>onboard</code>, <code>dora</code>, <code>deuda</code> or
+            <code>si aplicar</code>. Most of them use no model calls. They are all in <a href="../chat-commands/">Chat
+              commands</a>.</li>
+          <li><strong>Skills</strong>, with the <strong>/skill</strong> button: create a file, refactor, generate tests,
+            the daily standup… See <a href="../agents/">Agents</a>.</li>
+        </ul>
+        <h2 id="ideas-that-are-not-tasks-yet">Ideas that are not tasks yet</h2>
+        <p>Type a messy idea (&quot;I have an idea: members could book with priority…&quot;). The harness recognises the
+          <em>Flash · ideate</em> lane and files it in the <strong>idea inbox</strong>
+          (<code>.alpaquitay/ideas.json</code>) with a proposed objective, scope and out-of-scope. When it is clear,
+          type <code>promover</code> and the latest idea becomes a new epic in <code>spec.md</code>.</p>
+        <h2 id="linking-commits-to-tasks">Linking commits to tasks</h2>
+        <p>Mention the task in the commit message:</p>
+        <div class="code" data-lang="Text">
+          <pre><code class="language-text">feat(bookings): calendar of free courts #SPEC-001
 
 Shows the free slots for the next 7 days.
-</code></pre></div>
-<p>Both <code>#SPEC-001</code> and <code>[SPEC: 001]</code> are recognised. The <strong>Evidence</strong> tab marks those commits in the history and counts them in the repository signals: the more linked commits, the better the traceability.</p>
-<h2 id="generate-from-spec-and-validate-against-spec">Generate from Spec and Validate Against Spec</h2>
-<p>Besides the board, the quick menu has two classic commands that work with <strong>any spec file</strong> (<code>.md</code>, <code>.yaml</code>, <code>.yml</code>, <code>.json</code> or <code>.feature</code>):</p>
-<ul>
-<li><strong>Generate from Spec</strong> picks a file, plans the files it needs and generates them.</li>
-<li><strong>Validate Against Spec</strong> compares the project's code with the spec and reports what does not comply.</li>
-</ul>
-<aside class="callout callout-warning"><p class="callout-title">Warning</p>
-<p><em>Generate from Spec</em> <strong>writes the files directly</strong>, with no diff and no <code>si aplicar</code>, and can overwrite files with the same name. Use it on a clean Git tree so you can review the result with <code>git diff</code> and undo it if needed. For reviewed work, use the board.</p>
-</aside>
-<p><strong>New Specification</strong> creates a template in <code>specs/</code>: REST API (OpenAPI 3.0), BDD feature (Gherkin), database schema, Spring Boot microservice or React component.</p>
+</code></pre>
+        </div>
+        <p>Both <code>#SPEC-001</code> and <code>[SPEC: 001]</code> are recognised. The <strong>Evidence</strong> tab
+          marks those commits in the history and counts them in the repository signals: the more linked commits, the
+          better the traceability.</p>
+        <h2 id="generate-from-spec-and-validate-against-spec">Generate from Spec and Validate Against Spec</h2>
+        <p>Besides the board, the quick menu has two classic commands that work with <strong>any spec file</strong>
+          (<code>.md</code>, <code>.yaml</code>, <code>.yml</code>, <code>.json</code> or <code>.feature</code>):</p>
+        <ul>
+          <li><strong>Generate from Spec</strong> picks a file, plans the files it needs and generates them.</li>
+          <li><strong>Validate Against Spec</strong> compares the project's code with the spec and reports what does not
+            comply.</li>
+        </ul>
+        <aside class="callout callout-warning">
+          <p class="callout-title">Warning</p>
+          <p><em>Generate from Spec</em> <strong>writes the files directly</strong>, with no diff and no
+            <code>si aplicar</code>, and can overwrite files with the same name. Use it on a clean Git tree so you can
+            review the result with <code>git diff</code> and undo it if needed. For reviewed work, use the board.</p>
+        </aside>
+        <p><strong>New Specification</strong> creates a template in <code>specs/</code>: REST API (OpenAPI 3.0), BDD
+          feature (Gherkin), database schema, Spring Boot microservice or React component.</p>
 
-<div class="doc-foot">
-  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/04-work.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.8.2 · MIT</span>
-</div>
-<nav class="pager" aria-label="Chapters">
-<a class="prev" href="../harness/"><span>Previous</span>How the harness thinks</a>
-<a class="next" href="../chat-commands/"><span>Next</span>Chat commands</a>
-</nav>
-</article>
-<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#your-next-step-always-visible">Your next step, always visible</a></li><li class="l2"><a href="#1-the-spec-spec-md">1. The spec (spec.md)</a></li><li class="l3"><a href="#three-ways-to-create-it">Three ways to create it</a></li><li class="l2"><a href="#2-the-board">2. The board</a></li><li class="l2"><a href="#3-the-chat">3. The chat</a></li><li class="l2"><a href="#ideas-that-are-not-tasks-yet">Ideas that are not tasks yet</a></li><li class="l2"><a href="#linking-commits-to-tasks">Linking commits to tasks</a></li><li class="l2"><a href="#generate-from-spec-and-validate-against-spec">Generate from Spec and Validate Against Spec</a></li></ul></nav>
-</main>
-</div>
-<div class="search" id="search" hidden>
-  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
-    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
-    <ol id="searchResults" class="search-results"></ol>
-    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+        <div class="doc-foot">
+          <a class="edit"
+            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/04-work.md">Suggest an
+            improvement to this page</a>
+          <span>Manual for Alpaquitay AI 3.8.3 · MIT</span>
+        </div>
+        <nav class="pager" aria-label="Chapters">
+          <a class="prev" href="../harness/"><span>Previous</span>How the harness thinks</a>
+          <a class="next" href="../chat-commands/"><span>Next</span>Chat commands</a>
+        </nav>
+      </article>
+      <nav class="toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul>
+          <li class="l2"><a href="#your-next-step-always-visible">Your next step, always visible</a></li>
+          <li class="l2"><a href="#1-the-spec-spec-md">1. The spec (spec.md)</a></li>
+          <li class="l3"><a href="#three-ways-to-create-it">Three ways to create it</a></li>
+          <li class="l2"><a href="#2-the-board">2. The board</a></li>
+          <li class="l2"><a href="#3-the-chat">3. The chat</a></li>
+          <li class="l2"><a href="#ideas-that-are-not-tasks-yet">Ideas that are not tasks yet</a></li>
+          <li class="l2"><a href="#linking-commits-to-tasks">Linking commits to tasks</a></li>
+          <li class="l2"><a href="#generate-from-spec-and-validate-against-spec">Generate from Spec and Validate Against
+              Spec</a></li>
+        </ul>
+      </nav>
+    </main>
   </div>
-</div>
-<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
-<script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+  <div class="search" id="search" hidden>
+    <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+      <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off"
+        aria-label="Search text">
+      <ol id="searchResults" class="search-results"></ol>
+      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+    </div>
+  </div>
+  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+  <script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
+
 </html>

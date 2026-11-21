@@ -1,169 +1,248 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Docs: documents with an agent · Alpaquitay AI manual</title>
-<meta name="description" content="How to proofread, restyle, translate, summarise and check the consistency of Word, Markdown, EPUB and PDF documents with the Docs tab agent, reviewing every change before it is applied.">
-<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
-<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
-<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/docs/">
-<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
-<meta property="og:title" content="Docs: documents with an agent">
-<meta property="og:description" content="How to proofread, restyle, translate, summarise and check the consistency of Word, Markdown, EPUB and PDF documents with the Docs tab agent, reviewing every change before it is applied.">
-<meta property="og:locale" content="en_US">
-<meta name="theme-color" content="#07100d">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
-<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Docs: documents with an agent","description":"How to proofread, restyle, translate, summarise and check the consistency of Word, Markdown, EPUB and PDF documents with the Docs tab agent, reviewing every change before it is applied.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/docs/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Docs: documents with an agent · Alpaquitay AI manual</title>
+  <meta name="description"
+    content="How to proofread, restyle, translate, summarise and check the consistency of Word, Markdown, EPUB and PDF documents with the Docs tab agent, reviewing every change before it is applied.">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
+  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
+  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/docs/">
+  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
+  <meta property="og:title" content="Docs: documents with an agent">
+  <meta property="og:description"
+    content="How to proofread, restyle, translate, summarise and check the consistency of Word, Markdown, EPUB and PDF documents with the Docs tab agent, reviewing every change before it is applied.">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#07100d">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
+  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Docs: documents with an agent","description":"How to proofread, restyle, translate, summarise and check the consistency of Word, Markdown, EPUB and PDF documents with the Docs tab agent, reviewing every change before it is applied.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/docs/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
+
 <body>
-<a class="skip" href="#contenido">Skip to content</a>
-<header class="top">
-  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-  <a class="crumb" href="../">Manual</a>
-  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
-  <a class="lang" href="../../docs/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
-  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
-  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
-  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.8.2</span></p>
-  <ol class="chapters">
-<li><a href="../"><span class="n">00</span>Home</a></li>
-<li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
-<li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
-<li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
-<li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
-<li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
-<li><a href="../docs/" aria-current="page"><span class="n">06</span>Docs · documents with an agent</a></li>
-<li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
-<li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
-<li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
-<li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
-<li><a href="../models/"><span class="n">11</span>Available models</a></li>
-<li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
-<li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
-<li><a href="../reference/"><span class="n">14</span>Reference</a></li>
-<li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
-<li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
-  </ol>
-  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-</aside>
-<main class="content" id="contenido">
-<article class="doc">
-<p class="kicker">Chapter 06</p>
-<h1 id="docs-documents-with-an-agent">Docs: documents with an agent</h1>
-<p>The <strong>Docs</strong> tab is for everything that is not code: manuscripts, reports, articles, documentation and books. You talk to the agent in English or Spanish, as you would to an editor:</p>
-<blockquote>
-<p><em>&quot;proofread chapter 3&quot;</em> · <em>&quot;make it more direct, keep my voice&quot;</em> · <em>&quot;translate the book to Spanish&quot;</em> · <em>&quot;check consistency across chapters&quot;</em> · <em>&quot;what is this chapter missing?&quot;</em></p>
-</blockquote>
-<figure class="video">
-<video controls preload="none" playsinline poster="../../media/docs-agent-en.jpg" width="1440" height="900" aria-label="An editorial report on a document"><source src="../../media/docs-agent-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a href="../../media/docs-agent-en.mp4">Download the video</a>.</video>
-<figcaption><strong>An editorial report on a document</strong> <span class="video-len">1:11</span> — A Markdown file from the project is opened, <em>Editorial feedback</em> is requested and the agent returns strengths, problems and concrete suggestions, saved as .md. The document is not modified. The sample document is in Spanish, so the report is too. Recorded with Ollama (llama3.2 3B), sped up while waiting.</figcaption>
-</figure>
-<h2 id="formats">Formats</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Format</th>
-<th>Read</th>
-<th>Write</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>.docx</code> (Word)</td>
-<td>✅</td>
-<td>✅</td>
-<td>Edits are written as Word <strong>tracked changes</strong> (Review → Accept/Reject). Untouched paragraphs stay byte-identical.</td>
-</tr>
-<tr>
-<td><code>.md</code> / <code>.txt</code></td>
-<td>✅</td>
-<td>✅</td>
-<td>Lossless outside the edited blocks; code blocks, tables and front matter are protected.</td>
-</tr>
-<tr>
-<td><code>.epub</code></td>
-<td>✅</td>
-<td>✅</td>
-<td>Chapters follow the book's spine; italics and bold survive a round trip.</td>
-</tr>
-<tr>
-<td><code>.pdf</code></td>
-<td>✅</td>
-<td>➡️ <code>.md</code></td>
-<td>Read-only, best effort (text-based PDFs). A scanned PDF needs OCR first.</td>
-</tr>
-</tbody>
-</table></div>
-<p>From the same tab you can <strong>convert</strong> any document to <strong>Markdown</strong>, <strong>Word</strong> or <strong>EPUB</strong>: a manuscript in Markdown becomes a publishable EPUB in one click.</p>
-<h2 id="step-by-step">Step by step</h2>
-<figure class="figure"><a class="zoom" href="../../media/hub-docs.png" aria-label="Enlarge: The Docs tab with an open document and the agent's actions"><img src="../../media/hub-docs.png" alt="The Docs tab with an open document and the agent's actions" width="1600" height="1000" loading="lazy" decoding="async"></a><figcaption>The Docs tab: an open document, quick actions and the conversation with the agent.</figcaption></figure>
+  <a class="skip" href="#contenido">Skip to content</a>
+  <header class="top">
+    <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar"
+      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M3 5h14M3 10h14M3 15h14" />
+      </svg></button>
+    <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark"
+        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+    <a class="crumb" href="../">Manual</a>
+    <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <circle cx="9" cy="9" r="5.5" />
+        <path d="m13.5 13.5 3.5 3.5" />
+      </svg><span>Search</span><kbd>Ctrl K</kbd></button>
+    <a class="lang" href="../../docs/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
+      </svg></button>
+    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg
+        viewBox="0 0 16 16" aria-hidden="true" class="fill">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+      </svg></a>
+    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Manual contents">
+      <p class="side-title">User manual <span class="ver">v3.8.3</span></p>
+      <ol class="chapters">
+        <li><a href="../"><span class="n">00</span>Home</a></li>
+        <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
+        <li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
+        <li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
+        <li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
+        <li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
+        <li><a href="../docs/" aria-current="page"><span class="n">06</span>Docs · documents with an agent</a></li>
+        <li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
+        <li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+        <li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
+        <li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
+        <li><a href="../models/"><span class="n">11</span>Available models</a></li>
+        <li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
+        <li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
+        <li><a href="../reference/"><span class="n">14</span>Reference</a></li>
+        <li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+        <li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
+      </ol>
+      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+    </aside>
+    <main class="content" id="contenido">
+      <article class="doc">
+        <p class="kicker">Chapter 06</p>
+        <h1 id="docs-documents-with-an-agent">Docs: documents with an agent</h1>
+        <p>The <strong>Docs</strong> tab is for everything that is not code: manuscripts, reports, articles,
+          documentation and books. You talk to the agent in English or Spanish, as you would to an editor:</p>
+        <blockquote>
+          <p><em>&quot;proofread chapter 3&quot;</em> · <em>&quot;make it more direct, keep my voice&quot;</em> ·
+            <em>&quot;translate the book to Spanish&quot;</em> · <em>&quot;check consistency across chapters&quot;</em>
+            · <em>&quot;what is this chapter missing?&quot;</em></p>
+        </blockquote>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="../../media/docs-agent-en.jpg" width="1440" height="900"
+            aria-label="An editorial report on a document">
+            <source src="../../media/docs-agent-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a
+              href="../../media/docs-agent-en.mp4">Download the video</a>.
+          </video>
+          <figcaption><strong>An editorial report on a document</strong> <span class="video-len">1:11</span> — A
+            Markdown file from the project is opened, <em>Editorial feedback</em> is requested and the agent returns
+            strengths, problems and concrete suggestions, saved as .md. The document is not modified. The sample
+            document is in Spanish, so the report is too. Recorded with Ollama (llama3.2 3B), sped up while waiting.
+          </figcaption>
+        </figure>
+        <h2 id="formats">Formats</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Format</th>
+                <th>Read</th>
+                <th>Write</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>.docx</code> (Word)</td>
+                <td>✅</td>
+                <td>✅</td>
+                <td>Edits are written as Word <strong>tracked changes</strong> (Review → Accept/Reject). Untouched
+                  paragraphs stay byte-identical.</td>
+              </tr>
+              <tr>
+                <td><code>.md</code> / <code>.txt</code></td>
+                <td>✅</td>
+                <td>✅</td>
+                <td>Lossless outside the edited blocks; code blocks, tables and front matter are protected.</td>
+              </tr>
+              <tr>
+                <td><code>.epub</code></td>
+                <td>✅</td>
+                <td>✅</td>
+                <td>Chapters follow the book's spine; italics and bold survive a round trip.</td>
+              </tr>
+              <tr>
+                <td><code>.pdf</code></td>
+                <td>✅</td>
+                <td>➡️ <code>.md</code></td>
+                <td>Read-only, best effort (text-based PDFs). A scanned PDF needs OCR first.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>From the same tab you can <strong>convert</strong> any document to <strong>Markdown</strong>,
+          <strong>Word</strong> or <strong>EPUB</strong>: a manuscript in Markdown becomes a publishable EPUB in one
+          click.</p>
+        <h2 id="step-by-step">Step by step</h2>
+        <figure class="figure"><a class="zoom" href="../../media/hub-docs.png"
+            aria-label="Enlarge: The Docs tab with an open document and the agent's actions"><img
+              src="../../media/hub-docs.png" alt="The Docs tab with an open document and the agent's actions"
+              width="1600" height="1000" loading="lazy" decoding="async"></a>
+          <figcaption>The Docs tab: an open document, quick actions and the conversation with the agent.</figcaption>
+        </figure>
 
-<ol>
-<li><strong>Open a document</strong> with <em>Open file…</em> or pick it from <em>Documents in this workspace…</em>.</li>
-<li><strong>Choose an action</strong> or type your own instruction:
-<ul>
-<li><strong>Edit:</strong> <em>Proofread</em> (spelling and grammar), <em>Improve style</em>, <em>Shorten</em>, <em>Translate to</em> (English, Spanish, French, German, Italian or Portuguese).</li>
-<li><strong>Analyse:</strong> <em>Summarize</em>, <em>Outline</em>, <em>Consistency check</em> (names, dates, places and terminology across chapters) and <em>Editorial feedback</em>.</li>
-</ul>
-</li>
-<li><strong>Review the proposal.</strong> Every changed paragraph shows a <strong>word-level diff</strong>. Large rewrites, changed numbers and big length changes are flagged <em>review</em> and are <strong>not pre-selected</strong>.</li>
-<li><strong>Select</strong> with <em>Select all</em>, <em>Only safe</em> or <em>None</em>, or box by box.</li>
-<li><strong>Click <em>Apply selected</em>.</strong> By default a <strong>new file</strong> is written (<code>name.edited.docx</code>, <code>name.edited.md</code>…). If you choose to overwrite, a backup is saved first in <code>.alpaquitay/backups/</code>.</li>
-<li><strong>Verification.</strong> The written file is read back to check that it opens and contains every accepted edit.</li>
-</ol>
-<p>Analyses (summary, outline, consistency, feedback) do not change the document: save them with <em>Save report as .md</em>.</p>
-<figure class="figure"><a class="zoom" href="../../diagrams/10-docs-agent.svg" aria-label="Enlarge: The document agent flow"><img src="../../diagrams/10-docs-agent.svg" alt="The document agent flow" width="1120" height="968" loading="lazy" decoding="async"></a><figcaption>Format adapters, intent, confirmation, run, review, apply and verify.</figcaption></figure>
+        <ol>
+          <li><strong>Open a document</strong> with <em>Open file…</em> or pick it from <em>Documents in this
+              workspace…</em>.</li>
+          <li><strong>Choose an action</strong> or type your own instruction:
+            <ul>
+              <li><strong>Edit:</strong> <em>Proofread</em> (spelling and grammar), <em>Improve style</em>,
+                <em>Shorten</em>, <em>Translate to</em> (English, Spanish, French, German, Italian or Portuguese).</li>
+              <li><strong>Analyse:</strong> <em>Summarize</em>, <em>Outline</em>, <em>Consistency check</em> (names,
+                dates, places and terminology across chapters) and <em>Editorial feedback</em>.</li>
+            </ul>
+          </li>
+          <li><strong>Review the proposal.</strong> Every changed paragraph shows a <strong>word-level diff</strong>.
+            Large rewrites, changed numbers and big length changes are flagged <em>review</em> and are <strong>not
+              pre-selected</strong>.</li>
+          <li><strong>Select</strong> with <em>Select all</em>, <em>Only safe</em> or <em>None</em>, or box by box.</li>
+          <li><strong>Click <em>Apply selected</em>.</strong> By default a <strong>new file</strong> is written
+            (<code>name.edited.docx</code>, <code>name.edited.md</code>…). If you choose to overwrite, a backup is saved
+            first in <code>.alpaquitay/backups/</code>.</li>
+          <li><strong>Verification.</strong> The written file is read back to check that it opens and contains every
+            accepted edit.</li>
+        </ol>
+        <p>Analyses (summary, outline, consistency, feedback) do not change the document: save them with <em>Save report
+            as .md</em>.</p>
+        <figure class="figure"><a class="zoom" href="../../diagrams/10-docs-agent.svg"
+            aria-label="Enlarge: The document agent flow"><img src="../../diagrams/10-docs-agent.svg"
+              alt="The document agent flow" width="1120" height="968" loading="lazy" decoding="async"></a>
+          <figcaption>Format adapters, intent, confirmation, run, review, apply and verify.</figcaption>
+        </figure>
 
-<h2 id="the-same-guarantees-as-for-code">The same guarantees as for code</h2>
-<ul>
-<li>The agent only <strong>proposes</strong>; you decide what is applied.</li>
-<li><strong>Protected blocks it never touches:</strong> links, footnotes, fields, images, tables and code.</li>
-<li><strong>Whole books:</strong> if an operation needs more than 20 model calls it asks you first (<em>Continue</em>), and it never makes more than 60.</li>
-<li><strong>Privacy:</strong> with a cloud provider the text goes through the privacy boundary (personal data and secrets hidden); with a local model the manuscript never leaves your machine.</li>
-<li><strong>No external dependencies:</strong> the ZIP, DOCX, EPUB and PDF readers and writers are built in, so the extension stays small and auditable.</li>
-</ul>
-<h2 id="limits-stated-plainly">Limits, stated plainly</h2>
-<ul>
-<li>In a Word paragraph the agent rewrites, the formatting inside that paragraph (a bold word, for example) is replaced by the formatting of its first run. Tracked changes show exactly what changed.</li>
-<li>Paragraphs with hyperlinks, fields or notes are <strong>skipped</strong> rather than risk damaging them.</li>
-<li>Quality depends on the model. In our tests a 3B local model (<code>llama3.2:3b</code>) wrote a useful editorial report, but answered <em>&quot;No changes needed&quot;</em> when asked to fix a Spanish text with missing accents. To proofread, restyle or translate, use a 7B model or larger, or a cloud one.</li>
-</ul>
-<aside class="callout callout-tip"><p class="callout-title">Tip</p>
-<p>For a book, start with <strong>Consistency check</strong> and <strong>Outline</strong>: they change nothing and give you the big picture. Then proofread chapter by chapter with <em>Proofread</em> and take your time with the changes flagged <em>review</em>.</p>
-</aside>
+        <h2 id="the-same-guarantees-as-for-code">The same guarantees as for code</h2>
+        <ul>
+          <li>The agent only <strong>proposes</strong>; you decide what is applied.</li>
+          <li><strong>Protected blocks it never touches:</strong> links, footnotes, fields, images, tables and code.
+          </li>
+          <li><strong>Whole books:</strong> if an operation needs more than 20 model calls it asks you first
+            (<em>Continue</em>), and it never makes more than 60.</li>
+          <li><strong>Privacy:</strong> with a cloud provider the text goes through the privacy boundary (personal data
+            and secrets hidden); with a local model the manuscript never leaves your machine.</li>
+          <li><strong>No external dependencies:</strong> the ZIP, DOCX, EPUB and PDF readers and writers are built in,
+            so the extension stays small and auditable.</li>
+        </ul>
+        <h2 id="limits-stated-plainly">Limits, stated plainly</h2>
+        <ul>
+          <li>In a Word paragraph the agent rewrites, the formatting inside that paragraph (a bold word, for example) is
+            replaced by the formatting of its first run. Tracked changes show exactly what changed.</li>
+          <li>Paragraphs with hyperlinks, fields or notes are <strong>skipped</strong> rather than risk damaging them.
+          </li>
+          <li>Quality depends on the model. In our tests a 3B local model (<code>llama3.2:3b</code>) wrote a useful
+            editorial report, but answered <em>&quot;No changes needed&quot;</em> when asked to fix a Spanish text with
+            missing accents. To proofread, restyle or translate, use a 7B model or larger, or a cloud one.</li>
+        </ul>
+        <aside class="callout callout-tip">
+          <p class="callout-title">Tip</p>
+          <p>For a book, start with <strong>Consistency check</strong> and <strong>Outline</strong>: they change nothing
+            and give you the big picture. Then proofread chapter by chapter with <em>Proofread</em> and take your time
+            with the changes flagged <em>review</em>.</p>
+        </aside>
 
-<div class="doc-foot">
-  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/06-docs.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.8.2 · MIT</span>
-</div>
-<nav class="pager" aria-label="Chapters">
-<a class="prev" href="../chat-commands/"><span>Previous</span>Chat commands</a>
-<a class="next" href="../evidence/"><span>Next</span>Evidence · signals and review</a>
-</nav>
-</article>
-<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#formats">Formats</a></li><li class="l2"><a href="#step-by-step">Step by step</a></li><li class="l2"><a href="#the-same-guarantees-as-for-code">The same guarantees as for code</a></li><li class="l2"><a href="#limits-stated-plainly">Limits, stated plainly</a></li></ul></nav>
-</main>
-</div>
-<div class="search" id="search" hidden>
-  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
-    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
-    <ol id="searchResults" class="search-results"></ol>
-    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+        <div class="doc-foot">
+          <a class="edit"
+            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/06-docs.md">Suggest an
+            improvement to this page</a>
+          <span>Manual for Alpaquitay AI 3.8.3 · MIT</span>
+        </div>
+        <nav class="pager" aria-label="Chapters">
+          <a class="prev" href="../chat-commands/"><span>Previous</span>Chat commands</a>
+          <a class="next" href="../evidence/"><span>Next</span>Evidence · signals and review</a>
+        </nav>
+      </article>
+      <nav class="toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul>
+          <li class="l2"><a href="#formats">Formats</a></li>
+          <li class="l2"><a href="#step-by-step">Step by step</a></li>
+          <li class="l2"><a href="#the-same-guarantees-as-for-code">The same guarantees as for code</a></li>
+          <li class="l2"><a href="#limits-stated-plainly">Limits, stated plainly</a></li>
+        </ul>
+      </nav>
+    </main>
   </div>
-</div>
-<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
-<script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+  <div class="search" id="search" hidden>
+    <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+      <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off"
+        aria-label="Search text">
+      <ol id="searchResults" class="search-results"></ol>
+      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+    </div>
+  </div>
+  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+  <script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
+
 </html>

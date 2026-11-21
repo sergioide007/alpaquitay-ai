@@ -1,319 +1,429 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How the harness thinks · Alpaquitay AI manual</title>
-<meta name="description" content="The Flash, Build and Deep lanes, the six SDLC phases and their gates, the FABLE-5 rules, agentic debt and the evidence Alpaquitay keeps in .alpaquitay/.">
-<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/harness/">
-<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/harness/">
-<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/arnes/">
-<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/harness/">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/harness/">
-<meta property="og:title" content="How the harness thinks">
-<meta property="og:description" content="The Flash, Build and Deep lanes, the six SDLC phases and their gates, the FABLE-5 rules, agentic debt and the evidence Alpaquitay keeps in .alpaquitay/.">
-<meta property="og:locale" content="en_US">
-<meta name="theme-color" content="#07100d">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
-<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"How the harness thinks","description":"The Flash, Build and Deep lanes, the six SDLC phases and their gates, the FABLE-5 rules, agentic debt and the evidence Alpaquitay keeps in .alpaquitay/.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/harness/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How the harness thinks · Alpaquitay AI manual</title>
+  <meta name="description"
+    content="The Flash, Build and Deep lanes, the six SDLC phases and their gates, the FABLE-5 rules, agentic debt and the evidence Alpaquitay keeps in .alpaquitay/.">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/harness/">
+  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/harness/">
+  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/arnes/">
+  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/harness/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/harness/">
+  <meta property="og:title" content="How the harness thinks">
+  <meta property="og:description"
+    content="The Flash, Build and Deep lanes, the six SDLC phases and their gates, the FABLE-5 rules, agentic debt and the evidence Alpaquitay keeps in .alpaquitay/.">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#07100d">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
+  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"How the harness thinks","description":"The Flash, Build and Deep lanes, the six SDLC phases and their gates, the FABLE-5 rules, agentic debt and the evidence Alpaquitay keeps in .alpaquitay/.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/harness/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
+
 <body>
-<a class="skip" href="#contenido">Skip to content</a>
-<header class="top">
-  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-  <a class="crumb" href="../">Manual</a>
-  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
-  <a class="lang" href="../../arnes/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
-  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
-  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
-  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.8.2</span></p>
-  <ol class="chapters">
-<li><a href="../"><span class="n">00</span>Home</a></li>
-<li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
-<li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
-<li><a href="../harness/" aria-current="page"><span class="n">03</span>How the harness thinks</a></li>
-<li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
-<li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
-<li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
-<li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
-<li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
-<li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
-<li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
-<li><a href="../models/"><span class="n">11</span>Available models</a></li>
-<li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
-<li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
-<li><a href="../reference/"><span class="n">14</span>Reference</a></li>
-<li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
-<li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
-  </ol>
-  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-</aside>
-<main class="content" id="contenido">
-<article class="doc">
-<p class="kicker">Chapter 03</p>
-<h1 id="how-the-harness-thinks">How the harness thinks</h1>
-<p>A plain AI assistant takes your text and answers. Alpaquitay puts a <strong>harness</strong> in front: a deterministic layer (no model involved) that perceives the project, decides what kind of work this is, limits what can happen and keeps a record. Knowing how it works helps you ask better and understand why it sometimes asks before acting.</p>
-<figure class="figure"><a class="zoom" href="../../diagrams/01-harness-pipeline.svg" aria-label="Enlarge: The harness pipeline: perceive, decide, lanes and evidence"><img src="../../diagrams/01-harness-pipeline.svg" alt="The harness pipeline: perceive, decide, lanes and evidence" width="1120" height="1046" loading="lazy" decoding="async"></a><figcaption>Every request is perceived, sent to exactly one lane, previewed before any write, guarded, verified and logged.</figcaption></figure>
+  <a class="skip" href="#contenido">Skip to content</a>
+  <header class="top">
+    <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar"
+      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M3 5h14M3 10h14M3 15h14" />
+      </svg></button>
+    <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark"
+        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+    <a class="crumb" href="../">Manual</a>
+    <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <circle cx="9" cy="9" r="5.5" />
+        <path d="m13.5 13.5 3.5 3.5" />
+      </svg><span>Search</span><kbd>Ctrl K</kbd></button>
+    <a class="lang" href="../../arnes/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
+      </svg></button>
+    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg
+        viewBox="0 0 16 16" aria-hidden="true" class="fill">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+      </svg></a>
+    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Manual contents">
+      <p class="side-title">User manual <span class="ver">v3.8.3</span></p>
+      <ol class="chapters">
+        <li><a href="../"><span class="n">00</span>Home</a></li>
+        <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
+        <li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
+        <li><a href="../harness/" aria-current="page"><span class="n">03</span>How the harness thinks</a></li>
+        <li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
+        <li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
+        <li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
+        <li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
+        <li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+        <li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
+        <li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
+        <li><a href="../models/"><span class="n">11</span>Available models</a></li>
+        <li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
+        <li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
+        <li><a href="../reference/"><span class="n">14</span>Reference</a></li>
+        <li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+        <li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
+      </ol>
+      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+    </aside>
+    <main class="content" id="contenido">
+      <article class="doc">
+        <p class="kicker">Chapter 03</p>
+        <h1 id="how-the-harness-thinks">How the harness thinks</h1>
+        <p>A plain AI assistant takes your text and answers. Alpaquitay puts a <strong>harness</strong> in front: a
+          deterministic layer (no model involved) that perceives the project, decides what kind of work this is, limits
+          what can happen and keeps a record. Knowing how it works helps you ask better and understand why it sometimes
+          asks before acting.</p>
+        <figure class="figure"><a class="zoom" href="../../diagrams/01-harness-pipeline.svg"
+            aria-label="Enlarge: The harness pipeline: perceive, decide, lanes and evidence"><img
+              src="../../diagrams/01-harness-pipeline.svg"
+              alt="The harness pipeline: perceive, decide, lanes and evidence" width="1120" height="1046" loading="lazy"
+              decoding="async"></a>
+          <figcaption>Every request is perceived, sent to exactly one lane, previewed before any write, guarded,
+            verified and logged.</figcaption>
+        </figure>
 
-<h2 id="the-five-stages">The five stages</h2>
-<ol>
-<li><strong>Perceive.</strong> It detects the stack from marker files (<code>package.json</code>, <code>pom.xml</code>, <code>go.mod</code>, <code>pyproject.toml</code>…) and the real source folders. It never assumes the code lives in <code>src/</code>.</li>
-<li><strong>Decide.</strong> It classifies your request into a lane and a lifecycle phase, with a visible confidence and reasons.</li>
-<li><strong>Preview.</strong> If something must be written, it prepares a bounded <em>diff</em>. Nothing touches the disk yet.</li>
-<li><strong>Guard and verify.</strong> Write policy, automatic review, a Git checkpoint and, after applying, the real build and test commands.</li>
-<li><strong>Keep evidence.</strong> Decisions, debt and economy are stored in <code>.alpaquitay/</code>.</li>
-</ol>
-<h2 id="the-three-lanes">The three lanes</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Lane</th>
-<th>When</th>
-<th>What it does</th>
-<th>Cost</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>⚡ <strong>Flash</strong></td>
-<td>Short questions, explanations, loose ideas.</td>
-<td>Answers in the chat or files the idea in the inbox. Writes no files.</td>
-<td>One call, or none.</td>
-</tr>
-<tr>
-<td>🔨 <strong>Build</strong></td>
-<td>Create, implement, fix or refactor; talk about the spec or the board.</td>
-<td>From the <strong>board</strong>: plans, generates and leaves <strong>pending diffs</strong> for you to approve. From the <strong>chat</strong>: once you confirm with <code>si</code>, it turns your request into a new <code>spec.md</code> to work through on the board (see the warning below).</td>
-<td>2 to 4 calls per confirmed change.</td>
-</tr>
-<tr>
-<td>🧠 <strong>Deep</strong></td>
-<td>The message mentions deployment (<em>deploy</em>, <em>despliegue</em>), pipelines, Docker, Terraform, AWS, Azure, GCP, IaC, DORA, pentests, threats (<em>amenazas</em>), STRIDE, SBOM, OWASP SAMM, FinOps, zero trust, runbooks or MLOps.</td>
-<td>Sends the request to <strong>one registered specialist</strong> (security, DevOps, architecture, QA…).</td>
-<td>One call to the specialist.</td>
-</tr>
-</tbody>
-</table></div>
-<p>The harness decides with readable rules, not with another model. The keyword lists are bilingual, tuned first for Spanish; these English requests route as shown:</p>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>You type…</th>
-<th>Lane</th>
-<th>Why</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>&quot;what is an ADR?&quot;</td>
-<td>Flash · chat</td>
-<td>short question</td>
-</tr>
-<tr>
-<td>&quot;I have an idea for the login&quot;</td>
-<td>Flash · ideate</td>
-<td>loose idea → idea inbox</td>
-</tr>
-<tr>
-<td>&quot;add a payments epic to the spec&quot;</td>
-<td>Build · spec</td>
-<td>mentions the spec, an epic or the board</td>
-</tr>
-<tr>
-<td>&quot;implement the bookings endpoint&quot;</td>
-<td>Build · code</td>
-<td>code vocabulary</td>
-</tr>
-<tr>
-<td>&quot;prepare the deployment pipeline on AWS&quot;</td>
-<td>Deep · specialist</td>
-<td>operations or infrastructure</td>
-</tr>
-</tbody>
-</table></div>
-<aside class="callout callout-warning"><p class="callout-title">Warning</p>
-<p>Confirming with <code>si</code> a code request typed in the chat (<em>&quot;implement the bookings endpoint&quot;</em>) <strong>generates a new <code>spec.md</code> from that request and replaces the current one</strong>. A Git checkpoint is saved first, so you can get it back, but if you already have a spec you want to keep, add the task to the board and drag it to <em>In Progress</em> instead of asking in the chat.</p>
-</aside>
-<p>When confidence is low or the route is Deep, the harness <strong>proposes the route and waits</strong>: reply <code>si</code> (or <code>sí</code>, <code>dale</code>, <code>ok</code>, <code>confirmo</code>) to go ahead. Every answer shows a readable line with the lane, stack, phase, gate and session economy.</p>
-<h2 id="the-six-sdlc-phases-and-their-gates">The six SDLC phases and their gates</h2>
-<p>The harness also places each request in a lifecycle phase. A phase only moves on when its <strong>exit gate</strong> passes.</p>
-<figure class="figure"><a class="zoom" href="../../diagrams/04-sdlc-gates.svg" aria-label="Enlarge: Six SDLC phases with keywords, lane and gate"><img src="../../diagrams/04-sdlc-gates.svg" alt="Six SDLC phases with keywords, lane and gate" width="1120" height="736" loading="lazy" decoding="async"></a><figcaption>The six phases, the words that trigger them, their lane and the gate to pass.</figcaption></figure>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Phase</th>
-<th>Triggered by words such as…</th>
-<th>Exit gate</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>01 Requirements</td>
-<td>requisito, idea, alcance, historia, objetivo, épica</td>
-<td>objective + scope + out of scope + owner</td>
-</tr>
-<tr>
-<td>02 Design</td>
-<td>diseño, arquitectura, ADR, diagrama, esquema</td>
-<td>ADR recorded + no circular dependencies</td>
-</tr>
-<tr>
-<td>03 Implementation</td>
-<td>crea, genera, implementa, fix, bug, refactor, endpoint</td>
-<td>SOLID + preview + checkpoint + build and test</td>
-</tr>
-<tr>
-<td>04 Testing</td>
-<td>test, prueba, coverage, QA, e2e, unit</td>
-<td>happy path + edge + error for every public method</td>
-</tr>
-<tr>
-<td>05 Deployment</td>
-<td>deploy, pipeline, docker, release, rollback, terraform, aws</td>
-<td>green pipeline + human approval + rollback ready</td>
-</tr>
-<tr>
-<td>06 Maintenance</td>
-<td>logs, deuda, upgrade, incidente, postmortem, oncall</td>
-<td>runbook + alert + service owner</td>
-</tr>
-</tbody>
-</table></div>
-<h2 id="fable-5-the-five-design-rules">FABLE-5: the five design rules</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Letter</th>
-<th>Principle</th>
-<th>How you notice it</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>F</strong></td>
-<td>Fingerprint-first</td>
-<td>It detects your real stack before proposing anything.</td>
-</tr>
-<tr>
-<td><strong>A</strong></td>
-<td>Ask-before-act</td>
-<td>Every write and every risky route asks for confirmation.</td>
-</tr>
-<tr>
-<td><strong>B</strong></td>
-<td>Bounded preview</td>
-<td>A change plans at most <strong>6 files</strong>; more than that must be split into batches.</td>
-</tr>
-<tr>
-<td><strong>L</strong></td>
-<td>Legible-first</td>
-<td>Every answer states lane, stack, phase, gate and economy.</td>
-</tr>
-<tr>
-<td><strong>E</strong></td>
-<td>Evidence-always</td>
-<td>Every decision lands in <code>.alpaquitay/decisions.jsonl</code>.</td>
-</tr>
-</tbody>
-</table></div>
-<h2 id="what-guards-a-write">What guards a write</h2>
-<p>Review agent activity and diffs in <strong>Changes</strong>. Its <strong>Apply &amp; run gates</strong> and <strong>Discard all</strong> buttons act on every pending diff; applying starts the same guarded flow as <code>si aplicar</code>, and discarding is equivalent to <code>no</code>.</p>
-<p>When you reply <code>si aplicar</code> (or click <strong>Apply &amp; run gates</strong>), for <strong>each pending file</strong>:</p>
-<ol>
-<li><strong>Write policy.</strong> Files that <em>are</em> secrets are always denied: <code>.env</code>, <code>*.pem</code>, <code>*.key</code>, <code>id_rsa</code>, <code>id_ed25519</code>, <code>secrets/</code> folders, credential or token files. Writing <code>spec.md</code> needs confirmation and a backup.</li>
-<li><strong>Automatic review</strong> (no model). It <strong>blocks</strong> when the file is outside the detected source folders or the content looks like a literal secret (API keys, private keys, AWS keys, <code>sk-…</code>, <code>ghp_…</code>, JWTs). It <strong>warns</strong> when the file passes 400 lines, when <code>console.log</code>, <code>print(</code>, <code>TODO</code> or <code>FIXME</code> remain, or when the change changes nothing.</li>
-<li><strong>Git checkpoint.</strong> Before writing it saves a stash named <code>alpaquitay/apply-diffs-&lt;date&gt;</code> and re-applies it, so your work stays in the tree and you also get a way back. Without Git it carries on without a checkpoint and says so.</li>
-<li><strong>Write and verify.</strong> It writes the approved files and runs the real build and test commands detected by <code>onboard</code>.</li>
-</ol>
-<p>To go back after a <code>si aplicar</code>, find the stash with <code>git stash list</code> (Alpaquitay's start with <code>alpaquitay/</code>) and restore it with <code>git stash apply stash@{N}</code>.</p>
-<h2 id="the-definition-of-done-dod">The Definition of Done (DoD)</h2>
-<p>A card moves to <strong>Done</strong> only when it passes the DoD gate:</p>
-<ul>
-<li>no diffs are left unapplied (<code>si aplicar</code> or <code>no</code> first);</li>
-<li>for code projects, the <strong>platform contract</strong> is verified by an explicit <code>onboard</code> run and saved for the current stack;</li>
-<li>for code projects, build and tests <strong>really ran</strong> and came back green. Knowing which command to run does not count as having run it.</li>
-</ul>
-<p>Projects with no source code (for example, only PDFs, Markdown and HTML) skip the contract and quality evidence checks; pending diffs still block Done. The gate reads the saved contract without creating one and runs the exact build and test commands stored in <code>.alpaquitay/platform.json</code>. If the stack is not detected, confirm both commands with <code>onboard {&quot;build&quot;:&quot;...&quot;,&quot;test&quot;:&quot;...&quot;}</code>.</p>
-<p>If something fails, the card stays <em>In Progress</em> and the chat shows what blocks it, with an automatic, blameless postmortem.</p>
-<h2 id="agentic-debt">Agentic debt</h2>
-<p>Every risky decision adds debt and every gate passed pays some back. The meter runs from 0 to 100; <strong>at 100 the Build lane is blocked</strong> until you pay it down.</p>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Event</th>
-<th>Points</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Pending diff left unresolved</td>
-<td>+2</td>
-</tr>
-<tr>
-<td>Postmortem (something failed)</td>
-<td>+10</td>
-</tr>
-<tr>
-<td>DoD blocked</td>
-<td>+15</td>
-</tr>
-<tr>
-<td>Deployment without a rollback plan</td>
-<td>+25</td>
-</tr>
-<tr>
-<td>Any other recorded decision</td>
-<td>+1</td>
-</tr>
-<tr>
-<td>Successful <code>si aplicar</code></td>
-<td>−5</td>
-</tr>
-<tr>
-<td>Verified <em>Done</em></td>
-<td>−8</td>
-</tr>
-<tr>
-<td><code>onboard</code></td>
-<td>−10</td>
-</tr>
-</tbody>
-</table></div>
-<p>Above 70 the harness warns you (<em>alta, revisa antes de seguir</em>: high, review before going on). Check the meter with <code>deuda</code> in the chat or in the <a href="../evidence/">Evidence</a> tab.</p>
-<h2 id="session-economy">Session economy</h2>
-<p>The harness counts how many operations it solved <strong>locally, for free</strong> (<code>dora</code>, <code>deuda</code>, <code>postmortem</code>, <code>diff</code>, reviews, <code>economía</code>) against how many <strong>model calls</strong> it made. Type <code>economía</code> to see it. Its advice: short questions in Flash, <code>onboard</code> once, diffs in batches.</p>
-<h2 id="where-to-look-if-you-want-to-audit">Where to look if you want to audit</h2>
-<p>Everything is text in your repository. <code>decisions.jsonl</code> has one JSON line per decision, with its route, lane, confidence and reasons; <code>debt.json</code> keeps the last 50 debt events. You can read them, commit them or process them with your own tools.</p>
+        <h2 id="the-five-stages">The five stages</h2>
+        <ol>
+          <li><strong>Perceive.</strong> It detects the stack from marker files (<code>package.json</code>,
+            <code>pom.xml</code>, <code>go.mod</code>, <code>pyproject.toml</code>…) and the real source folders. It
+            never assumes the code lives in <code>src/</code>.</li>
+          <li><strong>Decide.</strong> It classifies your request into a lane and a lifecycle phase, with a visible
+            confidence and reasons.</li>
+          <li><strong>Preview.</strong> If something must be written, it prepares a bounded <em>diff</em>. Nothing
+            touches the disk yet.</li>
+          <li><strong>Guard and verify.</strong> Write policy, automatic review, a Git checkpoint and, after applying,
+            the real build and test commands.</li>
+          <li><strong>Keep evidence.</strong> Decisions, debt and economy are stored in <code>.alpaquitay/</code>.</li>
+        </ol>
+        <h2 id="the-three-lanes">The three lanes</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Lane</th>
+                <th>When</th>
+                <th>What it does</th>
+                <th>Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>⚡ <strong>Flash</strong></td>
+                <td>Short questions, explanations, loose ideas.</td>
+                <td>Answers in the chat or files the idea in the inbox. Writes no files.</td>
+                <td>One call, or none.</td>
+              </tr>
+              <tr>
+                <td>🔨 <strong>Build</strong></td>
+                <td>Create, implement, fix or refactor; talk about the spec or the board.</td>
+                <td>From the <strong>board</strong>: plans, generates and leaves <strong>pending diffs</strong> for you
+                  to approve. From the <strong>chat</strong>: once you confirm with <code>si</code>, it turns your
+                  request into a new <code>spec.md</code> to work through on the board (see the warning below).</td>
+                <td>2 to 4 calls per confirmed change.</td>
+              </tr>
+              <tr>
+                <td>🧠 <strong>Deep</strong></td>
+                <td>The message mentions deployment (<em>deploy</em>, <em>despliegue</em>), pipelines, Docker,
+                  Terraform, AWS, Azure, GCP, IaC, DORA, pentests, threats (<em>amenazas</em>), STRIDE, SBOM, OWASP
+                  SAMM, FinOps, zero trust, runbooks or MLOps.</td>
+                <td>Sends the request to <strong>one registered specialist</strong> (security, DevOps, architecture,
+                  QA…).</td>
+                <td>One call to the specialist.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The harness decides with readable rules, not with another model. The keyword lists are bilingual, tuned first
+          for Spanish; these English requests route as shown:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>You type…</th>
+                <th>Lane</th>
+                <th>Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>&quot;what is an ADR?&quot;</td>
+                <td>Flash · chat</td>
+                <td>short question</td>
+              </tr>
+              <tr>
+                <td>&quot;I have an idea for the login&quot;</td>
+                <td>Flash · ideate</td>
+                <td>loose idea → idea inbox</td>
+              </tr>
+              <tr>
+                <td>&quot;add a payments epic to the spec&quot;</td>
+                <td>Build · spec</td>
+                <td>mentions the spec, an epic or the board</td>
+              </tr>
+              <tr>
+                <td>&quot;implement the bookings endpoint&quot;</td>
+                <td>Build · code</td>
+                <td>code vocabulary</td>
+              </tr>
+              <tr>
+                <td>&quot;prepare the deployment pipeline on AWS&quot;</td>
+                <td>Deep · specialist</td>
+                <td>operations or infrastructure</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="callout callout-warning">
+          <p class="callout-title">Warning</p>
+          <p>Confirming with <code>si</code> a code request typed in the chat (<em>&quot;implement the bookings
+              endpoint&quot;</em>) <strong>generates a new <code>spec.md</code> from that request and replaces the
+              current one</strong>. A Git checkpoint is saved first, so you can get it back, but if you already have a
+            spec you want to keep, add the task to the board and drag it to <em>In Progress</em> instead of asking in
+            the chat.</p>
+        </aside>
+        <p>When confidence is low or the route is Deep, the harness <strong>proposes the route and waits</strong>: reply
+          <code>si</code> (or <code>sí</code>, <code>dale</code>, <code>ok</code>, <code>confirmo</code>) to go ahead.
+          Every answer shows a readable line with the lane, stack, phase, gate and session economy.</p>
+        <h2 id="the-six-sdlc-phases-and-their-gates">The six SDLC phases and their gates</h2>
+        <p>The harness also places each request in a lifecycle phase. A phase only moves on when its <strong>exit
+            gate</strong> passes.</p>
+        <figure class="figure"><a class="zoom" href="../../diagrams/04-sdlc-gates.svg"
+            aria-label="Enlarge: Six SDLC phases with keywords, lane and gate"><img
+              src="../../diagrams/04-sdlc-gates.svg" alt="Six SDLC phases with keywords, lane and gate" width="1120"
+              height="736" loading="lazy" decoding="async"></a>
+          <figcaption>The six phases, the words that trigger them, their lane and the gate to pass.</figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>Triggered by words such as…</th>
+                <th>Exit gate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>01 Requirements</td>
+                <td>requisito, idea, alcance, historia, objetivo, épica</td>
+                <td>objective + scope + out of scope + owner</td>
+              </tr>
+              <tr>
+                <td>02 Design</td>
+                <td>diseño, arquitectura, ADR, diagrama, esquema</td>
+                <td>ADR recorded + no circular dependencies</td>
+              </tr>
+              <tr>
+                <td>03 Implementation</td>
+                <td>crea, genera, implementa, fix, bug, refactor, endpoint</td>
+                <td>SOLID + preview + checkpoint + build and test</td>
+              </tr>
+              <tr>
+                <td>04 Testing</td>
+                <td>test, prueba, coverage, QA, e2e, unit</td>
+                <td>happy path + edge + error for every public method</td>
+              </tr>
+              <tr>
+                <td>05 Deployment</td>
+                <td>deploy, pipeline, docker, release, rollback, terraform, aws</td>
+                <td>green pipeline + human approval + rollback ready</td>
+              </tr>
+              <tr>
+                <td>06 Maintenance</td>
+                <td>logs, deuda, upgrade, incidente, postmortem, oncall</td>
+                <td>runbook + alert + service owner</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 id="fable-5-the-five-design-rules">FABLE-5: the five design rules</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Letter</th>
+                <th>Principle</th>
+                <th>How you notice it</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>F</strong></td>
+                <td>Fingerprint-first</td>
+                <td>It detects your real stack before proposing anything.</td>
+              </tr>
+              <tr>
+                <td><strong>A</strong></td>
+                <td>Ask-before-act</td>
+                <td>Every write and every risky route asks for confirmation.</td>
+              </tr>
+              <tr>
+                <td><strong>B</strong></td>
+                <td>Bounded preview</td>
+                <td>A change plans at most <strong>6 files</strong>; more than that must be split into batches.</td>
+              </tr>
+              <tr>
+                <td><strong>L</strong></td>
+                <td>Legible-first</td>
+                <td>Every answer states lane, stack, phase, gate and economy.</td>
+              </tr>
+              <tr>
+                <td><strong>E</strong></td>
+                <td>Evidence-always</td>
+                <td>Every decision lands in <code>.alpaquitay/decisions.jsonl</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 id="what-guards-a-write">What guards a write</h2>
+        <p>Review agent activity and diffs in <strong>Changes</strong>. Its <strong>Apply &amp; run gates</strong> and
+          <strong>Discard all</strong> buttons act on every pending diff; applying starts the same guarded flow as
+          <code>si aplicar</code>, and discarding is equivalent to <code>no</code>.</p>
+        <p>When you reply <code>si aplicar</code> (or click <strong>Apply &amp; run gates</strong>), for <strong>each
+            pending file</strong>:</p>
+        <ol>
+          <li><strong>Write policy.</strong> Files that <em>are</em> secrets are always denied: <code>.env</code>,
+            <code>*.pem</code>, <code>*.key</code>, <code>id_rsa</code>, <code>id_ed25519</code>, <code>secrets/</code>
+            folders, credential or token files. Writing <code>spec.md</code> needs confirmation and a backup.</li>
+          <li><strong>Automatic review</strong> (no model). It <strong>blocks</strong> when the file is outside the
+            detected source folders or the content looks like a literal secret (API keys, private keys, AWS keys,
+            <code>sk-…</code>, <code>ghp_…</code>, JWTs). It <strong>warns</strong> when the file passes 400 lines, when
+            <code>console.log</code>, <code>print(</code>, <code>TODO</code> or <code>FIXME</code> remain, or when the
+            change changes nothing.</li>
+          <li><strong>Git checkpoint.</strong> Before writing it saves a stash named
+            <code>alpaquitay/apply-diffs-&lt;date&gt;</code> and re-applies it, so your work stays in the tree and you
+            also get a way back. Without Git it carries on without a checkpoint and says so.</li>
+          <li><strong>Write and verify.</strong> It writes the approved files and runs the real build and test commands
+            detected by <code>onboard</code>.</li>
+        </ol>
+        <p>To go back after a <code>si aplicar</code>, find the stash with <code>git stash list</code> (Alpaquitay's
+          start with <code>alpaquitay/</code>) and restore it with <code>git stash apply stash@{N}</code>.</p>
+        <h2 id="the-definition-of-done-dod">The Definition of Done (DoD)</h2>
+        <p>A card moves to <strong>Done</strong> only when it passes the DoD gate:</p>
+        <ul>
+          <li>no diffs are left unapplied (<code>si aplicar</code> or <code>no</code> first);</li>
+          <li>for code projects, the <strong>platform contract</strong> is verified by an explicit <code>onboard</code>
+            run and saved for the current stack;</li>
+          <li>for code projects, build and tests <strong>really ran</strong> and came back green. Knowing which command
+            to run does not count as having run it.</li>
+        </ul>
+        <p>Projects with no source code (for example, only PDFs, Markdown and HTML) skip the contract and quality
+          evidence checks; pending diffs still block Done. The gate reads the saved contract without creating one and
+          runs the exact build and test commands stored in <code>.alpaquitay/platform.json</code>. If the stack is not
+          detected, confirm both commands with
+          <code>onboard {&quot;build&quot;:&quot;...&quot;,&quot;test&quot;:&quot;...&quot;}</code>.</p>
+        <p>If something fails, the card stays <em>In Progress</em> and the chat shows what blocks it, with an automatic,
+          blameless postmortem.</p>
+        <h2 id="agentic-debt">Agentic debt</h2>
+        <p>Every risky decision adds debt and every gate passed pays some back. The meter runs from 0 to 100; <strong>at
+            100 the Build lane is blocked</strong> until you pay it down.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Points</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Pending diff left unresolved</td>
+                <td>+2</td>
+              </tr>
+              <tr>
+                <td>Postmortem (something failed)</td>
+                <td>+10</td>
+              </tr>
+              <tr>
+                <td>DoD blocked</td>
+                <td>+15</td>
+              </tr>
+              <tr>
+                <td>Deployment without a rollback plan</td>
+                <td>+25</td>
+              </tr>
+              <tr>
+                <td>Any other recorded decision</td>
+                <td>+1</td>
+              </tr>
+              <tr>
+                <td>Successful <code>si aplicar</code></td>
+                <td>−5</td>
+              </tr>
+              <tr>
+                <td>Verified <em>Done</em></td>
+                <td>−8</td>
+              </tr>
+              <tr>
+                <td><code>onboard</code></td>
+                <td>−10</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Above 70 the harness warns you (<em>alta, revisa antes de seguir</em>: high, review before going on). Check
+          the meter with <code>deuda</code> in the chat or in the <a href="../evidence/">Evidence</a> tab.</p>
+        <h2 id="session-economy">Session economy</h2>
+        <p>The harness counts how many operations it solved <strong>locally, for free</strong> (<code>dora</code>,
+          <code>deuda</code>, <code>postmortem</code>, <code>diff</code>, reviews, <code>economía</code>) against how
+          many <strong>model calls</strong> it made. Type <code>economía</code> to see it. Its advice: short questions
+          in Flash, <code>onboard</code> once, diffs in batches.</p>
+        <h2 id="where-to-look-if-you-want-to-audit">Where to look if you want to audit</h2>
+        <p>Everything is text in your repository. <code>decisions.jsonl</code> has one JSON line per decision, with its
+          route, lane, confidence and reasons; <code>debt.json</code> keeps the last 50 debt events. You can read them,
+          commit them or process them with your own tools.</p>
 
-<div class="doc-foot">
-  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/03-harness.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.8.2 · MIT</span>
-</div>
-<nav class="pager" aria-label="Chapters">
-<a class="prev" href="../providers/"><span>Previous</span>Providers and privacy</a>
-<a class="next" href="../work/"><span>Next</span>Work · spec, board and chat</a>
-</nav>
-</article>
-<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#the-five-stages">The five stages</a></li><li class="l2"><a href="#the-three-lanes">The three lanes</a></li><li class="l2"><a href="#the-six-sdlc-phases-and-their-gates">The six SDLC phases and their gates</a></li><li class="l2"><a href="#fable-5-the-five-design-rules">FABLE-5: the five design rules</a></li><li class="l2"><a href="#what-guards-a-write">What guards a write</a></li><li class="l2"><a href="#the-definition-of-done-dod">The Definition of Done (DoD)</a></li><li class="l2"><a href="#agentic-debt">Agentic debt</a></li><li class="l2"><a href="#session-economy">Session economy</a></li><li class="l2"><a href="#where-to-look-if-you-want-to-audit">Where to look if you want to audit</a></li></ul></nav>
-</main>
-</div>
-<div class="search" id="search" hidden>
-  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
-    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
-    <ol id="searchResults" class="search-results"></ol>
-    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+        <div class="doc-foot">
+          <a class="edit"
+            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/03-harness.md">Suggest an
+            improvement to this page</a>
+          <span>Manual for Alpaquitay AI 3.8.3 · MIT</span>
+        </div>
+        <nav class="pager" aria-label="Chapters">
+          <a class="prev" href="../providers/"><span>Previous</span>Providers and privacy</a>
+          <a class="next" href="../work/"><span>Next</span>Work · spec, board and chat</a>
+        </nav>
+      </article>
+      <nav class="toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul>
+          <li class="l2"><a href="#the-five-stages">The five stages</a></li>
+          <li class="l2"><a href="#the-three-lanes">The three lanes</a></li>
+          <li class="l2"><a href="#the-six-sdlc-phases-and-their-gates">The six SDLC phases and their gates</a></li>
+          <li class="l2"><a href="#fable-5-the-five-design-rules">FABLE-5: the five design rules</a></li>
+          <li class="l2"><a href="#what-guards-a-write">What guards a write</a></li>
+          <li class="l2"><a href="#the-definition-of-done-dod">The Definition of Done (DoD)</a></li>
+          <li class="l2"><a href="#agentic-debt">Agentic debt</a></li>
+          <li class="l2"><a href="#session-economy">Session economy</a></li>
+          <li class="l2"><a href="#where-to-look-if-you-want-to-audit">Where to look if you want to audit</a></li>
+        </ul>
+      </nav>
+    </main>
   </div>
-</div>
-<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
-<script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+  <div class="search" id="search" hidden>
+    <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+      <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off"
+        aria-label="Search text">
+      <ol id="searchResults" class="search-results"></ol>
+      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+    </div>
+  </div>
+  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+  <script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
+
 </html>
