@@ -14,7 +14,7 @@ Alpaquitay no trae un modelo propio en la nube ni pasa tus datos por un servidor
 |---|---|---|---|---|
 | **Ollama** | Tu equipo | Todo en local | Gratis | Instala Ollama y descarga un modelo (`ollama pull <modelo>`). Se detecta en `http://localhost:11434`. |
 | **LM Studio** | Tu equipo | Todo en local | Gratis | Carga un modelo en LM Studio y arranca su servidor local. Se detecta en `http://localhost:1234`. |
-| **Modelo local (WebGPU)** | Dentro de VS Code, en tu GPU | Todo en local (solo descarga una vez el modelo firmado) | Gratis | `alpaquitay-ai.localEngine.enabled: true`. Ver [Motor local](../motor-local/). |
+| **Alpaquitay AI · Qwen 2.5 (on-device)** | Dentro de VS Code, en tu GPU | Todo en local (descarga inicial del modelo firmado) | Gratis | Actívalo en el selector de proveedor de **Settings**; modelo Qwen2.5-Coder 1.5B. Ver [Motor local](../motor-local/). |
 | **Anthropic Claude** | Nube de Anthropic | Llamada directa, con límite de privacidad | Precio de la API | Clave de API en el llavero del sistema. |
 | **OpenAI** | Nube de OpenAI (o Azure OpenAI) | Llamada directa, con límite de privacidad | Precio de la API | Clave de API en el llavero del sistema. |
 

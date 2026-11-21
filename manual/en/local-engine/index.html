@@ -159,7 +159,7 @@
 <p>This is a 1.5-billion-parameter model. It writes good <strong>first drafts</strong> of specs; it does not replace a large model. If the result does not follow the <code>spec.md</code> format, the command warns you so you can review it.</p>
 </aside>
 <h2 id="using-it-as-an-ai-provider">Using it as an AI provider</h2>
-<p>Besides the command, the engine can be one more provider, like Ollama:</p>
+<p>Besides the command, the engine can be one more provider, like Ollama. In <strong>Settings → AI Provider</strong>, select <strong>Alpaquitay AI · Qwen 2.5 (on-device)</strong> and enable the engine. On first use, confirm the signed model download; VS Code shows progress and required disk space before using it. Qwen2.5-Coder 1.5B runs on your machine, and your prompts are never sent to the CDN.</p>
 <div class="code" data-lang="JSON"><pre><code class="language-json">{
   &quot;alpaquitay-ai.localEngine.enabled&quot;: true,
   &quot;alpaquitay-ai.preferredProvider&quot;: &quot;local-wasm&quot;

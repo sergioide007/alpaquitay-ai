@@ -51,7 +51,7 @@ caption: Se abre el Hub con `Ctrl+Alt+A` y se recorren sus seis pestañas: Work,
 Busca cualquier tema con <kbd>Ctrl</kbd>+<kbd>K</kbd> (o <kbd>/</kbd>). Cada página tiene al final un enlace para proponer mejoras en GitHub: este manual es de la comunidad. También está [en inglés](en/) (botón **EN** arriba).
 
 > [!NOTE]
-> El manual describe la versión **3.8.1**. Incluye la pestaña **Changes** para seguir el progreso y revisar los diffs del agente, con botones para aplicar o descartar todos los cambios pendientes. También incluye el motor local (WebGPU), *Generate Specification (Local Model)* y la página de modelos.
+> El manual describe la versión **3.8.2**. Incluye la pestaña **Changes** para seguir el progreso y revisar los diffs del agente, con acciones para revisar y aplicar o descartar los cambios pendientes. También incluye el proveedor local Qwen 2.5 con WebGPU, *Generate Specification (Local Model)* y la página de modelos.
 
 ## Principios que vas a ver en todas partes
 

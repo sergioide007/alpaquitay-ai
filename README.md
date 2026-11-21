@@ -11,8 +11,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.85.0-blue)](https://github.com/sergioide007/alpaquitay-ai/releases)
-[![Version](https://img.shields.io/badge/version-3.8.1-green)](./CHANGELOG.md)
-[![Tests](https://img.shields.io/badge/tests-711%20passing-brightgreen)](./package.json)
+[![Version](https://img.shields.io/badge/version-3.8.2-green)](./CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-737%20passing-brightgreen)](./package.json)
 [![Marketplace](https://img.shields.io/badge/VS%20Marketplace-published-green)](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-published-green)](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai)
 [![Stars](https://img.shields.io/github/stars/sergioide007/alpaquitay-ai?style=social)](https://github.com/sergioide007/alpaquitay-ai/stargazers)
@@ -53,7 +53,7 @@ The Hub tells you what to do next instead of making you remember the commands.
 
 - **Next-step bar.** Under the tabs it follows *Spec → Build → Review → Verify* and shows one primary button: **Create spec with AI**, **Start SPEC-00x**, **Review changes**, **Apply & run gates** or **Validate against spec**, depending on where the project is.
 - **Start buttons.** Every card in *Backlog*, *Todo* and *In Progress* has **Start** / **Resume**; dragging still works.
-- **Quick actions.** Above the chat input: *Build next task*, *Validate*, *Tests*, *Refactor* and, when diffs are pending, *Apply changes*.
+- **Quick actions.** Above the chat input: *Build next task*, *Validate*, *Tests*, *Refactor* and, when diffs are pending, *Review and apply* or *Discard changes*.
 - **Command palette.** `Ctrl+K` (`Cmd+K` on macOS) searches every tab, action and agent.
 
 | Shortcut | Action |
@@ -99,7 +99,7 @@ These events flow from the extension host → the Hub webview → the **Changes*
 
 1. Install **Alpaquitay AI** from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai) or [Open VSX](https://open-vsx.org/extension/alpaquitay-ai/alpaquitay-ai).
 2. Press `Ctrl+Alt+A` to open the Hub, then add a provider in **Settings** — a local model ([Ollama](https://ollama.com) / LM Studio) keeps everything on your machine.
-3. **Code:** open the **Work** tab, generate a `spec.md`, and drag a task to *In Progress*.
+3. **Code:** open the **Work** tab, generate a `spec.md`, move a task from *Backlog* to *Todo*, then start it in *In Progress*.
 4. **Writing:** open the **Docs** tab, pick a `.docx`, `.md`, `.epub` or `.pdf`, and tell the agent what to do.
 5. **Live changes:** click **Changes** to inspect proposed file diffs and see them move to applied or discarded. Use **Apply all** to review, write all pending diffs and run the quality gates, or **Discard all** to reject them.
 
@@ -156,7 +156,7 @@ The harness detects the SDLC phase from the request and only lets it advance whe
 
 ## Core SDD Workflow
 
-![SDD workflow — drag card to In Progress, AI codes, task moves to Done](https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/media/demo-sdd.gif)
+![Kanban task running in In Progress; the DoD gate keeps it there when the sample build fails](https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/media/demo-sdd.gif)
 
 ```
   spec.md ──► Kanban Board ──► AI implements task ──► spec.md [x] ──► git #SPEC-XXX
@@ -166,16 +166,17 @@ The harness detects the SDLC phase from the request and only lets it advance whe
 ```
 
 1. Write (or AI-generate) a `spec.md` with epics and tasks
-2. Drag a task card to **In Progress** on the board
-3. The AI scans the workspace, plans which files to create, and writes the code
-4. The task auto-moves to **Done** and `spec.md` is updated (`- [x]`)
-5. Git commits reference `#SPEC-001` — every change is traceable to a requirement
+2. Prioritize a task by moving it from **Backlog** to **Todo**
+3. Start it from **Todo** to move it to **In Progress**; the AI plans and proposes bounded diffs
+4. Review the proposed changes, then choose **Review and apply** or **Discard changes**
+5. The harness runs the applicable checks; the task reaches **Done** and `spec.md` is checked only when its Definition of Done is satisfied
+6. Git commits reference `#SPEC-001` — every change is traceable to a requirement
 
 ---
 
 ### How a task runs
 
-Dragging a card to **In Progress** never writes silently. The agent plans up to 6 files, generates them, and stores the result as a **bounded diff**. Nothing touches disk until you answer `si aplicar` (or `no` to discard). On apply, PolicyGuard and AgentReview check each file, a git checkpoint is taken, files are written, and **real build and test commands** run. Code tasks reach **Done** only with a contract verified by `onboard` and green build/test evidence; docs-only projects can pass without those checks, but pending diffs always block Done.
+The normal path is **Backlog → Todo → In Progress → Done**. Moving a card to **Todo** prioritizes it; starting it from Todo begins implementation. Review is a state within **In Progress**, not a fifth column: the agent plans up to 6 files and stores its proposal as bounded diffs. Nothing touches disk until you choose **Review and apply** (or **Discard changes**). PolicyGuard and AgentReview inspect each file, a Git checkpoint is taken, and the applicable build/test checks run. The task reaches **Done** only when its Definition of Done has evidence; code tasks require the configured contract and green checks, while docs-only projects can use their applicable criteria. Pending diffs always block Done.
 
 
 <p align="center"><img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/docs/diagrams/03-sdd-task-sequence.png" alt="Sequence diagram of task execution: plan, generate, diff preview, approve, apply, prove, outcome"></p>
@@ -203,7 +204,7 @@ ovsx install alpaquitay-ai.alpaquitay-ai
 
 #### Step 2 — Configure a provider
 
-![Configuring an AI provider — local Ollama or cloud API key](https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/media/demo-providers.gif)
+![First use of the Alpaquitay AI local Qwen 2.5 model, including download confirmation and generation](https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/media/demo-providers.gif)
 
 **Local (free, fully private):**
 
@@ -236,7 +237,7 @@ In the **Work** tab → **Spec** pane → click **+ Create with AI** (or **Regen
 
 #### Step 5 — Work tasks
 
-On the **Board** pane, all tasks start in **Backlog**. Drag one to **In Progress** — the AI immediately starts implementing it and streams progress to the **Chat** pane.
+On the **Board** pane, all tasks start in **Backlog**. Move a task to **Todo** to prioritize it, then use **Start** (or move it to **In Progress**) to begin. Review the proposed diffs, apply or discard them, and resolve any DoD checks shown in the chat before the card can reach **Done**.
 
 ---
 
@@ -341,7 +342,7 @@ Run a small ONNX language model (default: Qwen2.5-Coder 1.5B Instruct) **inside 
 
 **Security model, in one paragraph:** the CDN is treated as untrusted. Each model manifest is **signed with Ed25519** and lists a **SHA-256 for every 8 MiB block** of every file; the Webview refuses any byte that does not match, any file that is not listed, and any older signed manifest (anti-rollback). The ONNX Runtime files are **pinned by hash inside the extension**, and the Webview's CSP allows no remote script origin. The manifest is fetched **without any decompression**, so no decoder parses network bytes before the signature check. CDN address, model and trusted keys can only be set in *user* settings, never by a workspace. Threat model, failure register and the answers to the objections architects raise: [`docs/LOCAL-ENGINE.md`](./docs/LOCAL-ENGINE.md).
 
-**Use it as a provider:** set `alpaquitay-ai.localEngine.enabled: true`. The engine then appears as a local provider (`local-wasm`): `auto` tries Ollama and LM Studio first and falls back to it, and you can pick it with `alpaquitay-ai.preferredProvider: "local-wasm"`.
+**Use it as a provider:** enable **Alpaquitay AI · Qwen 2.5 (on-device)** in **Settings → AI Provider** (or set `alpaquitay-ai.localEngine.enabled: true`). On first use, confirm the signed model download; its progress and disk use are shown in VS Code. The engine appears as `local-wasm`: `auto` tries Ollama and LM Studio first, then falls back to it. You can also select it with `alpaquitay-ai.preferredProvider: "local-wasm"`.
 
 **Set it up with a real model** (selective download, graph preparation, staging, signing, deploying the Worker and verifying the live CDN): [`docs/LOCAL-ENGINE.md` §6–7](./docs/LOCAL-ENGINE.md#6-choosing-the-model-measured-2026-11-15) and [`worker/README.md`](./worker/README.md). The signing key is generated on your machine (`npm run cdn:keygen`); the repository ships with none.
 
@@ -393,7 +394,7 @@ The canvas infers the real system from manifests, Docker Compose and `spec.md`, 
 |---|---|---|---|---|
 | Ollama | Local | 100% on-device | Free | `ollama pull <model>` |
 | LM Studio | Local | 100% on-device | Free | Load model, start server |
-| Local model (WebGPU / Wasm) | Local | 100% on-device (one-time model download from the CDN) | Free | `alpaquitay-ai.localEngine.enabled: true` |
+| Alpaquitay AI · Qwen 2.5 (on-device) | Local | 100% on-device (signed model download on first use) | Free | Choose it in **Settings → AI Provider** or enable `alpaquitay-ai.localEngine.enabled` |
 | Anthropic Claude | Cloud | Direct API | API pricing | API key in keychain |
 | OpenAI GPT | Cloud | Direct API | API pricing | API key in keychain |
 
