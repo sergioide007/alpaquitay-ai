@@ -14,3 +14,13 @@ routes = [
 [[r2_buckets]]
 binding = "MODELS"
 bucket_name = "alpaquitay-models"
+
+# Edge cache (Cloudflare "Workers Cache", needs Wrangler >= 4.107.0). Switched on for the ModelsCache entrypoint ONLY:
+# the default entrypoint is the gateway and must run on every request (CORS per origin, Range, manifests, the multi-GB
+# weights). There is deliberately no top-level [cache] block. To turn the edge cache off, set enabled = false and
+# redeploy: ModelsCache keeps working, it just runs (and reads R2) on every request, exactly as before this block.
+[exports.ModelsCache]
+type = "worker"
+
+  [exports.ModelsCache.cache]
+  enabled = true

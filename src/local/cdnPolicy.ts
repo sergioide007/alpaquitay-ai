@@ -101,6 +101,42 @@ export function cacheControlFor(pathname: string): string {
     : 'public, max-age=31536000, immutable, no-transform';
 }
 
+// ── Edge cache (Cloudflare "Workers Cache") ──
+//
+// Only small, static files go through the cached entrypoint. Everything else keeps the exact byte-for-byte path it
+// always had (R2 → Worker → client), because Workers Cache strips `Range` before calling the Worker and cannot store
+// anything above Cloudflare's 512 MB cap (Free-plan limit, applied to every plan at launch).
+
+/** Objects larger than this are never routed through the edge cache. Far below the 512 MB cap on purpose. */
+export const EDGE_CACHE_MAX_BYTES = 128 * 1024 * 1024;
+/** ONNX Runtime lives in a folder named after its version: its bytes never change under a given URL. */
+export const EDGE_TTL_RUNTIME_SECONDS = 7 * 24 * 3600;
+/**
+ * Model files sit under FIXED paths (`/models/<id>/…`) and are overwritten in place when a revision is published, so
+ * the edge copy must expire fast: a stale tokenizer next to a fresh signed manifest fails the hash check. The browser
+ * keeps its one-year `immutable` header (see cacheControlFor); this value is edge-only and never reaches the client.
+ */
+export const EDGE_TTL_MODEL_SECONDS = 3600;
+
+/**
+ * Edge TTL in seconds, or `undefined` when the path must ALWAYS be served straight from R2:
+ *  - manifests: the revalidation point, a stale copy next to freshly uploaded files breaks every client;
+ *  - `.onnx_data`: the multi-GB weights, above the cache cap and the one file that depends on real `Range` support.
+ */
+export function edgeTtlFor(pathname: string): number | undefined {
+  if (pathname.endsWith('/manifest.json') || pathname.endsWith('/manifest.sig.json')) { return undefined; }
+  if (extensionOf(pathname) === 'onnx_data') { return undefined; }
+  return pathname.startsWith(`${MODELS_PATH_PREFIX}runtime/`) ? EDGE_TTL_RUNTIME_SECONDS : EDGE_TTL_MODEL_SECONDS;
+}
+
+/** RFC 9110 weak comparison for `If-None-Match` (a list, `*`, or `W/"…"` entries). */
+export function etagMatches(ifNoneMatch: string | null | undefined, etag: string | null | undefined): boolean {
+  if (!ifNoneMatch || !etag) { return false; }
+  const strip = (v: string) => v.trim().replace(/^W\//, '');
+  const want = strip(etag);
+  return ifNoneMatch.split(',').some(candidate => { const c = strip(candidate); return c === '*' || c === want; });
+}
+
 export function contentRangeHeader(range: { offset?: number; length?: number }, size: number): string | undefined {
   if (range.offset === undefined || range.length === undefined || range.length <= 0) { return undefined; }
   return `bytes ${range.offset}-${range.offset + range.length - 1}/${size}`;

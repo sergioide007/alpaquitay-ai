@@ -8,6 +8,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.10.0] — 2026-11-22
+
+### Added
+- **Edge caching with per-origin CORS & range bypass** (`alpaquitay.specsolid.com`):
+  - Propagated real Cloudflare cache status (`Cf-Cache-Status`) into `X-Edge-Cache` (`HIT` / `BYPASS`) alongside `X-Edge-Filled-At` without introducing cache state into the gateway itself.
+  - Shared a single cache entry across distinct `vscode-webview://*` origins while returning the matching `Access-Control-Allow-Origin` per request (avoiding WebView cache fragmentation and cross-origin CORS leakage).
+  - Bypassed edge cache (`X-Edge-Cache: BYPASS`, `206 Partial Content`, `Content-Range`) for `Range` requests on large weight files (`model_q4f16.onnx_data`, ~1.34 GB) and small files (`tokenizer.json`) so they stream directly from R2.
+
 ## [3.9.1] — 2026-11-21
 
 ### Fixed
