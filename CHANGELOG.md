@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.10.1] — 2026-11-26
+
+### Fixed
+- Specification generation now rescans the workspace before every regeneration and carries verified repository context into both the first prompt and its retry. Existing Maven/Java projects therefore keep their language, build tool and source layout instead of being proposed as new TypeScript or generic Spring Boot projects.
+- Workspace discovery now traverses nested source trees, detects `src/main/java` and `src/test/java`, and invalidates shallow legacy fingerprints. Java path hints, tests and Clean Architecture refactor plans use `.java` paths and retain Maven/Gradle as authoritative evidence.
+- Requests for Clean Architecture are scoped as gradual refactors of the existing repository: inventory, package migration, import updates and regression tests, without inventing unrelated endpoints or product features.
+
+---
+
 ## [3.10.0] — 2026-11-22
 
 ### Added
