@@ -8,6 +8,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.10.2] — 2026-11-26
+
+### Fixed
+- Replaced `<picture>` and `<source>` theme-switching tags in `README.md` with a standard `<img>` element so raw HTML tags no longer render as plain text on the Visual Studio Marketplace.
+- Updated the header logo asset to keep visibility across light and dark backgrounds.
+
+---
+
 ## [3.10.1] — 2026-11-26
 
 ### Fixed
