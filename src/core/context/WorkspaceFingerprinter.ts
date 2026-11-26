@@ -2,13 +2,16 @@ import { MCPExecutor } from '../interfaces';
 export type PkgManager = 'npm'|'pnpm'|'pip'|'maven'|'gradle'|'go'|'cargo'|'composer'|'dotnet'|'unknown';
 export interface LanguageShare { name: string; pct: number; }
 export interface WorkspaceFingerprint {
-  version: 1; roots: string[]; sourceDirs: string[];
+  /** Increment when discovery semantics change so an old on-disk scan is never trusted. */
+  version: 2; roots: string[]; sourceDirs: string[];
   languages: LanguageShare[]; frameworks: string[];
   entryPoints: string[]; pkgManager: PkgManager;
   hasSpec: boolean; monorepo: boolean; scannedAt: string;
 }
 const FILE = '.alpaquitay/fingerprint.json';
 const IGNORED = new Set(['node_modules','.venv','venv','__pycache__','target','dist','build','.git','.alpaquitay','vendor','bin','obj','.next']);
+const MAX_SCAN_DIRECTORIES = 160;
+const MAX_SCAN_DEPTH = 8;
 const EXT: Record<string,string> = {
   ts: 'TypeScript', tsx: 'TypeScript', js: 'JavaScript', jsx: 'JavaScript', mjs: 'JavaScript', cjs: 'JavaScript',
   py: 'Python', java: 'Java', kt: 'Kotlin', kts: 'Kotlin', go: 'Go', rs: 'Rust', php: 'PHP', rb: 'Ruby',
@@ -21,6 +24,33 @@ const EXT: Record<string,string> = {
   s: 'Assembly', asm: 'Assembly', sol: 'Solidity', ipynb: 'Jupyter Notebook',
 };
 export const SOURCE_CODE_EXTENSIONS = [...Object.keys(EXT), 'C', 'H', 'R', 'S'];
+
+type WorkspaceEntry = { name: string; isDirectory: boolean };
+
+/**
+ * Retain source roots, rather than incidental package folders.  A Java class at
+ * `src/main/java/com/acme/App.java` belongs to `src/main/java`, not `com/acme`.
+ */
+function sourceRootFor(path: string): string {
+  const parts = path.split('/').filter(Boolean);
+  const main = parts.findIndex((part, index) => part === 'src' && parts[index + 1] === 'main' && parts[index + 2] === 'java');
+  if (main >= 0) { return parts.slice(0, main + 3).join('/'); }
+  const test = parts.findIndex((part, index) => part === 'src' && parts[index + 1] === 'test' && parts[index + 2] === 'java');
+  if (test >= 0) { return parts.slice(0, test + 3).join('/'); }
+  const src = parts.lastIndexOf('src');
+  if (src >= 0) { return parts.slice(0, src + 1).join('/'); }
+  return path;
+}
+
+function sourceDirOrder(left: string, right: string): number {
+  const rank = (path: string): number => {
+    if (/\/src\/main\/java$/.test(`/${path}`)) { return 0; }
+    if (/\/src\/test\/java$/.test(`/${path}`)) { return 2; }
+    if (/(^|\/)test(s)?($|\/)/i.test(path)) { return 2; }
+    return 1;
+  };
+  return rank(left) - rank(right) || left.localeCompare(right);
+}
 // Invariante Cap.09 Codigo Sintetico: NUNCA asumir src/. Todo sourceDir evidenciado.
 // Uncle Bob: el framework es un detalle. Fowler: pasos pequenos y reversibles.
 export class WorkspaceFingerprinter {
@@ -33,7 +63,9 @@ export class WorkspaceFingerprinter {
       try {
         const f = await this.mcp.executeTool('filesystem','read_file',{ path: FILE }) as { content: string };
         const p = JSON.parse(f.content) as WorkspaceFingerprint;
-        if (p?.version === 1 && Array.isArray(p.sourceDirs)) { this.cached = p; return p; }
+        // Version 1 only inspected one directory level, which misses Maven's
+        // `src/main/java` tree.  Force one fresh scan after upgrading.
+        if (p?.version === 2 && Array.isArray(p.sourceDirs)) { this.cached = p; return p; }
       } catch { /* cold start */ }
     }
     const fp = await this.scan();
@@ -45,8 +77,8 @@ export class WorkspaceFingerprinter {
   invalidate(): void { this.cached = null; this.forceScan = true; }
   async refresh(): Promise<WorkspaceFingerprint> { this.invalidate(); return this.fingerprint(); }
   private async scan(): Promise<WorkspaceFingerprint> {
-    const fp: WorkspaceFingerprint = { version: 1, roots: ['.'], sourceDirs: [], languages: [], frameworks: [], entryPoints: [], pkgManager: 'unknown', hasSpec: false, monorepo: false, scannedAt: new Date().toISOString() };
-    let top: Array<{ name: string; isDirectory: boolean }> = [];
+    const fp: WorkspaceFingerprint = { version: 2, roots: ['.'], sourceDirs: [], languages: [], frameworks: [], entryPoints: [], pkgManager: 'unknown', hasSpec: false, monorepo: false, scannedAt: new Date().toISOString() };
+    let top: WorkspaceEntry[] = [];
     try { top = await this.mcp.executeTool('filesystem','list_files',{ path: '.' }) as typeof top; } catch { return fp; }
     const names = new Set(top.map(e => e.name));
     const fw = (s: string) => { if (!fp.frameworks.includes(s)) { fp.frameworks.push(s); } };
@@ -58,8 +90,11 @@ export class WorkspaceFingerprinter {
     else if (names.has('package.json')) { fp.pkgManager = 'npm'; }
     if (names.has('manage.py')) { fw('Django + DRF'); fp.pkgManager = 'pip'; ent('manage.py'); }
     else if (names.has('pyproject.toml') || names.has('requirements.txt')) { fw(await this.refinePy(names)); fp.pkgManager = 'pip'; }
-    if (names.has('pom.xml')) { fw('Java + Maven'); fp.pkgManager = 'maven'; ent('pom.xml'); }
-    if (names.has('build.gradle') || names.has('build.gradle.kts')) { fw('Spring Boot'); fp.pkgManager = 'gradle'; }
+    if (names.has('pom.xml')) { fw(await this.refineMaven()); fp.pkgManager = 'maven'; ent('pom.xml'); }
+    if (names.has('build.gradle') || names.has('build.gradle.kts')) {
+      const buildFile = names.has('build.gradle.kts') ? 'build.gradle.kts' : 'build.gradle';
+      fw(await this.refineGradle(buildFile)); fp.pkgManager = 'gradle'; ent(buildFile);
+    }
     if (names.has('go.mod')) { fw('Go modules'); fp.pkgManager = 'go'; ent('go.mod'); }
     if (names.has('Cargo.toml')) { fw('Rust Cargo'); fp.pkgManager = 'cargo'; }
     if (names.has('composer.json')) { fw('PHP Composer'); fp.pkgManager = 'composer'; }
@@ -68,18 +103,35 @@ export class WorkspaceFingerprinter {
       if (!e.isDirectory && /^spec\.md$/i.test(e.name)) { fp.hasSpec = true; }
     }
     const counts = new Map<string,number>();
-    for (const e of top) {
-      if (!e.isDirectory || IGNORED.has(e.name)) { continue; }
-      let sub: Array<{ name: string; isDirectory: boolean }> = [];
-      try { sub = await this.mcp.executeTool('filesystem','list_files',{ path: e.name }) as typeof sub; } catch { continue; }
-      let code = 0;
-      for (const f of sub.slice(0,40)) {
-        if (f.isDirectory) { continue; }
-        const lang = EXT[(f.name.split('.').pop() ?? '').toLowerCase()];
-        if (lang) { code++; counts.set(lang,(counts.get(lang) ?? 0)+1); }
+    const sourceDirs = new Set<string>();
+    const queue = top
+      .filter(entry => entry.isDirectory && !IGNORED.has(entry.name))
+      .map(entry => ({ path: entry.name, depth: 1 }));
+    let scanned = 0;
+    while (queue.length > 0 && scanned < MAX_SCAN_DIRECTORIES) {
+      const current = queue.shift()!;
+      let entries: WorkspaceEntry[] = [];
+      try { entries = await this.mcp.executeTool('filesystem', 'list_files', { path: current.path }) as WorkspaceEntry[]; } catch { continue; }
+      scanned++;
+      for (const entry of entries.slice(0, 120)) {
+        if (entry.isDirectory) {
+          if (current.depth < MAX_SCAN_DEPTH && !IGNORED.has(entry.name)) {
+            queue.push({ path: `${current.path}/${entry.name}`, depth: current.depth + 1 });
+          }
+          continue;
+        }
+        const language = EXT[(entry.name.split('.').pop() ?? '').toLowerCase()];
+        if (!language) { continue; }
+        counts.set(language, (counts.get(language) ?? 0) + 1);
+        sourceDirs.add(sourceRootFor(current.path));
       }
-      if (code >= 1) { fp.sourceDirs.push(e.name); }
     }
+    // The build file is evidence of Java even in a repository whose source tree
+    // has not been created yet.  Do not let an empty Maven repo become TypeScript.
+    if ((fp.pkgManager === 'maven' || fp.pkgManager === 'gradle') && !counts.has('Java')) {
+      counts.set('Java', 1);
+    }
+    fp.sourceDirs = [...sourceDirs].sort(sourceDirOrder);
     const total = [...counts.values()].reduce((a,b) => a+b, 0) || 1;
     fp.languages = [...counts.entries()].map(([name,n]) => ({ name, pct: Math.round(n/total*100) })).sort((a,b) => b.pct-a.pct).slice(0,4);
     if (fp.sourceDirs.length === 0 && top.length > 0) { fp.sourceDirs = ['.']; }
@@ -112,5 +164,19 @@ export class WorkspaceFingerprinter {
       } catch { /* next */ }
     }
     return 'Python';
+  }
+  private async refineMaven(): Promise<string> {
+    try {
+      const f = await this.mcp.executeTool('filesystem', 'read_file', { path: 'pom.xml' }) as { content: string };
+      if (/spring-boot|org\.springframework/i.test(f.content)) { return 'Java + Spring Boot + Maven'; }
+    } catch { /* marker is still enough to identify Maven */ }
+    return 'Java + Maven';
+  }
+  private async refineGradle(path: string): Promise<string> {
+    try {
+      const f = await this.mcp.executeTool('filesystem', 'read_file', { path }) as { content: string };
+      if (/spring-boot|org\.springframework/i.test(f.content)) { return 'Java + Spring Boot + Gradle'; }
+    } catch { /* marker is still enough to identify Gradle */ }
+    return 'Java + Gradle';
   }
 }

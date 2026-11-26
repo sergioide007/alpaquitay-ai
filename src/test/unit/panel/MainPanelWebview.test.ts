@@ -1,5 +1,6 @@
 import { MainPanel } from '../../../panel/MainPanel';
 import { HUX_JS } from '../../../panel/HubUx';
+import type { WorkspaceFingerprint } from '../../../core/context/WorkspaceFingerprinter';
 
 describe('MainPanel changes webview', () => {
   it('generates a syntactically valid script with live file diff handling', () => {
@@ -78,5 +79,38 @@ describe('MainPanel changes webview', () => {
     expect(body).toContain('Qwen 2.5 Coder · 1.5B');
     expect(script).toContain("const PROVIDERS=['local-wasm','anthropic','openai','ollama','lmstudio']");
     expect(() => new Function(script)).not.toThrow();
+  });
+
+  it('grounds a Clean Architecture spec in the detected Maven/Java workspace', () => {
+    const panel = Object.create(MainPanel.prototype) as {
+      _buildSpecPrompt(context: string, small: boolean, fingerprint: WorkspaceFingerprint): string;
+      _buildSpecRetryPrompt(context: string, fingerprint: WorkspaceFingerprint): string;
+    };
+    const fingerprint = {
+      version: 2,
+      roots: ['.'],
+      sourceDirs: ['src/main/java', 'src/test/java'],
+      languages: [{ name: 'Java', pct: 100 }],
+      frameworks: ['Java + Spring Boot + Maven'],
+      entryPoints: ['pom.xml'],
+      pkgManager: 'maven',
+      hasSpec: false,
+      monorepo: false,
+      scannedAt: '2026-11-26T00:00:00.000Z',
+    } satisfies WorkspaceFingerprint;
+    const request = 'Estructura correctamente el repo usando Clean Architecture';
+
+    const prompt = panel._buildSpecPrompt(request, false, fingerprint);
+    const retry = panel._buildSpecRetryPrompt(request, fingerprint);
+
+    for (const text of [prompt, retry]) {
+      expect(text).toContain('Build/gestor: maven');
+      expect(text).toContain('Lenguajes detectados: Java (100%)');
+      expect(text).toContain('src/main/java');
+      expect(text).toContain('src/test/java');
+      expect(text).toContain('.java');
+      expect(text).toContain('No crees un proyecto Maven/Spring Boot nuevo');
+      expect(text).not.toContain('Feature.ts');
+    }
   });
 });

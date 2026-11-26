@@ -1899,53 +1899,104 @@ export class MainPanel {
 
   // Canonical format template injected into every spec-generation prompt so the model
   // knows exactly what structure is required and doesn't invent RNF_XX / #### styles.
-  // Fix legados: los ejemplos usan las carpetas fuente EVIDENCIADAS (nunca `src/` hardcodeado).
+  // Paths are stack-aware examples, never a reason to scaffold a different project.
   private _specFormatTemplate(fp: WorkspaceFingerprint | null): string {
     const h = specPathHints(fp);
     return (
-      `## Epic: [nombre de la épica]\n` +
-      `- [ ] Implementar archivo ${h.component}\n` +
-      `- [ ] Crear endpoint GET /api/resource en ${h.endpoint}\n` +
-      `- [ ] Agregar validación en ${h.validator}\n\n` +
-      `## Epic: [nombre de otra épica]\n` +
-      `- [ ] ...\n`
+      `## Epic: [resultado solicitado]\n` +
+      `- [ ] Implementar el cambio de dominio en una ruta real como ${h.component}\n` +
+      `- [ ] Adaptar la capa necesaria en una ruta real como ${h.endpoint}\n` +
+      `- [ ] Cubrir el cambio con una prueba en una ruta real como ${h.test}\n\n` +
+      `## Epic: [validación del cambio]\n` +
+      `- [ ] Ejecutar la comprobación de build y pruebas propia del repositorio\n`
     );
   }
 
+  /** Compact, factual context that keeps even a small local model grounded. */
+  private _specWorkspaceContext(fp: WorkspaceFingerprint | null): string {
+    if (!fp) {
+      return 'No se pudo leer el workspace. No inventes un stack ni inicialices un proyecto nuevo; limita el spec a la solicitud del usuario.';
+    }
+    const languages = fp.languages.map(language => `${language.name} (${language.pct}%)`).join(', ') || 'sin archivos fuente detectados';
+    const frameworks = fp.frameworks.join(', ') || 'sin framework detectado';
+    const sources = fp.sourceDirs.join(', ') || 'sin carpetas fuente detectadas';
+    const entries = fp.entryPoints.join(', ') || 'sin entry point detectado';
+    return [
+      'REPOSITORIO EXISTENTE — analiza y modifica este proyecto; no crees un proyecto desde cero.',
+      `- Build/gestor: ${fp.pkgManager}`,
+      `- Lenguajes detectados: ${languages}`,
+      `- Frameworks detectados: ${frameworks}`,
+      `- Rutas fuente detectadas: ${sources}`,
+      `- Manifiestos/entradas: ${entries}`,
+      '- Conserva el lenguaje, build, framework y contratos actuales. No propongas scaffold, migración de lenguaje ni dependencias que no sean necesarias para la solicitud.'
+    ].join('\n');
+  }
+
+  private _isArchitectureRequest(context: string): boolean {
+    return /clean\s+architecture|arquitectura\s+limpia|hexagonal|ports?\s+and\s+adapters|puertos?\s+y\s+adaptadores/i.test(context);
+  }
+
+  private _specScopeRule(context: string): string {
+    if (this._isArchitectureRequest(context)) {
+      return 'La solicitud es una reestructuración arquitectónica de un repositorio existente: propone inventario, destino de las capas, migración gradual, actualización de imports y pruebas. No crees un proyecto Maven/Spring Boot nuevo ni inventes endpoints, entidades o funcionalidades ajenas a la solicitud.';
+    }
+    return 'Propón sólo cambios necesarios para la solicitud; no añadas una API, autenticación, una base de datos ni funcionalidades de ejemplo si el usuario no las pidió.';
+  }
+
   private _buildSpecPrompt(context: string, small: boolean, fp: WorkspaceFingerprint | null = null): string {
-    const ctxSlice = context.slice(0, 300);
+    const ctxSlice = context.slice(0, 1000);
     const template = this._specFormatTemplate(fp);
     const rule = sourceRule(fp);
+    const workspace = this._specWorkspaceContext(fp);
+    const scope = this._specScopeRule(context);
     if (small) {
       return context
-        ? `Write a spec.md for: ${ctxSlice}\n\n` +
+        ? `Write a spec.md for this user request: ${ctxSlice}\n\n` +
+        `VERIFIED WORKSPACE CONTEXT:\n${workspace}\n\n` +
         `EXACT FORMAT (copy this structure):\n${template}\n` +
         `Rules:\n` +
         `- Use ## for epic headings ONLY (no ####, no RNF_XX, no numbered sections)\n` +
         `- Each task line MUST start with "- [ ] " followed by a concrete file or action\n` +
+        `- ${scope}\n` +
         `- ${rule}\n` +
         `- Write 3 epics with 3 tasks each\n` +
         `- Output ONLY the spec.md content`
-        : `Write a spec.md for a software project.\n\n` +
+        : `Write a spec.md for the existing software project.\n\nVERIFIED WORKSPACE CONTEXT:\n${workspace}\n\n` +
         `EXACT FORMAT:\n${template}\n` +
         `Rules:\n- ${rule}\n` +
-        `Write 3 epics (Auth, Core Features, Testing) with 3 tasks each.\n` +
+        `- ${scope}\n` +
+        `Write 3 project-relevant epics with 3 tasks each.\n` +
         `Output ONLY the spec.md content.`;
     }
     return context
       ? `Genera un spec.md para implementar: ${ctxSlice}\n\n` +
+      `CONTEXTO VERIFICADO DEL WORKSPACE:\n${workspace}\n\n` +
       `FORMATO EXACTO OBLIGATORIO — copia esta estructura:\n${template}\n` +
       `Reglas estrictas:\n` +
       `- Encabezados de épica SOLO con ## (prohibido ####, RNF_XX, numeración)\n` +
       `- Cada tarea DEBE empezar con "- [ ] " seguido de un archivo o acción concreta implementable\n` +
+      `- ${scope}\n` +
       `- ${rule}\n` +
       `- Mínimo 3 épicas con 3-5 tareas cada una\n` +
       `- Escribe ÚNICAMENTE el contenido del spec.md, sin texto adicional`
-      : `Genera un spec.md inicial para un proyecto de software.\n\n` +
+      : `Genera un spec.md inicial para este proyecto de software existente.\n\nCONTEXTO VERIFICADO DEL WORKSPACE:\n${workspace}\n\n` +
       `FORMATO EXACTO:\n${template}\n` +
       `Reglas:\n- ${rule}\n` +
-      `Usa 4 épicas: Autenticación, Funcionalidades Core, Testing, Despliegue.\n` +
+      `- ${scope}\n` +
+      `Usa 3-4 épicas relevantes para la evidencia del workspace.\n` +
       `3-4 tareas por épica. Solo el contenido del spec.md.`;
+  }
+
+  private _buildSpecRetryPrompt(context: string, fp: WorkspaceFingerprint | null): string {
+    return `El borrador anterior no tuvo suficientes tareas válidas. Regenera el spec.md desde cero para: ${context.slice(0, 1000) || 'la solicitud actual'}\n\n` +
+      `CONTEXTO VERIFICADO DEL WORKSPACE:\n${this._specWorkspaceContext(fp)}\n\n` +
+      `FORMATO OBLIGATORIO:\n${this._specFormatTemplate(fp)}\n` +
+      `Reglas:\n` +
+      `- ${this._specScopeRule(context)}\n` +
+      `- ${sourceRule(fp)}\n` +
+      `- Usa ## para 3 épicas y 3 tareas concretas por épica.\n` +
+      `- No copies los nombres de ejemplo literalmente; adáptalos a la solicitud y al repositorio.\n` +
+      `- Devuelve únicamente el contenido de spec.md.`;
   }
 
   private async _handleRegenSpec(context: string): Promise<void> {
@@ -1962,9 +2013,10 @@ export class MainPanel {
 
     const activeModelName = provider.modelName;
     const small = isSmallModel(activeModelName);
-    // Fix legados: el prompt de spec usa las carpetas fuente evidenciadas (nunca `src/`).
+    // A regeneration must examine the workspace again: a persisted/cached scan may
+    // describe the project before the user opened or reorganized it.
     let specFp: WorkspaceFingerprint | null = null;
-    try { specFp = await this._fingerprinter.fingerprint(); } catch { /* sin fingerprint: placeholders neutros */ }
+    try { specFp = await this._fingerprinter.refresh(); } catch { /* sin fingerprint: placeholders neutros */ }
     const prompt = this._buildSpecPrompt(context, small, specFp);
 
     try {
@@ -1977,12 +2029,7 @@ export class MainPanel {
       // Retry once when fewer than 3 parseable checkbox tasks remain after normalization.
       const taskCount = (content.match(/^\s*[-*]\s+\[([ x])\]\s*.+/gim) ?? []).length;
       if (taskCount < 3) {
-        const retryPrompt =
-          `Complete the following spec.md skeleton — fill in the [ ] lines with real implementable tasks for: ${context || 'a web application'}\n\n` +
-          `## Epic: Autenticación\n- [ ] \n- [ ] \n- [ ] \n\n` +
-          `## Epic: Funcionalidades Core\n- [ ] \n- [ ] \n- [ ] \n\n` +
-          `## Epic: Testing\n- [ ] \n- [ ] \n- [ ] \n\n` +
-          `Output ONLY the filled spec.md. Keep ## headings exactly as shown.`;
+        const retryPrompt = this._buildSpecRetryPrompt(context, specFp);
         content = await provider.complete(retryPrompt, { maxTokens: small ? 600 : 1500, temperature: 0.05 });
         content = normalizeSpecContent(content);
       }
