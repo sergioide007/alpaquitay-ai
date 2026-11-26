@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/icons/alpaquitay-logo.png">
-    <img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/icons/alpaquitay-logo-light.png" alt="Alpaquitay AI" width="340">
-  </picture>
+    <img src="https://raw.githubusercontent.com/sergioide007/alpaquitay-ai/main/icons/alpaquitay-logo.png" alt="Alpaquitay AI" width="340">
 </p>
 
 # Alpaquitay AI
