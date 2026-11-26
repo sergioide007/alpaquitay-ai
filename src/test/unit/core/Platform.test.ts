@@ -9,7 +9,7 @@ describe('Platform senior', () => {
       return [{ name: 'manage.py', isDirectory: false }, { name: 'apps', isDirectory: true }];
     } } as never).fingerprint().catch(() => null);
     expect(fp === null || fp.pkgManager !== undefined).toBe(true);
-    const c = contractFor({ version: 1, roots: ['.'], sourceDirs: ['apps'], languages: [], frameworks: ['Django + DRF'], entryPoints: ['manage.py'], pkgManager: 'pip', hasSpec: false, monorepo: false, scannedAt: '' });
+    const c = contractFor({ version: 2, roots: ['.'], sourceDirs: ['apps'], languages: [], frameworks: ['Django + DRF'], entryPoints: ['manage.py'], pkgManager: 'pip', hasSpec: false, monorepo: false, scannedAt: '' });
     expect(c.commands.test).toBe('pytest');
     expect(c.verified).toBe(false);
     expect(isPlatformContractVerified(c)).toBe(false);
@@ -24,7 +24,7 @@ describe('Platform senior', () => {
     expect(dodFor('despliegue', c)).toMatch(/rollback/);
   });
   it('unknown no inventa comandos', () => {
-    const c = contractFor({ version: 1, roots: ['.'], sourceDirs: ['.'], languages: [], frameworks: [], entryPoints: [], pkgManager: 'unknown', hasSpec: false, monorepo: false, scannedAt: '' });
+    const c = contractFor({ version: 2, roots: ['.'], sourceDirs: ['.'], languages: [], frameworks: [], entryPoints: [], pkgManager: 'unknown', hasSpec: false, monorepo: false, scannedAt: '' });
     expect(c.verified).toBe(false);
     expect(c.commands.test).toMatch(/pendiente/);
   });

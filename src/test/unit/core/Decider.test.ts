@@ -1,6 +1,6 @@
 import { decide } from '../../../core/reception/Decider';
 describe('Decider lanes', () => {
-  const fp = { version: 1 as const, roots: ['.'], sourceDirs: ['apps/users'], languages: [], frameworks: ['Django + DRF'], entryPoints: ['manage.py'], pkgManager: 'pip' as const, hasSpec: false, monorepo: false, scannedAt: '' };
+  const fp = { version: 2 as const, roots: ['.'], sourceDirs: ['apps/users'], languages: [], frameworks: ['Django + DRF'], entryPoints: ['manage.py'], pkgManager: 'pip' as const, hasSpec: false, monorepo: false, scannedAt: '' };
   it('chat corto va a flash sin confirmacion', () => {
     const d = decide('que es un JWT?', fp);
     expect(d.lane).toBe('flash'); expect(d.needsConfirm).toBe(false);
