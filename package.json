@@ -2,7 +2,7 @@
   "name": "alpaquitay-ai",
   "displayName": "Alpaquitay AI",
   "description": "AI software development harness for VS Code: plan from specs, orchestrate coding agents, review diffs, enforce SDLC quality gates, and build privately with local AI.",
-  "version": "3.10.2",
+  "version": "3.10.3",
   "publisher": "alpaquitay-ai",
   "icon": "resources/icon.png",
   "galleryBanner": {

@@ -1,0 +1,1165 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07100d">
+  <meta name="description"
+    content="Alpaquitay AI harness architecture: FABLE-5 framework, SDLC executable gates, chat commands, privacy boundary, and workspace invariants for VS Code.">
+  <title>Harness Architecture &mdash; Alpaquitay AI</title>
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/HARNESS.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/HARNESS.html">
+  <meta property="og:title" content="Harness Architecture &mdash; Alpaquitay AI">
+  <meta property="og:description"
+    content="FABLE-5 framework, SDLC executable gates, privacy boundary, and workspace invariants for the Alpaquitay AI VS Code harness.">
+  <meta property="og:image" content="https://alpaquitay-ai.specsolid.com/icons/alpaquitay-social.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/icons/site.webmanifest">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #eef4ef;
+      --ink-soft: #bac7c0;
+      --muted: #78877e;
+      --night: #07100d;
+      --night-2: #0a1511;
+      --panel: #0d1a15;
+      --panel-2: #11221b;
+      --line: rgba(216, 239, 224, .1);
+      --line-strong: rgba(216, 239, 224, .18);
+      --mint: #65f2ae;
+      --mint-2: #b9ffd9;
+      --amber: #f3bd69;
+      --red: #ff7189;
+      --blue: #7db7ff;
+      --violet: #be9cff;
+      --max: 860px;
+      --radius: 18px;
+      --mono: "SFMono-Regular", "Cascadia Code", "Liberation Mono", Menlo, Consolas, monospace;
+      --sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 74% 4%, rgba(101, 242, 174, .08), transparent 24rem),
+        radial-gradient(circle at 7% 35%, rgba(125, 183, 255, .05), transparent 22rem),
+        var(--night);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .18;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, black, transparent 72%);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .wrap {
+      width: min(calc(100% - 40px), var(--max));
+      margin-inline: auto;
+    }
+
+    /* ── NAV ── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--line);
+      background: rgba(7, 16, 13, .88);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      width: min(calc(100% - 40px), 1180px);
+      margin-inline: auto;
+    }
+
+    .brand {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-mark {
+      display: block;
+      height: 32px;
+      width: auto;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      font-size: .85rem;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color .15s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a[aria-current] {
+      color: var(--ink);
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 8px;
+      background: var(--mint);
+      color: var(--night) !important;
+      font-size: .82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+
+    .nav-cta:hover {
+      opacity: .88;
+    }
+
+    .menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 1.4rem;
+      line-height: 1;
+      padding: 4px 8px;
+    }
+
+    @media (max-width: 680px) {
+      .menu-btn {
+        display: block;
+      }
+
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 56px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        background: var(--night-2);
+        border-bottom: 1px solid var(--line);
+        padding: 12px 20px;
+      }
+
+      .nav-links li {
+        width: 100%;
+      }
+
+      .nav-links a {
+        display: block;
+        padding: 10px 0;
+        font-size: .9rem;
+      }
+
+      nav.open .nav-links {
+        display: flex;
+      }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 72px 0 48px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--mint);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.03em;
+      margin: 0 0 20px;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--ink-soft);
+      max-width: 600px;
+      margin: 0 auto 32px;
+      line-height: 1.65;
+    }
+
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel);
+      font-size: .78rem;
+      color: var(--ink-soft);
+    }
+
+    .version-badge strong {
+      color: var(--mint);
+    }
+
+    /* ── CONTENT LAYOUT ── */
+    .content {
+      padding: 0 0 80px;
+    }
+
+    /* ── SECTION HEADINGS ── */
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 56px 0 20px;
+    }
+
+    .section-heading h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .section-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--panel-2);
+      border: 1px solid var(--line-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    p {
+      color: var(--ink-soft);
+      line-height: 1.7;
+      margin: 0 0 16px;
+    }
+
+    /* ── FABLE-5 CARDS ── */
+    .fable-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .fable-card {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 16px;
+      padding: 20px;
+      border-radius: 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      transition: border-color .2s;
+    }
+
+    .fable-card:hover {
+      border-color: var(--line-strong);
+    }
+
+    .fable-letter {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--panel-2);
+      border: 1px solid var(--line-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--mint);
+      font-family: var(--mono);
+      flex-shrink: 0;
+    }
+
+    .fable-body {
+      min-width: 0;
+    }
+
+    .fable-title {
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0 0 4px;
+    }
+
+    .fable-principle {
+      font-size: .82rem;
+      color: var(--mint);
+      margin: 0 0 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .fable-impl {
+      font-size: .85rem;
+      color: var(--ink-soft);
+      margin: 0;
+      font-family: var(--mono);
+    }
+
+    /* ── SDLC TABLE ── */
+    .table-scroll {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+    }
+
+    thead th {
+      background: var(--panel-2);
+      padding: 12px 16px;
+      text-align: left;
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--line);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--line);
+      transition: background .15s;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--panel);
+    }
+
+    tbody td {
+      padding: 13px 16px;
+      color: var(--ink-soft);
+      vertical-align: top;
+    }
+
+    td strong {
+      color: var(--ink);
+    }
+
+    .lane-flash {
+      color: var(--amber);
+      font-weight: 600;
+    }
+
+    .lane-deep {
+      color: var(--violet);
+      font-weight: 600;
+    }
+
+    .lane-build {
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    /* ── COMMANDS GRID ── */
+    .commands-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .cmd-card {
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      transition: border-color .2s;
+    }
+
+    .cmd-card:hover {
+      border-color: var(--line-strong);
+    }
+
+    .cmd-name {
+      font-family: var(--mono);
+      font-size: .88rem;
+      color: var(--mint);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .cmd-desc {
+      font-size: .82rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: var(--panel-2);
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: .85rem;
+      color: var(--red);
+      line-height: 1.6;
+    }
+
+    /* ── INVARIANT SECTION ── */
+    .invariant-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--amber);
+      border-radius: 14px;
+      padding: 24px;
+      margin-top: 20px;
+    }
+
+    .invariant-panel h3 {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--amber);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0 0 12px;
+    }
+
+    .invariant-list {
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .invariant-list li {
+      display: flex;
+      gap: 10px;
+      font-size: .88rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .invariant-list li::before {
+      content: "→";
+      color: var(--mint);
+      flex-shrink: 0;
+      font-family: var(--mono);
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: .88em;
+      color: var(--mint-2);
+      background: rgba(101, 242, 174, .08);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* ── PROVIDERS GRID ── */
+    .providers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .provider-card {
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+    }
+
+    .provider-name {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .provider-desc {
+      font-size: .8rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .provider-tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(101, 242, 174, .1);
+      color: var(--mint);
+    }
+
+    .provider-tag.local {
+      background: rgba(125, 183, 255, .1);
+      color: var(--blue);
+    }
+
+    .provider-tag.cloud {
+      background: rgba(190, 156, 255, .1);
+      color: var(--violet);
+    }
+
+    /* ── SKILLS LIST ── */
+    .skills-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .skill-card {
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+    }
+
+    .skill-name {
+      font-family: var(--mono);
+      font-size: .85rem;
+      color: var(--blue);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .skill-desc {
+      font-size: .82rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 48px 0;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 32px 0;
+    }
+
+    .footer-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      width: min(calc(100% - 40px), 1180px);
+      margin-inline: auto;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      font-size: .82rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .15s;
+    }
+
+    .footer-links a:hover {
+      color: var(--ink);
+    }
+
+    .footer-copy {
+      font-size: .78rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+    <nav class="nav-inner" id="nav">
+      <a class="brand" href="/" aria-label="Alpaquitay AI home">
+        <img class="brand-mark" src="/icons/alpaquitay-logo.svg" alt="Alpaquitay AI" width="162" height="46">
+      </a>
+      <button class="menu-btn" id="menuButton" type="button" aria-expanded="false"
+        aria-label="Toggle menu">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/manual/en/">Manual</a></li>
+        <li><a href="/HARNESS.html" aria-current="page">Harness</a></li>
+        <li><a href="https://github.com/sergioide007/alpaquitay-ai" rel="noopener">GitHub</a></li>
+        <li><a class="nav-cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai"
+            rel="noopener">Install</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero wrap">
+      <div class="eyebrow">Architecture Reference</div>
+      <h1>Harness Architecture</h1>
+      <p class="hero-sub">
+        A reception, routing, and trust layer for VS Code. It perceives your project, decides the right lane, shows
+        previews before writing, enforces policy gates, verifies with metrics, and leaves evidence.
+      </p>
+      <div class="version-badge">
+        <strong>v3.10.3</strong>
+        <span>&middot;</span>
+        <span>Astra-style AI harness</span>
+        <span>&middot;</span>
+        <span>Built on Uncle Bob &amp; Martin Fowler principles</span>
+      </div>
+    </section>
+
+    <div class="content wrap">
+
+      <!-- FABLE-5 -->
+      <div class="section-heading">
+        <div class="section-icon">&#9670;</div>
+        <h2>FABLE-5 Framework</h2>
+      </div>
+      <p>Five invariants encoded into every harness interaction &mdash; not suggested, not documented: enforced at
+        runtime.</p>
+
+      <div class="fable-grid">
+        <div class="fable-card">
+          <div class="fable-letter">F</div>
+          <div class="fable-body">
+            <div class="fable-principle">Fingerprint-first</div>
+            <div class="fable-title">Detect before act</div>
+            <div class="fable-impl"><code>WorkspaceFingerprinter</code> &mdash; detects stack from markers (pom.xml,
+              go.mod, package.json&hellip;), never hardcodes paths</div>
+          </div>
+        </div>
+        <div class="fable-card">
+          <div class="fable-letter">A</div>
+          <div class="fable-body">
+            <div class="fable-principle">Ask-before-act</div>
+            <div class="fable-title">Every risky action is confirmed</div>
+            <div class="fable-impl"><code>Decider</code> &mdash; proposes a plan, waits for <code>si</code> /
+              <code>si aplicar</code> before any write</div>
+          </div>
+        </div>
+        <div class="fable-card">
+          <div class="fable-letter">B</div>
+          <div class="fable-body">
+            <div class="fable-principle">Bounded preview</div>
+            <div class="fable-title">Diffs before writes, always</div>
+            <div class="fable-impl"><code>FileDiff</code> &mdash; unified diff capped at 6 files, 120 lines before any
+              filesystem mutation</div>
+          </div>
+        </div>
+        <div class="fable-card">
+          <div class="fable-letter">L</div>
+          <div class="fable-body">
+            <div class="fable-principle">Legible-first</div>
+            <div class="fable-title">Every response is labeled</div>
+            <div class="fable-impl">Chip shows: lane &middot; stack &middot; phase &middot; gate &middot; DoD &middot;
+              economy on every reply</div>
+          </div>
+        </div>
+        <div class="fable-card">
+          <div class="fable-letter">E</div>
+          <div class="fable-body">
+            <div class="fable-principle">Evidence-always</div>
+            <div class="fable-title">Every decision is recorded</div>
+            <div class="fable-impl"><code>DecisionLog</code> &mdash; appends to <code>.alpaquitay/decisions.jsonl</code>
+              on every routed action</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SDLC GATES -->
+      <div class="section-heading">
+        <div class="section-icon">&#9654;</div>
+        <h2>SDLC with Executable Gates</h2>
+      </div>
+      <p>Each SDLC phase is detected from natural language, routed to the right lane, and must pass its gate before the
+        harness marks it done.</p>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Phase</th>
+              <th>Detected by</th>
+              <th>Lane</th>
+              <th>Gate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Requirements</strong></td>
+              <td><code>quiero</code>, <code>necesito</code>, <code>alcance</code></td>
+              <td class="lane-flash">&#9889; Flash</td>
+              <td>objective + scope + out-of-scope + owner</td>
+            </tr>
+            <tr>
+              <td><strong>Design</strong></td>
+              <td><code>arquitectura</code>, <code>ADR</code>, <code>diagrama</code></td>
+              <td class="lane-deep">&#129504; Deep</td>
+              <td>ADR recorded + no circular dependencies</td>
+            </tr>
+            <tr>
+              <td><strong>Implementation</strong></td>
+              <td><code>crea</code>, <code>fix</code>, <code>endpoint</code></td>
+              <td class="lane-build">&#128296; Build</td>
+              <td>SOLID + preview + checkpoint + build/test green</td>
+            </tr>
+            <tr>
+              <td><strong>Testing</strong></td>
+              <td><code>test</code>, <code>coverage</code>, <code>QA</code></td>
+              <td class="lane-build">&#128296; Build</td>
+              <td>happy + edge + error cases, coverage non-regressing</td>
+            </tr>
+            <tr>
+              <td><strong>Deployment</strong></td>
+              <td><code>deploy</code>, <code>pipeline</code>, <code>docker</code></td>
+              <td class="lane-deep">&#129504; Deep</td>
+              <td>pipeline green + human approval + rollback plan</td>
+            </tr>
+            <tr>
+              <td><strong>Maintenance</strong></td>
+              <td><code>monitoreo</code>, <code>deuda</code>, <code>incidente</code></td>
+              <td class="lane-deep">&#129504; Deep</td>
+              <td>runbook + alert + owner + postmortem</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- CHAT COMMANDS -->
+      <div class="section-heading">
+        <div class="section-icon">&#62;</div>
+        <h2>Chat Commands</h2>
+      </div>
+      <p>These commands run locally with no LLM call &mdash; instant, free, and deterministic.</p>
+
+      <div class="commands-grid">
+        <div class="cmd-card">
+          <div class="cmd-name">onboard</div>
+          <div class="cmd-desc">Legacy onboarding: fingerprint + platform detection + ADR-001 + DORA baseline</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">dora</div>
+          <div class="cmd-desc">DORA metrics computed from git log: lead time, deploy freq, MTTR, change fail rate</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">deuda</div>
+          <div class="cmd-desc">Agentic debt meter. Ceiling at 100 blocks Build lane until addressed</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">econom&iacute;a</div>
+          <div class="cmd-desc">Session cost report: LLM tokens vs local inference, estimated cost</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">postmortem &lt;log&gt;</div>
+          <div class="cmd-desc">Classify a pasted failure log. Returns root cause, contributing factors, action items
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">diff &lt;ruta&gt;</div>
+          <div class="cmd-desc">Show the pending unified diff for a file path before committing to write</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">si aplicar</div>
+          <div class="cmd-desc">Review pending diff &rarr; create checkpoint &rarr; write files to disk</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">no</div>
+          <div class="cmd-desc">Discard all pending diffs. No files are touched</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">promover</div>
+          <div class="cmd-desc">Elevate an idea to a spec.md epic with structured acceptance criteria</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">si</div>
+          <div class="cmd-desc">Confirm the proposed route so the harness proceeds to the next phase</div>
+        </div>
+      </div>
+
+      <!-- AI PROVIDERS -->
+      <div class="section-heading">
+        <div class="section-icon">&#9881;</div>
+        <h2>AI Providers</h2>
+      </div>
+      <p>The harness routes to any configured provider. All requests travel direct &mdash; no proxy, no data retention
+        by Alpaquitay.</p>
+
+      <div class="providers-grid">
+        <div class="provider-card">
+          <div class="provider-name">Gemini</div>
+          <div class="provider-desc">Google&rsquo;s frontier models via API key</div>
+          <span class="provider-tag cloud">Cloud</span>
+        </div>
+        <div class="provider-card">
+          <div class="provider-name">Claude</div>
+          <div class="provider-desc">Anthropic Claude via API key with prompt caching</div>
+          <span class="provider-tag cloud">Cloud</span>
+        </div>
+        <div class="provider-card">
+          <div class="provider-name">OpenAI</div>
+          <div class="provider-desc">GPT-4o and compatible endpoints via API key</div>
+          <span class="provider-tag cloud">Cloud</span>
+        </div>
+        <div class="provider-card">
+          <div class="provider-name">Ollama</div>
+          <div class="provider-desc">Local models on your machine via Ollama runtime</div>
+          <span class="provider-tag local">Local</span>
+        </div>
+        <div class="provider-card">
+          <div class="provider-name">LM Studio</div>
+          <div class="provider-desc">Local inference via LM Studio compatible endpoint</div>
+          <span class="provider-tag local">Local</span>
+        </div>
+        <div class="provider-card">
+          <div class="provider-name">Qwen 2.5 Coder</div>
+          <div class="provider-desc">On-device ONNX model &mdash; zero network, zero cost</div>
+          <span class="provider-tag local">Local</span>
+        </div>
+      </div>
+
+      <!-- BUILT-IN SKILLS -->
+      <div class="section-heading">
+        <div class="section-icon">&#9733;</div>
+        <h2>Built-in Skills</h2>
+      </div>
+      <p>Composable, agentic skills registered in <code>SkillRegistry</code>. Each skill runs with its own gate and
+        evidence trace.</p>
+
+      <div class="skills-list">
+        <div class="skill-card">
+          <div class="skill-name">GenerateFromSpecSkill</div>
+          <div class="skill-desc">Reads spec.md epics and generates implementation files with SOLID compliance check
+          </div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name">NewSpecificationSkill</div>
+          <div class="skill-desc">Creates a structured spec.md from a natural-language idea or feature request</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name">GenerateTestsSkill</div>
+          <div class="skill-desc">Generates happy-path, edge, and error tests for a given source file or class</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name">RefactorSkill</div>
+          <div class="skill-desc">Proposes a bounded refactor diff with SOLID explanation and regression test plan</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name">ValidateAgainstSpecSkill</div>
+          <div class="skill-desc">Cross-checks the workspace against spec.md acceptance criteria, reports gaps</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name">ProjectBuilderSkill</div>
+          <div class="skill-desc">Scaffolds a new project from a template for the detected architectural style</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name">CreateFileSkill</div>
+          <div class="skill-desc">Creates a single file with preview &rarr; checkpoint &rarr; write flow</div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-name">DailyStandupSkill</div>
+          <div class="skill-desc">Generates a standup summary from git log and open spec tasks</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- WORKSPACE INVARIANT -->
+      <div class="section-heading">
+        <div class="section-icon">&#128274;</div>
+        <h2>Workspace Root Invariant</h2>
+      </div>
+      <p>
+        <em>C&oacute;digo Sint&eacute;tico</em> Cap.&nbsp;09 &mdash; invariants are encoded, not suggested.
+        The harness never writes through a path it did not first validate.
+      </p>
+      <p>
+        <code>WorkspaceRoot.ts</code> resolves the root by priority
+        (<code>workspaceFolders</code> &rarr; <code>workspaceFile</code> dir &rarr; <code>cwd</code>)
+        and rejects: empty, relative, <code>undefined</code>, and filesystem roots
+        (<code>/</code>, <code>C:\</code>, <code>\\share</code>).
+        Empty <code>workspaceFolders</code> used to fall back to <code>process.cwd()</code>,
+        which in the extension host is often <code>/</code> &mdash; a read-only mount:
+      </p>
+
+      <div class="code-block">
+        <pre>Error: EROFS: read-only file system, open 'spec.md'</pre>
+      </div>
+
+      <div class="invariant-panel">
+        <h3>Guarantees</h3>
+        <ul class="invariant-list">
+          <li><code>SpecManager.specPath</code> returns <code>''</code> when no writable root exists; all spec writes
+            funnel through one guarded <code>_write()</code>.</li>
+          <li><code>FilesystemMCP</code> validates the root before resolving a path and translates <code>EROFS</code> /
+            <code>EACCES</code> / <code>ENOENT</code> / <code>EISDIR</code> into actionable messages.</li>
+          <li>Every mutation path runs a preflight (chat Build, <code>regenerate-spec</code>, <code>si aplicar</code>,
+            delete, arch/ADR/infra export, <code>specs/*</code> template, checkpoints, Git MCP).</li>
+          <li>With no writable root the harness degrades to <strong>chat mode</strong> &mdash; it explains the fix
+            instead of failing silently.</li>
+          <li>Path containment uses <code>path.relative()</code>, not <code>startsWith()</code>, so
+            <code>/tmp/app2</code> cannot masquerade as <code>/tmp/app</code>.</li>
+        </ul>
+      </div>
+
+      <!-- PRIVACY BOUNDARY -->
+      <div class="section-heading">
+        <div class="section-icon">&#128737;</div>
+        <h2>Privacy Boundary</h2>
+      </div>
+      <p>Alpaquitay AI is privacy-first by design. Your code and prompts travel only to the provider you configure.</p>
+
+      <div class="invariant-panel" style="border-left-color: var(--mint);">
+        <h3 style="color: var(--mint);">What we never do</h3>
+        <ul class="invariant-list">
+          <li>No telemetry is collected by default. Opt-in only.</li>
+          <li>No Alpaquitay server sits between you and your AI provider &mdash; direct connection always.</li>
+          <li>API keys are stored in the OS keychain, never in <code>settings.json</code> or logs.</li>
+          <li>PII and secrets are redacted by <code>PrivacyBoundaryProvider</code> before any prompt leaves the machine.
+          </li>
+          <li>Local provider (Qwen 2.5 Coder) runs fully on-device: no network, no key, no cost.</li>
+        </ul>
+      </div>
+
+      <!-- MCP -->
+      <div class="section-heading">
+        <div class="section-icon">&#128279;</div>
+        <h2>MCP Servers</h2>
+      </div>
+      <p>The harness exposes two built-in Model Context Protocol servers, registered via <code>MCPManager</code>.</p>
+
+      <div class="commands-grid">
+        <div class="cmd-card">
+          <div class="cmd-name">FilesystemMCP</div>
+          <div class="cmd-desc">Sandboxed read/write inside the validated workspace root. Translates OS errors into
+            actionable messages. Rejects paths outside the root.</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">GitMCP</div>
+          <div class="cmd-desc">Git log queries for DORA metrics, standup summaries, and checkpoint creation. Read-only
+            except for checkpoint commits.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ARCHITECTURAL STYLES -->
+      <div class="section-heading">
+        <div class="section-icon">&#9638;</div>
+        <h2>Supported Architectural Styles</h2>
+      </div>
+      <p>The fingerprinter detects one of these styles and injects it into every prompt as authoritative project
+        context.</p>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Style ID</th>
+              <th>Stack</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>react-spa</code></td>
+              <td>React (Vite / CRA), TypeScript, frontend only</td>
+            </tr>
+            <tr>
+              <td><code>react-node</code></td>
+              <td>React + Node.js Express fullstack monorepo</td>
+            </tr>
+            <tr>
+              <td><code>react-clean</code></td>
+              <td>React with Clean Architecture layers</td>
+            </tr>
+            <tr>
+              <td><code>nextjs</code></td>
+              <td>Next.js App Router or Pages Router</td>
+            </tr>
+            <tr>
+              <td><code>vue-spa</code></td>
+              <td>Vue 3 / Nuxt</td>
+            </tr>
+            <tr>
+              <td><code>angular</code></td>
+              <td>Angular 17+</td>
+            </tr>
+            <tr>
+              <td><code>express-api</code></td>
+              <td>Node.js Express REST API</td>
+            </tr>
+            <tr>
+              <td><code>django</code></td>
+              <td>Python Django</td>
+            </tr>
+            <tr>
+              <td><code>flask</code></td>
+              <td>Python Flask</td>
+            </tr>
+            <tr>
+              <td><code>java-maven</code></td>
+              <td>Java with Maven build</td>
+            </tr>
+            <tr>
+              <td><code>java-gradle</code></td>
+              <td>Java with Gradle build</td>
+            </tr>
+            <tr>
+              <td><code>spring-fullstack</code></td>
+              <td>Spring Boot fullstack</td>
+            </tr>
+            <tr>
+              <td><code>csharp-webapi</code></td>
+              <td>C# ASP.NET Core Web API</td>
+            </tr>
+            <tr>
+              <td><code>go-api</code></td>
+              <td>Go REST API</td>
+            </tr>
+            <tr>
+              <td><code>react-native</code></td>
+              <td>React Native mobile</td>
+            </tr>
+            <tr>
+              <td><code>python-package</code></td>
+              <td>Python library / package</td>
+            </tr>
+            <tr>
+              <td><code>generic</code></td>
+              <td>Fallback when markers are ambiguous</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+
+  <footer>
+    <div class="footer-row">
+      <a class="brand" href="/" aria-label="Alpaquitay AI home">
+        <img class="brand-mark" src="/icons/alpaquitay-logo.svg" alt="Alpaquitay AI" width="162" height="46">
+      </a>
+      <div class="footer-links">
+        <a href="/manual/en/">Manual</a>
+        <a href="/manual/" hreflang="es" lang="es">Manual (ES)</a>
+        <a href="/PRIVACY.html">Privacy</a>
+        <a href="/HARNESS.html">Harness</a>
+        <a href="/CONTRIBUTING.html">Contribute</a>
+        <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a>
+        <a href="mailto:sergio@specsolid.com">Email</a>
+        <a href="https://www.linkedin.com/in/sergioide007/" rel="noopener">LinkedIn</a>
+        <a href="https://medium.com/@sergioide007" rel="noopener">Medium</a>
+        <a href="https://www.youtube.com/@codigosinteticolibro" rel="noopener"
+          title="Videos about the book C&oacute;digo Sint&eacute;tico (Spanish)">YouTube</a>
+      </div>
+      <span class="footer-copy">Local-first delivery infrastructure &middot; MIT</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var nav = document.querySelector('nav');
+      var menu = document.getElementById('menuButton');
+      menu.addEventListener('click', function () {
+        var open = nav.classList.toggle('open');
+        menu.setAttribute('aria-expanded', String(open));
+        menu.textContent = open ? '\u00d7' : '\u2630';
+      });
+      nav.querySelectorAll('.nav-links a').forEach(function (link) {
+        link.addEventListener('click', function () {
+          nav.classList.remove('open');
+          menu.setAttribute('aria-expanded', 'false');
+          menu.textContent = '\u2630';
+        });
+      });
+    }());
+  </script>
+
+</body>
+
+</html>
