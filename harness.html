@@ -246,7 +246,9 @@
 
     .version-badge {
       display: inline-flex;
+      flex-wrap: wrap;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       padding: 6px 14px;
       border-radius: 20px;
@@ -254,6 +256,7 @@
       background: var(--panel);
       font-size: .78rem;
       color: var(--ink-soft);
+      max-width: 100%;
     }
 
     .version-badge strong {
@@ -529,6 +532,8 @@
       background: rgba(101, 242, 174, .08);
       padding: 1px 5px;
       border-radius: 4px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
 
     /* ── PROVIDERS GRID ── */
@@ -653,6 +658,117 @@
       font-size: .78rem;
       color: var(--muted);
     }
+
+    /* ── RESPONSIVE: MOBILE ── */
+
+    /* Version badge: allow wrapping on small screens */
+    .version-badge {
+      flex-wrap: wrap;
+      justify-content: center;
+      text-align: center;
+      max-width: 100%;
+    }
+
+    /* Code inside invariant lists: allow break */
+    .invariant-list li code,
+    code {
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    /* Code block: prevent horizontal blowout */
+    .code-block {
+      word-break: break-word;
+    }
+
+    .code-block pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    @media (max-width: 540px) {
+
+      /* Hero: reduce vertical padding */
+      .hero {
+        padding: 48px 0 32px;
+      }
+
+      .hero-sub {
+        font-size: .95rem;
+      }
+
+      /* FABLE cards: stack icon + body vertically on very narrow screens */
+      .fable-card {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .fable-letter {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+      }
+
+      /* Commands / providers / skills grids: single column */
+      .commands-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .providers-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .skills-list {
+        grid-template-columns: 1fr;
+      }
+
+      /* Section headings: tighter margin */
+      .section-heading {
+        margin: 40px 0 16px;
+      }
+
+      /* Invariant panel: less padding */
+      .invariant-panel {
+        padding: 16px;
+      }
+
+      /* Footer: center everything */
+      .footer-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .footer-links {
+        gap: 12px;
+      }
+    }
+
+    @media (max-width: 400px) {
+
+      /* Nav inner: tighter on very small phones */
+      .nav-inner {
+        width: calc(100% - 24px);
+      }
+
+      .wrap {
+        width: calc(100% - 24px);
+      }
+
+      .hero h1 {
+        font-size: 1.75rem;
+      }
+
+      /* Tables: smaller font to fit */
+      table {
+        font-size: .78rem;
+      }
+
+      thead th,
+      tbody td {
+        padding: 10px 10px;
+      }
+    }
   </style>
 </head>
 
@@ -685,7 +801,7 @@
         previews before writing, enforces policy gates, verifies with metrics, and leaves evidence.
       </p>
       <div class="version-badge">
-        <strong>v3.10.3</strong>
+        <strong>v3.10.6</strong>
         <span>&middot;</span>
         <span>Astra-style AI harness</span>
         <span>&middot;</span>

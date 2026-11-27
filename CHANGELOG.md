@@ -8,6 +8,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.10.6] — 2026-11-27
+
+### Fixed
+- responsive `harness.html` on the web (`alpaquitay-ai.specsolid.com`) in the browser.
+
+---
+
 ## [3.10.5] — 2026-11-26
 
 ### Fixed
