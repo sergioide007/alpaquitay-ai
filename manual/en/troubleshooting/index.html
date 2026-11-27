@@ -1,251 +1,156 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Troubleshooting and FAQ · Alpaquitay AI manual</title>
-  <meta name="description"
-    content="Fixes for the most common Alpaquitay AI problems (no provider, Ollama not detected, tasks that never reach Done, debt ceiling, local engine without WebGPU) and answers to frequent questions.">
-  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/troubleshooting/">
-  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/troubleshooting/">
-  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/problemas/">
-  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/troubleshooting/">
-  <meta property="og:type" content="article">
-  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/troubleshooting/">
-  <meta property="og:title" content="Troubleshooting and FAQ">
-  <meta property="og:description"
-    content="Fixes for the most common Alpaquitay AI problems (no provider, Ollama not detected, tasks that never reach Done, debt ceiling, local engine without WebGPU) and answers to frequent questions.">
-  <meta property="og:locale" content="en_US">
-  <meta name="theme-color" content="#07100d">
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-  <link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
-  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
-  <script
-    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Troubleshooting and FAQ","description":"Fixes for the most common Alpaquitay AI problems (no provider, Ollama not detected, tasks that never reach Done, debt ceiling, local engine without WebGPU) and answers to frequent questions.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/troubleshooting/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Troubleshooting and FAQ · Alpaquitay AI manual</title>
+<meta name="description" content="Fixes for the most common Alpaquitay AI problems (no provider, Ollama not detected, tasks that never reach Done, debt ceiling, local engine without WebGPU) and answers to frequent questions.">
+<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/troubleshooting/">
+<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/troubleshooting/">
+<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/problemas/">
+<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/troubleshooting/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/troubleshooting/">
+<meta property="og:title" content="Troubleshooting and FAQ">
+<meta property="og:description" content="Fixes for the most common Alpaquitay AI problems (no provider, Ollama not detected, tasks that never reach Done, debt ceiling, local engine without WebGPU) and answers to frequent questions.">
+<meta property="og:locale" content="en_US">
+<meta name="theme-color" content="#07100d">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+<link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
+<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Troubleshooting and FAQ","description":"Fixes for the most common Alpaquitay AI problems (no provider, Ollama not detected, tasks that never reach Done, debt ceiling, local engine without WebGPU) and answers to frequent questions.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/troubleshooting/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
-
 <body>
-  <a class="skip" href="#contenido">Skip to content</a>
-  <header class="top">
-    <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar"
-      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
-        <path d="M3 5h14M3 10h14M3 15h14" />
-      </svg></button>
-    <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark"
-        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-    <a class="crumb" href="../">Manual</a>
-    <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20"
-        aria-hidden="true">
-        <circle cx="9" cy="9" r="5.5" />
-        <path d="m13.5 13.5 3.5 3.5" />
-      </svg><span>Search</span><kbd>Ctrl K</kbd></button>
-    <a class="lang" href="../../problemas/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
-    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20"
-        aria-hidden="true">
-        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
-      </svg></button>
-    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg
-        viewBox="0 0 16 16" aria-hidden="true" class="fill">
-        <path
-          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
-      </svg></a>
-    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
-  </header>
-  <div class="layout">
-    <aside class="sidebar" id="sidebar" aria-label="Manual contents">
-      <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
-      <ol class="chapters">
-        <li><a href="../"><span class="n">00</span>Home</a></li>
-        <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
-        <li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
-        <li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
-        <li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
-        <li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
-        <li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
-        <li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
-        <li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
-        <li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
-        <li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
-        <li><a href="../models/"><span class="n">11</span>Available models</a></li>
-        <li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
-        <li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
-        <li><a href="../reference/"><span class="n">14</span>Reference</a></li>
-        <li><a href="../troubleshooting/" aria-current="page"><span class="n">15</span>Troubleshooting and FAQ</a></li>
-        <li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
-      </ol>
-      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
-          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a
-          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-    </aside>
-    <main class="content" id="contenido">
-      <article class="doc">
-        <p class="kicker">Chapter 15</p>
-        <h1 id="troubleshooting-and-faq">Troubleshooting and FAQ</h1>
-        <h2 id="common-problems">Common problems</h2>
-        <h3 id="no-hay-proveedor-ai-disponible-no-ai-provider-available">«No hay proveedor AI disponible» (no AI
-          provider available)</h3>
-        <p>No provider is active. Check, in this order:</p>
-        <ol>
-          <li>Is Ollama running? Open <code>http://localhost:11434</code> in a browser: it must answer <em>Ollama is
-              running</em>. Does it have a model? <code>ollama list</code>.</li>
-          <li>Does LM Studio have a model loaded <strong>and</strong> its server started?</li>
-          <li>Did you store a key with <strong>Configure AI Provider</strong>?</li>
-          <li>Does <code>preferredProvider</code> point at one that is not available? Set it to <code>auto</code>.</li>
-        </ol>
-        <p>After starting Ollama, pick the model in the Hub header selector or reload the window (<em>Developer: Reload
-            Window</em>).</p>
-        <h3 id="ollama-answers-take-very-long-or-are-cut-off">Ollama answers take very long or are cut off</h3>
-        <p>Raise <code>alpaquitay-ai.requestTimeout</code> (for example to <code>300000</code>) and, in <strong>Settings
-            → Ollama</strong>, <em>Max output tokens</em>. On machines without a dedicated GPU, use a smaller model.</p>
-        <h3 id="the-task-never-reaches-done">The task never reaches <em>Done</em></h3>
-        <p>That is the DoD gate doing its job. The chat says what blocks it:</p>
-        <ul>
-          <li><em>«N diff(s) sin aplicar»</em> (unapplied diffs) → reply <code>si aplicar</code> or <code>no</code>.
-          </li>
-          <li><em>«contrato platform sin verificar — corre <code>onboard</code> primero»</em> (platform contract not
-            verified) → run <code>onboard</code> and confirm the test command if asked.</li>
-          <li>Build or tests failed → read the postmortem in the chat, fix it and try again.</li>
-        </ul>
-        <h3 id="build-bloqueado-por-techo-de-deuda-build-blocked-by-the-debt-ceiling"><em>«Build bloqueado por techo de
-            deuda»</em> (Build blocked by the debt ceiling)</h3>
-        <p>Debt reached 100. Pay it down: <code>onboard</code> (−10), apply or discard the pending diffs and close tasks
-          with evidence (−8 each). Check the status with <code>deuda</code>. <a
-            href="../harness/#agentic-debt">Details</a></p>
-        <h3 id="bloqueado-protegido-secretos-or-fuera-de-fuentes-evidenciadas"><em>«Bloqueado: protegido …
-            (secretos)»</em> or <em>«fuera de fuentes evidenciadas»</em></h3>
-        <p>The policy or the automatic review stopped a file:</p>
-        <ul>
-          <li>Secret files (<code>.env</code>, <code>*.pem</code>, <code>*.key</code>…) are never written by the
-            harness. Edit them yourself.</li>
-          <li><em>Fuera de fuentes evidenciadas</em> (outside the evidenced sources) means the file is outside the
-            detected source folders. If the folder is right, run <code>onboard</code> again to refresh the project
-            fingerprint.</li>
-        </ul>
-        <h3 id="i-want-to-undo-a-si-aplicar">I want to undo a <code>si aplicar</code></h3>
-        <p>A checkpoint was saved before writing: <code>git stash list</code> shows one named
-          <code>alpaquitay/apply-diffs-&lt;date&gt;</code>. Discard unwanted changes with Git (for example
-          <code>git restore &lt;file&gt;</code>) or bring back the checkpoint state with
-          <code>git stash apply stash@{N}</code>.</p>
-        <h3 id="my-whole-spec-md-changed-after-a-si-in-the-chat">My whole <code>spec.md</code> changed after a
-          <code>si</code> in the chat</h3>
-        <p>You confirmed a code request typed in the chat, which generates a new <code>spec.md</code> from the request.
-          A checkpoint was saved first; get the previous version back with <code>git stash list</code> (look for
-          <code>alpaquitay/code-&lt;date&gt;</code> or <code>alpaquitay/spec-&lt;date&gt;</code>) and
-          <code>git checkout stash@{N} -- spec.md</code>, or with <code>git checkout -- spec.md</code> if it was
-          committed. To keep it, add new tasks to the board instead of asking for them in the chat. <a
-            href="../harness/#the-three-lanes">Details</a></p>
-        <h3 id="the-board-does-not-show-my-tasks">The board does not show my tasks</h3>
-        <ul>
-          <li>Is your spec called <code>spec.md</code> and at the root? If not, change
-            <code>alpaquitay-ai.specFile</code>.</li>
-          <li>Do the tasks use the <code>- [ ] text</code> format under a <code>##</code> heading? <a
-              href="../work/#1-the-spec-spec-md">Format</a></li>
-          <li>Click ↻ in the <em>Spec</em> pane to reload.</li>
-        </ul>
-        <h3 id="the-local-engine-does-not-work">The local engine does not work</h3>
-        <p>The full table of messages and fixes is in <a href="../local-engine/#if-something-goes-wrong">Local engine →
-            If something goes wrong</a>. The two most common causes:</p>
-        <ol>
-          <li><strong>The confirmation dialog is waiting for your click</strong> out of sight. Look for it in the
-            taskbar.</li>
-          <li><strong>VS Code is rendering in software</strong> after its GPU process failed. Close all its windows and
-            open it again; check with:</li>
-        </ol>
-        <div class="code" data-lang="Bash">
-          <pre><code class="language-bash">code --status
-</code></pre>
-        </div>
-        <p><em>GPU Status</em> must show <code>webgpu: enabled</code>.</p>
-        <h3 id="a-cloud-model-answers-with-a-400-error">A cloud model answers with a 400 error</h3>
-        <p>Current Claude and GPT models reason before answering and reject some older request parameters. From version
-          3.6.1 Alpaquitay only sends <code>temperature</code> to models that accept it and uses
-          <code>max_completion_tokens</code> with OpenAI. If you use an older version, choose a model from the selector
-          or update the extension.</p>
-        <h3 id="ctrl-shift-a-opens-something-else">Ctrl+Shift+A opens something else</h3>
-        <p>That shortcut is also GitHub Copilot's. Alpaquitay uses it for its quick menu, which includes an entry to
-          open Copilot Chat. To use another shortcut, change it in <em>File → Preferences → Keyboard Shortcuts</em> by
-          searching for <code>alpaquitay-ai.showMenu</code>.</p>
-        <h2 id="frequently-asked-questions">Frequently asked questions</h2>
-        <p><strong>Does Alpaquitay send my code to an Alpaquitay server?</strong>
-          No. There is no intermediary server. With a local provider your code never leaves the machine; with a cloud
-          one it goes straight to that provider after the privacy boundary. The project's only server is the static
-          model CDN, which only serves signed files and never receives your text.</p>
-        <p><strong>Is it free?</strong>
-          Yes, the extension is free and open source (MIT). You only pay for what you use of a cloud provider, if you
-          choose one.</p>
-        <p><strong>Do I need a GPU?</strong>
-          Not to use Alpaquitay with Ollama, LM Studio or the cloud. Yes for the local engine (WebGPU).</p>
-        <p><strong>Can I use it on a company project?</strong>
-          Yes. For confidential code, use local providers only and see the recipe <a
-            href="../use-cases/#3-work-without-your-code-leaving-your-machine">Work without your code leaving your
-            machine</a>.</p>
-        <p><strong>Why does it ask so much before acting?</strong>
-          On purpose: <em>ask-before-act</em> is one of its five principles. Short replies (<code>si</code>,
-          <code>si aplicar</code>, <code>no</code>) make confirming take a second.</p>
-        <p><strong>Are the DORA metrics real?</strong>
-          They are signals derived from Git and labelled as such. For operational metrics you need your deployment and
-          incident data.</p>
-        <p><strong>Why are some messages and commands in Spanish?</strong>
-          Alpaquitay was born in a Spanish-speaking community. The harness commands (<code>deuda</code>,
-          <code>si aplicar</code>, <code>promover</code>…) and some notifications are Spanish words; this manual
-          translates each one where it appears.</p>
-        <p><strong>Does it work with GitHub Copilot installed?</strong>
-          Yes, they coexist. Alpaquitay's quick menu includes an entry for Copilot Chat.</p>
-        <p><strong>Where do I report a bug?</strong>
-          In <a href="https://github.com/sergioide007/alpaquitay-ai/issues" rel="noopener">GitHub Issues</a>. If it is a
-          vulnerability, by private email, never in a public issue (<a
-            href="https://github.com/sergioide007/alpaquitay-ai/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a>).
-        </p>
+<a class="skip" href="#contenido">Skip to content</a>
+<header class="top">
+  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+  <a class="crumb" href="../">Manual</a>
+  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
+  <a class="lang" href="../../problemas/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
+  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
+  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+</header>
+<div class="layout">
+<aside class="sidebar" id="sidebar" aria-label="Manual contents">
+  <p class="side-title">User manual <span class="ver">v3.10.4</span></p>
+  <ol class="chapters">
+<li><a href="../"><span class="n">00</span>Home</a></li>
+<li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
+<li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
+<li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
+<li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
+<li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
+<li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
+<li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
+<li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+<li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
+<li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
+<li><a href="../models/"><span class="n">11</span>Available models</a></li>
+<li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
+<li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
+<li><a href="../reference/"><span class="n">14</span>Reference</a></li>
+<li><a href="../troubleshooting/" aria-current="page"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+<li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
+  </ol>
+  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+</aside>
+<main class="content" id="contenido">
+<article class="doc">
+<p class="kicker">Chapter 15</p>
+<h1 id="troubleshooting-and-faq">Troubleshooting and FAQ</h1>
+<h2 id="common-problems">Common problems</h2>
+<h3 id="no-hay-proveedor-ai-disponible-no-ai-provider-available">«No hay proveedor AI disponible» (no AI provider available)</h3>
+<p>No provider is active. Check, in this order:</p>
+<ol>
+<li>Is Ollama running? Open <code>http://localhost:11434</code> in a browser: it must answer <em>Ollama is running</em>. Does it have a model? <code>ollama list</code>.</li>
+<li>Does LM Studio have a model loaded <strong>and</strong> its server started?</li>
+<li>Did you store a key with <strong>Configure AI Provider</strong>?</li>
+<li>Does <code>preferredProvider</code> point at one that is not available? Set it to <code>auto</code>.</li>
+</ol>
+<p>After starting Ollama, pick the model in the Hub header selector or reload the window (<em>Developer: Reload Window</em>).</p>
+<h3 id="ollama-answers-take-very-long-or-are-cut-off">Ollama answers take very long or are cut off</h3>
+<p>Raise <code>alpaquitay-ai.requestTimeout</code> (for example to <code>300000</code>) and, in <strong>Settings → Ollama</strong>, <em>Max output tokens</em>. On machines without a dedicated GPU, use a smaller model.</p>
+<h3 id="the-task-never-reaches-done">The task never reaches <em>Done</em></h3>
+<p>That is the DoD gate doing its job. The chat says what blocks it:</p>
+<ul>
+<li><em>«N diff(s) sin aplicar»</em> (unapplied diffs) → reply <code>si aplicar</code> or <code>no</code>.</li>
+<li><em>«contrato platform sin verificar — corre <code>onboard</code> primero»</em> (platform contract not verified) → run <code>onboard</code> and confirm the test command if asked.</li>
+<li>Build or tests failed → read the postmortem in the chat, fix it and try again.</li>
+</ul>
+<h3 id="build-bloqueado-por-techo-de-deuda-build-blocked-by-the-debt-ceiling"><em>«Build bloqueado por techo de deuda»</em> (Build blocked by the debt ceiling)</h3>
+<p>Debt reached 100. Pay it down: <code>onboard</code> (−10), apply or discard the pending diffs and close tasks with evidence (−8 each). Check the status with <code>deuda</code>. <a href="../harness/#agentic-debt">Details</a></p>
+<h3 id="bloqueado-protegido-secretos-or-fuera-de-fuentes-evidenciadas"><em>«Bloqueado: protegido … (secretos)»</em> or <em>«fuera de fuentes evidenciadas»</em></h3>
+<p>The policy or the automatic review stopped a file:</p>
+<ul>
+<li>Secret files (<code>.env</code>, <code>*.pem</code>, <code>*.key</code>…) are never written by the harness. Edit them yourself.</li>
+<li><em>Fuera de fuentes evidenciadas</em> (outside the evidenced sources) means the file is outside the detected source folders. If the folder is right, run <code>onboard</code> again to refresh the project fingerprint.</li>
+</ul>
+<h3 id="i-want-to-undo-a-si-aplicar">I want to undo a <code>si aplicar</code></h3>
+<p>A checkpoint was saved before writing: <code>git stash list</code> shows one named <code>alpaquitay/apply-diffs-&lt;date&gt;</code>. Discard unwanted changes with Git (for example <code>git restore &lt;file&gt;</code>) or bring back the checkpoint state with <code>git stash apply stash@{N}</code>.</p>
+<h3 id="my-whole-spec-md-changed-after-a-si-in-the-chat">My whole <code>spec.md</code> changed after a <code>si</code> in the chat</h3>
+<p>You confirmed a code request typed in the chat, which generates a new <code>spec.md</code> from the request. A checkpoint was saved first; get the previous version back with <code>git stash list</code> (look for <code>alpaquitay/code-&lt;date&gt;</code> or <code>alpaquitay/spec-&lt;date&gt;</code>) and <code>git checkout stash@{N} -- spec.md</code>, or with <code>git checkout -- spec.md</code> if it was committed. To keep it, add new tasks to the board instead of asking for them in the chat. <a href="../harness/#the-three-lanes">Details</a></p>
+<h3 id="the-board-does-not-show-my-tasks">The board does not show my tasks</h3>
+<ul>
+<li>Is your spec called <code>spec.md</code> and at the root? If not, change <code>alpaquitay-ai.specFile</code>.</li>
+<li>Do the tasks use the <code>- [ ] text</code> format under a <code>##</code> heading? <a href="../work/#1-the-spec-spec-md">Format</a></li>
+<li>Click ↻ in the <em>Spec</em> pane to reload.</li>
+</ul>
+<h3 id="the-local-engine-does-not-work">The local engine does not work</h3>
+<p>The full table of messages and fixes is in <a href="../local-engine/#if-something-goes-wrong">Local engine → If something goes wrong</a>. The two most common causes:</p>
+<ol>
+<li><strong>The confirmation dialog is waiting for your click</strong> out of sight. Look for it in the taskbar.</li>
+<li><strong>VS Code is rendering in software</strong> after its GPU process failed. Close all its windows and open it again; check with:</li>
+</ol>
+<div class="code" data-lang="Bash"><pre><code class="language-bash">code --status
+</code></pre></div>
+<p><em>GPU Status</em> must show <code>webgpu: enabled</code>.</p>
+<h3 id="a-cloud-model-answers-with-a-400-error">A cloud model answers with a 400 error</h3>
+<p>Current Claude and GPT models reason before answering and reject some older request parameters. From version 3.6.1 Alpaquitay only sends <code>temperature</code> to models that accept it and uses <code>max_completion_tokens</code> with OpenAI. If you use an older version, choose a model from the selector or update the extension.</p>
+<h3 id="ctrl-shift-a-opens-something-else">Ctrl+Shift+A opens something else</h3>
+<p>That shortcut is also GitHub Copilot's. Alpaquitay uses it for its quick menu, which includes an entry to open Copilot Chat. To use another shortcut, change it in <em>File → Preferences → Keyboard Shortcuts</em> by searching for <code>alpaquitay-ai.showMenu</code>.</p>
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<p><strong>Does Alpaquitay send my code to an Alpaquitay server?</strong>
+No. There is no intermediary server. With a local provider your code never leaves the machine; with a cloud one it goes straight to that provider after the privacy boundary. The project's only server is the static model CDN, which only serves signed files and never receives your text.</p>
+<p><strong>Is it free?</strong>
+Yes, the extension is free and open source (MIT). You only pay for what you use of a cloud provider, if you choose one.</p>
+<p><strong>Do I need a GPU?</strong>
+Not to use Alpaquitay with Ollama, LM Studio or the cloud. Yes for the local engine (WebGPU).</p>
+<p><strong>Can I use it on a company project?</strong>
+Yes. For confidential code, use local providers only and see the recipe <a href="../use-cases/#3-work-without-your-code-leaving-your-machine">Work without your code leaving your machine</a>.</p>
+<p><strong>Why does it ask so much before acting?</strong>
+On purpose: <em>ask-before-act</em> is one of its five principles. Short replies (<code>si</code>, <code>si aplicar</code>, <code>no</code>) make confirming take a second.</p>
+<p><strong>Are the DORA metrics real?</strong>
+They are signals derived from Git and labelled as such. For operational metrics you need your deployment and incident data.</p>
+<p><strong>Why are some messages and commands in Spanish?</strong>
+Alpaquitay was born in a Spanish-speaking community. The harness commands (<code>deuda</code>, <code>si aplicar</code>, <code>promover</code>…) and some notifications are Spanish words; this manual translates each one where it appears.</p>
+<p><strong>Does it work with GitHub Copilot installed?</strong>
+Yes, they coexist. Alpaquitay's quick menu includes an entry for Copilot Chat.</p>
+<p><strong>Where do I report a bug?</strong>
+In <a href="https://github.com/sergioide007/alpaquitay-ai/issues" rel="noopener">GitHub Issues</a>. If it is a vulnerability, by private email, never in a public issue (<a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a>).</p>
 
-        <div class="doc-foot">
-          <a class="edit"
-            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/15-troubleshooting.md">Suggest
-            an improvement to this page</a>
-          <span>Manual for Alpaquitay AI 3.10.4 · MIT</span>
-        </div>
-        <nav class="pager" aria-label="Chapters">
-          <a class="prev" href="../reference/"><span>Previous</span>Reference</a>
-          <a class="next" href="../community/"><span>Next</span>Contributing and community</a>
-        </nav>
-      </article>
-      <nav class="toc" aria-label="On this page">
-        <p class="toc-title">On this page</p>
-        <ul>
-          <li class="l2"><a href="#common-problems">Common problems</a></li>
-          <li class="l3"><a href="#no-hay-proveedor-ai-disponible-no-ai-provider-available">«No hay proveedor AI
-              disponible» (no AI provider available)</a></li>
-          <li class="l3"><a href="#ollama-answers-take-very-long-or-are-cut-off">Ollama answers take very long or are
-              cut off</a></li>
-          <li class="l3"><a href="#the-task-never-reaches-done">The task never reaches Done</a></li>
-          <li class="l3"><a href="#build-bloqueado-por-techo-de-deuda-build-blocked-by-the-debt-ceiling">«Build
-              bloqueado por techo de deuda» (Build blocked by the debt ceiling)</a></li>
-          <li class="l3"><a href="#bloqueado-protegido-secretos-or-fuera-de-fuentes-evidenciadas">«Bloqueado: protegido
-              … (secretos)» or «fuera de fuentes evidenciadas»</a></li>
-          <li class="l3"><a href="#i-want-to-undo-a-si-aplicar">I want to undo a si aplicar</a></li>
-          <li class="l3"><a href="#my-whole-spec-md-changed-after-a-si-in-the-chat">My whole spec.md changed after a si
-              in the chat</a></li>
-          <li class="l3"><a href="#the-board-does-not-show-my-tasks">The board does not show my tasks</a></li>
-          <li class="l3"><a href="#the-local-engine-does-not-work">The local engine does not work</a></li>
-          <li class="l3"><a href="#a-cloud-model-answers-with-a-400-error">A cloud model answers with a 400 error</a>
-          </li>
-          <li class="l3"><a href="#ctrl-shift-a-opens-something-else">Ctrl+Shift+A opens something else</a></li>
-          <li class="l2"><a href="#frequently-asked-questions">Frequently asked questions</a></li>
-        </ul>
-      </nav>
-    </main>
+<div class="doc-foot">
+  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/15-troubleshooting.md">Suggest an improvement to this page</a>
+  <span>Manual for Alpaquitay AI 3.10.4 · MIT</span>
+</div>
+<nav class="pager" aria-label="Chapters">
+<a class="prev" href="../reference/"><span>Previous</span>Reference</a>
+<a class="next" href="../community/"><span>Next</span>Contributing and community</a>
+</nav>
+</article>
+<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#common-problems">Common problems</a></li><li class="l3"><a href="#no-hay-proveedor-ai-disponible-no-ai-provider-available">«No hay proveedor AI disponible» (no AI provider available)</a></li><li class="l3"><a href="#ollama-answers-take-very-long-or-are-cut-off">Ollama answers take very long or are cut off</a></li><li class="l3"><a href="#the-task-never-reaches-done">The task never reaches Done</a></li><li class="l3"><a href="#build-bloqueado-por-techo-de-deuda-build-blocked-by-the-debt-ceiling">«Build bloqueado por techo de deuda» (Build blocked by the debt ceiling)</a></li><li class="l3"><a href="#bloqueado-protegido-secretos-or-fuera-de-fuentes-evidenciadas">«Bloqueado: protegido … (secretos)» or «fuera de fuentes evidenciadas»</a></li><li class="l3"><a href="#i-want-to-undo-a-si-aplicar">I want to undo a si aplicar</a></li><li class="l3"><a href="#my-whole-spec-md-changed-after-a-si-in-the-chat">My whole spec.md changed after a si in the chat</a></li><li class="l3"><a href="#the-board-does-not-show-my-tasks">The board does not show my tasks</a></li><li class="l3"><a href="#the-local-engine-does-not-work">The local engine does not work</a></li><li class="l3"><a href="#a-cloud-model-answers-with-a-400-error">A cloud model answers with a 400 error</a></li><li class="l3"><a href="#ctrl-shift-a-opens-something-else">Ctrl+Shift+A opens something else</a></li><li class="l2"><a href="#frequently-asked-questions">Frequently asked questions</a></li></ul></nav>
+</main>
+</div>
+<div class="search" id="search" hidden>
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
+    <ol id="searchResults" class="search-results"></ol>
+    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
   </div>
-  <div class="search" id="search" hidden>
-    <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
-      <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off"
-        aria-label="Search text">
-      <ol id="searchResults" class="search-results"></ol>
-      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
-    </div>
-  </div>
-  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
-  <script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+</div>
+<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+<script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
-
 </html>
