@@ -35,7 +35,7 @@ console.log('\n📄 Archivos requeridos:');
 check('LICENSE', fs.existsSync(path.join(root, 'LICENSE')));
 check('CHANGELOG.md', fs.existsSync(path.join(root, 'CHANGELOG.md')));
 check('README.md', fs.existsSync(path.join(root, 'README.md')));
-check('HARNESS.md', fs.existsSync(path.join(root, 'HARNESS.md')));
+check('harness.md', fs.existsSync(path.join(root, 'harness.md')));
 
 // 3. Icono
 console.log('\n🖼️  Icono:');
@@ -46,7 +46,7 @@ if (fs.existsSync(iconPath)) {
   const w = isPng ? buf.readUInt32BE(16) : 0;
   const h = isPng ? buf.readUInt32BE(20) : 0;
   check('icon.png exists', true);
-  check('icon.png is a square PNG of at least 128x128', isPng && w === h && w >= 128, `(${w}x${h}, ${(buf.length/1024).toFixed(0)}KB)`);
+  check('icon.png is a square PNG of at least 128x128', isPng && w === h && w >= 128, `(${w}x${h}, ${(buf.length / 1024).toFixed(0)}KB)`);
 } else {
   check('icon.png exists', false);
 }
@@ -145,7 +145,7 @@ const vsixName = fs.readdirSync(root).find(f => f === `alpaquitay-ai-${VERSION}.
 check('.vsix for this version exists', !!vsixName, `(run: npx vsce package --no-dependencies)`);
 if (vsixName) {
   const vsixStats = fs.statSync(path.join(root, vsixName));
-  check('.vsix size > 500KB', vsixStats.size > 500000, `(${(vsixStats.size/1024).toFixed(0)}KB)`);
+  check('.vsix size > 500KB', vsixStats.size > 500000, `(${(vsixStats.size / 1024).toFixed(0)}KB)`);
   const newest = (dir) => { let t = 0; const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) { walk(p); } else { t = Math.max(t, fs.statSync(p).mtimeMs); } } }; if (fs.existsSync(dir)) { walk(dir); } return t; };
   const built = Math.max(newest(path.join(root, 'out')), newest(path.join(root, 'dist')), fs.statSync(path.join(root, 'package.json')).mtimeMs);
   check('.vsix is newer than out/, dist/ and package.json', vsixStats.mtimeMs >= built, '(stale package: rebuild it)');

@@ -6,10 +6,19 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+---
+
+## [3.10.4] — 2026-11-26
+
+### Fixed
+- link to `harness.html` as styled HTML on the web (`alpaquitay-ai.specsolid.com`) in the browser.
+
+---
+
 ## [3.10.3] — 2026-11-26
 
 ### Fixed
-- Rendered `HARNESS.md` as styled HTML on the web (`alpaquitay-ai.specsolid.com`) instead of serving raw unformatted Markdown text, fixing table alignment and typography in the browser.
+- Rendered `harness.md` as styled HTML on the web (`alpaquitay-ai.specsolid.com`) instead of serving raw unformatted Markdown text, fixing table alignment and typography in the browser.
 
 ---
 

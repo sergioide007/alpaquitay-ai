@@ -12,7 +12,7 @@
 | Icono PNG 1024x1024 | ✅ |
 | LICENSE (MIT) | ✅ |
 | CHANGELOG.md | ✅ |
-| HARNESS.md | ✅ |
+| harness.md | ✅ |
 | Sin eval()/new Function | ✅ |
 | Dependencias auditadas | ✅ (3 menores en testing) |
 | .vsix generado (778KB) | ✅ |
@@ -28,7 +28,7 @@
 | `.vscode/extensions.json` | Extensiones recomendadas |
 | `scripts/release.js` | Build local con validaciones |
 | `scripts/verify-marketplace.js` | Verificación completa marketplace |
-| `HARNESS.md` | Documentación del harness |
+| `harness.md` | Documentación del harness |
 | `CHANGELOG.md` | v3.2.0 documentada |
 
 ### Opción C — Desarrollo local (F5)
