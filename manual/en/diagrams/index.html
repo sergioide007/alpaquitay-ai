@@ -1,132 +1,229 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Architecture diagrams · Alpaquitay AI manual</title>
-<meta name="description" content="A gallery of the eleven Alpaquitay AI architecture diagrams and what each one shows: harness, extension, SDD tasks, SDLC gates, privacy, specialists, hexagonal architecture, inference, Clean Architecture, document agent and local engine.">
-<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/diagrams/">
-<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/diagrams/">
-<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/diagramas/">
-<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/diagrams/">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/diagrams/">
-<meta property="og:title" content="Architecture diagrams">
-<meta property="og:description" content="A gallery of the eleven Alpaquitay AI architecture diagrams and what each one shows: harness, extension, SDD tasks, SDLC gates, privacy, specialists, hexagonal architecture, inference, Clean Architecture, document agent and local engine.">
-<meta property="og:locale" content="en_US">
-<meta name="theme-color" content="#07100d">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
-<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Architecture diagrams","description":"A gallery of the eleven Alpaquitay AI architecture diagrams and what each one shows: harness, extension, SDD tasks, SDLC gates, privacy, specialists, hexagonal architecture, inference, Clean Architecture, document agent and local engine.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/diagrams/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture diagrams · Alpaquitay AI manual</title>
+  <meta name="description"
+    content="A gallery of the eleven Alpaquitay AI architecture diagrams and what each one shows: harness, extension, SDD tasks, SDLC gates, privacy, specialists, hexagonal architecture, inference, Clean Architecture, document agent and local engine.">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/diagrams/">
+  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/diagrams/">
+  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/diagramas/">
+  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/diagrams/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/diagrams/">
+  <meta property="og:title" content="Architecture diagrams">
+  <meta property="og:description"
+    content="A gallery of the eleven Alpaquitay AI architecture diagrams and what each one shows: harness, extension, SDD tasks, SDLC gates, privacy, specialists, hexagonal architecture, inference, Clean Architecture, document agent and local engine.">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#07100d">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
+  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Architecture diagrams","description":"A gallery of the eleven Alpaquitay AI architecture diagrams and what each one shows: harness, extension, SDD tasks, SDLC gates, privacy, specialists, hexagonal architecture, inference, Clean Architecture, document agent and local engine.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/diagrams/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
+
 <body>
-<a class="skip" href="#contenido">Skip to content</a>
-<header class="top">
-  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-  <a class="crumb" href="../">Manual</a>
-  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
-  <a class="lang" href="../../diagramas/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
-  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
-  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
-  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
-  <ol class="chapters">
-<li><a href="../"><span class="n">00</span>Home</a></li>
-<li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
-<li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
-<li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
-<li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
-<li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
-<li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
-<li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
-<li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
-<li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
-<li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
-<li><a href="../models/"><span class="n">11</span>Available models</a></li>
-<li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
-<li><a href="../diagrams/" aria-current="page"><span class="n">13</span>Architecture diagrams</a></li>
-<li><a href="../reference/"><span class="n">14</span>Reference</a></li>
-<li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
-<li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
-  </ol>
-  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-</aside>
-<main class="content" id="contenido">
-<article class="doc">
-<p class="kicker">Chapter 13</p>
-<h1 id="architecture-diagrams">Architecture diagrams</h1>
-<p>These are Alpaquitay AI's official diagrams. Click any of them to see it full screen. They are available as SVG (editable) and PNG in <a href="https://github.com/sergioide007/alpaquitay-ai/tree/main/docs/diagrams" rel="noopener"><code>docs/diagrams/</code></a>, generated by the Python scripts in <code>docs/diagrams/src/</code>.</p>
-<h2 id="1-the-harness-pipeline">1. The harness pipeline</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/01-harness-pipeline.svg" aria-label="Enlarge: The harness pipeline"><img src="../../diagrams/01-harness-pipeline.svg" alt="The harness pipeline" width="1120" height="1046" loading="lazy" decoding="async"></a><figcaption>Perceive, decide, the Flash, Build and Deep lanes, and the evidence layer.</figcaption></figure>
+  <a class="skip" href="#contenido">Skip to content</a>
+  <header class="top">
+    <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar"
+      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M3 5h14M3 10h14M3 15h14" />
+      </svg></button>
+    <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark"
+        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+    <a class="crumb" href="../">Manual</a>
+    <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <circle cx="9" cy="9" r="5.5" />
+        <path d="m13.5 13.5 3.5 3.5" />
+      </svg><span>Search</span><kbd>Ctrl K</kbd></button>
+    <a class="lang" href="../../diagramas/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
+      </svg></button>
+    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg
+        viewBox="0 0 16 16" aria-hidden="true" class="fill">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+      </svg></a>
+    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Manual contents">
+      <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
+      <ol class="chapters">
+        <li><a href="../"><span class="n">00</span>Home</a></li>
+        <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
+        <li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
+        <li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
+        <li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
+        <li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
+        <li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
+        <li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
+        <li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+        <li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
+        <li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
+        <li><a href="../models/"><span class="n">11</span>Available models</a></li>
+        <li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
+        <li><a href="../diagrams/" aria-current="page"><span class="n">13</span>Architecture diagrams</a></li>
+        <li><a href="../reference/"><span class="n">14</span>Reference</a></li>
+        <li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+        <li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
+      </ol>
+      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+    </aside>
+    <main class="content" id="contenido">
+      <article class="doc">
+        <p class="kicker">Chapter 13</p>
+        <h1 id="architecture-diagrams">Architecture diagrams</h1>
+        <p>These are Alpaquitay AI's official diagrams. Click any of them to see it full screen. They are available as
+          SVG (editable) and PNG in <a href="https://github.com/sergioide007/alpaquitay-ai/tree/main/docs/diagrams"
+            rel="noopener"><code>docs/diagrams/</code></a>, generated by the Python scripts in
+          <code>docs/diagrams/src/</code>.</p>
+        <h2 id="1-the-harness-pipeline">1. The harness pipeline</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/01-harness-pipeline.svg"
+            aria-label="Enlarge: The harness pipeline"><img src="../../diagrams/01-harness-pipeline.svg"
+              alt="The harness pipeline" width="1120" height="1046" loading="lazy" decoding="async"></a>
+          <figcaption>Perceive, decide, the Flash, Build and Deep lanes, and the evidence layer.</figcaption>
+        </figure>
 
-<p>How a request travels through the harness: the project is perceived, a lane is chosen, the change is previewed, guarded, verified and logged. Explained in <a href="../harness/">How the harness thinks</a>.</p>
-<h2 id="2-inside-the-extension">2. Inside the extension</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/02-extension-architecture.svg" aria-label="Enlarge: Extension architecture"><img src="../../diagrams/02-extension-architecture.svg" alt="Extension architecture" width="1120" height="1040" loading="lazy" decoding="async"></a><figcaption>Composition root, Hub, harness core, capability layers and external systems.</figcaption></figure>
+        <p>How a request travels through the harness: the project is perceived, a lane is chosen, the change is
+          previewed, guarded, verified and logged. Explained in <a href="../harness/">How the harness thinks</a>.</p>
+        <h2 id="2-inside-the-extension">2. Inside the extension</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/02-extension-architecture.svg"
+            aria-label="Enlarge: Extension architecture"><img src="../../diagrams/02-extension-architecture.svg"
+              alt="Extension architecture" width="1120" height="1040" loading="lazy" decoding="async"></a>
+          <figcaption>Composition root, Hub, harness core, capability layers and external systems.</figcaption>
+        </figure>
 
-<p>The components of the extension host: the composition root, the Hub, the harness core, the capability layers (providers, tools, skills, documents, local engine) and the external systems it talks to.</p>
-<h2 id="3-sequence-of-an-sdd-task">3. Sequence of an SDD task</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/03-sdd-task-sequence.svg" aria-label="Enlarge: Task sequence"><img src="../../diagrams/03-sdd-task-sequence.svg" alt="Task sequence" width="1120" height="1358" loading="lazy" decoding="async"></a><figcaption>Plan, generate, diff, approve, apply, prove and outcome.</figcaption></figure>
+        <p>The components of the extension host: the composition root, the Hub, the harness core, the capability layers
+          (providers, tools, skills, documents, local engine) and the external systems it talks to.</p>
+        <h2 id="3-sequence-of-an-sdd-task">3. Sequence of an SDD task</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/03-sdd-task-sequence.svg"
+            aria-label="Enlarge: Task sequence"><img src="../../diagrams/03-sdd-task-sequence.svg" alt="Task sequence"
+              width="1120" height="1358" loading="lazy" decoding="async"></a>
+          <figcaption>Plan, generate, diff, approve, apply, prove and outcome.</figcaption>
+        </figure>
 
-<p>What happens between dragging a card to <em>In Progress</em> and it reaching <em>Done</em>. Explained in <a href="../work/#2-the-board">Work</a>.</p>
-<h2 id="4-sdlc-gates">4. SDLC gates</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/04-sdlc-gates.svg" aria-label="Enlarge: SDLC gates"><img src="../../diagrams/04-sdlc-gates.svg" alt="SDLC gates" width="1120" height="736" loading="lazy" decoding="async"></a><figcaption>Six phases with their keywords, lane and exit gate.</figcaption></figure>
+        <p>What happens between dragging a card to <em>In Progress</em> and it reaching <em>Done</em>. Explained in <a
+            href="../work/#2-the-board">Work</a>.</p>
+        <h2 id="4-sdlc-gates">4. SDLC gates</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/04-sdlc-gates.svg"
+            aria-label="Enlarge: SDLC gates"><img src="../../diagrams/04-sdlc-gates.svg" alt="SDLC gates" width="1120"
+              height="736" loading="lazy" decoding="async"></a>
+          <figcaption>Six phases with their keywords, lane and exit gate.</figcaption>
+        </figure>
 
-<p>The six phases and what each one requires to move on. Explained in <a href="../harness/#the-six-sdlc-phases-and-their-gates">How the harness thinks</a>.</p>
-<h2 id="5-providers-and-the-privacy-boundary">5. Providers and the privacy boundary</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/05-provider-privacy.svg" aria-label="Enlarge: Providers and privacy"><img src="../../diagrams/05-provider-privacy.svg" alt="Providers and privacy" width="1120" height="914" loading="lazy" decoding="async"></a><figcaption>The local path unchanged; the cloud path with data hidden and value-free records.</figcaption></figure>
+        <p>The six phases and what each one requires to move on. Explained in <a
+            href="../harness/#the-six-sdlc-phases-and-their-gates">How the harness thinks</a>.</p>
+        <h2 id="5-providers-and-the-privacy-boundary">5. Providers and the privacy boundary</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/05-provider-privacy.svg"
+            aria-label="Enlarge: Providers and privacy"><img src="../../diagrams/05-provider-privacy.svg"
+              alt="Providers and privacy" width="1120" height="914" loading="lazy" decoding="async"></a>
+          <figcaption>The local path unchanged; the cloud path with data hidden and value-free records.</figcaption>
+        </figure>
 
-<p>How the provider is chosen and what happens to your text on each path. Explained in <a href="../providers/#the-privacy-boundary">Providers</a>.</p>
-<h2 id="6-specialist-orchestration">6. Specialist orchestration</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/06-domain-orchestration.svg" aria-label="Enlarge: Specialist orchestration"><img src="../../diagrams/06-domain-orchestration.svg" alt="Specialist orchestration" width="1120" height="962" loading="lazy" decoding="async"></a><figcaption>The central agent, the orchestrator and the registry of 17 specialists.</figcaption></figure>
+        <p>How the provider is chosen and what happens to your text on each path. Explained in <a
+            href="../providers/#the-privacy-boundary">Providers</a>.</p>
+        <h2 id="6-specialist-orchestration">6. Specialist orchestration</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/06-domain-orchestration.svg"
+            aria-label="Enlarge: Specialist orchestration"><img src="../../diagrams/06-domain-orchestration.svg"
+              alt="Specialist orchestration" width="1120" height="962" loading="lazy" decoding="async"></a>
+          <figcaption>The central agent, the orchestrator and the registry of 17 specialists.</figcaption>
+        </figure>
 
-<p>The central agent (privacy, knowledge retrieval, orchestration and refinement), the orchestrator and the specialist registry. Explained in <a href="../agents/">Agents</a>.</p>
-<h2 id="7-hexagonal-specialist">7. Hexagonal specialist</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/07-hexagonal-domain-shell.svg" aria-label="Enlarge: Hexagonal specialist"><img src="../../diagrams/07-hexagonal-domain-shell.svg" alt="Hexagonal specialist" width="1120" height="890" loading="lazy" decoding="async"></a><figcaption>Primary ports, use cases, domain, guardrails, secondary ports and adapters.</figcaption></figure>
+        <p>The central agent (privacy, knowledge retrieval, orchestration and refinement), the orchestrator and the
+          specialist registry. Explained in <a href="../agents/">Agents</a>.</p>
+        <h2 id="7-hexagonal-specialist">7. Hexagonal specialist</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/07-hexagonal-domain-shell.svg"
+            aria-label="Enlarge: Hexagonal specialist"><img src="../../diagrams/07-hexagonal-domain-shell.svg"
+              alt="Hexagonal specialist" width="1120" height="890" loading="lazy" decoding="async"></a>
+          <figcaption>Primary ports, use cases, domain, guardrails, secondary ports and adapters.</figcaption>
+        </figure>
 
-<p>The ports-and-adapters architecture of each specialist: the domain never depends on the infrastructure.</p>
-<h2 id="8-architecture-inference">8. Architecture inference</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/08-arch-inference.svg" aria-label="Enlarge: Architecture inference"><img src="../../diagrams/08-arch-inference.svg" alt="Architecture inference" width="1120" height="820" loading="lazy" decoding="async"></a><figcaption>From manifests, compose and spec to the canvas and the IaC export.</figcaption></figure>
+        <p>The ports-and-adapters architecture of each specialist: the domain never depends on the infrastructure.</p>
+        <h2 id="8-architecture-inference">8. Architecture inference</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/08-arch-inference.svg"
+            aria-label="Enlarge: Architecture inference"><img src="../../diagrams/08-arch-inference.svg"
+              alt="Architecture inference" width="1120" height="820" loading="lazy" decoding="async"></a>
+          <figcaption>From manifests, compose and spec to the canvas and the IaC export.</figcaption>
+        </figure>
 
-<p>The evidence behind the Architecture tab's diagram. Explained in <a href="../architecture/#where-the-diagram-comes-from">Architecture</a>.</p>
-<h2 id="9-generated-clean-architecture">9. Generated Clean Architecture</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/09-clean-architecture.svg" aria-label="Enlarge: Clean Architecture"><img src="../../diagrams/09-clean-architecture.svg" alt="Clean Architecture" width="1120" height="770" loading="lazy" decoding="async"></a><figcaption>Clean Architecture structures for Java Spring and React.</figcaption></figure>
+        <p>The evidence behind the Architecture tab's diagram. Explained in <a
+            href="../architecture/#where-the-diagram-comes-from">Architecture</a>.</p>
+        <h2 id="9-generated-clean-architecture">9. Generated Clean Architecture</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/09-clean-architecture.svg"
+            aria-label="Enlarge: Clean Architecture"><img src="../../diagrams/09-clean-architecture.svg"
+              alt="Clean Architecture" width="1120" height="770" loading="lazy" decoding="async"></a>
+          <figcaption>Clean Architecture structures for Java Spring and React.</figcaption>
+        </figure>
 
-<p>The structures the project builder generates for Java Spring and React.</p>
-<h2 id="10-document-agent">10. Document agent</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/10-docs-agent.svg" aria-label="Enlarge: Document agent"><img src="../../diagrams/10-docs-agent.svg" alt="Document agent" width="1120" height="968" loading="lazy" decoding="async"></a><figcaption>Adapters, intent, confirmation, edit and analysis runs, review, apply and verify.</figcaption></figure>
+        <p>The structures the project builder generates for Java Spring and React.</p>
+        <h2 id="10-document-agent">10. Document agent</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/10-docs-agent.svg"
+            aria-label="Enlarge: Document agent"><img src="../../diagrams/10-docs-agent.svg" alt="Document agent"
+              width="1120" height="968" loading="lazy" decoding="async"></a>
+          <figcaption>Adapters, intent, confirmation, edit and analysis runs, review, apply and verify.</figcaption>
+        </figure>
 
-<p>The Docs tab flow, from reading the format to verifying the written file. Explained in <a href="../docs/">Docs</a>.</p>
-<h2 id="11-local-engine">11. Local engine</h2>
-<figure class="figure"><a class="zoom" href="../../diagrams/11-local-gemma-engine.svg" aria-label="Enlarge: Local engine"><img src="../../diagrams/11-local-gemma-engine.svg" alt="Local engine" width="1120" height="780" loading="lazy" decoding="async"></a><figcaption>Extension host, engine panel with its cache, static CDN and local GPU.</figcaption></figure>
+        <p>The Docs tab flow, from reading the format to verifying the written file. Explained in <a
+            href="../docs/">Docs</a>.</p>
+        <h2 id="11-local-engine">11. Local engine</h2>
+        <figure class="figure"><a class="zoom" href="../../diagrams/11-local-gemma-engine.svg"
+            aria-label="Enlarge: Local engine"><img src="../../diagrams/11-local-gemma-engine.svg" alt="Local engine"
+              width="1120" height="780" loading="lazy" decoding="async"></a>
+          <figcaption>Extension host, engine panel with its cache, static CDN and local GPU.</figcaption>
+        </figure>
 
-<p>How the model is downloaded, verified, cached and run on your GPU. Explained in <a href="../local-engine/#security-why-you-can-trust-what-is-downloaded">Local engine</a>.</p>
+        <p>How the model is downloaded, verified, cached and run on your GPU. Explained in <a
+            href="../local-engine/#security-why-you-can-trust-what-is-downloaded">Local engine</a>.</p>
 
-<div class="doc-foot">
-  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/13-diagrams.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.10.3 · MIT</span>
-</div>
-<nav class="pager" aria-label="Chapters">
-<a class="prev" href="../use-cases/"><span>Previous</span>Use cases</a>
-<a class="next" href="../reference/"><span>Next</span>Reference</a>
-</nav>
-</article>
-<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#1-the-harness-pipeline">1. The harness pipeline</a></li><li class="l2"><a href="#2-inside-the-extension">2. Inside the extension</a></li><li class="l2"><a href="#3-sequence-of-an-sdd-task">3. Sequence of an SDD task</a></li><li class="l2"><a href="#4-sdlc-gates">4. SDLC gates</a></li><li class="l2"><a href="#5-providers-and-the-privacy-boundary">5. Providers and the privacy boundary</a></li><li class="l2"><a href="#6-specialist-orchestration">6. Specialist orchestration</a></li><li class="l2"><a href="#7-hexagonal-specialist">7. Hexagonal specialist</a></li><li class="l2"><a href="#8-architecture-inference">8. Architecture inference</a></li><li class="l2"><a href="#9-generated-clean-architecture">9. Generated Clean Architecture</a></li><li class="l2"><a href="#10-document-agent">10. Document agent</a></li><li class="l2"><a href="#11-local-engine">11. Local engine</a></li></ul></nav>
-</main>
-</div>
-<div class="search" id="search" hidden>
-  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
-    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
-    <ol id="searchResults" class="search-results"></ol>
-    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+        <div class="doc-foot">
+          <a class="edit"
+            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/13-diagrams.md">Suggest an
+            improvement to this page</a>
+          <span>Manual for Alpaquitay AI 3.10.4 · MIT</span>
+        </div>
+        <nav class="pager" aria-label="Chapters">
+          <a class="prev" href="../use-cases/"><span>Previous</span>Use cases</a>
+          <a class="next" href="../reference/"><span>Next</span>Reference</a>
+        </nav>
+      </article>
+      <nav class="toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul>
+          <li class="l2"><a href="#1-the-harness-pipeline">1. The harness pipeline</a></li>
+          <li class="l2"><a href="#2-inside-the-extension">2. Inside the extension</a></li>
+          <li class="l2"><a href="#3-sequence-of-an-sdd-task">3. Sequence of an SDD task</a></li>
+          <li class="l2"><a href="#4-sdlc-gates">4. SDLC gates</a></li>
+          <li class="l2"><a href="#5-providers-and-the-privacy-boundary">5. Providers and the privacy boundary</a></li>
+          <li class="l2"><a href="#6-specialist-orchestration">6. Specialist orchestration</a></li>
+          <li class="l2"><a href="#7-hexagonal-specialist">7. Hexagonal specialist</a></li>
+          <li class="l2"><a href="#8-architecture-inference">8. Architecture inference</a></li>
+          <li class="l2"><a href="#9-generated-clean-architecture">9. Generated Clean Architecture</a></li>
+          <li class="l2"><a href="#10-document-agent">10. Document agent</a></li>
+          <li class="l2"><a href="#11-local-engine">11. Local engine</a></li>
+        </ul>
+      </nav>
+    </main>
   </div>
-</div>
-<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
-<script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+  <div class="search" id="search" hidden>
+    <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+      <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off"
+        aria-label="Search text">
+      <ol id="searchResults" class="search-results"></ol>
+      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+    </div>
+  </div>
+  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+  <script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
+
 </html>

@@ -8,9 +8,9 @@
   <meta name="description"
     content="Alpaquitay AI harness architecture: FABLE-5 framework, SDLC executable gates, chat commands, privacy boundary, and workspace invariants for VS Code.">
   <title>Harness Architecture &mdash; Alpaquitay AI</title>
-  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/HARNESS.html">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/harness.html">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/HARNESS.html">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/harness.html">
   <meta property="og:title" content="Harness Architecture &mdash; Alpaquitay AI">
   <meta property="og:description"
     content="FABLE-5 framework, SDLC executable gates, privacy boundary, and workspace invariants for the Alpaquitay AI VS Code harness.">
@@ -668,7 +668,7 @@
       <ul class="nav-links">
         <li><a href="/">Home</a></li>
         <li><a href="/manual/en/">Manual</a></li>
-        <li><a href="/HARNESS.html" aria-current="page">Harness</a></li>
+        <li><a href="/harness.html" aria-current="page">Harness</a></li>
         <li><a href="https://github.com/sergioide007/alpaquitay-ai" rel="noopener">GitHub</a></li>
         <li><a class="nav-cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai"
             rel="noopener">Install</a></li>
@@ -719,7 +719,8 @@
             <div class="fable-principle">Ask-before-act</div>
             <div class="fable-title">Every risky action is confirmed</div>
             <div class="fable-impl"><code>Decider</code> &mdash; proposes a plan, waits for <code>si</code> /
-              <code>si aplicar</code> before any write</div>
+              <code>si aplicar</code> before any write
+            </div>
           </div>
         </div>
         <div class="fable-card">
@@ -976,13 +977,15 @@
           <li><code>SpecManager.specPath</code> returns <code>''</code> when no writable root exists; all spec writes
             funnel through one guarded <code>_write()</code>.</li>
           <li><code>FilesystemMCP</code> validates the root before resolving a path and translates <code>EROFS</code> /
-            <code>EACCES</code> / <code>ENOENT</code> / <code>EISDIR</code> into actionable messages.</li>
+            <code>EACCES</code> / <code>ENOENT</code> / <code>EISDIR</code> into actionable messages.
+          </li>
           <li>Every mutation path runs a preflight (chat Build, <code>regenerate-spec</code>, <code>si aplicar</code>,
             delete, arch/ADR/infra export, <code>specs/*</code> template, checkpoints, Git MCP).</li>
           <li>With no writable root the harness degrades to <strong>chat mode</strong> &mdash; it explains the fix
             instead of failing silently.</li>
           <li>Path containment uses <code>path.relative()</code>, not <code>startsWith()</code>, so
-            <code>/tmp/app2</code> cannot masquerade as <code>/tmp/app</code>.</li>
+            <code>/tmp/app2</code> cannot masquerade as <code>/tmp/app</code>.
+          </li>
         </ul>
       </div>
 
@@ -1128,7 +1131,7 @@
         <a href="/manual/en/">Manual</a>
         <a href="/manual/" hreflang="es" lang="es">Manual (ES)</a>
         <a href="/PRIVACY.html">Privacy</a>
-        <a href="/HARNESS.html">Harness</a>
+        <a href="/harness.html">Harness</a>
         <a href="/CONTRIBUTING.html">Contribute</a>
         <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a>
         <a href="mailto:sergio@specsolid.com">Email</a>

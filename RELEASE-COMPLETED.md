@@ -12,7 +12,7 @@
 - ✅ 16 módulos del harness (Decider, Fingerprinter, FileDiff, AgentReview, etc.)
 - ✅ 12 tests nuevos (328 total, 36 suites)
 - ✅ GitHub Actions workflow (Node 22, concurrency, timeouts)
-- ✅ Documentación: HARNESS.md, CONTRIBUTING.md, GITHUB-DEPLOY.md
+- ✅ Documentación: harness.md, CONTRIBUTING.md, GITHUB-DEPLOY.md
 - ✅ Scripts: release.js, release-git.sh, verify-marketplace.js
 - ✅ Configuración .vscode (launch, settings, tasks, extensions)
 - ✅ README actualizado con Why Alpaquitay?, Contributing, Community

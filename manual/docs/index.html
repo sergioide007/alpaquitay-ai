@@ -1,169 +1,253 @@
 <!doctype html>
 <html lang="es" data-theme="dark">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Docs: documentos con un agente · Manual de Alpaquitay AI</title>
-<meta name="description" content="Cómo corregir, mejorar, traducir, resumir y revisar la coherencia de documentos Word, Markdown, EPUB y PDF con el agente de la pestaña Docs, revisando cada cambio antes de aplicarlo.">
-<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/docs/">
-<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/docs/">
-<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
-<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/docs/">
-<meta property="og:title" content="Docs: documentos con un agente">
-<meta property="og:description" content="Cómo corregir, mejorar, traducir, resumir y revisar la coherencia de documentos Word, Markdown, EPUB y PDF con el agente de la pestaña Docs, revisando cada cambio antes de aplicarlo.">
-<meta property="og:locale" content="es_ES">
-<meta name="theme-color" content="#07100d">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
-<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Docs: documentos con un agente","description":"Cómo corregir, mejorar, traducir, resumir y revisar la coherencia de documentos Word, Markdown, EPUB y PDF con el agente de la pestaña Docs, revisando cada cambio antes de aplicarlo.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/docs/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Docs: documentos con un agente · Manual de Alpaquitay AI</title>
+  <meta name="description"
+    content="Cómo corregir, mejorar, traducir, resumir y revisar la coherencia de documentos Word, Markdown, EPUB y PDF con el agente de la pestaña Docs, revisando cada cambio antes de aplicarlo.">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/docs/">
+  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/docs/">
+  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
+  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/docs/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/docs/">
+  <meta property="og:title" content="Docs: documentos con un agente">
+  <meta property="og:description"
+    content="Cómo corregir, mejorar, traducir, resumir y revisar la coherencia de documentos Word, Markdown, EPUB y PDF con el agente de la pestaña Docs, revisando cada cambio antes de aplicarlo.">
+  <meta property="og:locale" content="es_ES">
+  <meta name="theme-color" content="#07100d">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
+  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Docs: documentos con un agente","description":"Cómo corregir, mejorar, traducir, resumir y revisar la coherencia de documentos Word, Markdown, EPUB y PDF con el agente de la pestaña Docs, revisando cada cambio antes de aplicarlo.","inLanguage":"es","url":"https://alpaquitay-ai.specsolid.com/manual/docs/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
+
 <body>
-<a class="skip" href="#contenido">Saltar al contenido</a>
-<header class="top">
-  <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-  <a class="crumb" href="../">Manual</a>
-  <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
-  <a class="lang" href="../en/docs/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
-  <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
-  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
-  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar" aria-label="Índice del manual">
-  <p class="side-title">Manual de uso <span class="ver">v3.10.3</span></p>
-  <ol class="chapters">
-<li><a href="../"><span class="n">00</span>Inicio</a></li>
-<li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
-<li><a href="../proveedores/"><span class="n">02</span>Proveedores y privacidad</a></li>
-<li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
-<li><a href="../work/"><span class="n">04</span>Work · spec, tablero y chat</a></li>
-<li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
-<li><a href="../docs/" aria-current="page"><span class="n">06</span>Docs · documentos con un agente</a></li>
-<li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
-<li><a href="../arquitectura/"><span class="n">08</span>Architecture · ADR e IaC</a></li>
-<li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
-<li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
-<li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
-<li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
-<li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
-<li><a href="../referencia/"><span class="n">14</span>Referencia</a></li>
-<li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
-<li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
-  </ol>
-  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-</aside>
-<main class="content" id="contenido">
-<article class="doc">
-<p class="kicker">Capítulo 06</p>
-<h1 id="docs-documentos-con-un-agente">Docs: documentos con un agente</h1>
-<p>La pestaña <strong>Docs</strong> es para todo lo que no es código: manuscritos, informes, artículos, documentación y libros. Le hablas al agente en español o en inglés, como a un editor:</p>
-<blockquote>
-<p><em>«corrige la ortografía del capítulo 3»</em> · <em>«hazlo más directo, mantén mi voz»</em> · <em>«translate the book to English»</em> · <em>«revisa la coherencia entre capítulos»</em> · <em>«¿qué le falta a este capítulo?»</em></p>
-</blockquote>
-<figure class="video">
-<video controls preload="none" playsinline poster="../media/docs-agent.jpg" width="1440" height="900" aria-label="Un informe editorial de un documento"><source src="../media/docs-agent.mp4" type="video/mp4">Tu navegador no reproduce vídeo MP4. <a href="../media/docs-agent.mp4">Descarga el vídeo</a>.</video>
-<figcaption><strong>Un informe editorial de un documento</strong> <span class="video-len">1:03</span> — Se abre un Markdown del proyecto, se pide <em>Editorial feedback</em> y el agente devuelve fortalezas, problemas y sugerencias concretas, que se guardan como .md. No modifica el documento. Grabado con Ollama (llama3.2 3B) y acelerado en la espera.</figcaption>
-</figure>
-<h2 id="formatos">Formatos</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Formato</th>
-<th>Leer</th>
-<th>Escribir</th>
-<th>Notas</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>.docx</code> (Word)</td>
-<td>✅</td>
-<td>✅</td>
-<td>Los cambios se escriben como <strong>control de cambios</strong> de Word (Revisar → Aceptar/Rechazar). Los párrafos que no se tocan quedan idénticos byte a byte.</td>
-</tr>
-<tr>
-<td><code>.md</code> / <code>.txt</code></td>
-<td>✅</td>
-<td>✅</td>
-<td>Sin pérdidas fuera de los bloques editados; bloques de código, tablas y <em>front matter</em> protegidos.</td>
-</tr>
-<tr>
-<td><code>.epub</code></td>
-<td>✅</td>
-<td>✅</td>
-<td>Los capítulos siguen el orden del libro; las cursivas y negritas sobreviven.</td>
-</tr>
-<tr>
-<td><code>.pdf</code></td>
-<td>✅</td>
-<td>➡️ <code>.md</code></td>
-<td>Solo lectura, en la medida de lo posible (PDF con texto). Un PDF escaneado necesita OCR antes.</td>
-</tr>
-</tbody>
-</table></div>
-<p>Desde la misma pestaña puedes <strong>convertir</strong> cualquier documento a <strong>Markdown</strong>, <strong>Word</strong> o <strong>EPUB</strong>: un manuscrito en Markdown se convierte en un EPUB publicable con un clic.</p>
-<h2 id="paso-a-paso">Paso a paso</h2>
-<figure class="figure"><a class="zoom" href="../media/hub-docs.png" aria-label="Ampliar: Pestaña Docs con un documento abierto y las acciones del agente"><img src="../media/hub-docs.png" alt="Pestaña Docs con un documento abierto y las acciones del agente" width="1600" height="1000" loading="lazy" decoding="async"></a><figcaption>La pestaña Docs: documento abierto, acciones rápidas y conversación con el agente.</figcaption></figure>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  <header class="top">
+    <button class="icon-btn menu" id="menuBtn" aria-label="Abrir el índice" aria-controls="sidebar"
+      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M3 5h14M3 10h14M3 15h14" />
+      </svg></button>
+    <a class="brand" href="/" aria-label="Alpaquitay AI, página principal"><img class="brand-mark"
+        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+    <a class="crumb" href="../">Manual</a>
+    <button class="search-btn" id="searchBtn" aria-label="Buscar en el manual (Ctrl+K)"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <circle cx="9" cy="9" r="5.5" />
+        <path d="m13.5 13.5 3.5 3.5" />
+      </svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
+    <a class="lang" href="../en/docs/" hreflang="en" lang="en" aria-label="Read this page in English">EN</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
+      </svg></button>
+    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Código fuente en GitHub"><svg
+        viewBox="0 0 16 16" aria-hidden="true" class="fill">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+      </svg></a>
+    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Instalar</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Índice del manual">
+      <p class="side-title">Manual de uso <span class="ver">v3.10.3</span></p>
+      <ol class="chapters">
+        <li><a href="../"><span class="n">00</span>Inicio</a></li>
+        <li><a href="../instalacion/"><span class="n">01</span>Instalación y primeros pasos</a></li>
+        <li><a href="../proveedores/"><span class="n">02</span>Proveedores y privacidad</a></li>
+        <li><a href="../arnes/"><span class="n">03</span>Cómo piensa el arnés</a></li>
+        <li><a href="../work/"><span class="n">04</span>Work · spec, tablero y chat</a></li>
+        <li><a href="../comandos-chat/"><span class="n">05</span>Comandos del chat</a></li>
+        <li><a href="../docs/" aria-current="page"><span class="n">06</span>Docs · documentos con un agente</a></li>
+        <li><a href="../evidence/"><span class="n">07</span>Evidence · señales y revisión</a></li>
+        <li><a href="../arquitectura/"><span class="n">08</span>Architecture · ADR e IaC</a></li>
+        <li><a href="../agentes/"><span class="n">09</span>Agents · skills y especialistas</a></li>
+        <li><a href="../motor-local/"><span class="n">10</span>Motor local (WebGPU)</a></li>
+        <li><a href="../modelos/"><span class="n">11</span>Modelos disponibles</a></li>
+        <li><a href="../casos-de-uso/"><span class="n">12</span>Casos de uso</a></li>
+        <li><a href="../diagramas/"><span class="n">13</span>Diagramas de arquitectura</a></li>
+        <li><a href="../referencia/"><span class="n">14</span>Referencia</a></li>
+        <li><a href="../problemas/"><span class="n">15</span>Problemas y preguntas</a></li>
+        <li><a href="../comunidad/"><span class="n">16</span>Contribuir y comunidad</a></li>
+      </ol>
+      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Cambios</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+    </aside>
+    <main class="content" id="contenido">
+      <article class="doc">
+        <p class="kicker">Capítulo 06</p>
+        <h1 id="docs-documentos-con-un-agente">Docs: documentos con un agente</h1>
+        <p>La pestaña <strong>Docs</strong> es para todo lo que no es código: manuscritos, informes, artículos,
+          documentación y libros. Le hablas al agente en español o en inglés, como a un editor:</p>
+        <blockquote>
+          <p><em>«corrige la ortografía del capítulo 3»</em> · <em>«hazlo más directo, mantén mi voz»</em> ·
+            <em>«translate the book to English»</em> · <em>«revisa la coherencia entre capítulos»</em> · <em>«¿qué le
+              falta a este capítulo?»</em></p>
+        </blockquote>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="../media/docs-agent.jpg" width="1440" height="900"
+            aria-label="Un informe editorial de un documento">
+            <source src="../media/docs-agent.mp4" type="video/mp4">Tu navegador no reproduce vídeo MP4. <a
+              href="../media/docs-agent.mp4">Descarga el vídeo</a>.
+          </video>
+          <figcaption><strong>Un informe editorial de un documento</strong> <span class="video-len">1:03</span> — Se
+            abre un Markdown del proyecto, se pide <em>Editorial feedback</em> y el agente devuelve fortalezas,
+            problemas y sugerencias concretas, que se guardan como .md. No modifica el documento. Grabado con Ollama
+            (llama3.2 3B) y acelerado en la espera.</figcaption>
+        </figure>
+        <h2 id="formatos">Formatos</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Formato</th>
+                <th>Leer</th>
+                <th>Escribir</th>
+                <th>Notas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>.docx</code> (Word)</td>
+                <td>✅</td>
+                <td>✅</td>
+                <td>Los cambios se escriben como <strong>control de cambios</strong> de Word (Revisar →
+                  Aceptar/Rechazar). Los párrafos que no se tocan quedan idénticos byte a byte.</td>
+              </tr>
+              <tr>
+                <td><code>.md</code> / <code>.txt</code></td>
+                <td>✅</td>
+                <td>✅</td>
+                <td>Sin pérdidas fuera de los bloques editados; bloques de código, tablas y <em>front matter</em>
+                  protegidos.</td>
+              </tr>
+              <tr>
+                <td><code>.epub</code></td>
+                <td>✅</td>
+                <td>✅</td>
+                <td>Los capítulos siguen el orden del libro; las cursivas y negritas sobreviven.</td>
+              </tr>
+              <tr>
+                <td><code>.pdf</code></td>
+                <td>✅</td>
+                <td>➡️ <code>.md</code></td>
+                <td>Solo lectura, en la medida de lo posible (PDF con texto). Un PDF escaneado necesita OCR antes.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Desde la misma pestaña puedes <strong>convertir</strong> cualquier documento a <strong>Markdown</strong>,
+          <strong>Word</strong> o <strong>EPUB</strong>: un manuscrito en Markdown se convierte en un EPUB publicable
+          con un clic.</p>
+        <h2 id="paso-a-paso">Paso a paso</h2>
+        <figure class="figure"><a class="zoom" href="../media/hub-docs.png"
+            aria-label="Ampliar: Pestaña Docs con un documento abierto y las acciones del agente"><img
+              src="../media/hub-docs.png" alt="Pestaña Docs con un documento abierto y las acciones del agente"
+              width="1600" height="1000" loading="lazy" decoding="async"></a>
+          <figcaption>La pestaña Docs: documento abierto, acciones rápidas y conversación con el agente.</figcaption>
+        </figure>
 
-<ol>
-<li><strong>Abre un documento</strong> con <em>Open file…</em> o elígelo en la lista <em>Documents in this workspace…</em>.</li>
-<li><strong>Elige una acción</strong> o escribe tu propia instrucción:
-<ul>
-<li><strong>Editar:</strong> <em>Proofread</em> (ortografía y gramática), <em>Improve style</em>, <em>Shorten</em>, <em>Translate to</em> (inglés, español, francés, alemán, italiano o portugués).</li>
-<li><strong>Analizar:</strong> <em>Summarize</em>, <em>Outline</em>, <em>Consistency check</em> (nombres, fechas, lugares y terminología entre capítulos) y <em>Editorial feedback</em>.</li>
-</ul>
-</li>
-<li><strong>Revisa la propuesta.</strong> Cada párrafo cambiado se muestra con un <strong>diff palabra a palabra</strong>. Los cambios grandes, los que alteran números y los que cambian mucho la longitud se marcan como <em>review</em> y <strong>no vienen preseleccionados</strong>.</li>
-<li><strong>Selecciona</strong> con <em>Select all</em>, <em>Only safe</em> o <em>None</em>, o casilla a casilla.</li>
-<li><strong>Pulsa <em>Apply selected</em>.</strong> Por defecto se escribe <strong>un archivo nuevo</strong> (<code>nombre.edited.docx</code>, <code>nombre.edited.md</code>…). Si decides sobrescribir, antes se guarda una copia en <code>.alpaquitay/backups/</code>.</li>
-<li><strong>Verificación.</strong> El archivo escrito se vuelve a leer para comprobar que se puede abrir y que contiene cada cambio aceptado.</li>
-</ol>
-<p>Los análisis (resumen, esquema, coherencia, comentarios) no modifican el documento: los puedes guardar con <em>Save report as .md</em>.</p>
-<figure class="figure"><a class="zoom" href="../diagrams/10-docs-agent.svg" aria-label="Ampliar: Flujo del agente de documentos"><img src="../diagrams/10-docs-agent.svg" alt="Flujo del agente de documentos" width="1120" height="968" loading="lazy" decoding="async"></a><figcaption>Adaptadores por formato, intención, confirmación, ejecución, revisión, aplicación y verificación.</figcaption></figure>
+        <ol>
+          <li><strong>Abre un documento</strong> con <em>Open file…</em> o elígelo en la lista <em>Documents in this
+              workspace…</em>.</li>
+          <li><strong>Elige una acción</strong> o escribe tu propia instrucción:
+            <ul>
+              <li><strong>Editar:</strong> <em>Proofread</em> (ortografía y gramática), <em>Improve style</em>,
+                <em>Shorten</em>, <em>Translate to</em> (inglés, español, francés, alemán, italiano o portugués).</li>
+              <li><strong>Analizar:</strong> <em>Summarize</em>, <em>Outline</em>, <em>Consistency check</em> (nombres,
+                fechas, lugares y terminología entre capítulos) y <em>Editorial feedback</em>.</li>
+            </ul>
+          </li>
+          <li><strong>Revisa la propuesta.</strong> Cada párrafo cambiado se muestra con un <strong>diff palabra a
+              palabra</strong>. Los cambios grandes, los que alteran números y los que cambian mucho la longitud se
+            marcan como <em>review</em> y <strong>no vienen preseleccionados</strong>.</li>
+          <li><strong>Selecciona</strong> con <em>Select all</em>, <em>Only safe</em> o <em>None</em>, o casilla a
+            casilla.</li>
+          <li><strong>Pulsa <em>Apply selected</em>.</strong> Por defecto se escribe <strong>un archivo nuevo</strong>
+            (<code>nombre.edited.docx</code>, <code>nombre.edited.md</code>…). Si decides sobrescribir, antes se guarda
+            una copia en <code>.alpaquitay/backups/</code>.</li>
+          <li><strong>Verificación.</strong> El archivo escrito se vuelve a leer para comprobar que se puede abrir y que
+            contiene cada cambio aceptado.</li>
+        </ol>
+        <p>Los análisis (resumen, esquema, coherencia, comentarios) no modifican el documento: los puedes guardar con
+          <em>Save report as .md</em>.</p>
+        <figure class="figure"><a class="zoom" href="../diagrams/10-docs-agent.svg"
+            aria-label="Ampliar: Flujo del agente de documentos"><img src="../diagrams/10-docs-agent.svg"
+              alt="Flujo del agente de documentos" width="1120" height="968" loading="lazy" decoding="async"></a>
+          <figcaption>Adaptadores por formato, intención, confirmación, ejecución, revisión, aplicación y verificación.
+          </figcaption>
+        </figure>
 
-<h2 id="las-mismas-garantias-que-en-el-codigo">Las mismas garantías que en el código</h2>
-<ul>
-<li>El agente solo <strong>propone</strong>; tú decides qué se aplica.</li>
-<li><strong>Bloques protegidos que nunca toca:</strong> enlaces, notas al pie, campos, imágenes, tablas y código.</li>
-<li><strong>Libros enteros:</strong> si una operación necesita más de 20 llamadas al modelo te pide confirmación (<em>Continue</em>), y nunca hace más de 60.</li>
-<li><strong>Privacidad:</strong> con un proveedor en la nube el texto pasa por el límite de privacidad (datos personales y secretos ocultados); con un modelo local el manuscrito no sale de tu equipo.</li>
-<li><strong>Sin dependencias externas:</strong> los lectores y escritores de ZIP, DOCX, EPUB y PDF están integrados en la extensión, así que es pequeña y auditable.</li>
-</ul>
-<h2 id="limites-dichos-claramente">Límites, dichos claramente</h2>
-<ul>
-<li>En un párrafo de Word que el agente reescribe, el formato interno del párrafo (por ejemplo, una palabra en negrita) se sustituye por el formato de su primer fragmento. El control de cambios muestra exactamente qué cambió.</li>
-<li>Los párrafos con hipervínculos, campos o notas se <strong>saltan</strong> en lugar de arriesgarse a dañarlos.</li>
-<li>La calidad depende del modelo. En nuestras pruebas, un modelo local de 3B (<code>llama3.2:3b</code>) hizo un informe editorial útil, pero respondió <em>«No changes needed»</em> al pedirle corregir un texto en español sin tildes. Para corregir, editar estilo o traducir, usa un modelo de 7B o más, o uno en la nube.</li>
-</ul>
-<aside class="callout callout-tip"><p class="callout-title">Consejo</p>
-<p>Para un libro, empieza por <strong>Consistency check</strong> y <strong>Outline</strong>: no cambian nada y te dan una visión del conjunto. Después corrige capítulo a capítulo con <em>Proofread</em> y revisa con calma los cambios marcados como <em>review</em>.</p>
-</aside>
+        <h2 id="las-mismas-garantias-que-en-el-codigo">Las mismas garantías que en el código</h2>
+        <ul>
+          <li>El agente solo <strong>propone</strong>; tú decides qué se aplica.</li>
+          <li><strong>Bloques protegidos que nunca toca:</strong> enlaces, notas al pie, campos, imágenes, tablas y
+            código.</li>
+          <li><strong>Libros enteros:</strong> si una operación necesita más de 20 llamadas al modelo te pide
+            confirmación (<em>Continue</em>), y nunca hace más de 60.</li>
+          <li><strong>Privacidad:</strong> con un proveedor en la nube el texto pasa por el límite de privacidad (datos
+            personales y secretos ocultados); con un modelo local el manuscrito no sale de tu equipo.</li>
+          <li><strong>Sin dependencias externas:</strong> los lectores y escritores de ZIP, DOCX, EPUB y PDF están
+            integrados en la extensión, así que es pequeña y auditable.</li>
+        </ul>
+        <h2 id="limites-dichos-claramente">Límites, dichos claramente</h2>
+        <ul>
+          <li>En un párrafo de Word que el agente reescribe, el formato interno del párrafo (por ejemplo, una palabra en
+            negrita) se sustituye por el formato de su primer fragmento. El control de cambios muestra exactamente qué
+            cambió.</li>
+          <li>Los párrafos con hipervínculos, campos o notas se <strong>saltan</strong> en lugar de arriesgarse a
+            dañarlos.</li>
+          <li>La calidad depende del modelo. En nuestras pruebas, un modelo local de 3B (<code>llama3.2:3b</code>) hizo
+            un informe editorial útil, pero respondió <em>«No changes needed»</em> al pedirle corregir un texto en
+            español sin tildes. Para corregir, editar estilo o traducir, usa un modelo de 7B o más, o uno en la nube.
+          </li>
+        </ul>
+        <aside class="callout callout-tip">
+          <p class="callout-title">Consejo</p>
+          <p>Para un libro, empieza por <strong>Consistency check</strong> y <strong>Outline</strong>: no cambian nada y
+            te dan una visión del conjunto. Después corrige capítulo a capítulo con <em>Proofread</em> y revisa con
+            calma los cambios marcados como <em>review</em>.</p>
+        </aside>
 
-<div class="doc-foot">
-  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/06-docs.md">Proponer una mejora a esta página</a>
-  <span>Manual para Alpaquitay AI 3.10.3 · MIT</span>
-</div>
-<nav class="pager" aria-label="Capítulos">
-<a class="prev" href="../comandos-chat/"><span>Anterior</span>Comandos del chat</a>
-<a class="next" href="../evidence/"><span>Siguiente</span>Evidence · señales y revisión</a>
-</nav>
-</article>
-<nav class="toc" aria-label="En esta página"><p class="toc-title">En esta página</p><ul><li class="l2"><a href="#formatos">Formatos</a></li><li class="l2"><a href="#paso-a-paso">Paso a paso</a></li><li class="l2"><a href="#las-mismas-garantias-que-en-el-codigo">Las mismas garantías que en el código</a></li><li class="l2"><a href="#limites-dichos-claramente">Límites, dichos claramente</a></li></ul></nav>
-</main>
-</div>
-<div class="search" id="search" hidden>
-  <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
-    <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off" aria-label="Texto a buscar">
-    <ol id="searchResults" class="search-results"></ol>
-    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para cerrar</p>
+        <div class="doc-foot">
+          <a class="edit"
+            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/es/06-docs.md">Proponer una mejora
+            a esta página</a>
+          <span>Manual para Alpaquitay AI 3.10.4 · MIT</span>
+        </div>
+        <nav class="pager" aria-label="Capítulos">
+          <a class="prev" href="../comandos-chat/"><span>Anterior</span>Comandos del chat</a>
+          <a class="next" href="../evidence/"><span>Siguiente</span>Evidence · señales y revisión</a>
+        </nav>
+      </article>
+      <nav class="toc" aria-label="En esta página">
+        <p class="toc-title">En esta página</p>
+        <ul>
+          <li class="l2"><a href="#formatos">Formatos</a></li>
+          <li class="l2"><a href="#paso-a-paso">Paso a paso</a></li>
+          <li class="l2"><a href="#las-mismas-garantias-que-en-el-codigo">Las mismas garantías que en el código</a></li>
+          <li class="l2"><a href="#limites-dichos-claramente">Límites, dichos claramente</a></li>
+        </ul>
+      </nav>
+    </main>
   </div>
-</div>
-<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
-<script src="../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+  <div class="search" id="search" hidden>
+    <div class="search-box" role="dialog" aria-modal="true" aria-label="Buscar en el manual">
+      <input id="searchInput" type="search" placeholder="Buscar: spec, diff, privacidad, WebGPU…" autocomplete="off"
+        aria-label="Texto a buscar">
+      <ol id="searchResults" class="search-results"></ol>
+      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> para moverte · <kbd>Enter</kbd> para abrir · <kbd>Esc</kbd> para
+        cerrar</p>
+    </div>
+  </div>
+  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Cerrar">✕</button></div>
+  <script src="../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
+
 </html>

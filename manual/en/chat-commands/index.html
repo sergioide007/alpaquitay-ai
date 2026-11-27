@@ -1,225 +1,309 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chat commands · Alpaquitay AI manual</title>
-<meta name="description" content="Reference for the commands the Alpaquitay AI harness chat understands: onboard, dora, deuda, economía, postmortem, diff, si aplicar, no, promover and si.">
-<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/chat-commands/">
-<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/chat-commands/">
-<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/comandos-chat/">
-<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/chat-commands/">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/chat-commands/">
-<meta property="og:title" content="Chat commands">
-<meta property="og:description" content="Reference for the commands the Alpaquitay AI harness chat understands: onboard, dora, deuda, economía, postmortem, diff, si aplicar, no, promover and si.">
-<meta property="og:locale" content="en_US">
-<meta name="theme-color" content="#07100d">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
-<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Chat commands","description":"Reference for the commands the Alpaquitay AI harness chat understands: onboard, dora, deuda, economía, postmortem, diff, si aplicar, no, promover and si.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/chat-commands/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chat commands · Alpaquitay AI manual</title>
+  <meta name="description"
+    content="Reference for the commands the Alpaquitay AI harness chat understands: onboard, dora, deuda, economía, postmortem, diff, si aplicar, no, promover and si.">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/chat-commands/">
+  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/chat-commands/">
+  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/comandos-chat/">
+  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/chat-commands/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/chat-commands/">
+  <meta property="og:title" content="Chat commands">
+  <meta property="og:description"
+    content="Reference for the commands the Alpaquitay AI harness chat understands: onboard, dora, deuda, economía, postmortem, diff, si aplicar, no, promover and si.">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#07100d">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
+  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Chat commands","description":"Reference for the commands the Alpaquitay AI harness chat understands: onboard, dora, deuda, economía, postmortem, diff, si aplicar, no, promover and si.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/chat-commands/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
+
 <body>
-<a class="skip" href="#contenido">Skip to content</a>
-<header class="top">
-  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-  <a class="crumb" href="../">Manual</a>
-  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
-  <a class="lang" href="../../comandos-chat/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
-  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
-  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
-  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
-  <ol class="chapters">
-<li><a href="../"><span class="n">00</span>Home</a></li>
-<li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
-<li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
-<li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
-<li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
-<li><a href="../chat-commands/" aria-current="page"><span class="n">05</span>Chat commands</a></li>
-<li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
-<li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
-<li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
-<li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
-<li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
-<li><a href="../models/"><span class="n">11</span>Available models</a></li>
-<li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
-<li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
-<li><a href="../reference/"><span class="n">14</span>Reference</a></li>
-<li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
-<li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
-  </ol>
-  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-</aside>
-<main class="content" id="contenido">
-<article class="doc">
-<p class="kicker">Chapter 05</p>
-<h1 id="chat-commands">Chat commands</h1>
-<p>Besides natural language, the chat in the <strong>Work</strong> tab understands a set of short commands. Type them <strong>on their own</strong>, as the whole message. Most of them are solved on your machine without calling any model, so they are free and fast. The command names are Spanish words; type them exactly as shown.</p>
-<figure class="video">
-<video controls preload="none" playsinline poster="../../media/evidence-chat-en.jpg" width="1440" height="900" aria-label="onboard, dora, deuda and economía"><source src="../../media/evidence-chat-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a href="../../media/evidence-chat-en.mp4">Download the video</a>.</video>
-<figcaption><strong>onboard, dora, deuda and economía</strong> <span class="video-len">0:35</span> — The harness's local commands on a real project: first analysis, DORA signals, debt and session economy.</figcaption>
-</figure>
-<h2 id="summary">Summary</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Command</th>
-<th>What it does</th>
-<th>Calls a model?</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>onboard</code></td>
-<td>Analyses the project, detects build and test, writes ADR-001 and computes DORA.</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>dora</code></td>
-<td>DORA signals from the last 40 commits.</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>deuda</code> (debt)</td>
-<td>Shows the agentic debt meter.</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>economía</code> or <code>economia</code> (economy)</td>
-<td>Local operations versus model calls in the session.</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>postmortem &lt;text&gt;</code></td>
-<td>Classifies a failure you paste (build, test, lint, write…).</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>diff &lt;path&gt;</code></td>
-<td>Shows a file's pending diff in full.</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>si aplicar</code> (yes, apply)</td>
-<td>Writes every pending diff with policy, review and a checkpoint.</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>no</code></td>
-<td>Discards every pending diff.</td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>promover</code> (promote)</td>
-<td>Turns the latest idea in the inbox into an epic of <code>spec.md</code>.</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><code>si</code> (or <code>sí</code>, <code>dale</code>, <code>ok</code>, <code>confirmo</code>)</td>
-<td>Confirms the route the harness proposed.</td>
-<td>Depends on the route</td>
-</tr>
-</tbody>
-</table></div>
-<aside class="callout callout-note"><p class="callout-title">Note</p>
-<p>The chat needs an active provider to accept messages, even for these local commands. If there is none, you will see <em>«No hay proveedor AI disponible»</em> (no AI provider available).</p>
-</aside>
-<h2 id="onboard">onboard</h2>
-<p>Running <code>onboard</code> saves the contract verification; detecting a stack alone does not open the gate. For an unknown stack, confirm the commands with <code>onboard {&quot;build&quot;:&quot;build command&quot;,&quot;test&quot;:&quot;test command&quot;}</code>.</p>
-<p>The best first step in any project, especially a legacy one. Locally, it produces:</p>
-<ul>
-<li><strong>Project fingerprint:</strong> frameworks, real source folders and entry points. It never assumes <code>src/</code>.</li>
-<li><strong>Platform contract:</strong> the test, build and lint commands for your stack (stored in <code>.alpaquitay/platform.json</code>). If it cannot confirm them it says so (<em>sin verificar — confirma tu comando</em>: unverified, confirm your command).</li>
-<li><strong>ADR-001:</strong> a first decision record with the stack, the sources and the harness rule (every write goes through diff, policy and checkpoint), in <code>.alpaquitay/ADR-001-onboard.md</code>.</li>
-<li>The repository's <strong>DORA level</strong>.</li>
-</ul>
-<p>It also <strong>removes 10 debt points</strong>. Run it once when you start, and again if your stack changes.</p>
-<h2 id="dora">dora</h2>
-<p>Computes delivery <strong>signals</strong> from <code>git log</code> (the last 40 commits), with no external telemetry:</p>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Signal</th>
-<th>How it is computed</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Frequency</td>
-<td>15 or more commits: &quot;daily or better&quot;; 6 or more: &quot;weekly&quot;; fewer: &quot;occasional&quot;.</td>
-</tr>
-<tr>
-<td>Lead time</td>
-<td>&quot;Traceable by #SPEC&quot; when commits are linked to tasks.</td>
-</tr>
-<tr>
-<td>Failure rate</td>
-<td>Share of commits that are <em>fix</em>, <em>hotfix</em>, <em>revert</em>, <em>rollback</em> or <em>bug</em>.</td>
-</tr>
-<tr>
-<td>Recovery</td>
-<td>Through the harness checkpoints (stashes).</td>
-</tr>
-<tr>
-<td>Level</td>
-<td><strong>High</strong> when at least 60% of commits are linked and the failure rate is ≤ 15%; <strong>Low</strong> when the rate is above 30%; <strong>Medium</strong> otherwise.</td>
-</tr>
-</tbody>
-</table></div>
-<aside class="callout callout-important"><p class="callout-title">Important</p>
-<p>These are <strong>repository-derived proxies</strong>, not operational DORA metrics: Git does not know when you deploy or when there is an incident. Alpaquitay labels them that way on purpose. Improve the signal by linking commits with <code>#SPEC-xxx</code> and with fewer hotfixes.</p>
-</aside>
-<h2 id="deuda">deuda</h2>
-<p>Shows the score (0 to 100), a bar and the status: <em>sana</em> (healthy), <em>alta — revisa antes de seguir</em> (high, from 70) or <em>techo roto — paga deuda antes de Build</em> (ceiling broken, from 100). The point rules are in <a href="../harness/#agentic-debt">How the harness thinks</a>.</p>
-<h2 id="economia">economía</h2>
-<p>Counts the operations solved locally (free) against model calls. Each confirmed Build costs 2 to 4 calls. Useful when you pay per use for a cloud provider.</p>
-<h2 id="postmortem">postmortem</h2>
-<p>Paste a failure after the word:</p>
-<div class="code" data-lang="Text"><pre><code class="language-text">postmortem npm ERR! Test failed. See above for more details.
+  <a class="skip" href="#contenido">Skip to content</a>
+  <header class="top">
+    <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar"
+      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M3 5h14M3 10h14M3 15h14" />
+      </svg></button>
+    <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark"
+        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+    <a class="crumb" href="../">Manual</a>
+    <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <circle cx="9" cy="9" r="5.5" />
+        <path d="m13.5 13.5 3.5 3.5" />
+      </svg><span>Search</span><kbd>Ctrl K</kbd></button>
+    <a class="lang" href="../../comandos-chat/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
+      </svg></button>
+    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg
+        viewBox="0 0 16 16" aria-hidden="true" class="fill">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+      </svg></a>
+    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Manual contents">
+      <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
+      <ol class="chapters">
+        <li><a href="../"><span class="n">00</span>Home</a></li>
+        <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
+        <li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
+        <li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
+        <li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
+        <li><a href="../chat-commands/" aria-current="page"><span class="n">05</span>Chat commands</a></li>
+        <li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
+        <li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
+        <li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+        <li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
+        <li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
+        <li><a href="../models/"><span class="n">11</span>Available models</a></li>
+        <li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
+        <li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
+        <li><a href="../reference/"><span class="n">14</span>Reference</a></li>
+        <li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+        <li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
+      </ol>
+      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+    </aside>
+    <main class="content" id="contenido">
+      <article class="doc">
+        <p class="kicker">Chapter 05</p>
+        <h1 id="chat-commands">Chat commands</h1>
+        <p>Besides natural language, the chat in the <strong>Work</strong> tab understands a set of short commands. Type
+          them <strong>on their own</strong>, as the whole message. Most of them are solved on your machine without
+          calling any model, so they are free and fast. The command names are Spanish words; type them exactly as shown.
+        </p>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="../../media/evidence-chat-en.jpg" width="1440" height="900"
+            aria-label="onboard, dora, deuda and economía">
+            <source src="../../media/evidence-chat-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a
+              href="../../media/evidence-chat-en.mp4">Download the video</a>.
+          </video>
+          <figcaption><strong>onboard, dora, deuda and economía</strong> <span class="video-len">0:35</span> — The
+            harness's local commands on a real project: first analysis, DORA signals, debt and session economy.
+          </figcaption>
+        </figure>
+        <h2 id="summary">Summary</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Command</th>
+                <th>What it does</th>
+                <th>Calls a model?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>onboard</code></td>
+                <td>Analyses the project, detects build and test, writes ADR-001 and computes DORA.</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><code>dora</code></td>
+                <td>DORA signals from the last 40 commits.</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><code>deuda</code> (debt)</td>
+                <td>Shows the agentic debt meter.</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><code>economía</code> or <code>economia</code> (economy)</td>
+                <td>Local operations versus model calls in the session.</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><code>postmortem &lt;text&gt;</code></td>
+                <td>Classifies a failure you paste (build, test, lint, write…).</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><code>diff &lt;path&gt;</code></td>
+                <td>Shows a file's pending diff in full.</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><code>si aplicar</code> (yes, apply)</td>
+                <td>Writes every pending diff with policy, review and a checkpoint.</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><code>no</code></td>
+                <td>Discards every pending diff.</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td><code>promover</code> (promote)</td>
+                <td>Turns the latest idea in the inbox into an epic of <code>spec.md</code>.</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td><code>si</code> (or <code>sí</code>, <code>dale</code>, <code>ok</code>, <code>confirmo</code>)</td>
+                <td>Confirms the route the harness proposed.</td>
+                <td>Depends on the route</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="callout callout-note">
+          <p class="callout-title">Note</p>
+          <p>The chat needs an active provider to accept messages, even for these local commands. If there is none, you
+            will see <em>«No hay proveedor AI disponible»</em> (no AI provider available).</p>
+        </aside>
+        <h2 id="onboard">onboard</h2>
+        <p>Running <code>onboard</code> saves the contract verification; detecting a stack alone does not open the gate.
+          For an unknown stack, confirm the commands with
+          <code>onboard {&quot;build&quot;:&quot;build command&quot;,&quot;test&quot;:&quot;test command&quot;}</code>.
+        </p>
+        <p>The best first step in any project, especially a legacy one. Locally, it produces:</p>
+        <ul>
+          <li><strong>Project fingerprint:</strong> frameworks, real source folders and entry points. It never assumes
+            <code>src/</code>.</li>
+          <li><strong>Platform contract:</strong> the test, build and lint commands for your stack (stored in
+            <code>.alpaquitay/platform.json</code>). If it cannot confirm them it says so (<em>sin verificar — confirma
+              tu comando</em>: unverified, confirm your command).</li>
+          <li><strong>ADR-001:</strong> a first decision record with the stack, the sources and the harness rule (every
+            write goes through diff, policy and checkpoint), in <code>.alpaquitay/ADR-001-onboard.md</code>.</li>
+          <li>The repository's <strong>DORA level</strong>.</li>
+        </ul>
+        <p>It also <strong>removes 10 debt points</strong>. Run it once when you start, and again if your stack changes.
+        </p>
+        <h2 id="dora">dora</h2>
+        <p>Computes delivery <strong>signals</strong> from <code>git log</code> (the last 40 commits), with no external
+          telemetry:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Signal</th>
+                <th>How it is computed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Frequency</td>
+                <td>15 or more commits: &quot;daily or better&quot;; 6 or more: &quot;weekly&quot;; fewer:
+                  &quot;occasional&quot;.</td>
+              </tr>
+              <tr>
+                <td>Lead time</td>
+                <td>&quot;Traceable by #SPEC&quot; when commits are linked to tasks.</td>
+              </tr>
+              <tr>
+                <td>Failure rate</td>
+                <td>Share of commits that are <em>fix</em>, <em>hotfix</em>, <em>revert</em>, <em>rollback</em> or
+                  <em>bug</em>.</td>
+              </tr>
+              <tr>
+                <td>Recovery</td>
+                <td>Through the harness checkpoints (stashes).</td>
+              </tr>
+              <tr>
+                <td>Level</td>
+                <td><strong>High</strong> when at least 60% of commits are linked and the failure rate is ≤ 15%;
+                  <strong>Low</strong> when the rate is above 30%; <strong>Medium</strong> otherwise.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="callout callout-important">
+          <p class="callout-title">Important</p>
+          <p>These are <strong>repository-derived proxies</strong>, not operational DORA metrics: Git does not know when
+            you deploy or when there is an incident. Alpaquitay labels them that way on purpose. Improve the signal by
+            linking commits with <code>#SPEC-xxx</code> and with fewer hotfixes.</p>
+        </aside>
+        <h2 id="deuda">deuda</h2>
+        <p>Shows the score (0 to 100), a bar and the status: <em>sana</em> (healthy), <em>alta — revisa antes de
+            seguir</em> (high, from 70) or <em>techo roto — paga deuda antes de Build</em> (ceiling broken, from 100).
+          The point rules are in <a href="../harness/#agentic-debt">How the harness thinks</a>.</p>
+        <h2 id="economia">economía</h2>
+        <p>Counts the operations solved locally (free) against model calls. Each confirmed Build costs 2 to 4 calls.
+          Useful when you pay per use for a cloud provider.</p>
+        <h2 id="postmortem">postmortem</h2>
+        <p>Paste a failure after the word:</p>
+        <div class="code" data-lang="Text">
+          <pre><code class="language-text">postmortem npm ERR! Test failed. See above for more details.
   ● bookings › does not allow booking a taken court
     expect(received).toBe(expected)
-</code></pre></div>
-<p>It classifies it (build, test, lint, diagnostics, write or unknown), suggests the likely cause and the next step, with your project's test command. It runs nothing. The harness also writes an automatic, blameless postmortem when a board task fails.</p>
-<h2 id="diff-si-aplicar-and-no">diff, si aplicar and no</h2>
-<p>You can also click <strong>Apply &amp; run gates</strong> or <strong>Discard all</strong> in the <strong>Changes</strong> tab. Both buttons act on every pending diff; <strong>Apply &amp; run gates</strong> runs the same reviews, checkpoint and gates as <code>si aplicar</code>.</p>
-<p>After the agent generates changes, the chat lists the <strong>pending diffs</strong>. Nothing is written yet.</p>
-<ul>
-<li><code>diff src/bookings/calendar.ts</code> shows that file's full diff.</li>
-<li><code>si aplicar</code> writes <strong>all</strong> pending files. First it checks the debt ceiling and that the folder is writable, saves a Git checkpoint and passes each file through the policy and the automatic review. A blocked file is not written; the rest are.</li>
-<li><code>no</code> discards them all.</li>
-</ul>
-<h2 id="promover">promover</h2>
-<p>Takes the latest idea in the inbox (<code>.alpaquitay/ideas.json</code>) and adds it to <code>spec.md</code> as an epic with tasks. Since it writes <code>spec.md</code>, it first checks the folder and saves a checkpoint.</p>
-<h2 id="si">si</h2>
-<p>When the harness is unsure, or the route is <em>Deep</em> (a specialist), it proposes the route and waits. Reply <code>si</code> to go ahead with it; anything else is treated as a new message.</p>
+</code></pre>
+        </div>
+        <p>It classifies it (build, test, lint, diagnostics, write or unknown), suggests the likely cause and the next
+          step, with your project's test command. It runs nothing. The harness also writes an automatic, blameless
+          postmortem when a board task fails.</p>
+        <h2 id="diff-si-aplicar-and-no">diff, si aplicar and no</h2>
+        <p>You can also click <strong>Apply &amp; run gates</strong> or <strong>Discard all</strong> in the
+          <strong>Changes</strong> tab. Both buttons act on every pending diff; <strong>Apply &amp; run gates</strong>
+          runs the same reviews, checkpoint and gates as <code>si aplicar</code>.</p>
+        <p>After the agent generates changes, the chat lists the <strong>pending diffs</strong>. Nothing is written yet.
+        </p>
+        <ul>
+          <li><code>diff src/bookings/calendar.ts</code> shows that file's full diff.</li>
+          <li><code>si aplicar</code> writes <strong>all</strong> pending files. First it checks the debt ceiling and
+            that the folder is writable, saves a Git checkpoint and passes each file through the policy and the
+            automatic review. A blocked file is not written; the rest are.</li>
+          <li><code>no</code> discards them all.</li>
+        </ul>
+        <h2 id="promover">promover</h2>
+        <p>Takes the latest idea in the inbox (<code>.alpaquitay/ideas.json</code>) and adds it to <code>spec.md</code>
+          as an epic with tasks. Since it writes <code>spec.md</code>, it first checks the folder and saves a
+          checkpoint.</p>
+        <h2 id="si">si</h2>
+        <p>When the harness is unsure, or the route is <em>Deep</em> (a specialist), it proposes the route and waits.
+          Reply <code>si</code> to go ahead with it; anything else is treated as a new message.</p>
 
-<div class="doc-foot">
-  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/05-chat-commands.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.10.3 · MIT</span>
-</div>
-<nav class="pager" aria-label="Chapters">
-<a class="prev" href="../work/"><span>Previous</span>Work · spec, board and chat</a>
-<a class="next" href="../docs/"><span>Next</span>Docs · documents with an agent</a>
-</nav>
-</article>
-<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#summary">Summary</a></li><li class="l2"><a href="#onboard">onboard</a></li><li class="l2"><a href="#dora">dora</a></li><li class="l2"><a href="#deuda">deuda</a></li><li class="l2"><a href="#economia">economía</a></li><li class="l2"><a href="#postmortem">postmortem</a></li><li class="l2"><a href="#diff-si-aplicar-and-no">diff, si aplicar and no</a></li><li class="l2"><a href="#promover">promover</a></li><li class="l2"><a href="#si">si</a></li></ul></nav>
-</main>
-</div>
-<div class="search" id="search" hidden>
-  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
-    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
-    <ol id="searchResults" class="search-results"></ol>
-    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+        <div class="doc-foot">
+          <a class="edit"
+            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/05-chat-commands.md">Suggest an
+            improvement to this page</a>
+          <span>Manual for Alpaquitay AI 3.10.4 · MIT</span>
+        </div>
+        <nav class="pager" aria-label="Chapters">
+          <a class="prev" href="../work/"><span>Previous</span>Work · spec, board and chat</a>
+          <a class="next" href="../docs/"><span>Next</span>Docs · documents with an agent</a>
+        </nav>
+      </article>
+      <nav class="toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul>
+          <li class="l2"><a href="#summary">Summary</a></li>
+          <li class="l2"><a href="#onboard">onboard</a></li>
+          <li class="l2"><a href="#dora">dora</a></li>
+          <li class="l2"><a href="#deuda">deuda</a></li>
+          <li class="l2"><a href="#economia">economía</a></li>
+          <li class="l2"><a href="#postmortem">postmortem</a></li>
+          <li class="l2"><a href="#diff-si-aplicar-and-no">diff, si aplicar and no</a></li>
+          <li class="l2"><a href="#promover">promover</a></li>
+          <li class="l2"><a href="#si">si</a></li>
+        </ul>
+      </nav>
+    </main>
   </div>
-</div>
-<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
-<script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+  <div class="search" id="search" hidden>
+    <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+      <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off"
+        aria-label="Search text">
+      <ol id="searchResults" class="search-results"></ol>
+      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+    </div>
+  </div>
+  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+  <script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
+
 </html>

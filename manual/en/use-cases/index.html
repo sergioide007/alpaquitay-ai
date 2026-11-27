@@ -1,162 +1,238 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Step-by-step use cases · Alpaquitay AI manual</title>
-<meta name="description" content="Concrete recipes for Alpaquitay AI: understand a legacy project, start a new one from an idea, work without code leaving your machine, write a book, record an architecture decision, review security and follow a team's delivery.">
-<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/use-cases/">
-<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/use-cases/">
-<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/casos-de-uso/">
-<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/use-cases/">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/use-cases/">
-<meta property="og:title" content="Step-by-step use cases">
-<meta property="og:description" content="Concrete recipes for Alpaquitay AI: understand a legacy project, start a new one from an idea, work without code leaving your machine, write a book, record an architecture decision, review security and follow a team's delivery.">
-<meta property="og:locale" content="en_US">
-<meta name="theme-color" content="#07100d">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
-<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Step-by-step use cases","description":"Concrete recipes for Alpaquitay AI: understand a legacy project, start a new one from an idea, work without code leaving your machine, write a book, record an architecture decision, review security and follow a team's delivery.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/use-cases/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
-</head>
-<body>
-<a class="skip" href="#contenido">Skip to content</a>
-<header class="top">
-  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-  <a class="crumb" href="../">Manual</a>
-  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
-  <a class="lang" href="../../casos-de-uso/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
-  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
-  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
-  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
-  <ol class="chapters">
-<li><a href="../"><span class="n">00</span>Home</a></li>
-<li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
-<li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
-<li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
-<li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
-<li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
-<li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
-<li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
-<li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
-<li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
-<li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
-<li><a href="../models/"><span class="n">11</span>Available models</a></li>
-<li><a href="../use-cases/" aria-current="page"><span class="n">12</span>Use cases</a></li>
-<li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
-<li><a href="../reference/"><span class="n">14</span>Reference</a></li>
-<li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
-<li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
-  </ol>
-  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-</aside>
-<main class="content" id="contenido">
-<article class="doc">
-<p class="kicker">Chapter 12</p>
-<h1 id="step-by-step-use-cases">Step-by-step use cases</h1>
-<p>Each recipe says who it is for, what you need and the steps, with links to the chapter that explains each piece.</p>
-<h2 id="1-understand-an-undocumented-legacy-project">1. Understand an undocumented legacy project</h2>
-<p><strong>For:</strong> whoever inherits a repository and needs to find their way before touching anything.
-<strong>You need:</strong> the repository with its Git history, and any provider.</p>
-<ol>
-<li>Open the folder and the Hub (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>).</li>
-<li>Type <code>onboard</code>. You get the stack, the real source folders, the test and build commands and an ADR-001 in <code>.alpaquitay/</code>. <a href="../chat-commands/#onboard">Chat commands</a></li>
-<li>Type <code>dora</code> to see how delivery has gone so far: frequency, share of fixes and traceability. <a href="../chat-commands/#dora">Chat commands</a></li>
-<li>Open <strong>Architecture</strong> and click <strong>↻ Re-infer</strong>: you will see the services, databases and queues the project really uses. <a href="../architecture/">Architecture</a></li>
-<li>Ask in the chat: <em>&quot;explain how a booking request flows through this project&quot;</em>.</li>
-<li>Write a spec with what you are going to change and start with the smallest task. The first <code>si aplicar</code> will show you the whole cycle with a checkpoint.</li>
-</ol>
-<p><strong>Outcome:</strong> a map of the system, an initial ADR and debt that starts already paid down (<code>onboard</code> removes 10 points).</p>
-<h2 id="2-start-a-new-project-from-an-idea">2. Start a new project from an idea</h2>
-<p><strong>For:</strong> whoever has an idea and an empty folder.</p>
-<ol>
-<li>Type the idea in the chat just as you have it: <em>&quot;I have an idea for an app to book padel courts with payment and reminders&quot;</em>. It goes to the idea inbox with a proposed objective, scope and out-of-scope. <a href="../work/#ideas-that-are-not-tasks-yet">Work</a></li>
-<li>When it is clear, type <code>promover</code> to turn it into an epic of <code>spec.md</code>.</li>
-<li>Want a complete first draft without your idea leaving the machine? Use <strong>Generate Specification (Local Model)</strong>. <a href="../local-engine/">Local engine</a></li>
-<li>Order and refine the tasks by hand. Small, verifiable, starting with a verb.</li>
-<li>If you want the folder structure done, use the <strong>Project Builder</strong> skill with the stack you prefer. <a href="../agents/">Agents</a></li>
-<li>Run <code>onboard</code> as soon as there is a <code>package.json</code>, <code>pom.xml</code> or similar, so the harness knows your build and test commands.</li>
-<li>Work task by task from the board.</li>
-</ol>
-<h2 id="3-work-without-your-code-leaving-your-machine">3. Work without your code leaving your machine</h2>
-<p><strong>For:</strong> teams with confidential code, personal data or compliance requirements.</p>
-<ol>
-<li>Install <strong>Ollama</strong> and pull a 7B or larger code model if your machine can run it. <a href="../providers/#ollama">Providers</a></li>
-<li>Set <code>alpaquitay-ai.preferredProvider: &quot;ollama&quot;</code> so a cloud provider is never picked by accident, and <strong>do not store</strong> Anthropic or OpenAI keys.</li>
-<li>Use the <strong>local engine</strong> for specs: the only network it uses is the one-time signed model download.</li>
-<li>Check that the harness strip says <code>privacy on-device</code>.</li>
-<li>For a network without Internet, serve the models from your own CDN with your key (<code>cdnBaseUrl</code> + <code>extraTrustedKeys</code>). <a href="../models/#publishing-a-model-on-your-own-cdn">Models</a></li>
-</ol>
-<aside class="callout callout-tip"><p class="callout-title">Tip</p>
-<p>Telemetry is already off. With a local provider, Alpaquitay makes no network request with your code.</p>
-</aside>
-<h2 id="4-write-proofread-and-publish-a-book">4. Write, proofread and publish a book</h2>
-<p><strong>For:</strong> authors and documentation teams.</p>
-<ol>
-<li>Write the manuscript in Markdown (one file per chapter or a single one) or in Word.</li>
-<li>In <strong>Docs</strong>, open the document and run <strong>Consistency check</strong>: names, dates, places and terminology that do not match across chapters. <a href="../docs/">Docs</a></li>
-<li>Run <strong>Outline</strong> and <strong>Editorial feedback</strong> to see the structure and what is missing.</li>
-<li>Proofread chapter by chapter with <strong>Proofread</strong>. Apply <em>Only safe</em> first and review the ones flagged <em>review</em> by hand.</li>
-<li>An edition in another language? <strong>Translate to</strong> writes a new file and leaves the original untouched.</li>
-<li>Convert the final Markdown to <strong>EPUB</strong> in one click. In Word, edits arrive as tracked changes for your editor to accept or reject.</li>
-</ol>
-<h2 id="5-make-and-record-an-architecture-decision">5. Make and record an architecture decision</h2>
-<p><strong>For:</strong> architects and tech leads.</p>
-<ol>
-<li>In <strong>Architecture</strong>, click <strong>↻ Re-infer</strong> to start from the real system.</li>
-<li>With <strong>▲ AI</strong>, ask for the alternative: <em>&quot;extract the payments module into its own service with a queue between them&quot;</em>.</li>
-<li>Click <strong>▲ Assess</strong> to compare quality attributes and risks.</li>
-<li>Click <strong>ADR</strong>, describe the context and the decision and create the record in <code>.alpaquitay/adrs/</code>.</li>
-<li>Ask in the chat <em>&quot;generate a C4 container diagram of this system&quot;</em> to prepare the explanation for each audience.</li>
-<li>Export a <strong>Terraform</strong>, CDK, Bicep or GCP skeleton as a starting point for the platform team. <a href="../architecture/#exporting-infrastructure-as-code">Architecture</a></li>
-</ol>
-<h2 id="6-review-security-before-a-release">6. Review security before a release</h2>
-<p><strong>For:</strong> teams that ship software and want a structured review.</p>
-<ol>
-<li>Ask in the chat <em>&quot;build a STRIDE threat model of the payments flow&quot;</em> and confirm with <code>si</code>: the DevSecOps specialist handles it. <a href="../agents/#domain-specialists">Agents</a></li>
-<li>Ask <em>&quot;generate an SBOM for this project&quot;</em> and <em>&quot;assess our pipeline against OWASP SAMM&quot;</em>.</li>
-<li>Review the pending diffs in <strong>Evidence</strong>: the automatic review blocks literal secrets and files outside the sources. <a href="../harness/#what-guards-a-write">How the harness thinks</a></li>
-<li>Check that the release's tasks are in <em>Done</em> with the DoD gate passed, not just ticked.</li>
-</ol>
-<h2 id="7-follow-a-team-s-delivery">7. Follow a team's delivery</h2>
-<p><strong>For:</strong> tech leads and engineering managers.</p>
-<ol>
-<li>Ask the team to link their commits with <code>#SPEC-xxx</code>. <a href="../work/#linking-commits-to-tasks">Work</a></li>
-<li>Look at <strong>Evidence</strong>: repository signal, debt and review queue. <a href="../evidence/">Evidence</a></li>
-<li>Commit <code>.alpaquitay/decisions.jsonl</code> and <code>debt.json</code> to keep an auditable history of what the harness decided and why.</li>
-<li>If debt passes 70, stop and pay it down: apply or discard diffs, close tasks with evidence and run <code>onboard</code> again if the stack changed.</li>
-</ol>
-<aside class="callout callout-note"><p class="callout-title">Note</p>
-<p>Alpaquitay's DORA figures come from Git and are labelled as <strong>signals</strong>, not operational metrics. For management decisions, combine them with your real deployment and incident data.</p>
-</aside>
 
-<div class="doc-foot">
-  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/12-use-cases.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.10.3 · MIT</span>
-</div>
-<nav class="pager" aria-label="Chapters">
-<a class="prev" href="../models/"><span>Previous</span>Available models</a>
-<a class="next" href="../diagrams/"><span>Next</span>Architecture diagrams</a>
-</nav>
-</article>
-<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#1-understand-an-undocumented-legacy-project">1. Understand an undocumented legacy project</a></li><li class="l2"><a href="#2-start-a-new-project-from-an-idea">2. Start a new project from an idea</a></li><li class="l2"><a href="#3-work-without-your-code-leaving-your-machine">3. Work without your code leaving your machine</a></li><li class="l2"><a href="#4-write-proofread-and-publish-a-book">4. Write, proofread and publish a book</a></li><li class="l2"><a href="#5-make-and-record-an-architecture-decision">5. Make and record an architecture decision</a></li><li class="l2"><a href="#6-review-security-before-a-release">6. Review security before a release</a></li><li class="l2"><a href="#7-follow-a-team-s-delivery">7. Follow a team's delivery</a></li></ul></nav>
-</main>
-</div>
-<div class="search" id="search" hidden>
-  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
-    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
-    <ol id="searchResults" class="search-results"></ol>
-    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Step-by-step use cases · Alpaquitay AI manual</title>
+  <meta name="description"
+    content="Concrete recipes for Alpaquitay AI: understand a legacy project, start a new one from an idea, work without code leaving your machine, write a book, record an architecture decision, review security and follow a team's delivery.">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/use-cases/">
+  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/use-cases/">
+  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/casos-de-uso/">
+  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/use-cases/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/use-cases/">
+  <meta property="og:title" content="Step-by-step use cases">
+  <meta property="og:description"
+    content="Concrete recipes for Alpaquitay AI: understand a legacy project, start a new one from an idea, work without code leaving your machine, write a book, record an architecture decision, review security and follow a team's delivery.">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#07100d">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
+  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Step-by-step use cases","description":"Concrete recipes for Alpaquitay AI: understand a legacy project, start a new one from an idea, work without code leaving your machine, write a book, record an architecture decision, review security and follow a team's delivery.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/use-cases/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+</head>
+
+<body>
+  <a class="skip" href="#contenido">Skip to content</a>
+  <header class="top">
+    <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar"
+      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M3 5h14M3 10h14M3 15h14" />
+      </svg></button>
+    <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark"
+        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+    <a class="crumb" href="../">Manual</a>
+    <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <circle cx="9" cy="9" r="5.5" />
+        <path d="m13.5 13.5 3.5 3.5" />
+      </svg><span>Search</span><kbd>Ctrl K</kbd></button>
+    <a class="lang" href="../../casos-de-uso/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
+      </svg></button>
+    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg
+        viewBox="0 0 16 16" aria-hidden="true" class="fill">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+      </svg></a>
+    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Manual contents">
+      <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
+      <ol class="chapters">
+        <li><a href="../"><span class="n">00</span>Home</a></li>
+        <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
+        <li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
+        <li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
+        <li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
+        <li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
+        <li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
+        <li><a href="../evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
+        <li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+        <li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
+        <li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
+        <li><a href="../models/"><span class="n">11</span>Available models</a></li>
+        <li><a href="../use-cases/" aria-current="page"><span class="n">12</span>Use cases</a></li>
+        <li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
+        <li><a href="../reference/"><span class="n">14</span>Reference</a></li>
+        <li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+        <li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
+      </ol>
+      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+    </aside>
+    <main class="content" id="contenido">
+      <article class="doc">
+        <p class="kicker">Chapter 12</p>
+        <h1 id="step-by-step-use-cases">Step-by-step use cases</h1>
+        <p>Each recipe says who it is for, what you need and the steps, with links to the chapter that explains each
+          piece.</p>
+        <h2 id="1-understand-an-undocumented-legacy-project">1. Understand an undocumented legacy project</h2>
+        <p><strong>For:</strong> whoever inherits a repository and needs to find their way before touching anything.
+          <strong>You need:</strong> the repository with its Git history, and any provider.
+        </p>
+        <ol>
+          <li>Open the folder and the Hub (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>).</li>
+          <li>Type <code>onboard</code>. You get the stack, the real source folders, the test and build commands and an
+            ADR-001 in <code>.alpaquitay/</code>. <a href="../chat-commands/#onboard">Chat commands</a></li>
+          <li>Type <code>dora</code> to see how delivery has gone so far: frequency, share of fixes and traceability. <a
+              href="../chat-commands/#dora">Chat commands</a></li>
+          <li>Open <strong>Architecture</strong> and click <strong>↻ Re-infer</strong>: you will see the services,
+            databases and queues the project really uses. <a href="../architecture/">Architecture</a></li>
+          <li>Ask in the chat: <em>&quot;explain how a booking request flows through this project&quot;</em>.</li>
+          <li>Write a spec with what you are going to change and start with the smallest task. The first
+            <code>si aplicar</code> will show you the whole cycle with a checkpoint.</li>
+        </ol>
+        <p><strong>Outcome:</strong> a map of the system, an initial ADR and debt that starts already paid down
+          (<code>onboard</code> removes 10 points).</p>
+        <h2 id="2-start-a-new-project-from-an-idea">2. Start a new project from an idea</h2>
+        <p><strong>For:</strong> whoever has an idea and an empty folder.</p>
+        <ol>
+          <li>Type the idea in the chat just as you have it: <em>&quot;I have an idea for an app to book padel courts
+              with payment and reminders&quot;</em>. It goes to the idea inbox with a proposed objective, scope and
+            out-of-scope. <a href="../work/#ideas-that-are-not-tasks-yet">Work</a></li>
+          <li>When it is clear, type <code>promover</code> to turn it into an epic of <code>spec.md</code>.</li>
+          <li>Want a complete first draft without your idea leaving the machine? Use <strong>Generate Specification
+              (Local Model)</strong>. <a href="../local-engine/">Local engine</a></li>
+          <li>Order and refine the tasks by hand. Small, verifiable, starting with a verb.</li>
+          <li>If you want the folder structure done, use the <strong>Project Builder</strong> skill with the stack you
+            prefer. <a href="../agents/">Agents</a></li>
+          <li>Run <code>onboard</code> as soon as there is a <code>package.json</code>, <code>pom.xml</code> or similar,
+            so the harness knows your build and test commands.</li>
+          <li>Work task by task from the board.</li>
+        </ol>
+        <h2 id="3-work-without-your-code-leaving-your-machine">3. Work without your code leaving your machine</h2>
+        <p><strong>For:</strong> teams with confidential code, personal data or compliance requirements.</p>
+        <ol>
+          <li>Install <strong>Ollama</strong> and pull a 7B or larger code model if your machine can run it. <a
+              href="../providers/#ollama">Providers</a></li>
+          <li>Set <code>alpaquitay-ai.preferredProvider: &quot;ollama&quot;</code> so a cloud provider is never picked
+            by accident, and <strong>do not store</strong> Anthropic or OpenAI keys.</li>
+          <li>Use the <strong>local engine</strong> for specs: the only network it uses is the one-time signed model
+            download.</li>
+          <li>Check that the harness strip says <code>privacy on-device</code>.</li>
+          <li>For a network without Internet, serve the models from your own CDN with your key (<code>cdnBaseUrl</code>
+            + <code>extraTrustedKeys</code>). <a href="../models/#publishing-a-model-on-your-own-cdn">Models</a></li>
+        </ol>
+        <aside class="callout callout-tip">
+          <p class="callout-title">Tip</p>
+          <p>Telemetry is already off. With a local provider, Alpaquitay makes no network request with your code.</p>
+        </aside>
+        <h2 id="4-write-proofread-and-publish-a-book">4. Write, proofread and publish a book</h2>
+        <p><strong>For:</strong> authors and documentation teams.</p>
+        <ol>
+          <li>Write the manuscript in Markdown (one file per chapter or a single one) or in Word.</li>
+          <li>In <strong>Docs</strong>, open the document and run <strong>Consistency check</strong>: names, dates,
+            places and terminology that do not match across chapters. <a href="../docs/">Docs</a></li>
+          <li>Run <strong>Outline</strong> and <strong>Editorial feedback</strong> to see the structure and what is
+            missing.</li>
+          <li>Proofread chapter by chapter with <strong>Proofread</strong>. Apply <em>Only safe</em> first and review
+            the ones flagged <em>review</em> by hand.</li>
+          <li>An edition in another language? <strong>Translate to</strong> writes a new file and leaves the original
+            untouched.</li>
+          <li>Convert the final Markdown to <strong>EPUB</strong> in one click. In Word, edits arrive as tracked changes
+            for your editor to accept or reject.</li>
+        </ol>
+        <h2 id="5-make-and-record-an-architecture-decision">5. Make and record an architecture decision</h2>
+        <p><strong>For:</strong> architects and tech leads.</p>
+        <ol>
+          <li>In <strong>Architecture</strong>, click <strong>↻ Re-infer</strong> to start from the real system.</li>
+          <li>With <strong>▲ AI</strong>, ask for the alternative: <em>&quot;extract the payments module into its own
+              service with a queue between them&quot;</em>.</li>
+          <li>Click <strong>▲ Assess</strong> to compare quality attributes and risks.</li>
+          <li>Click <strong>ADR</strong>, describe the context and the decision and create the record in
+            <code>.alpaquitay/adrs/</code>.</li>
+          <li>Ask in the chat <em>&quot;generate a C4 container diagram of this system&quot;</em> to prepare the
+            explanation for each audience.</li>
+          <li>Export a <strong>Terraform</strong>, CDK, Bicep or GCP skeleton as a starting point for the platform team.
+            <a href="../architecture/#exporting-infrastructure-as-code">Architecture</a></li>
+        </ol>
+        <h2 id="6-review-security-before-a-release">6. Review security before a release</h2>
+        <p><strong>For:</strong> teams that ship software and want a structured review.</p>
+        <ol>
+          <li>Ask in the chat <em>&quot;build a STRIDE threat model of the payments flow&quot;</em> and confirm with
+            <code>si</code>: the DevSecOps specialist handles it. <a href="../agents/#domain-specialists">Agents</a>
+          </li>
+          <li>Ask <em>&quot;generate an SBOM for this project&quot;</em> and <em>&quot;assess our pipeline against OWASP
+              SAMM&quot;</em>.</li>
+          <li>Review the pending diffs in <strong>Evidence</strong>: the automatic review blocks literal secrets and
+            files outside the sources. <a href="../harness/#what-guards-a-write">How the harness thinks</a></li>
+          <li>Check that the release's tasks are in <em>Done</em> with the DoD gate passed, not just ticked.</li>
+        </ol>
+        <h2 id="7-follow-a-team-s-delivery">7. Follow a team's delivery</h2>
+        <p><strong>For:</strong> tech leads and engineering managers.</p>
+        <ol>
+          <li>Ask the team to link their commits with <code>#SPEC-xxx</code>. <a
+              href="../work/#linking-commits-to-tasks">Work</a></li>
+          <li>Look at <strong>Evidence</strong>: repository signal, debt and review queue. <a
+              href="../evidence/">Evidence</a></li>
+          <li>Commit <code>.alpaquitay/decisions.jsonl</code> and <code>debt.json</code> to keep an auditable history of
+            what the harness decided and why.</li>
+          <li>If debt passes 70, stop and pay it down: apply or discard diffs, close tasks with evidence and run
+            <code>onboard</code> again if the stack changed.</li>
+        </ol>
+        <aside class="callout callout-note">
+          <p class="callout-title">Note</p>
+          <p>Alpaquitay's DORA figures come from Git and are labelled as <strong>signals</strong>, not operational
+            metrics. For management decisions, combine them with your real deployment and incident data.</p>
+        </aside>
+
+        <div class="doc-foot">
+          <a class="edit"
+            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/12-use-cases.md">Suggest an
+            improvement to this page</a>
+          <span>Manual for Alpaquitay AI 3.10.4 · MIT</span>
+        </div>
+        <nav class="pager" aria-label="Chapters">
+          <a class="prev" href="../models/"><span>Previous</span>Available models</a>
+          <a class="next" href="../diagrams/"><span>Next</span>Architecture diagrams</a>
+        </nav>
+      </article>
+      <nav class="toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul>
+          <li class="l2"><a href="#1-understand-an-undocumented-legacy-project">1. Understand an undocumented legacy
+              project</a></li>
+          <li class="l2"><a href="#2-start-a-new-project-from-an-idea">2. Start a new project from an idea</a></li>
+          <li class="l2"><a href="#3-work-without-your-code-leaving-your-machine">3. Work without your code leaving your
+              machine</a></li>
+          <li class="l2"><a href="#4-write-proofread-and-publish-a-book">4. Write, proofread and publish a book</a></li>
+          <li class="l2"><a href="#5-make-and-record-an-architecture-decision">5. Make and record an architecture
+              decision</a></li>
+          <li class="l2"><a href="#6-review-security-before-a-release">6. Review security before a release</a></li>
+          <li class="l2"><a href="#7-follow-a-team-s-delivery">7. Follow a team's delivery</a></li>
+        </ul>
+      </nav>
+    </main>
   </div>
-</div>
-<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
-<script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+  <div class="search" id="search" hidden>
+    <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+      <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off"
+        aria-label="Search text">
+      <ol id="searchResults" class="search-results"></ol>
+      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+    </div>
+  </div>
+  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+  <script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
+
 </html>

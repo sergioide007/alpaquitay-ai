@@ -1,168 +1,232 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Evidence: signals, debt and review · Alpaquitay AI manual</title>
-<meta name="description" content="The Alpaquitay AI Evidence tab: repository signals, agentic debt, the diff review queue, SDLC gates, traceable Git history, specialist routes and privacy status.">
-<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/evidence/">
-<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/evidence/">
-<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/evidence/">
-<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/evidence/">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/evidence/">
-<meta property="og:title" content="Evidence: signals, debt and review">
-<meta property="og:description" content="The Alpaquitay AI Evidence tab: repository signals, agentic debt, the diff review queue, SDLC gates, traceable Git history, specialist routes and privacy status.">
-<meta property="og:locale" content="en_US">
-<meta name="theme-color" content="#07100d">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
-<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Evidence: signals, debt and review","description":"The Alpaquitay AI Evidence tab: repository signals, agentic debt, the diff review queue, SDLC gates, traceable Git history, specialist routes and privacy status.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/evidence/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evidence: signals, debt and review · Alpaquitay AI manual</title>
+  <meta name="description"
+    content="The Alpaquitay AI Evidence tab: repository signals, agentic debt, the diff review queue, SDLC gates, traceable Git history, specialist routes and privacy status.">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/evidence/">
+  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/evidence/">
+  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/evidence/">
+  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/evidence/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/evidence/">
+  <meta property="og:title" content="Evidence: signals, debt and review">
+  <meta property="og:description"
+    content="The Alpaquitay AI Evidence tab: repository signals, agentic debt, the diff review queue, SDLC gates, traceable Git history, specialist routes and privacy status.">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#07100d">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/manual.css?v=ae81f6f39c">
+  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Evidence: signals, debt and review","description":"The Alpaquitay AI Evidence tab: repository signals, agentic debt, the diff review queue, SDLC gates, traceable Git history, specialist routes and privacy status.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/evidence/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
+
 <body>
-<a class="skip" href="#contenido">Skip to content</a>
-<header class="top">
-  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-  <a class="crumb" href="../">Manual</a>
-  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
-  <a class="lang" href="../../evidence/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
-  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
-  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
-  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
-  <ol class="chapters">
-<li><a href="../"><span class="n">00</span>Home</a></li>
-<li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
-<li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
-<li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
-<li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
-<li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
-<li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
-<li><a href="../evidence/" aria-current="page"><span class="n">07</span>Evidence · signals and review</a></li>
-<li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
-<li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
-<li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
-<li><a href="../models/"><span class="n">11</span>Available models</a></li>
-<li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
-<li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
-<li><a href="../reference/"><span class="n">14</span>Reference</a></li>
-<li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
-<li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
-  </ol>
-  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-</aside>
-<main class="content" id="contenido">
-<article class="doc">
-<p class="kicker">Chapter 07</p>
-<h1 id="evidence-signals-debt-and-review">Evidence: signals, debt and review</h1>
-<p>The <strong>Evidence</strong> tab is the delivery control panel: one screen with what the harness knows about your project and what is waiting for your decision. Its motto sums up Alpaquitay's idea: <strong>evidence before autonomy</strong>.</p>
-<figure class="figure"><a class="zoom" href="../../media/hub-evidence.png" aria-label="Enlarge: The Evidence tab with metrics, gates, review queue and debt"><img src="../../media/hub-evidence.png" alt="The Evidence tab with metrics, gates, review queue and debt" width="1600" height="1000" loading="lazy" decoding="async"></a><figcaption>Evidence: four metrics at the top; gates, review queue and history on the left; debt, routes and privacy on the right.</figcaption></figure>
+  <a class="skip" href="#contenido">Skip to content</a>
+  <header class="top">
+    <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar"
+      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M3 5h14M3 10h14M3 15h14" />
+      </svg></button>
+    <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark"
+        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+    <a class="crumb" href="../">Manual</a>
+    <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <circle cx="9" cy="9" r="5.5" />
+        <path d="m13.5 13.5 3.5 3.5" />
+      </svg><span>Search</span><kbd>Ctrl K</kbd></button>
+    <a class="lang" href="../../evidence/" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
+      </svg></button>
+    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg
+        viewBox="0 0 16 16" aria-hidden="true" class="fill">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+      </svg></a>
+    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Manual contents">
+      <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
+      <ol class="chapters">
+        <li><a href="../"><span class="n">00</span>Home</a></li>
+        <li><a href="../installation/"><span class="n">01</span>Installation and first steps</a></li>
+        <li><a href="../providers/"><span class="n">02</span>Providers and privacy</a></li>
+        <li><a href="../harness/"><span class="n">03</span>How the harness thinks</a></li>
+        <li><a href="../work/"><span class="n">04</span>Work · spec, board and chat</a></li>
+        <li><a href="../chat-commands/"><span class="n">05</span>Chat commands</a></li>
+        <li><a href="../docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
+        <li><a href="../evidence/" aria-current="page"><span class="n">07</span>Evidence · signals and review</a></li>
+        <li><a href="../architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+        <li><a href="../agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
+        <li><a href="../local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
+        <li><a href="../models/"><span class="n">11</span>Available models</a></li>
+        <li><a href="../use-cases/"><span class="n">12</span>Use cases</a></li>
+        <li><a href="../diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
+        <li><a href="../reference/"><span class="n">14</span>Reference</a></li>
+        <li><a href="../troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+        <li><a href="../community/"><span class="n">16</span>Contributing and community</a></li>
+      </ol>
+      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+    </aside>
+    <main class="content" id="contenido">
+      <article class="doc">
+        <p class="kicker">Chapter 07</p>
+        <h1 id="evidence-signals-debt-and-review">Evidence: signals, debt and review</h1>
+        <p>The <strong>Evidence</strong> tab is the delivery control panel: one screen with what the harness knows about
+          your project and what is waiting for your decision. Its motto sums up Alpaquitay's idea: <strong>evidence
+            before autonomy</strong>.</p>
+        <figure class="figure"><a class="zoom" href="../../media/hub-evidence.png"
+            aria-label="Enlarge: The Evidence tab with metrics, gates, review queue and debt"><img
+              src="../../media/hub-evidence.png" alt="The Evidence tab with metrics, gates, review queue and debt"
+              width="1600" height="1000" loading="lazy" decoding="async"></a>
+          <figcaption>Evidence: four metrics at the top; gates, review queue and history on the left; debt, routes and
+            privacy on the right.</figcaption>
+        </figure>
 
-<h2 id="the-four-metrics">The four metrics</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Card</th>
-<th>What it shows</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Repository signal</strong></td>
-<td>The approximate DORA level computed from Git (<em>High</em>, <em>Medium</em>, <em>Low</em> or no data).</td>
-</tr>
-<tr>
-<td><strong>Agentic debt</strong></td>
-<td>Current debt out of 100.</td>
-</tr>
-<tr>
-<td><strong>Review queue</strong></td>
-<td>How many files have a diff waiting for your decision.</td>
-</tr>
-<tr>
-<td><strong>Session economy</strong></td>
-<td>Local operations versus model calls.</td>
-</tr>
-</tbody>
-</table></div>
-<p>The <strong>Run onboarding</strong> (same as <code>onboard</code>) and <strong>↻ Refresh evidence</strong> buttons are at the top right.</p>
-<h2 id="executable-sdlc-gates">Executable SDLC gates</h2>
-<p>The six phases (Requirements, Design, Build, Test, Deploy, Maintain) with their gate and state: <em>routed</em>, <em>enforced</em>, <em>evidence</em>, <em>human gate</em> or <em>tracked</em>. They show <strong>what kind of control the harness applies</strong> in each phase: in Build and Design it is enforced, in Test real evidence is required and in Deploy a person always decides. Details in <a href="../harness/#the-six-sdlc-phases-and-their-gates">How the harness thinks</a>.</p>
-<h2 id="review-queue">Review queue</h2>
-<p>Lists every file with a pending diff. Two buttons:</p>
-<ul>
-<li><strong>Discard all</strong> — discards them all (like <code>no</code>).</li>
-<li><strong>Apply &amp; run gates</strong> — applies them all with policy, automatic review and checkpoint, and runs build and test (like <code>si aplicar</code>).</li>
-</ul>
-<p>When the queue is empty you will see <em>&quot;No pending changes. The harness writes only after review.&quot;</em></p>
-<h2 id="traceable-git-history">Traceable Git history</h2>
-<p>The repository's latest commits, with a mark on those that link a task (<code>#SPEC-001</code> or <code>[SPEC: 001]</code>). The note next to it is deliberate: the DORA figures are <strong>repository-derived proxies</strong>; connect your real deployment and incident events before treating them as operational measurements.</p>
-<h2 id="debt-ceiling">Debt ceiling</h2>
-<p>Score, state (<em>healthy</em>, high or ceiling broken) and the latest events that moved it. At 100 the Build lane is blocked. It is paid down with <code>onboard</code>, applied diffs and verified <em>Done</em> tasks.</p>
-<h2 id="specialist-routing">Specialist routing</h2>
-<p>A reminder of the three lanes:</p>
-<ul>
-<li><strong>Flash</strong> — local reception: questions, ideas and free commands.</li>
-<li><strong>Build</strong> — diff-first implementation: plan, preview, apply and verify.</li>
-<li><strong>Deep</strong> — one registered specialist: security, QA, architecture, DevOps…</li>
-</ul>
-<p>Every route leaves a receipt in <code>.alpaquitay/decisions.jsonl</code>: <strong>one agent, one receipt</strong>.</p>
-<h2 id="privacy-boundary">Privacy boundary</h2>
-<p>The session's privacy status:</p>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>Line</th>
-<th>Usual value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Telemetry</td>
-<td><em>Off by default</em></td>
-</tr>
-<tr>
-<td>Cloud redaction</td>
-<td><em>Boundary ready</em>, or the number of replacements made in the latest cloud request</td>
-</tr>
-<tr>
-<td>Keys</td>
-<td>VS Code SecretStorage</td>
-</tr>
-<tr>
-<td>Intermediary servers</td>
-<td><em>None</em></td>
-</tr>
-</tbody>
-</table></div>
-<p>The harness strip (below the tabs) shows the same status in short: <code>privacy on-device</code> with a local provider and <code>privacy cloud boundary</code> with a cloud one.</p>
+        <h2 id="the-four-metrics">The four metrics</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Card</th>
+                <th>What it shows</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Repository signal</strong></td>
+                <td>The approximate DORA level computed from Git (<em>High</em>, <em>Medium</em>, <em>Low</em> or no
+                  data).</td>
+              </tr>
+              <tr>
+                <td><strong>Agentic debt</strong></td>
+                <td>Current debt out of 100.</td>
+              </tr>
+              <tr>
+                <td><strong>Review queue</strong></td>
+                <td>How many files have a diff waiting for your decision.</td>
+              </tr>
+              <tr>
+                <td><strong>Session economy</strong></td>
+                <td>Local operations versus model calls.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The <strong>Run onboarding</strong> (same as <code>onboard</code>) and <strong>↻ Refresh evidence</strong>
+          buttons are at the top right.</p>
+        <h2 id="executable-sdlc-gates">Executable SDLC gates</h2>
+        <p>The six phases (Requirements, Design, Build, Test, Deploy, Maintain) with their gate and state:
+          <em>routed</em>, <em>enforced</em>, <em>evidence</em>, <em>human gate</em> or <em>tracked</em>. They show
+          <strong>what kind of control the harness applies</strong> in each phase: in Build and Design it is enforced,
+          in Test real evidence is required and in Deploy a person always decides. Details in <a
+            href="../harness/#the-six-sdlc-phases-and-their-gates">How the harness thinks</a>.</p>
+        <h2 id="review-queue">Review queue</h2>
+        <p>Lists every file with a pending diff. Two buttons:</p>
+        <ul>
+          <li><strong>Discard all</strong> — discards them all (like <code>no</code>).</li>
+          <li><strong>Apply &amp; run gates</strong> — applies them all with policy, automatic review and checkpoint,
+            and runs build and test (like <code>si aplicar</code>).</li>
+        </ul>
+        <p>When the queue is empty you will see <em>&quot;No pending changes. The harness writes only after
+            review.&quot;</em></p>
+        <h2 id="traceable-git-history">Traceable Git history</h2>
+        <p>The repository's latest commits, with a mark on those that link a task (<code>#SPEC-001</code> or
+          <code>[SPEC: 001]</code>). The note next to it is deliberate: the DORA figures are <strong>repository-derived
+            proxies</strong>; connect your real deployment and incident events before treating them as operational
+          measurements.</p>
+        <h2 id="debt-ceiling">Debt ceiling</h2>
+        <p>Score, state (<em>healthy</em>, high or ceiling broken) and the latest events that moved it. At 100 the Build
+          lane is blocked. It is paid down with <code>onboard</code>, applied diffs and verified <em>Done</em> tasks.
+        </p>
+        <h2 id="specialist-routing">Specialist routing</h2>
+        <p>A reminder of the three lanes:</p>
+        <ul>
+          <li><strong>Flash</strong> — local reception: questions, ideas and free commands.</li>
+          <li><strong>Build</strong> — diff-first implementation: plan, preview, apply and verify.</li>
+          <li><strong>Deep</strong> — one registered specialist: security, QA, architecture, DevOps…</li>
+        </ul>
+        <p>Every route leaves a receipt in <code>.alpaquitay/decisions.jsonl</code>: <strong>one agent, one
+            receipt</strong>.</p>
+        <h2 id="privacy-boundary">Privacy boundary</h2>
+        <p>The session's privacy status:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Line</th>
+                <th>Usual value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Telemetry</td>
+                <td><em>Off by default</em></td>
+              </tr>
+              <tr>
+                <td>Cloud redaction</td>
+                <td><em>Boundary ready</em>, or the number of replacements made in the latest cloud request</td>
+              </tr>
+              <tr>
+                <td>Keys</td>
+                <td>VS Code SecretStorage</td>
+              </tr>
+              <tr>
+                <td>Intermediary servers</td>
+                <td><em>None</em></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The harness strip (below the tabs) shows the same status in short: <code>privacy on-device</code> with a
+          local provider and <code>privacy cloud boundary</code> with a cloud one.</p>
 
-<div class="doc-foot">
-  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/07-evidence.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.10.3 · MIT</span>
-</div>
-<nav class="pager" aria-label="Chapters">
-<a class="prev" href="../docs/"><span>Previous</span>Docs · documents with an agent</a>
-<a class="next" href="../architecture/"><span>Next</span>Architecture · ADRs and IaC</a>
-</nav>
-</article>
-<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#the-four-metrics">The four metrics</a></li><li class="l2"><a href="#executable-sdlc-gates">Executable SDLC gates</a></li><li class="l2"><a href="#review-queue">Review queue</a></li><li class="l2"><a href="#traceable-git-history">Traceable Git history</a></li><li class="l2"><a href="#debt-ceiling">Debt ceiling</a></li><li class="l2"><a href="#specialist-routing">Specialist routing</a></li><li class="l2"><a href="#privacy-boundary">Privacy boundary</a></li></ul></nav>
-</main>
-</div>
-<div class="search" id="search" hidden>
-  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
-    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
-    <ol id="searchResults" class="search-results"></ol>
-    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+        <div class="doc-foot">
+          <a class="edit"
+            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/07-evidence.md">Suggest an
+            improvement to this page</a>
+          <span>Manual for Alpaquitay AI 3.10.4 · MIT</span>
+        </div>
+        <nav class="pager" aria-label="Chapters">
+          <a class="prev" href="../docs/"><span>Previous</span>Docs · documents with an agent</a>
+          <a class="next" href="../architecture/"><span>Next</span>Architecture · ADRs and IaC</a>
+        </nav>
+      </article>
+      <nav class="toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul>
+          <li class="l2"><a href="#the-four-metrics">The four metrics</a></li>
+          <li class="l2"><a href="#executable-sdlc-gates">Executable SDLC gates</a></li>
+          <li class="l2"><a href="#review-queue">Review queue</a></li>
+          <li class="l2"><a href="#traceable-git-history">Traceable Git history</a></li>
+          <li class="l2"><a href="#debt-ceiling">Debt ceiling</a></li>
+          <li class="l2"><a href="#specialist-routing">Specialist routing</a></li>
+          <li class="l2"><a href="#privacy-boundary">Privacy boundary</a></li>
+        </ul>
+      </nav>
+    </main>
   </div>
-</div>
-<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
-<script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
+  <div class="search" id="search" hidden>
+    <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+      <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off"
+        aria-label="Search text">
+      <ol id="searchResults" class="search-results"></ol>
+      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+    </div>
+  </div>
+  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+  <script src="../../assets/manual.js?v=ae81f6f39c" data-root="../" defer></script>
 </body>
+
 </html>

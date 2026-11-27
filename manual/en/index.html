@@ -1,169 +1,242 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alpaquitay AI manual</title>
-<meta name="description" content="User manual for Alpaquitay AI for VS Code: installation, AI providers, specs and board, document agent, evidence, architecture, the WebGPU local engine, use cases and videos.">
-<link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/">
-<link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/">
-<link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/">
-<link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/">
-<meta property="og:title" content="Alpaquitay AI manual">
-<meta property="og:description" content="User manual for Alpaquitay AI for VS Code: installation, AI providers, specs and board, document agent, evidence, architecture, the WebGPU local engine, use cases and videos.">
-<meta property="og:locale" content="en_US">
-<meta name="theme-color" content="#07100d">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
-<link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
-<script>try{var t=localStorage.getItem('alpaquitay-manual-theme');if(t){document.documentElement.setAttribute('data-theme',t);}else if(matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}catch(e){}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Alpaquitay AI manual","description":"User manual for Alpaquitay AI for VS Code: installation, AI providers, specs and board, document agent, evidence, architecture, the WebGPU local engine, use cases and videos.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alpaquitay AI manual</title>
+  <meta name="description"
+    content="User manual for Alpaquitay AI for VS Code: installation, AI providers, specs and board, document agent, evidence, architecture, the WebGPU local engine, use cases and videos.">
+  <link rel="canonical" href="https://alpaquitay-ai.specsolid.com/manual/en/">
+  <link rel="alternate" hreflang="en" href="https://alpaquitay-ai.specsolid.com/manual/en/">
+  <link rel="alternate" hreflang="es" href="https://alpaquitay-ai.specsolid.com/manual/">
+  <link rel="alternate" hreflang="x-default" href="https://alpaquitay-ai.specsolid.com/manual/en/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://alpaquitay-ai.specsolid.com/manual/en/">
+  <meta property="og:title" content="Alpaquitay AI manual">
+  <meta property="og:description"
+    content="User manual for Alpaquitay AI for VS Code: installation, AI providers, specs and board, document agent, evidence, architecture, the WebGPU local engine, use cases and videos.">
+  <meta property="og:locale" content="en_US">
+  <meta name="theme-color" content="#07100d">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="stylesheet" href="../assets/manual.css?v=ae81f6f39c">
+  <script>try { var t = localStorage.getItem('alpaquitay-manual-theme'); if (t) { document.documentElement.setAttribute('data-theme', t); } else if (matchMedia('(prefers-color-scheme: light)').matches) { document.documentElement.setAttribute('data-theme', 'light'); } } catch (e) { }</script>
+  <script
+    type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Alpaquitay AI manual","description":"User manual for Alpaquitay AI for VS Code: installation, AI providers, specs and board, document agent, evidence, architecture, the WebGPU local engine, use cases and videos.","inLanguage":"en","url":"https://alpaquitay-ai.specsolid.com/manual/en/","isPartOf":{"@type":"WebSite","name":"Alpaquitay AI","url":"https://alpaquitay-ai.specsolid.com/"},"about":{"@type":"SoftwareApplication","name":"Alpaquitay AI","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux (Visual Studio Code)"},"author":{"@type":"Person","name":"Sergio Perez Ruiz","url":"https://www.specsolid.com/"}}</script>
 </head>
+
 <body>
-<a class="skip" href="#contenido">Skip to content</a>
-<header class="top">
-  <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-  <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark" src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
-  <a class="crumb" href="./">Manual</a>
-  <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
-  <a class="lang" href="../" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
-  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z"/></svg></button>
-  <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg viewBox="0 0 16 16" aria-hidden="true" class="fill"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg></a>
-  <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
-</header>
-<div class="layout">
-<aside class="sidebar" id="sidebar" aria-label="Manual contents">
-  <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
-  <ol class="chapters">
-<li><a href="" aria-current="page"><span class="n">00</span>Home</a></li>
-<li><a href="installation/"><span class="n">01</span>Installation and first steps</a></li>
-<li><a href="providers/"><span class="n">02</span>Providers and privacy</a></li>
-<li><a href="harness/"><span class="n">03</span>How the harness thinks</a></li>
-<li><a href="work/"><span class="n">04</span>Work · spec, board and chat</a></li>
-<li><a href="chat-commands/"><span class="n">05</span>Chat commands</a></li>
-<li><a href="docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
-<li><a href="evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
-<li><a href="architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
-<li><a href="agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
-<li><a href="local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
-<li><a href="models/"><span class="n">11</span>Available models</a></li>
-<li><a href="use-cases/"><span class="n">12</span>Use cases</a></li>
-<li><a href="diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
-<li><a href="reference/"><span class="n">14</span>Reference</a></li>
-<li><a href="troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
-<li><a href="community/"><span class="n">16</span>Contributing and community</a></li>
-  </ol>
-  <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
-</aside>
-<main class="content" id="contenido">
-<article class="doc">
+  <a class="skip" href="#contenido">Skip to content</a>
+  <header class="top">
+    <button class="icon-btn menu" id="menuBtn" aria-label="Open the table of contents" aria-controls="sidebar"
+      aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M3 5h14M3 10h14M3 15h14" />
+      </svg></button>
+    <a class="brand" href="/" aria-label="Alpaquitay AI home page"><img class="brand-mark"
+        src="/icons/favicon-96x96.png" alt="" width="28" height="28"><span>Alpaquitay AI</span></a>
+    <a class="crumb" href="./">Manual</a>
+    <button class="search-btn" id="searchBtn" aria-label="Search the manual (Ctrl+K)"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <circle cx="9" cy="9" r="5.5" />
+        <path d="m13.5 13.5 3.5 3.5" />
+      </svg><span>Search</span><kbd>Ctrl K</kbd></button>
+    <a class="lang" href="../" hreflang="es" lang="es" aria-label="Leer esta página en español">ES</a>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme"><svg viewBox="0 0 20 20"
+        aria-hidden="true">
+        <path d="M10 3a7 7 0 1 0 7 7 5.5 5.5 0 0 1-7-7Z" />
+      </svg></button>
+    <a class="icon-btn" href="https://github.com/sergioide007/alpaquitay-ai" aria-label="Source code on GitHub"><svg
+        viewBox="0 0 16 16" aria-hidden="true" class="fill">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+      </svg></a>
+    <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=alpaquitay-ai.alpaquitay-ai">Install</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Manual contents">
+      <p class="side-title">User manual <span class="ver">v3.10.3</span></p>
+      <ol class="chapters">
+        <li><a href="" aria-current="page"><span class="n">00</span>Home</a></li>
+        <li><a href="installation/"><span class="n">01</span>Installation and first steps</a></li>
+        <li><a href="providers/"><span class="n">02</span>Providers and privacy</a></li>
+        <li><a href="harness/"><span class="n">03</span>How the harness thinks</a></li>
+        <li><a href="work/"><span class="n">04</span>Work · spec, board and chat</a></li>
+        <li><a href="chat-commands/"><span class="n">05</span>Chat commands</a></li>
+        <li><a href="docs/"><span class="n">06</span>Docs · documents with an agent</a></li>
+        <li><a href="evidence/"><span class="n">07</span>Evidence · signals and review</a></li>
+        <li><a href="architecture/"><span class="n">08</span>Architecture · ADRs and IaC</a></li>
+        <li><a href="agents/"><span class="n">09</span>Agents · skills and specialists</a></li>
+        <li><a href="local-engine/"><span class="n">10</span>Local engine (WebGPU)</a></li>
+        <li><a href="models/"><span class="n">11</span>Available models</a></li>
+        <li><a href="use-cases/"><span class="n">12</span>Use cases</a></li>
+        <li><a href="diagrams/"><span class="n">13</span>Architecture diagrams</a></li>
+        <li><a href="reference/"><span class="n">14</span>Reference</a></li>
+        <li><a href="troubleshooting/"><span class="n">15</span>Troubleshooting and FAQ</a></li>
+        <li><a href="community/"><span class="n">16</span>Contributing and community</a></li>
+      </ol>
+      <p class="side-foot"><a href="https://github.com/sergioide007/alpaquitay-ai/blob/main/README.md">README</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/blob/main/CHANGELOG.md">Changelog</a> · <a
+          href="https://github.com/sergioide007/alpaquitay-ai/issues">Issues</a></p>
+    </aside>
+    <main class="content" id="contenido">
+      <article class="doc">
 
-<h1 id="alpaquitay-ai-manual">Alpaquitay AI manual</h1>
-<p>Alpaquitay AI is a free, open-source (MIT) extension for Visual Studio Code. It puts a <strong>harness</strong> between your intent and your code: it picks the right route for each request, shows you every change as a <em>diff</em> before writing it, checks the gates of the software lifecycle and keeps a local record of what happened. You can use it with models on your own machine (Ollama, LM Studio or its WebGPU local engine) or with Anthropic and OpenAI.</p>
-<p>This manual explains how to use each part, what it is good for and what it guarantees, with screenshots and videos of the real extension.</p>
-<figure class="video">
-<video controls preload="none" playsinline poster="../media/tour-en.jpg" width="1440" height="900" aria-label="A tour of the Hub"><source src="../media/tour-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a href="../media/tour-en.mp4">Download the video</a>.</video>
-<figcaption><strong>A tour of the Hub</strong> <span class="video-len">0:44</span> — The Hub opens with <code>Ctrl+Alt+A</code>; the video walks through its six tabs: Work, Docs, Evidence, Architecture, Agents and Settings.</figcaption>
-</figure>
-<aside class="callout callout-note"><p class="callout-title">Note</p>
-<p>Some messages inside the extension are in Spanish (for example the download confirmation and the progress notifications of the local engine). This manual quotes them as they appear and translates them.</p>
-</aside>
-<h2 id="where-to-start">Where to start</h2>
-<ul class="cards">
-<li><a href="installation/"><strong>1 · Install and open the Hub</strong><span>Marketplace or Open VSX, the two shortcuts and your first session.</span></a></li>
-<li><a href="providers/"><strong>2 · Choose an AI provider</strong><span>Local and private (Ollama, LM Studio, local engine) or in the cloud.</span></a></li>
-<li><a href="work/"><strong>3 · Work from a spec</strong><span>From <code>spec.md</code> to the board, and from the board to a reviewed change.</span></a></li>
-<li><a href="local-engine/"><strong>4 · AI on your own machine</strong><span>Generate specs with WebGPU without sending your text to any server.</span></a></li>
-<li><a href="use-cases/"><strong>5 · Step-by-step use cases</strong><span>Legacy project, new project, a book, architecture and more.</span></a></li>
-<li><a href="models/"><strong>6 · Available models</strong><span>Live status of the signed models of the local engine.</span></a></li>
-</ul>
-<h2 id="what-alpaquitay-does-in-one-table">What Alpaquitay does, in one table</h2>
-<div class="table-wrap"><table>
-<thead>
-<tr>
-<th>You need to…</th>
-<th>Use</th>
-<th>Chapter</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Turn an idea into epics and tasks</td>
-<td><strong>Work</strong> tab → <em>Create with AI</em>, or the <em>Generate Specification (Local Model)</em> command</td>
-<td><a href="work/">Work</a>, <a href="local-engine/">Local engine</a></td>
-</tr>
-<tr>
-<td>Let the AI implement a task without writing blindly</td>
-<td>Drag the card to <strong>In Progress</strong>, review the diff, <code>si aplicar</code></td>
-<td><a href="work/">Work</a></td>
-</tr>
-<tr>
-<td>Know the real state of the repository</td>
-<td><code>onboard</code>, <code>dora</code>, <code>deuda</code> in the chat; the <strong>Evidence</strong> tab</td>
-<td><a href="chat-commands/">Chat commands</a>, <a href="evidence/">Evidence</a></td>
-</tr>
-<tr>
-<td>Proofread, translate or review a manuscript</td>
-<td>The <strong>Docs</strong> tab (Word, Markdown, EPUB, PDF)</td>
-<td><a href="docs/">Docs</a></td>
-</tr>
-<tr>
-<td>See and document the architecture</td>
-<td>The <strong>Architecture</strong> tab: inference, ADRs, assessment, IaC export</td>
-<td><a href="architecture/">Architecture</a></td>
-</tr>
-<tr>
-<td>An expert opinion (security, QA, DevOps, cloud…)</td>
-<td>Ask in the chat; the harness picks a specialist</td>
-<td><a href="agents/">Agents</a></td>
-</tr>
-<tr>
-<td>Work without your code leaving your machine</td>
-<td>Ollama, LM Studio or the local engine</td>
-<td><a href="providers/">Providers</a></td>
-</tr>
-</tbody>
-</table></div>
-<h2 id="how-this-manual-is-organised">How this manual is organised</h2>
-<ul>
-<li><strong>Chapters 1 to 3:</strong> installation, providers and how the harness thinks. Read them in order the first time.</li>
-<li><strong>Chapters 4 to 10:</strong> one tab or feature per chapter. Jump to the one you need.</li>
-<li><strong>Chapters 11 to 16:</strong> models, recipes, diagrams, reference, troubleshooting and how to contribute.</li>
-</ul>
-<p>Search any topic with <kbd>Ctrl</kbd>+<kbd>K</kbd> (or <kbd>/</kbd>). Every page ends with a link to suggest improvements on GitHub: this manual belongs to the community. There is also a <a href="../">Spanish version</a>.</p>
-<aside class="callout callout-note"><p class="callout-title">Note</p>
-<p>The manual describes version <strong>3.8.3</strong>. It includes the <strong>Changes</strong> tab for following agent progress and reviewing file diffs, with actions to review and apply or discard pending changes. It also covers the Qwen 2.5 local provider with WebGPU, <em>Generate Specification (Local Model)</em> and the models page.</p>
-</aside>
-<h2 id="principles-you-will-see-everywhere">Principles you will see everywhere</h2>
-<ol>
-<li><strong>Nothing is written without you seeing it.</strong> In the Hub, every code change first arrives as a bounded <em>diff</em>, and writing needs your <code>si aplicar</code>. (The exception is the classic <em>Generate from Spec</em> command, which writes directly; see <a href="work/#generate-from-spec-and-validate-against-spec">Work</a>.)</li>
-<li><strong>Evidence before autonomy.</strong> Code tasks move to <em>Done</em> only with no pending diffs, an <code>onboard</code>-verified platform contract and green build/test evidence. Docs-only projects need no contract or build/test evidence, but pending diffs still block <em>Done</em>.</li>
-<li><strong>Privacy by architecture.</strong> There is no Alpaquitay intermediary server. Local models never leave your machine; cloud calls go straight to your provider after passing a privacy boundary that hides personal data and secrets.</li>
-<li><strong>Everything is recorded in your repository</strong>, in the <code>.alpaquitay/</code> folder: decisions, debt, session economy, project memory and ADRs.</li>
-</ol>
+        <h1 id="alpaquitay-ai-manual">Alpaquitay AI manual</h1>
+        <p>Alpaquitay AI is a free, open-source (MIT) extension for Visual Studio Code. It puts a
+          <strong>harness</strong> between your intent and your code: it picks the right route for each request, shows
+          you every change as a <em>diff</em> before writing it, checks the gates of the software lifecycle and keeps a
+          local record of what happened. You can use it with models on your own machine (Ollama, LM Studio or its WebGPU
+          local engine) or with Anthropic and OpenAI.</p>
+        <p>This manual explains how to use each part, what it is good for and what it guarantees, with screenshots and
+          videos of the real extension.</p>
+        <figure class="video">
+          <video controls preload="none" playsinline poster="../media/tour-en.jpg" width="1440" height="900"
+            aria-label="A tour of the Hub">
+            <source src="../media/tour-en.mp4" type="video/mp4">Your browser cannot play MP4 video. <a
+              href="../media/tour-en.mp4">Download the video</a>.
+          </video>
+          <figcaption><strong>A tour of the Hub</strong> <span class="video-len">0:44</span> — The Hub opens with
+            <code>Ctrl+Alt+A</code>; the video walks through its six tabs: Work, Docs, Evidence, Architecture, Agents
+            and Settings.</figcaption>
+        </figure>
+        <aside class="callout callout-note">
+          <p class="callout-title">Note</p>
+          <p>Some messages inside the extension are in Spanish (for example the download confirmation and the progress
+            notifications of the local engine). This manual quotes them as they appear and translates them.</p>
+        </aside>
+        <h2 id="where-to-start">Where to start</h2>
+        <ul class="cards">
+          <li><a href="installation/"><strong>1 · Install and open the Hub</strong><span>Marketplace or Open VSX, the
+                two shortcuts and your first session.</span></a></li>
+          <li><a href="providers/"><strong>2 · Choose an AI provider</strong><span>Local and private (Ollama, LM Studio,
+                local engine) or in the cloud.</span></a></li>
+          <li><a href="work/"><strong>3 · Work from a spec</strong><span>From <code>spec.md</code> to the board, and
+                from the board to a reviewed change.</span></a></li>
+          <li><a href="local-engine/"><strong>4 · AI on your own machine</strong><span>Generate specs with WebGPU
+                without sending your text to any server.</span></a></li>
+          <li><a href="use-cases/"><strong>5 · Step-by-step use cases</strong><span>Legacy project, new project, a book,
+                architecture and more.</span></a></li>
+          <li><a href="models/"><strong>6 · Available models</strong><span>Live status of the signed models of the local
+                engine.</span></a></li>
+        </ul>
+        <h2 id="what-alpaquitay-does-in-one-table">What Alpaquitay does, in one table</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>You need to…</th>
+                <th>Use</th>
+                <th>Chapter</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Turn an idea into epics and tasks</td>
+                <td><strong>Work</strong> tab → <em>Create with AI</em>, or the <em>Generate Specification (Local
+                    Model)</em> command</td>
+                <td><a href="work/">Work</a>, <a href="local-engine/">Local engine</a></td>
+              </tr>
+              <tr>
+                <td>Let the AI implement a task without writing blindly</td>
+                <td>Drag the card to <strong>In Progress</strong>, review the diff, <code>si aplicar</code></td>
+                <td><a href="work/">Work</a></td>
+              </tr>
+              <tr>
+                <td>Know the real state of the repository</td>
+                <td><code>onboard</code>, <code>dora</code>, <code>deuda</code> in the chat; the
+                  <strong>Evidence</strong> tab</td>
+                <td><a href="chat-commands/">Chat commands</a>, <a href="evidence/">Evidence</a></td>
+              </tr>
+              <tr>
+                <td>Proofread, translate or review a manuscript</td>
+                <td>The <strong>Docs</strong> tab (Word, Markdown, EPUB, PDF)</td>
+                <td><a href="docs/">Docs</a></td>
+              </tr>
+              <tr>
+                <td>See and document the architecture</td>
+                <td>The <strong>Architecture</strong> tab: inference, ADRs, assessment, IaC export</td>
+                <td><a href="architecture/">Architecture</a></td>
+              </tr>
+              <tr>
+                <td>An expert opinion (security, QA, DevOps, cloud…)</td>
+                <td>Ask in the chat; the harness picks a specialist</td>
+                <td><a href="agents/">Agents</a></td>
+              </tr>
+              <tr>
+                <td>Work without your code leaving your machine</td>
+                <td>Ollama, LM Studio or the local engine</td>
+                <td><a href="providers/">Providers</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 id="how-this-manual-is-organised">How this manual is organised</h2>
+        <ul>
+          <li><strong>Chapters 1 to 3:</strong> installation, providers and how the harness thinks. Read them in order
+            the first time.</li>
+          <li><strong>Chapters 4 to 10:</strong> one tab or feature per chapter. Jump to the one you need.</li>
+          <li><strong>Chapters 11 to 16:</strong> models, recipes, diagrams, reference, troubleshooting and how to
+            contribute.</li>
+        </ul>
+        <p>Search any topic with <kbd>Ctrl</kbd>+<kbd>K</kbd> (or <kbd>/</kbd>). Every page ends with a link to suggest
+          improvements on GitHub: this manual belongs to the community. There is also a <a href="../">Spanish
+            version</a>.</p>
+        <aside class="callout callout-note">
+          <p class="callout-title">Note</p>
+          <p>The manual describes version <strong>3.8.3</strong>. It includes the <strong>Changes</strong> tab for
+            following agent progress and reviewing file diffs, with actions to review and apply or discard pending
+            changes. It also covers the Qwen 2.5 local provider with WebGPU, <em>Generate Specification (Local
+              Model)</em> and the models page.</p>
+        </aside>
+        <h2 id="principles-you-will-see-everywhere">Principles you will see everywhere</h2>
+        <ol>
+          <li><strong>Nothing is written without you seeing it.</strong> In the Hub, every code change first arrives as
+            a bounded <em>diff</em>, and writing needs your <code>si aplicar</code>. (The exception is the classic
+            <em>Generate from Spec</em> command, which writes directly; see <a
+              href="work/#generate-from-spec-and-validate-against-spec">Work</a>.)</li>
+          <li><strong>Evidence before autonomy.</strong> Code tasks move to <em>Done</em> only with no pending diffs, an
+            <code>onboard</code>-verified platform contract and green build/test evidence. Docs-only projects need no
+            contract or build/test evidence, but pending diffs still block <em>Done</em>.</li>
+          <li><strong>Privacy by architecture.</strong> There is no Alpaquitay intermediary server. Local models never
+            leave your machine; cloud calls go straight to your provider after passing a privacy boundary that hides
+            personal data and secrets.</li>
+          <li><strong>Everything is recorded in your repository</strong>, in the <code>.alpaquitay/</code> folder:
+            decisions, debt, session economy, project memory and ADRs.</li>
+        </ol>
 
-<div class="doc-foot">
-  <a class="edit" href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/00-home.md">Suggest an improvement to this page</a>
-  <span>Manual for Alpaquitay AI 3.10.3 · MIT</span>
-</div>
-<nav class="pager" aria-label="Chapters">
-<span></span>
-<a class="next" href="installation/"><span>Next</span>Installation and first steps</a>
-</nav>
-</article>
-<nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ul><li class="l2"><a href="#where-to-start">Where to start</a></li><li class="l2"><a href="#what-alpaquitay-does-in-one-table">What Alpaquitay does, in one table</a></li><li class="l2"><a href="#how-this-manual-is-organised">How this manual is organised</a></li><li class="l2"><a href="#principles-you-will-see-everywhere">Principles you will see everywhere</a></li></ul></nav>
-</main>
-</div>
-<div class="search" id="search" hidden>
-  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
-    <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off" aria-label="Search text">
-    <ol id="searchResults" class="search-results"></ol>
-    <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+        <div class="doc-foot">
+          <a class="edit"
+            href="https://github.com/sergioide007/alpaquitay-ai/edit/main/docs/manual/en/00-home.md">Suggest an
+            improvement to this page</a>
+          <span>Manual for Alpaquitay AI 3.10.4 · MIT</span>
+        </div>
+        <nav class="pager" aria-label="Chapters">
+          <span></span>
+          <a class="next" href="installation/"><span>Next</span>Installation and first steps</a>
+        </nav>
+      </article>
+      <nav class="toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul>
+          <li class="l2"><a href="#where-to-start">Where to start</a></li>
+          <li class="l2"><a href="#what-alpaquitay-does-in-one-table">What Alpaquitay does, in one table</a></li>
+          <li class="l2"><a href="#how-this-manual-is-organised">How this manual is organised</a></li>
+          <li class="l2"><a href="#principles-you-will-see-everywhere">Principles you will see everywhere</a></li>
+        </ul>
+      </nav>
+    </main>
   </div>
-</div>
-<div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
-<script src="../assets/manual.js?v=ae81f6f39c" data-root="./" defer></script>
+  <div class="search" id="search" hidden>
+    <div class="search-box" role="dialog" aria-modal="true" aria-label="Search the manual">
+      <input id="searchInput" type="search" placeholder="Search: spec, diff, privacy, WebGPU…" autocomplete="off"
+        aria-label="Search text">
+      <ol id="searchResults" class="search-results"></ol>
+      <p class="search-hint"><kbd>↑</kbd><kbd>↓</kbd> to move · <kbd>Enter</kbd> to open · <kbd>Esc</kbd> to close</p>
+    </div>
+  </div>
+  <div class="lightbox" id="lightbox" hidden><img alt=""><button class="icon-btn" aria-label="Close">✕</button></div>
+  <script src="../assets/manual.js?v=ae81f6f39c" data-root="./" defer></script>
 </body>
+
 </html>
